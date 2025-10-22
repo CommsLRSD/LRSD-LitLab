@@ -1,0 +1,401 @@
+{
+  "tiers": [
+    {
+      "id": "tier1",
+      "name": "Tier 1 - Universal/Core Instruction",
+      "description": "High-quality instruction for all students",
+      "screeners": [
+        {
+          "id": "dibels",
+          "name": "DIBELS",
+          "description": "Dynamic Indicators of Basic Early Literacy Skills",
+          "testAreas": [
+            {
+              "id": "phonemic-awareness",
+              "name": "Phonemic Awareness",
+              "pillars": [
+                {
+                  "id": "phoneme-segmentation",
+                  "name": "Phoneme Segmentation",
+                  "interventions": [
+                    {
+                      "name": "Sound Boxes (Elkonin Boxes)",
+                      "description": "Students use boxes to represent individual sounds in words, moving tokens into boxes as they segment sounds.",
+                      "duration": "10-15 minutes",
+                      "groupSize": "Small group (3-5 students)",
+                      "frequency": "Daily",
+                      "resources": "Elkonin box templates, tokens or counters"
+                    },
+                    {
+                      "name": "Phoneme Counting Activities",
+                      "description": "Practice identifying and counting the number of phonemes in spoken words using various manipulatives.",
+                      "duration": "10-15 minutes",
+                      "groupSize": "Small group (3-5 students)",
+                      "frequency": "4-5 times per week",
+                      "resources": "Counters, picture cards"
+                    }
+                  ]
+                },
+                {
+                  "id": "phoneme-blending",
+                  "name": "Phoneme Blending",
+                  "interventions": [
+                    {
+                      "name": "Blending Chains",
+                      "description": "Teacher says individual phonemes and students blend them together to form words. Progress from simple to complex words.",
+                      "duration": "10-15 minutes",
+                      "groupSize": "Small group (3-5 students)",
+                      "frequency": "Daily",
+                      "resources": "Word lists, picture cards for support"
+                    },
+                    {
+                      "name": "Robot Talk",
+                      "description": "Students practice blending sounds together by pretending to be robots who speak in separate sounds.",
+                      "duration": "10-15 minutes",
+                      "groupSize": "Small group (3-5 students)",
+                      "frequency": "Daily",
+                      "resources": "Picture cards, word lists"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "phonics",
+              "name": "Phonics",
+              "pillars": [
+                {
+                  "id": "letter-sound",
+                  "name": "Letter-Sound Correspondence",
+                  "interventions": [
+                    {
+                      "name": "Letter-Keyword-Sound Association",
+                      "description": "Systematic instruction connecting letters with key words and their sounds using multisensory approaches.",
+                      "duration": "15-20 minutes",
+                      "groupSize": "Small group (3-5 students)",
+                      "frequency": "Daily",
+                      "resources": "Letter cards, keyword picture cards, sound charts"
+                    },
+                    {
+                      "name": "Sky Writing",
+                      "description": "Students trace large letters in the air while saying the letter name and sound, reinforcing motor memory.",
+                      "duration": "10 minutes",
+                      "groupSize": "Small group or whole class",
+                      "frequency": "Daily",
+                      "resources": "Letter cards for reference"
+                    }
+                  ]
+                },
+                {
+                  "id": "decoding",
+                  "name": "Decoding Skills",
+                  "interventions": [
+                    {
+                      "name": "Word Building with Letter Cards",
+                      "description": "Students manipulate letter cards to build and decode words, focusing on CVC patterns initially.",
+                      "duration": "15-20 minutes",
+                      "groupSize": "Small group (3-5 students)",
+                      "frequency": "Daily",
+                      "resources": "Letter cards or magnetic letters, word lists"
+                    },
+                    {
+                      "name": "Decodable Text Practice",
+                      "description": "Guided reading practice with texts that follow learned phonics patterns.",
+                      "duration": "20-25 minutes",
+                      "groupSize": "Small group (3-5 students)",
+                      "frequency": "Daily",
+                      "resources": "Decodable readers, running record forms"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fastbridge",
+          "name": "FastBridge",
+          "description": "Universal screening and progress monitoring",
+          "testAreas": [
+            {
+              "id": "reading-fluency",
+              "name": "Reading Fluency",
+              "pillars": [
+                {
+                  "id": "oral-reading",
+                  "name": "Oral Reading Fluency",
+                  "interventions": [
+                    {
+                      "name": "Repeated Reading",
+                      "description": "Students read the same passage multiple times to build automaticity and fluency.",
+                      "duration": "15-20 minutes",
+                      "groupSize": "Small group (2-3 students) or paired",
+                      "frequency": "Daily",
+                      "resources": "Leveled passages, timer, fluency charts"
+                    },
+                    {
+                      "name": "Partner Reading",
+                      "description": "Students take turns reading aloud with a partner, providing support and feedback to each other.",
+                      "duration": "20 minutes",
+                      "groupSize": "Pairs",
+                      "frequency": "Daily",
+                      "resources": "Paired reading protocols, appropriate-level texts"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "comprehension",
+              "name": "Reading Comprehension",
+              "pillars": [
+                {
+                  "id": "vocabulary",
+                  "name": "Vocabulary Development",
+                  "interventions": [
+                    {
+                      "name": "Vocabulary Mapping",
+                      "description": "Students create visual maps of words including definitions, synonyms, examples, and illustrations.",
+                      "duration": "20-25 minutes",
+                      "groupSize": "Small group (4-6 students)",
+                      "frequency": "3-4 times per week",
+                      "resources": "Vocabulary maps templates, target word lists"
+                    },
+                    {
+                      "name": "Word Study Activities",
+                      "description": "Explicit instruction in word meanings through context, word parts, and semantic relationships.",
+                      "duration": "15-20 minutes",
+                      "groupSize": "Small group (4-6 students)",
+                      "frequency": "Daily",
+                      "resources": "Word cards, context passages, morphology charts"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tier2",
+      "name": "Tier 2 - Targeted/Supplemental Intervention",
+      "description": "Additional support for students at risk",
+      "screeners": [
+        {
+          "id": "dibels",
+          "name": "DIBELS",
+          "description": "Dynamic Indicators of Basic Early Literacy Skills",
+          "testAreas": [
+            {
+              "id": "phonics",
+              "name": "Phonics",
+              "pillars": [
+                {
+                  "id": "decoding",
+                  "name": "Decoding Skills",
+                  "interventions": [
+                    {
+                      "name": "Intensive Phonics Instruction",
+                      "description": "Systematic and explicit phonics instruction with increased practice opportunities and immediate corrective feedback.",
+                      "duration": "30 minutes",
+                      "groupSize": "Small group (3-4 students)",
+                      "frequency": "Daily",
+                      "resources": "Structured phonics program materials, word lists, decodable texts"
+                    },
+                    {
+                      "name": "Word Study Intervention",
+                      "description": "Focused instruction on word patterns, syllable types, and morphology with extensive practice.",
+                      "duration": "25-30 minutes",
+                      "groupSize": "Small group (3-4 students)",
+                      "frequency": "Daily",
+                      "resources": "Word sort cards, syllable division guides, morphology charts"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "reading-fluency",
+              "name": "Reading Fluency",
+              "pillars": [
+                {
+                  "id": "oral-reading",
+                  "name": "Oral Reading Fluency",
+                  "interventions": [
+                    {
+                      "name": "Guided Repeated Reading with Progress Monitoring",
+                      "description": "Structured repeated reading sessions with graphing of progress and specific fluency goals.",
+                      "duration": "20-25 minutes",
+                      "groupSize": "Small group (2-3 students)",
+                      "frequency": "Daily",
+                      "resources": "Leveled passages, timers, progress monitoring graphs"
+                    },
+                    {
+                      "name": "Phrase-Cued Text Reading",
+                      "description": "Reading practice with texts marked in meaningful phrases to improve phrasing and prosody.",
+                      "duration": "20 minutes",
+                      "groupSize": "Small group (2-3 students)",
+                      "frequency": "Daily",
+                      "resources": "Phrase-cued texts, audio models (optional)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fastbridge",
+          "name": "FastBridge",
+          "description": "Universal screening and progress monitoring",
+          "testAreas": [
+            {
+              "id": "comprehension",
+              "name": "Reading Comprehension",
+              "pillars": [
+                {
+                  "id": "vocabulary",
+                  "name": "Vocabulary Development",
+                  "interventions": [
+                    {
+                      "name": "Intensive Vocabulary Instruction",
+                      "description": "Explicit teaching of tier 2 academic vocabulary with multiple exposures and practice in various contexts.",
+                      "duration": "25-30 minutes",
+                      "groupSize": "Small group (3-5 students)",
+                      "frequency": "Daily",
+                      "resources": "Academic vocabulary lists, word cards, context sentences"
+                    }
+                  ]
+                },
+                {
+                  "id": "reading-strategies",
+                  "name": "Reading Comprehension Strategies",
+                  "interventions": [
+                    {
+                      "name": "Strategic Reading Instruction",
+                      "description": "Explicit instruction in comprehension strategies including predicting, questioning, clarifying, and summarizing.",
+                      "duration": "30 minutes",
+                      "groupSize": "Small group (4-6 students)",
+                      "frequency": "Daily",
+                      "resources": "Strategy posters, graphic organizers, leveled texts"
+                    },
+                    {
+                      "name": "Guided Reading with Comprehension Focus",
+                      "description": "Small group guided reading with explicit attention to comprehension strategies and discussion.",
+                      "duration": "25-30 minutes",
+                      "groupSize": "Small group (4-6 students)",
+                      "frequency": "Daily",
+                      "resources": "Leveled books, comprehension question stems, discussion guides"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tier3",
+      "name": "Tier 3 - Intensive/Individual Intervention",
+      "description": "Intensive, individualized support for students with significant needs",
+      "screeners": [
+        {
+          "id": "dibels",
+          "name": "DIBELS",
+          "description": "Dynamic Indicators of Basic Early Literacy Skills",
+          "testAreas": [
+            {
+              "id": "phonemic-awareness",
+              "name": "Phonemic Awareness",
+              "pillars": [
+                {
+                  "id": "phoneme-segmentation",
+                  "name": "Phoneme Segmentation",
+                  "interventions": [
+                    {
+                      "name": "Intensive Phonemic Awareness Training",
+                      "description": "One-on-one or very small group intensive practice with phoneme manipulation tasks using multisensory techniques.",
+                      "duration": "20-30 minutes",
+                      "groupSize": "1-2 students",
+                      "frequency": "Daily (5 days per week)",
+                      "resources": "Elkonin boxes, sound cards, manipulatives, specialized PA program"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "phonics",
+              "name": "Phonics",
+              "pillars": [
+                {
+                  "id": "decoding",
+                  "name": "Decoding Skills",
+                  "interventions": [
+                    {
+                      "name": "Structured Literacy Approach",
+                      "description": "Intensive, systematic, explicit instruction following a structured literacy approach (e.g., Orton-Gillingham based).",
+                      "duration": "45-60 minutes",
+                      "groupSize": "1-2 students",
+                      "frequency": "Daily (5 days per week)",
+                      "resources": "Structured literacy program materials, multisensory materials, progress monitoring tools"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fastbridge",
+          "name": "FastBridge",
+          "description": "Universal screening and progress monitoring",
+          "testAreas": [
+            {
+              "id": "reading-fluency",
+              "name": "Reading Fluency",
+              "pillars": [
+                {
+                  "id": "oral-reading",
+                  "name": "Oral Reading Fluency",
+                  "interventions": [
+                    {
+                      "name": "Intensive Fluency Building Program",
+                      "description": "One-on-one intensive repeated reading with immediate corrective feedback and frequent progress monitoring.",
+                      "duration": "30-40 minutes",
+                      "groupSize": "1 student",
+                      "frequency": "Daily (5 days per week)",
+                      "resources": "Controlled text passages, recording tools, detailed progress charts"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "comprehension",
+              "name": "Reading Comprehension",
+              "pillars": [
+                {
+                  "id": "reading-strategies",
+                  "name": "Reading Comprehension Strategies",
+                  "interventions": [
+                    {
+                      "name": "Individualized Comprehension Intervention",
+                      "description": "One-on-one explicit strategy instruction with scaffolded practice and gradual release tailored to student needs.",
+                      "duration": "40-45 minutes",
+                      "groupSize": "1 student",
+                      "frequency": "Daily (5 days per week)",
+                      "resources": "Individualized reading materials, strategy cards, graphic organizers, assessment tools"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
