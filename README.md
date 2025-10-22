@@ -28,7 +28,7 @@ A web application designed to help educators guide literacy interventions based 
 ## Technology Stack
 
 - **HTML5**: Semantic markup and structure
-- **CSS3**: Modern styling with gradient headers, card layouts, and responsive design
+- **CSS3**: Modern minimalist styling with solid colors, smooth animations, and responsive design
 - **Vanilla JavaScript**: No frameworks - pure JavaScript for all functionality
 - **JSON**: Data-driven approach with structured intervention data
 
