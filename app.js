@@ -1,8 +1,8 @@
 // Application State
 const appState = {
     interventionsData: null,
+    currentTier: null,
     currentFilters: {
-        tier: '',
         screener: '',
         testArea: '',
         pillar: ''
@@ -13,8 +13,8 @@ const appState = {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadInterventionsData();
     initializeNavigation();
-    initializeFilters();
-    populateTierFilter();
+    initializeTierSelection();
+    initializeStepExpansion();
 });
 
 // Load interventions data from JSON
@@ -88,111 +88,149 @@ function hideAllSections() {
     });
 }
 
-// Initialize filter dropdowns
-function initializeFilters() {
-    const tierFilter = document.getElementById('tier-filter');
-    const screenerFilter = document.getElementById('screener-filter');
-    const testAreaFilter = document.getElementById('testarea-filter');
-    const pillarFilter = document.getElementById('pillar-filter');
-    const resetButton = document.getElementById('reset-filters');
+// Initialize tier selection
+function initializeTierSelection() {
+    const tierButtons = document.querySelectorAll('.btn-tier');
+    const backButton = document.getElementById('back-to-tiers');
     
-    tierFilter.addEventListener('change', () => {
-        appState.currentFilters.tier = tierFilter.value;
-        populateScreenerFilter();
-        resetSubsequentFilters('screener');
-        updateResults();
-    });
-    
-    screenerFilter.addEventListener('change', () => {
-        appState.currentFilters.screener = screenerFilter.value;
-        populateTestAreaFilter();
-        resetSubsequentFilters('testArea');
-        updateResults();
-    });
-    
-    testAreaFilter.addEventListener('change', () => {
-        appState.currentFilters.testArea = testAreaFilter.value;
-        populatePillarFilter();
-        resetSubsequentFilters('pillar');
-        updateResults();
-    });
-    
-    pillarFilter.addEventListener('change', () => {
-        appState.currentFilters.pillar = pillarFilter.value;
-        updateResults();
-    });
-    
-    resetButton.addEventListener('click', resetFilters);
-}
-
-// Populate Tier filter
-function populateTierFilter() {
-    const tierFilter = document.getElementById('tier-filter');
-    if (!appState.interventionsData) return;
-    
-    const tiers = appState.interventionsData.tiers;
-    tierFilter.innerHTML = '<option value="">Select Tier</option>';
-    
-    tiers.forEach(tier => {
-        const option = document.createElement('option');
-        option.value = tier.id;
-        option.textContent = tier.name;
-        tierFilter.appendChild(option);
-    });
-}
-
-// Populate Screener filter
-function populateScreenerFilter() {
-    const screenerFilter = document.getElementById('screener-filter');
-    screenerFilter.innerHTML = '<option value="">Select Screener</option>';
-    screenerFilter.disabled = true;
-    
-    if (!appState.currentFilters.tier) return;
-    
-    const tier = appState.interventionsData.tiers.find(t => t.id === appState.currentFilters.tier);
-    if (tier && tier.screeners) {
-        tier.screeners.forEach(screener => {
-            const option = document.createElement('option');
-            option.value = screener.id;
-            option.textContent = screener.name;
-            screenerFilter.appendChild(option);
+    tierButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tierId = button.getAttribute('data-tier');
+            showTierProcess(tierId);
         });
-        screenerFilter.disabled = false;
-    }
+    });
+    
+    backButton.addEventListener('click', () => {
+        showTierDashboard();
+    });
 }
 
-// Populate Test Area filter
-function populateTestAreaFilter() {
-    const testAreaFilter = document.getElementById('testarea-filter');
-    testAreaFilter.innerHTML = '<option value="">Select Test Area</option>';
-    testAreaFilter.disabled = true;
+// Show tier process view
+function showTierProcess(tierId) {
+    const tier = appState.interventionsData.tiers.find(t => t.id === tierId);
+    if (!tier) return;
     
-    if (!appState.currentFilters.tier || !appState.currentFilters.screener) return;
+    appState.currentTier = tier;
+    appState.currentFilters = { screener: '', testArea: '', pillar: '' };
     
-    const tier = appState.interventionsData.tiers.find(t => t.id === appState.currentFilters.tier);
-    const screener = tier.screeners.find(s => s.id === appState.currentFilters.screener);
+    // Update header
+    document.getElementById('process-tier-title').textContent = tier.name;
+    document.getElementById('process-tier-description').textContent = tier.description;
     
+    // Hide dashboard, show process
+    document.querySelector('.tier-dashboard').style.display = 'none';
+    document.getElementById('intervention-process').style.display = 'block';
+    
+    // Reset and populate step selections
+    document.getElementById('step-testarea').innerHTML = '<option value="">Select Test Area</option>';
+    document.getElementById('step-pillar').innerHTML = '<option value="">Select Skill Area</option>';
+    document.getElementById('step-interventions-list').innerHTML = '<p class="info-message">Select options in steps above to view available interventions.</p>';
+    
+    // Populate step 2 screener options
+    populateStepScreeners();
+}
+
+// Show tier dashboard
+function showTierDashboard() {
+    document.querySelector('.tier-dashboard').style.display = 'grid';
+    document.getElementById('intervention-process').style.display = 'none';
+    appState.currentTier = null;
+    appState.currentFilters = { screener: '', testArea: '', pillar: '' };
+}
+
+// Initialize step expansion
+function initializeStepExpansion() {
+    const expandButtons = document.querySelectorAll('.btn-expand');
+    
+    expandButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const stepNum = button.getAttribute('data-step');
+            const stepItem = button.closest('.step-item');
+            const stepDetails = stepItem.querySelector('.step-details');
+            const allButtons = stepItem.querySelectorAll('.btn-expand');
+            
+            if (stepDetails.style.display === 'none' || !stepDetails.style.display) {
+                stepDetails.style.display = 'block';
+                allButtons.forEach(btn => {
+                    if (btn.textContent === 'Show Details') {
+                        btn.style.display = 'none';
+                    }
+                });
+            } else {
+                stepDetails.style.display = 'none';
+                allButtons.forEach(btn => {
+                    if (btn.textContent === 'Show Details') {
+                        btn.style.display = 'inline-block';
+                    }
+                });
+            }
+        });
+    });
+    
+    // Add event listeners for step selections
+    const screenerSelect = document.getElementById('step-screener');
+    const testareaSelect = document.getElementById('step-testarea');
+    const pillarSelect = document.getElementById('step-pillar');
+    
+    screenerSelect.addEventListener('change', () => {
+        appState.currentFilters.screener = screenerSelect.value;
+        populateStepTestAreas();
+        resetPillarAndInterventions();
+    });
+    
+    testareaSelect.addEventListener('change', () => {
+        appState.currentFilters.testArea = testareaSelect.value;
+        populateStepPillars();
+        resetInterventions();
+    });
+    
+    pillarSelect.addEventListener('change', () => {
+        appState.currentFilters.pillar = pillarSelect.value;
+        displayStepInterventions();
+    });
+}
+
+// Populate screeners in step 2
+function populateStepScreeners() {
+    const screenerSelect = document.getElementById('step-screener');
+    screenerSelect.innerHTML = '<option value="">Select Screener</option>';
+    
+    if (!appState.currentTier) return;
+    
+    appState.currentTier.screeners.forEach(screener => {
+        const option = document.createElement('option');
+        option.value = screener.id;
+        option.textContent = screener.name;
+        screenerSelect.appendChild(option);
+    });
+}
+
+// Populate test areas in step 2
+function populateStepTestAreas() {
+    const testareaSelect = document.getElementById('step-testarea');
+    testareaSelect.innerHTML = '<option value="">Select Test Area</option>';
+    
+    if (!appState.currentFilters.screener) return;
+    
+    const screener = appState.currentTier.screeners.find(s => s.id === appState.currentFilters.screener);
     if (screener && screener.testAreas) {
         screener.testAreas.forEach(testArea => {
             const option = document.createElement('option');
             option.value = testArea.id;
             option.textContent = testArea.name;
-            testAreaFilter.appendChild(option);
+            testareaSelect.appendChild(option);
         });
-        testAreaFilter.disabled = false;
     }
 }
 
-// Populate Pillar filter
-function populatePillarFilter() {
-    const pillarFilter = document.getElementById('pillar-filter');
-    pillarFilter.innerHTML = '<option value="">Select Pillar</option>';
-    pillarFilter.disabled = true;
+// Populate pillars in step 3
+function populateStepPillars() {
+    const pillarSelect = document.getElementById('step-pillar');
+    pillarSelect.innerHTML = '<option value="">Select Skill Area</option>';
     
-    if (!appState.currentFilters.tier || !appState.currentFilters.screener || !appState.currentFilters.testArea) return;
+    if (!appState.currentFilters.screener || !appState.currentFilters.testArea) return;
     
-    const tier = appState.interventionsData.tiers.find(t => t.id === appState.currentFilters.tier);
-    const screener = tier.screeners.find(s => s.id === appState.currentFilters.screener);
+    const screener = appState.currentTier.screeners.find(s => s.id === appState.currentFilters.screener);
     const testArea = screener.testAreas.find(ta => ta.id === appState.currentFilters.testArea);
     
     if (testArea && testArea.pillars) {
@@ -200,81 +238,34 @@ function populatePillarFilter() {
             const option = document.createElement('option');
             option.value = pillar.id;
             option.textContent = pillar.name;
-            pillarFilter.appendChild(option);
+            pillarSelect.appendChild(option);
         });
-        pillarFilter.disabled = false;
     }
 }
 
-// Reset subsequent filters
-function resetSubsequentFilters(fromFilter) {
-    const filterHierarchy = ['tier', 'screener', 'testArea', 'pillar'];
-    const startIndex = filterHierarchy.indexOf(fromFilter);
+// Display interventions in step 4
+function displayStepInterventions() {
+    const interventionsList = document.getElementById('step-interventions-list');
     
-    for (let i = startIndex; i < filterHierarchy.length; i++) {
-        const filterName = filterHierarchy[i];
-        appState.currentFilters[filterName] = '';
-        
-        const filterElement = document.getElementById(`${filterName === 'testArea' ? 'testarea' : filterName}-filter`);
-        if (filterElement) {
-            filterElement.innerHTML = `<option value="">Select ${filterName.charAt(0).toUpperCase() + filterName.slice(1)}</option>`;
-            if (i > startIndex) {
-                filterElement.disabled = true;
-            }
-        }
-    }
-}
-
-// Reset all filters
-function resetFilters() {
-    appState.currentFilters = {
-        tier: '',
-        screener: '',
-        testArea: '',
-        pillar: ''
-    };
-    
-    document.getElementById('tier-filter').value = '';
-    document.getElementById('screener-filter').value = '';
-    document.getElementById('screener-filter').disabled = true;
-    document.getElementById('testarea-filter').value = '';
-    document.getElementById('testarea-filter').disabled = true;
-    document.getElementById('pillar-filter').value = '';
-    document.getElementById('pillar-filter').disabled = true;
-    
-    populateScreenerFilter();
-    populateTestAreaFilter();
-    populatePillarFilter();
-    updateResults();
-}
-
-// Update results based on filters
-function updateResults() {
-    const resultsContainer = document.getElementById('interventions-results');
-    
-    // If no pillar is selected, show info message
     if (!appState.currentFilters.pillar) {
-        resultsContainer.innerHTML = '<p class="info-message">Please select all filters to view available interventions.</p>';
+        interventionsList.innerHTML = '<p class="info-message">Select options in steps above to view available interventions.</p>';
         return;
     }
     
-    // Get interventions for selected pillar
-    const tier = appState.interventionsData.tiers.find(t => t.id === appState.currentFilters.tier);
-    const screener = tier.screeners.find(s => s.id === appState.currentFilters.screener);
+    const screener = appState.currentTier.screeners.find(s => s.id === appState.currentFilters.screener);
     const testArea = screener.testAreas.find(ta => ta.id === appState.currentFilters.testArea);
     const pillar = testArea.pillars.find(p => p.id === appState.currentFilters.pillar);
     
     if (!pillar || !pillar.interventions || pillar.interventions.length === 0) {
-        resultsContainer.innerHTML = '<p class="info-message">No interventions found for the selected criteria.</p>';
+        interventionsList.innerHTML = '<p class="info-message">No interventions found for the selected criteria.</p>';
         return;
     }
     
-    // Display interventions
     let html = '<div class="interventions-list">';
     pillar.interventions.forEach(intervention => {
         html += `
             <div class="intervention-card">
-                <h3>${intervention.name}</h3>
+                <h4>${intervention.name}</h4>
                 <p>${intervention.description}</p>
                 <div class="intervention-meta">
                     <span><strong>Duration:</strong> ${intervention.duration}</span>
@@ -287,11 +278,34 @@ function updateResults() {
     });
     html += '</div>';
     
-    resultsContainer.innerHTML = html;
+    interventionsList.innerHTML = html;
+}
+
+// Reset step selections
+function resetStepSelections() {
+    document.getElementById('step-screener').innerHTML = '<option value="">Select Screener</option>';
+    document.getElementById('step-testarea').innerHTML = '<option value="">Select Test Area</option>';
+    document.getElementById('step-pillar').innerHTML = '<option value="">Select Skill Area</option>';
+    document.getElementById('step-interventions-list').innerHTML = '<p class="info-message">Select options in steps above to view available interventions.</p>';
+}
+
+// Reset pillar and interventions
+function resetPillarAndInterventions() {
+    document.getElementById('step-pillar').innerHTML = '<option value="">Select Skill Area</option>';
+    appState.currentFilters.pillar = '';
+    resetInterventions();
+}
+
+// Reset interventions
+function resetInterventions() {
+    document.getElementById('step-interventions-list').innerHTML = '<p class="info-message">Select options in steps above to view available interventions.</p>';
 }
 
 // Show error message
 function showError(message) {
-    const resultsContainer = document.getElementById('interventions-results');
-    resultsContainer.innerHTML = `<div class="error-message">${message}</div>`;
+    const mainContent = document.getElementById('main-content');
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    mainContent.prepend(errorDiv);
 }
