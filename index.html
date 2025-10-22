@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Litera - Literacy Intervention Assistant</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Litera</h1>
+            <p class="tagline">Literacy Intervention Assistant for Educators</p>
+        </div>
+    </header>
+
+    <nav id="main-nav">
+        <div class="container">
+            <ul>
+                <li><a href="#" data-page="interventions" class="active">Interventions</a></li>
+                <li><a href="#" data-page="assessment-schedules">Assessment Schedules</a></li>
+                <li><a href="#" data-page="understanding-scores">Understanding Scores</a></li>
+                <li><a href="#" data-page="faqs">FAQs</a></li>
+                <li><a href="#" data-page="resources">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main id="main-content" class="container">
+        <!-- Interventions Section (default view) -->
+        <section id="interventions-section">
+            <h2>Find Interventions</h2>
+            <p class="description">Use the filters below to find appropriate literacy interventions based on student assessment data.</p>
+            
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="tier-filter">Tier:</label>
+                    <select id="tier-filter" class="filter-select">
+                        <option value="">Select Tier</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="screener-filter">Screener:</label>
+                    <select id="screener-filter" class="filter-select" disabled>
+                        <option value="">Select Screener</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="testarea-filter">Test Area:</label>
+                    <select id="testarea-filter" class="filter-select" disabled>
+                        <option value="">Select Test Area</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="pillar-filter">Pillar:</label>
+                    <select id="pillar-filter" class="filter-select" disabled>
+                        <option value="">Select Pillar</option>
+                    </select>
+                </div>
+
+                <button id="reset-filters" class="btn-secondary">Reset Filters</button>
+            </div>
+
+            <div id="interventions-results">
+                <p class="info-message">Please select filters above to view available interventions.</p>
+            </div>
+        </section>
+
+        <!-- Dynamic content will be loaded here -->
+        <section id="dynamic-content" style="display: none;"></section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Litera - Literacy Intervention Assistant. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
