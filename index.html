@@ -35,43 +35,165 @@
     <main id="main-content" class="container">
         <!-- Interventions Section (default view) -->
         <section id="interventions-section">
-            <h2>Find Interventions</h2>
-            <p class="description">Use the filters below to find appropriate literacy interventions based on student assessment data.</p>
+            <h2>Intervention System</h2>
+            <p class="description">Select a tier below to view the intervention process and available strategies.</p>
             
-            <div class="filters-container">
-                <div class="filter-group">
-                    <label for="tier-filter">Tier:</label>
-                    <select id="tier-filter" class="filter-select">
-                        <option value="">Select Tier</option>
-                    </select>
+            <!-- Tier Selection Dashboard -->
+            <div class="tier-dashboard">
+                <div class="tier-card" data-tier="tier1">
+                    <div class="tier-header tier1-header">
+                        <h3>Tier 1</h3>
+                        <p class="tier-subtitle">Universal/Core Instruction</p>
+                    </div>
+                    <div class="tier-body">
+                        <p class="tier-description">High-quality instruction for all students in the general education classroom.</p>
+                        <ul class="tier-stats">
+                            <li><strong>80%</strong> of students</li>
+                            <li><strong>Whole class</strong></li>
+                            <li><strong>Core curriculum</strong></li>
+                        </ul>
+                        <button class="btn-tier" data-tier="tier1">View Tier 1 Process</button>
+                    </div>
                 </div>
 
-                <div class="filter-group">
-                    <label for="screener-filter">Screener:</label>
-                    <select id="screener-filter" class="filter-select" disabled>
-                        <option value="">Select Screener</option>
-                    </select>
+                <div class="tier-card" data-tier="tier2">
+                    <div class="tier-header tier2-header">
+                        <h3>Tier 2</h3>
+                        <p class="tier-subtitle">Targeted/Supplemental</p>
+                    </div>
+                    <div class="tier-body">
+                        <p class="tier-description">Additional support for students who need extra help beyond core instruction.</p>
+                        <ul class="tier-stats">
+                            <li><strong>15%</strong> of students</li>
+                            <li><strong>Small groups</strong> (3-6)</li>
+                            <li><strong>20-30 min</strong> daily</li>
+                        </ul>
+                        <button class="btn-tier" data-tier="tier2">View Tier 2 Process</button>
+                    </div>
                 </div>
 
-                <div class="filter-group">
-                    <label for="testarea-filter">Test Area:</label>
-                    <select id="testarea-filter" class="filter-select" disabled>
-                        <option value="">Select Test Area</option>
-                    </select>
+                <div class="tier-card" data-tier="tier3">
+                    <div class="tier-header tier3-header">
+                        <h3>Tier 3</h3>
+                        <p class="tier-subtitle">Intensive/Individual</p>
+                    </div>
+                    <div class="tier-body">
+                        <p class="tier-description">Intensive, individualized interventions for students with significant needs.</p>
+                        <ul class="tier-stats">
+                            <li><strong>5%</strong> of students</li>
+                            <li><strong>1-on-1</strong> or pairs</li>
+                            <li><strong>45-60 min</strong> daily</li>
+                        </ul>
+                        <button class="btn-tier" data-tier="tier3">View Tier 3 Process</button>
+                    </div>
                 </div>
-
-                <div class="filter-group">
-                    <label for="pillar-filter">Pillar:</label>
-                    <select id="pillar-filter" class="filter-select" disabled>
-                        <option value="">Select Pillar</option>
-                    </select>
-                </div>
-
-                <button id="reset-filters" class="btn-secondary">Reset Filters</button>
             </div>
 
-            <div id="interventions-results">
-                <p class="info-message">Please select filters above to view available interventions.</p>
+            <!-- Intervention Process View (Hidden by default) -->
+            <div id="intervention-process" style="display: none;">
+                <button id="back-to-tiers" class="btn-back">← Back to Tier Selection</button>
+                
+                <div id="process-header">
+                    <h3 id="process-tier-title"></h3>
+                    <p id="process-tier-description"></p>
+                </div>
+
+                <div class="steps-container">
+                    <div class="step-item" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4 class="step-title">Identify Students</h4>
+                            <p class="step-description">Review assessment data to identify students who need support.</p>
+                            <div class="step-details" style="display: none;">
+                                <ul>
+                                    <li>Review universal screening data (DIBELS, FastBridge)</li>
+                                    <li>Analyze benchmark scores and identify at-risk students</li>
+                                    <li>Consider multiple data points (classroom assessments, observations)</li>
+                                    <li>Document student performance levels</li>
+                                </ul>
+                                <button class="btn-expand" data-step="1">Show Less</button>
+                            </div>
+                            <button class="btn-expand" data-step="1">Show Details</button>
+                        </div>
+                    </div>
+
+                    <div class="step-item" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4 class="step-title">Select Assessment Tool</h4>
+                            <p class="step-description">Choose the appropriate screener and test area for intervention focus.</p>
+                            <div class="step-details" style="display: none;">
+                                <div class="screener-options">
+                                    <label><strong>Screener:</strong></label>
+                                    <select id="step-screener" class="step-select">
+                                        <option value="">Select Screener</option>
+                                    </select>
+                                </div>
+                                <div class="testarea-options">
+                                    <label><strong>Test Area:</strong></label>
+                                    <select id="step-testarea" class="step-select">
+                                        <option value="">Select Test Area</option>
+                                    </select>
+                                </div>
+                                <button class="btn-expand" data-step="2">Show Less</button>
+                            </div>
+                            <button class="btn-expand" data-step="2">Show Details</button>
+                        </div>
+                    </div>
+
+                    <div class="step-item" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4 class="step-title">Choose Focus Area</h4>
+                            <p class="step-description">Select the specific skill area (pillar) that needs attention.</p>
+                            <div class="step-details" style="display: none;">
+                                <div class="pillar-options">
+                                    <label><strong>Skill Area:</strong></label>
+                                    <select id="step-pillar" class="step-select">
+                                        <option value="">Select Skill Area</option>
+                                    </select>
+                                </div>
+                                <button class="btn-expand" data-step="3">Show Less</button>
+                            </div>
+                            <button class="btn-expand" data-step="3">Show Details</button>
+                        </div>
+                    </div>
+
+                    <div class="step-item" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4 class="step-title">Implement Intervention</h4>
+                            <p class="step-description">Select and implement evidence-based intervention strategies.</p>
+                            <div class="step-details" style="display: none;">
+                                <div id="step-interventions-list">
+                                    <p class="info-message">Select options in steps above to view available interventions.</p>
+                                </div>
+                                <button class="btn-expand" data-step="4">Show Less</button>
+                            </div>
+                            <button class="btn-expand" data-step="4">Show Details</button>
+                        </div>
+                    </div>
+
+                    <div class="step-item" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4 class="step-title">Monitor Progress</h4>
+                            <p class="step-description">Track student progress and adjust interventions as needed.</p>
+                            <div class="step-details" style="display: none;">
+                                <ul>
+                                    <li>Conduct progress monitoring based on tier frequency</li>
+                                    <li>Graph and analyze student data regularly</li>
+                                    <li>Compare progress to expected growth rate</li>
+                                    <li>Meet with team to review data and make decisions</li>
+                                    <li>Adjust intervention intensity or approach if needed</li>
+                                    <li>Communicate progress with families</li>
+                                </ul>
+                                <button class="btn-expand" data-step="5">Show Less</button>
+                            </div>
+                            <button class="btn-expand" data-step="5">Show Details</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
