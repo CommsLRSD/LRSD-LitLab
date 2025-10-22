@@ -22,7 +22,7 @@ body {
 
 /* Header Styles */
 header {
-    background: linear-gradient(135deg, #BE5247 0%, #2BA680 100%);
+    background: #BE5247;
     color: white;
     padding: 2rem 0;
     text-align: center;
@@ -67,13 +67,15 @@ header .tagline {
     text-decoration: none;
     color: #212529;
     font-weight: 500;
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
     border-bottom: 3px solid transparent;
+    position: relative;
 }
 
 #main-nav a:hover {
     background-color: #f8f9fa;
     color: #BE5247;
+    transform: translateY(-2px);
 }
 
 #main-nav a.active {
@@ -93,6 +95,18 @@ section {
     border-radius: 8px;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     margin-bottom: 2rem;
+    animation: fadeIn 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 h2 {
@@ -131,13 +145,14 @@ p.description {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid transparent;
 }
 
 .tier-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -5px rgba(0, 0, 0, 0.08);
+    border: 2px solid rgba(0, 0, 0, 0.05);
 }
 
 .tier-header {
@@ -147,15 +162,15 @@ p.description {
 }
 
 .tier1-header {
-    background: linear-gradient(135deg, #2BA680 0%, #1e8566 100%);
+    background: #2BA680;
 }
 
 .tier2-header {
-    background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+    background: #f39c12;
 }
 
 .tier3-header {
-    background: linear-gradient(135deg, #BE5247 0%, #a94439 100%);
+    background: #BE5247;
 }
 
 .tier-header h3 {
@@ -208,7 +223,7 @@ p.description {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
     font-family: 'Poppins', sans-serif;
     margin-top: 1rem;
 }
@@ -216,7 +231,12 @@ p.description {
 .btn-tier:hover {
     background-color: #a94439;
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 12px -2px rgba(190, 82, 71, 0.3);
+}
+
+.btn-tier:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(190, 82, 71, 0.2);
 }
 
 /* Intervention Process View */
@@ -233,7 +253,7 @@ p.description {
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
     font-family: 'Poppins', sans-serif;
     margin-bottom: 1.5rem;
 }
@@ -241,10 +261,16 @@ p.description {
 .btn-back:hover {
     background-color: #5a6268;
     transform: translateX(-4px);
+    box-shadow: 0 4px 8px -2px rgba(108, 117, 125, 0.3);
+}
+
+.btn-back:active {
+    transform: translateX(-2px);
+    box-shadow: 0 2px 4px -1px rgba(108, 117, 125, 0.2);
 }
 
 #process-header {
-    background: linear-gradient(135deg, #BE5247 0%, #2BA680 100%);
+    background: #2BA680;
     color: white;
     padding: 2rem;
     border-radius: 8px;
@@ -278,18 +304,21 @@ p.description {
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
 }
 
 .step-item:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.12);
+    border: 2px solid rgba(190, 82, 71, 0.1);
+    transform: translateX(4px);
 }
 
 .step-number {
     flex-shrink: 0;
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #BE5247 0%, #2BA680 100%);
+    background: #BE5247;
     color: white;
     border-radius: 50%;
     display: flex;
@@ -298,6 +327,12 @@ p.description {
     font-size: 1.5rem;
     font-weight: 700;
     font-family: 'Ubuntu', sans-serif;
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.step-item:hover .step-number {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px -2px rgba(190, 82, 71, 0.4);
 }
 
 .step-content {
@@ -322,6 +357,22 @@ p.description {
     background-color: #f8f9fa;
     border-radius: 6px;
     border-left: 4px solid #BE5247;
+    animation: slideDown 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
 }
 
 .step-details ul {
@@ -352,23 +403,24 @@ p.description {
 .step-select {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #dee2e6;
+    border: 2px solid #dee2e6;
     border-radius: 4px;
     font-size: 1rem;
     background-color: white;
     cursor: pointer;
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
     font-family: 'Poppins', sans-serif;
 }
 
 .step-select:hover {
     border-color: #BE5247;
+    box-shadow: 0 2px 4px rgba(190, 82, 71, 0.1);
 }
 
 .step-select:focus {
     outline: none;
     border-color: #BE5247;
-    box-shadow: 0 0 0 3px rgba(190, 82, 71, 0.1);
+    box-shadow: 0 0 0 4px rgba(190, 82, 71, 0.15);
 }
 
 .btn-expand {
@@ -380,13 +432,20 @@ p.description {
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
     font-family: 'Poppins', sans-serif;
     margin-top: 0.5rem;
 }
 
 .btn-expand:hover {
     background-color: #a94439;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px -2px rgba(190, 82, 71, 0.3);
+}
+
+.btn-expand:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 4px -1px rgba(190, 82, 71, 0.2);
 }
 
 #step-interventions-list {
@@ -406,13 +465,14 @@ p.description {
     background-color: #ffffff;
     padding: 1rem;
     border-radius: 6px;
-    border: 1px solid #dee2e6;
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid #dee2e6;
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .intervention-card:hover {
     border-color: #BE5247;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px -2px rgba(190, 82, 71, 0.15);
+    transform: translateY(-2px);
 }
 
 .intervention-card h4 {
@@ -448,9 +508,14 @@ button, .btn {
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 500;
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+button:focus, .btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(190, 82, 71, 0.15);
 }
 
 #reset-filters, .btn-secondary {
@@ -461,7 +526,12 @@ button, .btn {
 #reset-filters:hover, .btn-secondary:hover {
     background-color: #5a6268;
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 12px -2px rgba(108, 117, 125, 0.3);
+}
+
+#reset-filters:active, .btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(108, 117, 125, 0.2);
 }
 
 .btn-primary {
@@ -472,7 +542,12 @@ button, .btn {
 .btn-primary:hover {
     background-color: #a94439;
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 12px -2px rgba(190, 82, 71, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(190, 82, 71, 0.2);
 }
 
 /* Results Area */
@@ -490,12 +565,13 @@ button, .btn {
     padding: 1.5rem;
     border-radius: 8px;
     border-left: 4px solid #BE5247;
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .intervention-card:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transform: translateX(5px);
+    box-shadow: 0 6px 12px -2px rgba(190, 82, 71, 0.15);
+    transform: translateX(8px);
+    border-left-width: 6px;
 }
 
 .intervention-card h3 {
