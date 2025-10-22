@@ -13,8 +13,9 @@ A web application designed to help educators guide literacy interventions based 
   - Interventions (Detailed strategies with duration, group size, frequency, and resources)
 
 ### Single Page Application
-- Dynamic content loading without page refreshes
-- Smooth navigation between sections
+- All content contained in a single HTML file with multiple sections
+- Instant navigation between sections without page reloads
+- Dynamic content visibility managed through JavaScript
 - Responsive and modern design
 
 ### Educational Content
@@ -35,18 +36,11 @@ A web application designed to help educators guide literacy interventions based 
 
 ```
 Litera/
-├── index.html              # Main entry point
-├── css/
-│   └── style.css          # Application styling
-├── js/
-│   └── app.js             # Application logic and filtering
+├── index.html              # Main entry point with all page sections
+├── app.js                  # Application logic and filtering
+├── styles.css              # Application styling
 ├── data/
 │   └── interventions.json # Intervention data structure
-├── pages/
-│   ├── assessment-schedules.html
-│   ├── understanding-scores.html
-│   ├── faqs.html
-│   └── resources.html
 └── README.md
 ```
 

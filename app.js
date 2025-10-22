@@ -49,7 +49,7 @@ function initializeNavigation() {
             if (page === 'interventions') {
                 showInterventionsSection();
             } else {
-                loadPage(page);
+                showSection(page);
             }
         });
     });
@@ -57,34 +57,35 @@ function initializeNavigation() {
 
 // Show interventions section
 function showInterventionsSection() {
+    hideAllSections();
     document.getElementById('interventions-section').style.display = 'block';
-    document.getElementById('dynamic-content').style.display = 'none';
 }
 
-// Load page content
-async function loadPage(pageName) {
-    const dynamicContent = document.getElementById('dynamic-content');
-    const interventionsSection = document.getElementById('interventions-section');
-    
-    interventionsSection.style.display = 'none';
-    dynamicContent.style.display = 'block';
-    
-    try {
-        const response = await fetch(`pages/${pageName}.html`);
-        if (!response.ok) {
-            throw new Error(`Failed to load page: ${pageName}`);
-        }
-        const content = await response.text();
-        dynamicContent.innerHTML = content;
-    } catch (error) {
-        console.error('Error loading page:', error);
-        dynamicContent.innerHTML = `
-            <div class="error-message">
-                <h3>Error Loading Page</h3>
-                <p>Sorry, we couldn't load the requested page. Please try again.</p>
-            </div>
-        `;
+// Show specific section
+function showSection(sectionName) {
+    hideAllSections();
+    const sectionId = sectionName + '-section';
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.style.display = 'block';
     }
+}
+
+// Hide all content sections
+function hideAllSections() {
+    const sections = [
+        'interventions-section',
+        'assessment-schedules-section',
+        'understanding-scores-section',
+        'faqs-section',
+        'resources-section'
+    ];
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = 'none';
+        }
+    });
 }
 
 // Initialize filter dropdowns
