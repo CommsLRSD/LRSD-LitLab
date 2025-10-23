@@ -15,7 +15,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeNavigation();
     initializeTierSelection();
     initializeStepExpansion();
+    initializeMobileMenu();
+    animatePageLoad();
 });
+
+// Animate page load with Motion One
+function animatePageLoad() {
+    if (typeof Motion !== 'undefined') {
+        // Animate sidebar navigation items
+        Motion.animate(
+            '#sidebar-nav li',
+            { x: [-50, 0], opacity: [0, 1] },
+            { delay: Motion.stagger(0.1), duration: 0.5, easing: 'ease-out' }
+        );
+
+        // Animate tier cards on initial load
+        Motion.animate(
+            '.tier-card',
+            { y: [50, 0], opacity: [0, 1], scale: [0.9, 1] },
+            { delay: Motion.stagger(0.15), duration: 0.6, easing: [0.4, 0, 0.2, 1] }
+        );
+    }
+}
+
+// Initialize mobile menu
+function initializeMobileMenu() {
+    const mobileToggle = document.getElementById('mobile-menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (mobileToggle && sidebar) {
+        mobileToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            
+            // Animate hamburger menu
+            if (typeof Motion !== 'undefined') {
+                const spans = mobileToggle.querySelectorAll('span');
+                if (sidebar.classList.contains('active')) {
+                    Motion.animate(spans[0], { rotate: 45, y: 8 }, { duration: 0.3 });
+                    Motion.animate(spans[1], { opacity: 0 }, { duration: 0.2 });
+                    Motion.animate(spans[2], { rotate: -45, y: -8 }, { duration: 0.3 });
+                } else {
+                    Motion.animate(spans[0], { rotate: 0, y: 0 }, { duration: 0.3 });
+                    Motion.animate(spans[1], { opacity: 1 }, { duration: 0.2 });
+                    Motion.animate(spans[2], { rotate: 0, y: 0 }, { duration: 0.3 });
+                }
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(e.target) && 
+                !mobileToggle.contains(e.target) &&
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+    }
+}
 
 // Load interventions data from JSON
 async function loadInterventionsData() {
@@ -33,7 +90,7 @@ async function loadInterventionsData() {
 
 // Initialize navigation
 function initializeNavigation() {
-    const navLinks = document.querySelectorAll('#main-nav a');
+    const navLinks = document.querySelectorAll('#sidebar-nav a');
     
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -50,6 +107,24 @@ function initializeNavigation() {
                 showInterventionsSection();
             } else {
                 showSection(page);
+            }
+
+            // Close mobile menu after selection
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+
+            // Animate section transition with Motion One
+            if (typeof Motion !== 'undefined') {
+                const visibleSection = document.querySelector('section[style="display: block;"]');
+                if (visibleSection) {
+                    Motion.animate(
+                        visibleSection,
+                        { opacity: [0, 1], y: [20, 0] },
+                        { duration: 0.5, easing: [0.4, 0, 0.2, 1] }
+                    );
+                }
             }
         });
     });
@@ -128,6 +203,21 @@ function showTierProcess(tierId) {
     
     // Populate step 2 screener options
     populateStepScreeners();
+
+    // Animate steps with Motion One
+    if (typeof Motion !== 'undefined') {
+        Motion.animate(
+            '#process-header',
+            { scale: [0.9, 1], opacity: [0, 1], y: [-20, 0] },
+            { duration: 0.5, easing: [0.4, 0, 0.2, 1] }
+        );
+
+        Motion.animate(
+            '.step-item',
+            { x: [-50, 0], opacity: [0, 1] },
+            { delay: Motion.stagger(0.1, { start: 0.2 }), duration: 0.6, easing: [0.4, 0, 0.2, 1] }
+        );
+    }
 }
 
 // Show tier dashboard
@@ -136,6 +226,15 @@ function showTierDashboard() {
     document.getElementById('intervention-process').style.display = 'none';
     appState.currentTier = null;
     appState.currentFilters = { screener: '', testArea: '', pillar: '' };
+
+    // Animate tier cards back in with Motion One
+    if (typeof Motion !== 'undefined') {
+        Motion.animate(
+            '.tier-card',
+            { y: [30, 0], opacity: [0, 1], scale: [0.95, 1] },
+            { delay: Motion.stagger(0.1), duration: 0.5, easing: [0.4, 0, 0.2, 1] }
+        );
+    }
 }
 
 // Initialize step expansion
@@ -156,13 +255,38 @@ function initializeStepExpansion() {
                         btn.style.display = 'none';
                     }
                 });
+
+                // Animate step details expansion with Motion One
+                if (typeof Motion !== 'undefined') {
+                    Motion.animate(
+                        stepDetails,
+                        { height: ['0px', 'auto'], opacity: [0, 1] },
+                        { duration: 0.4, easing: [0.4, 0, 0.2, 1] }
+                    );
+                }
             } else {
-                stepDetails.style.display = 'none';
-                allButtons.forEach(btn => {
-                    if (btn.textContent === 'Show Details') {
-                        btn.style.display = 'inline-block';
-                    }
-                });
+                // Animate step details collapse with Motion One
+                if (typeof Motion !== 'undefined') {
+                    Motion.animate(
+                        stepDetails,
+                        { height: ['auto', '0px'], opacity: [1, 0] },
+                        { duration: 0.3, easing: [0.4, 0, 0.2, 1] }
+                    ).finished.then(() => {
+                        stepDetails.style.display = 'none';
+                        allButtons.forEach(btn => {
+                            if (btn.textContent === 'Show Details') {
+                                btn.style.display = 'inline-block';
+                            }
+                        });
+                    });
+                } else {
+                    stepDetails.style.display = 'none';
+                    allButtons.forEach(btn => {
+                        if (btn.textContent === 'Show Details') {
+                            btn.style.display = 'inline-block';
+                        }
+                    });
+                }
             }
         });
     });
@@ -279,6 +403,15 @@ function displayStepInterventions() {
     html += '</div>';
     
     interventionsList.innerHTML = html;
+
+    // Animate intervention cards with Motion One
+    if (typeof Motion !== 'undefined') {
+        Motion.animate(
+            '.intervention-card',
+            { y: [30, 0], opacity: [0, 1], scale: [0.95, 1] },
+            { delay: Motion.stagger(0.1), duration: 0.5, easing: [0.4, 0, 0.2, 1] }
+        );
+    }
 }
 
 // Reset step selections
