@@ -43,6 +43,7 @@ body {
     margin-bottom: 0.5rem;
     font-weight: 700;
     color: white;
+    animation: bounceIn 0.8s ease-out;
 }
 
 .sidebar-header .tagline {
@@ -172,6 +173,7 @@ h2 {
     font-weight: 700;
     position: relative;
     padding-bottom: 1rem;
+    animation: slideInRight 0.8s ease-out;
 }
 
 h2::after {
@@ -183,6 +185,7 @@ h2::after {
     height: 4px;
     background: linear-gradient(90deg, #BE5247, #2BA680);
     border-radius: 2px;
+    animation: slideInRight 1s ease-out;
 }
 
 h3 {
@@ -284,6 +287,34 @@ p.description {
     }
     100% {
         background-position: 200% center;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
     }
 }
 
@@ -541,6 +572,15 @@ p.description {
     }
 }
 
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(43, 166, 128, 0.35);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(43, 166, 128, 0.6);
+    }
+}
+
 .step-item::before {
     content: '';
     position: absolute;
@@ -602,6 +642,7 @@ p.description {
 .step-item.completed .step-number {
     background: linear-gradient(135deg, #2BA680 0%, #24916f 100%);
     box-shadow: 0 4px 15px rgba(43, 166, 128, 0.35);
+    animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .step-item:hover .step-number {
@@ -759,6 +800,7 @@ p.description {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    animation: bounceIn 0.6s ease-out;
 }
 
 .intervention-card::before {
