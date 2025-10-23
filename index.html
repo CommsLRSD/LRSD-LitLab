@@ -10,29 +10,53 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Ubuntu:wght@700&display=swap" rel="stylesheet">
     
+    <!-- Motion One JS for animations -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar">
+        <div class="sidebar-header">
             <h1>Litera</h1>
-            <p class="tagline">Literacy Intervention Assistant for Educators</p>
+            <p class="tagline">Literacy Intervention Assistant</p>
         </div>
-    </header>
-
-    <nav id="main-nav">
-        <div class="container">
+        <nav id="sidebar-nav">
             <ul>
-                <li><a href="#" data-page="interventions" class="active">Interventions</a></li>
-                <li><a href="#" data-page="assessment-schedules">Assessment Schedules</a></li>
-                <li><a href="#" data-page="understanding-scores">Understanding Scores</a></li>
-                <li><a href="#" data-page="faqs">FAQs</a></li>
-                <li><a href="#" data-page="resources">Resources</a></li>
+                <li><a href="#" data-page="interventions" class="active">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-text">Interventions</span>
+                </a></li>
+                <li><a href="#" data-page="assessment-schedules">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text">Assessment Schedules</span>
+                </a></li>
+                <li><a href="#" data-page="understanding-scores">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Understanding Scores</span>
+                </a></li>
+                <li><a href="#" data-page="faqs">
+                    <span class="nav-icon">❓</span>
+                    <span class="nav-text">FAQs</span>
+                </a></li>
+                <li><a href="#" data-page="resources">
+                    <span class="nav-icon">🔗</span>
+                    <span class="nav-text">Resources</span>
+                </a></li>
             </ul>
-        </div>
-    </nav>
+        </nav>
+    </aside>
 
-    <main id="main-content" class="container">
+    <!-- Mobile Menu Toggle -->
+    <button id="mobile-menu-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
         <!-- Interventions Section (default view) -->
         <section id="interventions-section">
             <h2>Intervention System</h2>
