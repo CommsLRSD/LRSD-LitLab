@@ -1,16 +1,37 @@
 # Literacy Pal - Literacy Intervention Assistant
 
-A web application designed to help educators guide literacy interventions based on student assessment data.
+A web application designed to help educators navigate the Multi-Tiered System of Supports (MTSS) for literacy interventions.
 
 ## Features
 
-### Multi-Level Filtering System
-- **Hierarchical Navigation**: Filter interventions through a multi-level system:
-  - Tier (1: Universal/Core, 2: Targeted/Supplemental, 3: Intensive/Individual)
-  - Screener (DIBELS, FastBridge)
-  - Test Area (Phonemic Awareness, Phonics, Reading Fluency, Comprehension)
-  - Pillar (Specific skill areas within each test area)
-  - Interventions (Detailed strategies with duration, group size, frequency, and resources)
+### Step-by-Step Intervention Wizard
+- **Tier 1 - Universal Classroom Interventions**: High-quality instruction for all students (80%)
+  - Review principles of explicit and systematic instruction
+  - Select literacy screener (DIBELS, CTOPP-2, THaFoL, IDAPEL)
+  - Evaluate effectiveness with intelligent branching logic
+  - Determine next steps based on student success rates
+
+- **Tier 2 - Small Group Interventions**: Targeted support for at-risk students (15%)
+  - Review small group intervention requirements
+  - Select drill-down assessments based on screener results
+  - Choose evidence-based interventions (placeholder)
+  - Complete 8-week intervention cycle with progress monitoring
+  - Fade to Tier 1 or move to Tier 3 based on results
+
+- **Tier 3 - Personalized Interventions**: Intensive support for students with significant needs (5%)
+  - Review intensive intervention characteristics
+  - Select comprehensive diagnostic assessments
+  - Choose personalized interventions (placeholder)
+  - Complete 8-week intensive cycle with weekly monitoring
+  - Fade to Tier 2 or meet with clinicians based on results
+
+### User Experience
+- **One Step at a Time**: Only one step visible at a time for focused workflow
+- **Back Button**: Navigate to previous steps throughout the process
+- **Smart Branching**: Logic-based navigation based on educator choices
+- **Smooth Transitions**: Modern animations triggered only by user interactions
+- **No Distractions**: Removed all constantly running animations
+- **Welcome Animation**: Single, welcoming animation on initial page load
 
 ### Single Page Application
 - All content contained in a single HTML file with multiple sections
@@ -19,7 +40,7 @@ A web application designed to help educators guide literacy interventions based 
 - Responsive and modern design
 
 ### Educational Content
-- **Interventions**: Main filtering interface to find appropriate strategies
+- **Interventions**: Step-by-step wizard for all three intervention tiers
 - **Assessment Schedules**: Universal screening and progress monitoring guidelines
 - **Understanding Scores**: How to interpret assessment results
 - **FAQs**: Common questions about MTSS and literacy interventions
@@ -128,11 +149,13 @@ The application uses a hierarchical JSON structure in `data/interventions.json`:
 
 ## How to Use
 
-1. **Select a Tier**: Choose the appropriate tier based on student needs
-2. **Select a Screener**: Choose the assessment tool used (DIBELS or FastBridge)
-3. **Select a Test Area**: Identify the specific area of concern
-4. **Select a Pillar**: Narrow down to the specific skill
-5. **View Interventions**: See detailed intervention strategies with implementation details
+1. **Select a Tier**: Choose to start with Tier 1, Tier 2, or Tier 3 based on student needs
+2. **Follow the Wizard**: Complete each step in the guided process
+3. **Make Decisions**: Choose appropriate options based on student data
+4. **Navigate**: Use the back button to review previous steps if needed
+5. **Follow Recommendations**: The system will guide you to appropriate next steps based on your selections
+
+For detailed information about the tier system and flows, see [TIER_SYSTEM_GUIDE.md](TIER_SYSTEM_GUIDE.md).
 
 ## Adding New Interventions
 
