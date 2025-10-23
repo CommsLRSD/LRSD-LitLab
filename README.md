@@ -1,4 +1,4 @@
-# Litera - Literacy Intervention Assistant
+# Literacy Pal - Literacy Intervention Assistant
 
 A web application designed to help educators guide literacy interventions based on student assessment data.
 
@@ -35,7 +35,7 @@ A web application designed to help educators guide literacy interventions based 
 ## File Structure
 
 ```
-Litera/
+Literacy-Pal/
 ├── index.html              # Main entry point with all page sections
 ├── app.js                  # Application logic and filtering
 ├── styles.css              # Application styling
@@ -50,8 +50,8 @@ Litera/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/CommsLRSD/Litera.git
-cd Litera
+git clone https://github.com/CommsLRSD/Literacy-Pal.git
+cd Literacy-Pal
 ```
 
 2. Serve the application using any static web server:
@@ -155,7 +155,7 @@ To add new interventions, edit `data/interventions.json` following the existing 
 
 ## License
 
-© 2025 Litera - Literacy Intervention Assistant. All rights reserved.
+© 2025 Literacy Pal - Literacy Intervention Assistant. All rights reserved.
 
 ## Support
 

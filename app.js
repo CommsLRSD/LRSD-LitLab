@@ -6,7 +6,8 @@ const appState = {
         screener: '',
         testArea: '',
         pillar: ''
-    }
+    },
+    completedSteps: new Set()
 };
 
 // Initialize the application
@@ -187,6 +188,7 @@ function showTierProcess(tierId) {
     
     appState.currentTier = tier;
     appState.currentFilters = { screener: '', testArea: '', pillar: '' };
+    appState.completedSteps = new Set();
     
     // Update header
     document.getElementById('process-tier-title').textContent = tier.name;
@@ -203,6 +205,9 @@ function showTierProcess(tierId) {
     
     // Populate step 2 screener options
     populateStepScreeners();
+    
+    // Initialize step states - only step 1 is unlocked
+    updateStepStates();
 
     // Animate steps with Motion One
     if (typeof Motion !== 'undefined') {
@@ -226,6 +231,7 @@ function showTierDashboard() {
     document.getElementById('intervention-process').style.display = 'none';
     appState.currentTier = null;
     appState.currentFilters = { screener: '', testArea: '', pillar: '' };
+    appState.completedSteps = new Set();
 
     // Animate tier cards back in with Motion One
     if (typeof Motion !== 'undefined') {
@@ -237,16 +243,65 @@ function showTierDashboard() {
     }
 }
 
+// Update step states based on completion
+function updateStepStates() {
+    const steps = document.querySelectorAll('.step-item');
+    
+    steps.forEach((step, index) => {
+        const stepNum = index + 1;
+        step.classList.remove('locked', 'completed');
+        
+        // Step 1 is always unlocked
+        if (stepNum === 1) {
+            return;
+        }
+        
+        // Check if previous step is completed
+        if (appState.completedSteps.has(stepNum - 1)) {
+            // Previous step is complete, this step is unlocked
+            if (appState.completedSteps.has(stepNum)) {
+                step.classList.add('completed');
+            }
+        } else {
+            // Previous step is not complete, lock this step
+            step.classList.add('locked');
+        }
+    });
+}
+
+// Mark step as completed
+function completeStep(stepNum) {
+    appState.completedSteps.add(stepNum);
+    updateStepStates();
+    
+    // Animate the completion
+    if (typeof Motion !== 'undefined') {
+        const stepItem = document.querySelector(`.step-item[data-step="${stepNum}"]`);
+        if (stepItem) {
+            Motion.animate(
+                stepItem,
+                { scale: [1, 1.05, 1], borderColor: ['#f5f5f5', '#2BA680', '#2BA680'] },
+                { duration: 0.6, easing: [0.4, 0, 0.2, 1] }
+            );
+        }
+    }
+}
+
 // Initialize step expansion
 function initializeStepExpansion() {
     const expandButtons = document.querySelectorAll('.btn-expand');
     
     expandButtons.forEach(button => {
         button.addEventListener('click', () => {
-            const stepNum = button.getAttribute('data-step');
+            const stepNum = parseInt(button.getAttribute('data-step'));
             const stepItem = button.closest('.step-item');
             const stepDetails = stepItem.querySelector('.step-details');
             const allButtons = stepItem.querySelectorAll('.btn-expand');
+            
+            // Check if step is locked
+            if (stepItem.classList.contains('locked')) {
+                return;
+            }
             
             if (stepDetails.style.display === 'none' || !stepDetails.style.display) {
                 stepDetails.style.display = 'block';
@@ -255,6 +310,11 @@ function initializeStepExpansion() {
                         btn.style.display = 'none';
                     }
                 });
+                
+                // Mark step 1 as completed when expanded
+                if (stepNum === 1) {
+                    completeStep(1);
+                }
 
                 // Animate step details expansion with Motion One
                 if (typeof Motion !== 'undefined') {
@@ -300,17 +360,32 @@ function initializeStepExpansion() {
         appState.currentFilters.screener = screenerSelect.value;
         populateStepTestAreas();
         resetPillarAndInterventions();
+        
+        // Check if both screener and test area are selected to complete step 2
+        if (appState.currentFilters.screener && appState.currentFilters.testArea) {
+            completeStep(2);
+        }
     });
     
     testareaSelect.addEventListener('change', () => {
         appState.currentFilters.testArea = testareaSelect.value;
         populateStepPillars();
         resetInterventions();
+        
+        // Complete step 2 when test area is selected
+        if (appState.currentFilters.screener && appState.currentFilters.testArea) {
+            completeStep(2);
+        }
     });
     
     pillarSelect.addEventListener('change', () => {
         appState.currentFilters.pillar = pillarSelect.value;
         displayStepInterventions();
+        
+        // Complete step 3 when pillar is selected
+        if (appState.currentFilters.pillar) {
+            completeStep(3);
+        }
     });
 }
 
@@ -403,6 +478,9 @@ function displayStepInterventions() {
     html += '</div>';
     
     interventionsList.innerHTML = html;
+    
+    // Mark step 4 as completed when interventions are displayed
+    completeStep(4);
 
     // Animate intervention cards with Motion One
     if (typeof Motion !== 'undefined') {
