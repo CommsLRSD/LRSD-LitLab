@@ -220,19 +220,6 @@ p.description {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid #f5f5f5;
     cursor: pointer;
-    animation: float 3s ease-in-out infinite;
-}
-
-.tier-card:nth-child(1) {
-    animation-delay: 0s;
-}
-
-.tier-card:nth-child(2) {
-    animation-delay: 0.5s;
-}
-
-.tier-card:nth-child(3) {
-    animation-delay: 1s;
 }
 
 .tier-card:hover {
@@ -258,7 +245,6 @@ p.description {
     width: 200%;
     height: 200%;
     background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    animation: pulse 3s ease-in-out infinite;
 }
 
 @keyframes pulse {
@@ -422,7 +408,6 @@ p.description {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(190, 82, 71, 0.35);
     background-position: right center;
-    animation: shimmer 2s linear infinite;
 }
 
 .btn-tier:active {
@@ -483,7 +468,6 @@ p.description {
     width: 200%;
     height: 200%;
     background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    animation: rotate 20s linear infinite;
 }
 
 @keyframes rotate {
@@ -642,7 +626,6 @@ p.description {
 .step-item.completed .step-number {
     background: linear-gradient(135deg, #2BA680 0%, #24916f 100%);
     box-shadow: 0 4px 15px rgba(43, 166, 128, 0.35);
-    animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .step-item:hover .step-number {
@@ -1104,4 +1087,197 @@ footer p {
     border-left: 5px solid #28a745;
     margin-bottom: 1.5rem;
     box-shadow: 0 2px 12px rgba(40, 167, 69, 0.15);
+}
+
+/* Step-by-Step Wizard System */
+.wizard-step {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.wizard-step.active {
+    display: block;
+    opacity: 1;
+}
+
+.wizard-step.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.wizard-step.fade-out {
+    animation: fadeOut 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.wizard-content {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.wizard-checklist {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+}
+
+.wizard-checklist ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.wizard-checklist li {
+    padding: 0.75rem 0;
+    padding-left: 2rem;
+    position: relative;
+    color: #495057;
+    line-height: 1.6;
+}
+
+.wizard-checklist li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #2BA680;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.wizard-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.wizard-buttons.center {
+    justify-content: center;
+}
+
+.wizard-buttons.right {
+    justify-content: flex-end;
+}
+
+.btn-primary {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #2BA680 0%, #24916f 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #24916f 0%, #1d7a5c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(43, 166, 128, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+}
+
+.btn-option {
+    padding: 1rem 1.5rem;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    color: #495057;
+    flex: 1;
+    min-width: 200px;
+}
+
+.btn-option:hover {
+    border-color: #BE5247;
+    background: #fff5f4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(190, 82, 71, 0.15);
+}
+
+.btn-option.selected {
+    border-color: #2BA680;
+    background: #e8f5f1;
+    color: #2BA680;
+}
+
+.placeholder-box {
+    background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
+    border: 2px dashed #ff9800;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.placeholder-box h4 {
+    color: #e65100;
+    margin: 0 0 0.75rem 0;
+}
+
+.placeholder-box p {
+    color: #f57c00;
+    margin: 0;
+}
+
+.option-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
 }
