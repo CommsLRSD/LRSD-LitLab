@@ -1164,3 +1164,132 @@ body {
 .mb-2 {
     margin-bottom: 2rem;
 }
+
+/* Wizard Components */
+.wizard-body {
+    padding: 2rem 0;
+}
+
+.wizard-footer {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.wizard-btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.wizard-btn-back {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+.wizard-btn-back:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.wizard-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.wizard-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.option-btn {
+    padding: 1rem 1.5rem;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.option-btn:hover {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.option-btn.selected {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    font-weight: 600;
+}
+
+.checklist {
+    list-style: none;
+    padding: 0;
+}
+
+.checklist li {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 8px;
+    position: relative;
+    padding-left: 3rem;
+}
+
+.checklist li::before {
+    content: '✓';
+    position: absolute;
+    left: 1rem;
+    color: #667eea;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.content-list {
+    list-style: none;
+    padding: 0;
+}
+
+.content-list li {
+    padding: 0.75rem 0;
+    padding-left: 2rem;
+    position: relative;
+}
+
+.content-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.wizard-complete {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.wizard-complete h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #667eea;
+}
+
+.wizard-complete p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #666;
+}
