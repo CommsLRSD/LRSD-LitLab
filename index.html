@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Literacy Pal - Literacy Intervention Assistant</title>
+    <title>Literacy Pal - Your Intervention Guide</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Ubuntu:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     
     <!-- Motion One JS for animations -->
     <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
@@ -16,554 +16,482 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar">
-        <div class="sidebar-header">
-            <h1>Literacy Pal</h1>
-            <p class="tagline">Literacy Intervention Assistant</p>
-        </div>
-        <nav id="sidebar-nav">
-            <ul>
-                <li><a href="#" data-page="interventions" class="active">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                        </svg>
-                    </span>
-                    <span class="nav-text">Interventions</span>
-                </a></li>
-                <li><a href="#" data-page="assessment-schedules">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                    </span>
-                    <span class="nav-text">Assessment Schedules</span>
-                </a></li>
-                <li><a href="#" data-page="understanding-scores">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                        </svg>
-                    </span>
-                    <span class="nav-text">Understanding Scores</span>
-                </a></li>
-                <li><a href="#" data-page="faqs">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                        </svg>
-                    </span>
-                    <span class="nav-text">FAQs</span>
-                </a></li>
-                <li><a href="#" data-page="resources">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                        </svg>
-                    </span>
-                    <span class="nav-text">Resources</span>
-                </a></li>
-            </ul>
-        </nav>
-    </aside>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+        <div class="floating-orb orb-3"></div>
+    </div>
 
-    <!-- Mobile Menu Toggle -->
-    <button id="mobile-menu-toggle" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-
-    <!-- Main Content Area -->
-    <main id="main-content">
-        <!-- Interventions Section (default view) -->
-        <section id="interventions-section">
-            <h2>Intervention System</h2>
-            <p class="description">Select a tier below to view the intervention process and available strategies.</p>
+    <!-- Main Navigation Bar -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="2"/>
+                        <path d="M15 15L25 20L15 25V15Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <h1 class="logo-text">Literacy Pal</h1>
+            </div>
             
-            <!-- Tier Selection Dashboard -->
-            <div class="tier-dashboard">
-                <div class="tier-card" data-tier="tier1">
-                    <div class="tier-header tier1-header">
-                        <h3>Tier 1</h3>
-                        <p class="tier-subtitle">Universal/Core Instruction</p>
+            <div class="nav-links">
+                <button class="nav-link active" data-page="interventions">
+                    <span class="nav-link-text">Interventions</span>
+                    <span class="nav-link-indicator"></span>
+                </button>
+                <button class="nav-link" data-page="assessment-schedules">
+                    <span class="nav-link-text">Assessments</span>
+                    <span class="nav-link-indicator"></span>
+                </button>
+                <button class="nav-link" data-page="understanding-scores">
+                    <span class="nav-link-text">Scores</span>
+                    <span class="nav-link-indicator"></span>
+                </button>
+                <button class="nav-link" data-page="faqs">
+                    <span class="nav-link-text">FAQs</span>
+                    <span class="nav-link-indicator"></span>
+                </button>
+                <button class="nav-link" data-page="resources">
+                    <span class="nav-link-text">Resources</span>
+                    <span class="nav-link-indicator"></span>
+                </button>
+            </div>
+
+            <button class="mobile-menu-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay">
+        <div class="mobile-nav-content">
+            <button class="mobile-nav-item" data-page="interventions">
+                <span>Interventions</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+            <button class="mobile-nav-item" data-page="assessment-schedules">
+                <span>Assessments</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+            <button class="mobile-nav-item" data-page="understanding-scores">
+                <span>Understanding Scores</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+            <button class="mobile-nav-item" data-page="faqs">
+                <span>FAQs</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+            <button class="mobile-nav-item" data-page="resources">
+                <span>Resources</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Interventions Section -->
+        <section id="interventions-section" class="content-section active">
+            <div class="hero-area">
+                <h2 class="section-title">
+                    <span class="title-word">Choose</span>
+                    <span class="title-word">Your</span>
+                    <span class="title-word">Path</span>
+                </h2>
+                <p class="section-subtitle">Select an intervention tier to begin your journey</p>
+            </div>
+
+            <!-- Tier Selection - Minimalist Design -->
+            <div class="tier-selection">
+                <div class="tier-path" data-tier="tier1">
+                    <div class="tier-number">1</div>
+                    <div class="tier-content">
+                        <h3 class="tier-title">Universal Core</h3>
+                        <p class="tier-desc">High-quality instruction for all students</p>
+                        <div class="tier-metrics">
+                            <span class="metric">80% of students</span>
+                            <span class="metric-dot">•</span>
+                            <span class="metric">Whole class</span>
+                        </div>
                     </div>
-                    <div class="tier-body">
-                        <p class="tier-description">High-quality instruction for all students in the general education classroom.</p>
-                        <ul class="tier-stats">
-                            <li><strong>80%</strong> of students</li>
-                            <li><strong>Whole class</strong></li>
-                            <li><strong>Core curriculum</strong></li>
-                        </ul>
-                        <button class="btn-tier" data-tier="tier1">View Tier 1 Process</button>
-                    </div>
+                    <button class="tier-action">
+                        <span>Start Journey</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
                 </div>
 
-                <div class="tier-card" data-tier="tier2">
-                    <div class="tier-header tier2-header">
-                        <h3>Tier 2</h3>
-                        <p class="tier-subtitle">Targeted/Supplemental</p>
+                <div class="tier-path" data-tier="tier2">
+                    <div class="tier-number">2</div>
+                    <div class="tier-content">
+                        <h3 class="tier-title">Targeted Support</h3>
+                        <p class="tier-desc">Additional help for students who need extra support</p>
+                        <div class="tier-metrics">
+                            <span class="metric">15% of students</span>
+                            <span class="metric-dot">•</span>
+                            <span class="metric">Small groups</span>
+                        </div>
                     </div>
-                    <div class="tier-body">
-                        <p class="tier-description">Additional support for students who need extra help beyond core instruction.</p>
-                        <ul class="tier-stats">
-                            <li><strong>15%</strong> of students</li>
-                            <li><strong>Small groups</strong> (3-6)</li>
-                            <li><strong>20-30 min</strong> daily</li>
-                        </ul>
-                        <button class="btn-tier" data-tier="tier2">View Tier 2 Process</button>
-                    </div>
+                    <button class="tier-action">
+                        <span>Start Journey</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
                 </div>
 
-                <div class="tier-card" data-tier="tier3">
-                    <div class="tier-header tier3-header">
-                        <h3>Tier 3</h3>
-                        <p class="tier-subtitle">Intensive/Individual</p>
+                <div class="tier-path" data-tier="tier3">
+                    <div class="tier-number">3</div>
+                    <div class="tier-content">
+                        <h3 class="tier-title">Intensive Care</h3>
+                        <p class="tier-desc">Personalized interventions for significant needs</p>
+                        <div class="tier-metrics">
+                            <span class="metric">5% of students</span>
+                            <span class="metric-dot">•</span>
+                            <span class="metric">1-on-1</span>
+                        </div>
                     </div>
-                    <div class="tier-body">
-                        <p class="tier-description">Intensive, individualized interventions for students with significant needs.</p>
-                        <ul class="tier-stats">
-                            <li><strong>5%</strong> of students</li>
-                            <li><strong>1-on-1</strong> or pairs</li>
-                            <li><strong>45-60 min</strong> daily</li>
-                        </ul>
-                        <button class="btn-tier" data-tier="tier3">View Tier 3 Process</button>
-                    </div>
+                    <button class="tier-action">
+                        <span>Start Journey</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <!-- Wizard Container (will be populated dynamically) -->
-            <div id="wizard-container" style="display: none;"></div>
+            <!-- Wizard Container -->
+            <div id="wizard-container" class="wizard-container hidden"></div>
         </section>
 
         <!-- Assessment Schedules Section -->
-        <section id="assessment-schedules-section" style="display: none;">
-            <div class="page-content">
-                <h2>Assessment Schedules</h2>
-                <p class="description">Recommended assessment schedules for universal screening and progress monitoring.</p>
-                
-                <h3>Universal Screening</h3>
-                <p>Universal screening should be conducted for all students to identify those who may be at risk for reading difficulties.</p>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Assessment Period</th>
-                            <th>Timeframe</th>
-                            <th>Purpose</th>
-                            <th>Students Assessed</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Fall Screening</td>
-                            <td>First 3 weeks of school</td>
-                            <td>Identify students at risk and establish baseline data</td>
-                            <td>All students</td>
-                        </tr>
-                        <tr>
-                            <td>Winter Screening</td>
-                            <td>Mid-January to early February</td>
-                            <td>Monitor student progress and adjust interventions</td>
-                            <td>All students</td>
-                        </tr>
-                        <tr>
-                            <td>Spring Screening</td>
-                            <td>April to early May</td>
-                            <td>Evaluate year-end growth and plan for next year</td>
-                            <td>All students</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <h3>Progress Monitoring</h3>
-                <p>Progress monitoring is conducted more frequently for students receiving interventions to ensure the interventions are effective.</p>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tier Level</th>
-                            <th>Frequency</th>
-                            <th>Purpose</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Tier 1</td>
-                            <td>3 times per year (Universal Screening)</td>
-                            <td>Monitor general classroom instruction effectiveness</td>
-                        </tr>
-                        <tr>
-                            <td>Tier 2</td>
-                            <td>Bi-weekly to monthly</td>
-                            <td>Monitor intervention effectiveness and adjust as needed</td>
-                        </tr>
-                        <tr>
-                            <td>Tier 3</td>
-                            <td>Weekly</td>
-                            <td>Closely monitor intensive intervention and make frequent adjustments</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <h3>Best Practices</h3>
-                <ul>
-                    <li>Administer assessments in a quiet, distraction-free environment</li>
-                    <li>Ensure assessors are properly trained on administration procedures</li>
-                    <li>Complete all universal screening within the designated timeframe</li>
-                    <li>Review data promptly and make instructional decisions within 1-2 weeks</li>
-                    <li>Use multiple data points to make instructional decisions</li>
-                    <li>Communicate results with families and involve them in the intervention process</li>
-                </ul>
+        <section id="assessment-schedules-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">
+                    <span class="title-word">Assessment</span>
+                    <span class="title-word">Schedules</span>
+                </h2>
+                <p class="section-subtitle">Timing is everything in literacy assessment</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="info-grid">
+                    <div class="info-block">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 6v6l4 2"/>
+                            </svg>
+                        </div>
+                        <h3>Universal Screening</h3>
+                        <p>Conducted for all students to identify those at risk</p>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Fall</h4>
+                                    <p>First 3 weeks of school</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Winter</h4>
+                                    <p>Mid-January to early February</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Spring</h4>
+                                    <p>April to early May</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                        </div>
+                        <h3>Progress Monitoring</h3>
+                        <p>Track student growth and intervention effectiveness</p>
+                        
+                        <div class="frequency-list">
+                            <div class="frequency-item">
+                                <span class="freq-tier">Tier 1</span>
+                                <span class="freq-timing">3x per year</span>
+                            </div>
+                            <div class="frequency-item">
+                                <span class="freq-tier">Tier 2</span>
+                                <span class="freq-timing">Bi-weekly to monthly</span>
+                            </div>
+                            <div class="frequency-item">
+                                <span class="freq-tier">Tier 3</span>
+                                <span class="freq-timing">Weekly</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="best-practices">
+                    <h3>Best Practices</h3>
+                    <div class="practice-grid">
+                        <div class="practice-item">
+                            <span class="practice-icon">🎯</span>
+                            <span>Quiet testing environment</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">👥</span>
+                            <span>Trained assessors</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">⏱️</span>
+                            <span>Timely data review</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">📊</span>
+                            <span>Multiple data points</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">💬</span>
+                            <span>Family communication</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">🔄</span>
+                            <span>Regular adjustments</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- Understanding Scores Section -->
-        <section id="understanding-scores-section" style="display: none;">
-            <div class="page-content">
-                <h2>Understanding Scores</h2>
-                <p class="description">Learn how to interpret assessment scores and make data-informed decisions.</p>
-                
-                <h3>Score Categories</h3>
-                <p>Most literacy assessments categorize student performance into benchmark categories:</p>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Description</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Above Benchmark</strong> (Green)</td>
-                            <td>Student is performing at or above grade-level expectations</td>
-                            <td>Continue with core instruction; may provide enrichment</td>
-                        </tr>
-                        <tr>
-                            <td><strong>At Benchmark</strong> (Green)</td>
-                            <td>Student is meeting grade-level expectations with core instruction</td>
-                            <td>Continue with core instruction and monitor</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Below Benchmark</strong> (Yellow)</td>
-                            <td>Student is at some risk and may need additional support</td>
-                            <td>Provide Tier 2 interventions and progress monitor</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Well Below Benchmark</strong> (Red)</td>
-                            <td>Student is at high risk and needs intensive support</td>
-                            <td>Provide Tier 3 interventions and frequent progress monitoring</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <h3>Common Assessment Measures</h3>
-                
-                <h4>DIBELS (Dynamic Indicators of Basic Early Literacy Skills)</h4>
-                <ul>
-                    <li><strong>Phoneme Segmentation Fluency (PSF):</strong> Measures ability to segment words into individual phonemes</li>
-                    <li><strong>Nonsense Word Fluency (NWF):</strong> Assesses letter-sound correspondence and blending</li>
-                    <li><strong>Oral Reading Fluency (ORF):</strong> Measures reading accuracy and fluency with connected text</li>
-                    <li><strong>Maze:</strong> Assesses reading comprehension</li>
-                </ul>
-                
-                <h4>FastBridge</h4>
-                <ul>
-                    <li><strong>earlyReading:</strong> Composite measure for K-1 students</li>
-                    <li><strong>aReading:</strong> Adaptive reading assessment for comprehension</li>
-                    <li><strong>CBMreading:</strong> Curriculum-based measure of oral reading fluency</li>
-                </ul>
-                
-                <h3>Understanding Percentiles and Standard Scores</h3>
-                <p><strong>Percentile Rank:</strong> Indicates the percentage of students in the norm group who scored at or below a given score. For example, a percentile rank of 75 means the student scored as well as or better than 75% of students.</p>
-                
-                <p><strong>Standard Score:</strong> A score that describes how far above or below the mean (average) a student performed. Standard scores typically have a mean of 100 and a standard deviation of 15.</p>
-                
-                <h3>Making Data-Informed Decisions</h3>
-                <ul>
-                    <li>Look at trends over time, not just a single score</li>
-                    <li>Consider multiple measures and data sources</li>
-                    <li>Compare student performance to both benchmarks and their own previous performance</li>
-                    <li>Evaluate the rate of improvement (slope) for students receiving interventions</li>
-                    <li>Use data to determine if interventions should be continued, modified, or discontinued</li>
-                    <li>Consider other factors such as attendance, language background, and specific learning needs</li>
-                </ul>
-                
-                <h3>Questions to Ask When Reviewing Data</h3>
-                <ul>
-                    <li>Is the student meeting grade-level benchmarks?</li>
-                    <li>Is the student making adequate progress over time?</li>
-                    <li>Are there specific skill areas where the student struggles?</li>
-                    <li>Is the current intervention effective? (Is the student's rate of improvement adequate?)</li>
-                    <li>Do we need to adjust the intensity, duration, or type of intervention?</li>
-                    <li>What are the student's strengths that we can build upon?</li>
-                </ul>
+        <section id="understanding-scores-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">
+                    <span class="title-word">Decode</span>
+                    <span class="title-word">The</span>
+                    <span class="title-word">Data</span>
+                </h2>
+                <p class="section-subtitle">Make sense of assessment scores and benchmarks</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="score-categories">
+                    <div class="score-card above">
+                        <div class="score-indicator"></div>
+                        <h3>Above Benchmark</h3>
+                        <p>Exceeding expectations</p>
+                        <span class="score-action">Continue core instruction</span>
+                    </div>
+                    <div class="score-card at">
+                        <div class="score-indicator"></div>
+                        <h3>At Benchmark</h3>
+                        <p>Meeting expectations</p>
+                        <span class="score-action">Monitor progress</span>
+                    </div>
+                    <div class="score-card below">
+                        <div class="score-indicator"></div>
+                        <h3>Below Benchmark</h3>
+                        <p>Some risk</p>
+                        <span class="score-action">Tier 2 interventions</span>
+                    </div>
+                    <div class="score-card well-below">
+                        <div class="score-indicator"></div>
+                        <h3>Well Below</h3>
+                        <p>High risk</p>
+                        <span class="score-action">Tier 3 interventions</span>
+                    </div>
+                </div>
+
+                <div class="assessment-tools">
+                    <h3>Common Assessments</h3>
+                    <div class="tool-accordion">
+                        <button class="accordion-trigger">
+                            <span>DIBELS</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><strong>PSF:</strong> Phoneme Segmentation Fluency</li>
+                                <li><strong>NWF:</strong> Nonsense Word Fluency</li>
+                                <li><strong>ORF:</strong> Oral Reading Fluency</li>
+                                <li><strong>Maze:</strong> Reading Comprehension</li>
+                            </ul>
+                        </div>
+                        
+                        <button class="accordion-trigger">
+                            <span>FastBridge</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><strong>earlyReading:</strong> K-1 composite measure</li>
+                                <li><strong>aReading:</strong> Adaptive comprehension assessment</li>
+                                <li><strong>CBMreading:</strong> Oral reading fluency</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- FAQs Section -->
-        <section id="faqs-section" style="display: none;">
-            <div class="page-content">
-                <h2>Frequently Asked Questions</h2>
-                <p class="description">Common questions about literacy interventions and Multi-Tiered System of Supports (MTSS).</p>
-                
-                <h3>General Questions</h3>
-                
-                <h4>What is MTSS?</h4>
-                <p>Multi-Tiered System of Supports (MTSS) is a framework for providing academic and behavioral support to all students. It uses data to identify students who need additional support and provides increasingly intensive interventions based on student needs.</p>
-                
-                <h4>What is the difference between Tier 1, Tier 2, and Tier 3?</h4>
-                <ul>
-                    <li><strong>Tier 1:</strong> High-quality core instruction for all students in the general education classroom. About 80% of students succeed with Tier 1 alone.</li>
-                    <li><strong>Tier 2:</strong> Supplemental interventions for students who need additional support beyond core instruction. Typically provided in small groups. About 15% of students need Tier 2.</li>
-                    <li><strong>Tier 3:</strong> Intensive, individualized interventions for students with significant needs. About 5% of students need Tier 3 support.</li>
-                </ul>
-                
-                <h4>How long should a student receive an intervention before making changes?</h4>
-                <p>Generally, interventions should be implemented with fidelity for 6-8 weeks before making decisions about effectiveness. However, progress monitoring data should be reviewed regularly (weekly for Tier 3, bi-weekly to monthly for Tier 2) to ensure the student is responding to the intervention.</p>
-                
-                <h3>Assessment Questions</h3>
-                
-                <h4>What is the purpose of universal screening?</h4>
-                <p>Universal screening helps identify students who may be at risk for reading difficulties so they can receive early intervention. It provides a snapshot of all students' skills and helps schools allocate resources effectively.</p>
-                
-                <h4>How often should students be progress monitored?</h4>
-                <p>The frequency depends on the tier level:</p>
-                <ul>
-                    <li>Tier 1: 3 times per year (fall, winter, spring screening)</li>
-                    <li>Tier 2: Every 2-4 weeks</li>
-                    <li>Tier 3: Weekly</li>
-                </ul>
-                
-                <h4>What if a student doesn't make progress with Tier 2 interventions?</h4>
-                <p>If a student doesn't respond adequately to Tier 2 interventions after 6-8 weeks, consider:</p>
-                <ul>
-                    <li>Increasing the intensity (more time, smaller group, more explicit instruction)</li>
-                    <li>Changing the intervention approach</li>
-                    <li>Moving to Tier 3 for more intensive support</li>
-                    <li>Conducting additional diagnostic assessments to better understand the student's needs</li>
-                    <li>Considering a referral for special education evaluation if appropriate</li>
-                </ul>
-                
-                <h3>Intervention Questions</h3>
-                
-                <h4>How long should intervention sessions last?</h4>
-                <p>Intervention duration varies by tier:</p>
-                <ul>
-                    <li>Tier 2: Typically 20-30 minutes per session</li>
-                    <li>Tier 3: Typically 30-60 minutes per session</li>
-                </ul>
-                <p>Sessions should be in addition to, not instead of, core literacy instruction.</p>
-                
-                <h4>What is the ideal group size for interventions?</h4>
-                <ul>
-                    <li>Tier 2: Small groups of 3-6 students with similar needs</li>
-                    <li>Tier 3: Very small groups of 1-3 students or one-on-one</li>
-                </ul>
-                
-                <h4>Can students receive more than one intervention at a time?</h4>
-                <p>Students can receive multiple interventions if they address different skill areas (e.g., one for decoding and one for comprehension). However, be mindful of the total intervention time to avoid overwhelming the student or taking too much time away from other important learning opportunities.</p>
-                
-                <h4>Should interventions replace core instruction?</h4>
-                <p>No. Interventions should be provided in addition to core literacy instruction, not as a replacement. Students need access to both high-quality core instruction and targeted interventions to address their specific needs.</p>
-                
-                <h3>Family Communication</h3>
-                
-                <h4>How should I communicate with families about interventions?</h4>
-                <p>Best practices include:</p>
-                <ul>
-                    <li>Explain what the data shows about their child's current performance</li>
-                    <li>Describe the intervention plan in clear, jargon-free language</li>
-                    <li>Emphasize that interventions are proactive support, not punishment</li>
-                    <li>Share progress regularly (at least once per marking period)</li>
-                    <li>Provide suggestions for home support</li>
-                    <li>Welcome questions and input from families</li>
-                </ul>
-                
-                <h4>What can families do at home to support literacy development?</h4>
-                <ul>
-                    <li>Read aloud together daily</li>
-                    <li>Practice high-frequency words</li>
-                    <li>Play word games and rhyming activities</li>
-                    <li>Visit the library regularly</li>
-                    <li>Talk about stories and ask questions about what was read</li>
-                    <li>Encourage writing for authentic purposes (lists, letters, stories)</li>
-                </ul>
-                
-                <h3>Implementation Questions</h3>
-                
-                <h4>Who should provide interventions?</h4>
-                <p>Interventions can be provided by various educators depending on the tier and school resources:</p>
-                <ul>
-                    <li>Classroom teachers</li>
-                    <li>Reading specialists/interventionists</li>
-                    <li>Special education teachers</li>
-                    <li>Title I teachers</li>
-                    <li>Trained paraprofessionals (with supervision)</li>
-                </ul>
-                <p>More intensive interventions (Tier 3) should be provided by the most experienced and specialized staff.</p>
-                
-                <h4>How do I find time for interventions in my schedule?</h4>
-                <p>Strategies for scheduling interventions:</p>
-                <ul>
-                    <li>Designate a specific intervention block in the daily schedule</li>
-                    <li>Use flexible grouping during literacy centers or stations</li>
-                    <li>Coordinate with specialists to maximize small-group time</li>
-                    <li>Consider before or after school programs for some students</li>
-                    <li>Prioritize and protect intervention time as essential instruction</li>
-                </ul>
+        <section id="faqs-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">
+                    <span class="title-word">Got</span>
+                    <span class="title-word">Questions?</span>
+                </h2>
+                <p class="section-subtitle">We've got answers</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What is MTSS?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Multi-Tiered System of Supports (MTSS) is a framework for providing academic and behavioral support to all students. It uses data to identify students who need additional support and provides increasingly intensive interventions based on their needs.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How long should interventions last?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Interventions should be implemented with fidelity for 6-8 weeks before making decisions about effectiveness. Session duration varies by tier: Tier 2 typically 20-30 minutes, Tier 3 typically 30-60 minutes per session.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What's the ideal group size?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Tier 2: Small groups of 3-6 students with similar needs. Tier 3: Very small groups of 1-3 students or one-on-one instruction for intensive support.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Should interventions replace core instruction?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>No. Interventions should be provided in addition to core literacy instruction, not as a replacement. Students need access to both high-quality core instruction and targeted interventions.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- Resources Section -->
-        <section id="resources-section" style="display: none;">
-            <div class="page-content">
-                <h2>Resources</h2>
-                <p class="description">Helpful resources for implementing literacy interventions and understanding reading development.</p>
-                
-                <h3>Assessment Resources</h3>
-                <ul>
-                    <li><strong>DIBELS (University of Oregon):</strong> https://dibels.uoregon.edu/ - Official DIBELS website with training materials and resources</li>
-                    <li><strong>FastBridge Learning:</strong> https://www.fastbridge.org/ - Comprehensive assessment and intervention system</li>
-                    <li><strong>AIMSweb:</strong> https://www.aimsweb.com/ - Curriculum-based measurement and data management</li>
-                </ul>
-                
-                <h3>Intervention Programs and Materials</h3>
-                <h4>Phonemic Awareness</h4>
-                <ul>
-                    <li><strong>Phonemic Awareness in Young Children:</strong> Research-based activities by Adams, Foorman, Lundberg, and Beeler</li>
-                    <li><strong>Road to the Code:</strong> Phonological awareness program by Blachman et al.</li>
-                    <li><strong>Equipped for Reading Success:</strong> Multisensory activities by Kilpatrick</li>
-                </ul>
-                
-                <h4>Phonics and Decoding</h4>
-                <ul>
-                    <li><strong>Fundations:</strong> Wilson Language Training structured literacy program</li>
-                    <li><strong>Really Great Reading:</strong> Comprehensive phonics programs including Blast and Countdown</li>
-                    <li><strong>95 Percent Group:</strong> Phonics and decoding interventions</li>
-                    <li><strong>UFLI Foundations:</strong> Free structured literacy curriculum from University of Florida</li>
-                </ul>
-                
-                <h4>Fluency</h4>
-                <ul>
-                    <li><strong>Read Naturally:</strong> Evidence-based fluency intervention</li>
-                    <li><strong>Repeated Reading protocols:</strong> Free resources available from Reading Rockets</li>
-                    <li><strong>Quick Reads:</strong> Short passages for fluency practice</li>
-                </ul>
-                
-                <h4>Comprehension and Vocabulary</h4>
-                <ul>
-                    <li><strong>Project CRISS:</strong> Strategic reading strategies</li>
-                    <li><strong>Bringing Words to Life:</strong> Vocabulary instruction by Beck, McKeown, and Kucan</li>
-                    <li><strong>Question-Answer Relationships (QAR):</strong> Comprehension strategy framework</li>
-                    <li><strong>Collaborative Strategic Reading (CSR):</strong> Comprehension strategies for groups</li>
-                </ul>
-                
-                <h3>Professional Learning Resources</h3>
-                <h4>Organizations</h4>
-                <ul>
-                    <li><strong>International Dyslexia Association (IDA):</strong> https://dyslexiaida.org/ - Resources on structured literacy and dyslexia</li>
-                    <li><strong>Reading Rockets:</strong> https://www.readingrockets.org/ - Free resources for teaching reading</li>
-                    <li><strong>Center on MTSS:</strong> https://mtss4success.org/ - Resources on implementing MTSS</li>
-                    <li><strong>What Works Clearinghouse:</strong> https://ies.ed.gov/ncee/wwc/ - Reviews of research on educational interventions</li>
-                </ul>
-                
-                <h4>Key Research and Publications</h4>
-                <ul>
-                    <li><strong>"Equipped for Reading Success"</strong> by David Kilpatrick - Understanding phonological awareness and orthographic mapping</li>
-                    <li><strong>"Reading in the Brain"</strong> by Stanislas Dehaene - Neuroscience of reading</li>
-                    <li><strong>"Scarborough's Reading Rope"</strong> - Framework for understanding skilled reading components</li>
-                    <li><strong>National Reading Panel Report</strong> - Research synthesis on effective reading instruction</li>
-                    <li><strong>Simple View of Reading</strong> (Gough & Tunmer) - Foundational reading comprehension model</li>
-                </ul>
-                
-                <h3>Free Online Resources</h3>
-                <ul>
-                    <li><strong>Florida Center for Reading Research (FCRR):</strong> Free downloadable activities for literacy centers</li>
-                    <li><strong>Meadows Center:</strong> Free intervention activities and resources</li>
-                    <li><strong>Intervention Central:</strong> Free tools for progress monitoring and interventions</li>
-                    <li><strong>UFLI:</strong> Free structured literacy curriculum and resources</li>
-                    <li><strong>University of Oregon Big Ideas in Beginning Reading:</strong> Research summaries and activities</li>
-                </ul>
-                
-                <h3>Technology Resources</h3>
-                <ul>
-                    <li><strong>Lexia:</strong> Adaptive literacy software</li>
-                    <li><strong>iReady Reading:</strong> Personalized instruction and assessment</li>
-                    <li><strong>Reading Horizons:</strong> Software for phonics and decoding</li>
-                    <li><strong>Raz-Kids:</strong> Leveled reading practice online</li>
-                    <li><strong>Nessy:</strong> Multisensory reading and spelling programs</li>
-                </ul>
-                
-                <h3>Data Analysis Tools</h3>
-                <ul>
-                    <li><strong>Intervention Central:</strong> Free graphing and progress monitoring tools</li>
-                    <li><strong>STEEP (System to Enhance Educational Performance):</strong> Formative assessment decision-making tool</li>
-                    <li><strong>AIMLINE Calculator:</strong> Tool for setting realistic growth goals</li>
-                </ul>
-                
-                <h3>Materials for Interventions</h3>
-                <h4>Suggested Manipulatives and Supplies</h4>
-                <ul>
-                    <li>Letter cards (uppercase and lowercase)</li>
-                    <li>Sound cards with keywords</li>
-                    <li>Elkonin boxes (sound boxes) laminated or in sheet protectors</li>
-                    <li>Counters or tokens</li>
-                    <li>Dry erase boards and markers</li>
-                    <li>Timers</li>
-                    <li>Decodable texts at various levels</li>
-                    <li>Word lists organized by phonics patterns</li>
-                    <li>Fluency passages at various levels</li>
-                    <li>Progress monitoring graphs</li>
-                </ul>
-                
-                <h3>Cultural and Linguistic Diversity Considerations</h3>
-                <ul>
-                    <li><strong>WIDA:</strong> Resources for English language learners</li>
-                    <li><strong>Colorín Colorado:</strong> Bilingual literacy resources</li>
-                    <li><strong>First Nations Pedagogy:</strong> Culturally responsive literacy practices</li>
-                </ul>
-                
-                <h3>Family Engagement Resources</h3>
-                <ul>
-                    <li><strong>Reading Is Fundamental (RIF):</strong> Resources for families to support reading at home</li>
-                    <li><strong>PBS Parents - Reading & Language:</strong> Tips and activities for families</li>
-                    <li><strong>Understood.org:</strong> Resources for families of children with learning differences</li>
-                    <li><strong>LD OnLine:</strong> Information about learning disabilities and interventions</li>
-                </ul>
-                
-                <h3>Evidence-Based Practice Guides</h3>
-                <ul>
-                    <li><strong>IES Practice Guides:</strong> Free guides from the Institute of Education Sciences
-                        <ul>
-                            <li>Foundational Skills to Support Reading for Understanding in Kindergarten Through 3rd Grade</li>
-                            <li>Improving Reading Comprehension in Kindergarten Through 3rd Grade</li>
-                            <li>Assisting Students Struggling with Reading: Response to Intervention (RtI)</li>
+        <section id="resources-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">
+                    <span class="title-word">Resource</span>
+                    <span class="title-word">Library</span>
+                </h2>
+                <p class="section-subtitle">Tools and materials for literacy success</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="resource-grid">
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">📊</span>
+                            <h3>Assessment Tools</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li><a href="https://dibels.uoregon.edu/" target="_blank">DIBELS Official Site</a></li>
+                            <li><a href="https://www.fastbridge.org/" target="_blank">FastBridge Learning</a></li>
+                            <li><a href="https://www.aimsweb.com/" target="_blank">AIMSweb</a></li>
                         </ul>
-                    </li>
-                </ul>
-                
-                <p><em>Note: This resource list is not exhaustive and does not constitute an endorsement of any particular product or program. Always evaluate resources based on your students' specific needs, available research evidence, and district policies.</em></p>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">📚</span>
+                            <h3>Intervention Programs</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li>Fundations - Wilson Language</li>
+                            <li>Really Great Reading</li>
+                            <li>UFLI Foundations (Free)</li>
+                            <li>95 Percent Group</li>
+                        </ul>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">🎓</span>
+                            <h3>Professional Learning</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li><a href="https://dyslexiaida.org/" target="_blank">International Dyslexia Association</a></li>
+                            <li><a href="https://www.readingrockets.org/" target="_blank">Reading Rockets</a></li>
+                            <li><a href="https://mtss4success.org/" target="_blank">Center on MTSS</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">💻</span>
+                            <h3>Technology</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li>Lexia Adaptive Software</li>
+                            <li>iReady Reading</li>
+                            <li>Raz-Kids</li>
+                            <li>Nessy Programs</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Literacy Pal - Literacy Intervention Assistant. All rights reserved.</p>
-        </div>
+    <!-- Minimal Footer -->
+    <footer class="site-footer">
+        <p>© 2025 Literacy Pal · Empowering educators, one student at a time</p>
     </footer>
 
     <script src="app.js"></script>
