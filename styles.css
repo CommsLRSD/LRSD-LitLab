@@ -28,6 +28,7 @@
     --radius-sm: 4px;
     --radius: 6px;
     --radius-lg: 8px;
+    --radius-xl: 12px;
     
     --transition: all 0.2s ease;
     --transition-slow: all 0.3s ease;
@@ -39,11 +40,18 @@
     box-sizing: border-box;
 }
 
+/* Update body font to Source Sans Pro for better readability */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
     color: var(--text-primary);
     background: var(--bg-secondary);
+    font-size: 16px;
+}
+
+/* Keep header font as Inter for contrast */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Top Navigation */
@@ -84,6 +92,7 @@ body {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
 }
 
 .nav-links {
@@ -210,10 +219,11 @@ body {
     padding: 3rem 1.5rem 2rem;
     max-width: 1400px;
     margin: 0 auto;
+    text-align: center;
 }
 
 .section-title {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     color: var(--text-primary);
@@ -221,7 +231,8 @@ body {
 
 .section-subtitle {
     color: var(--text-secondary);
-    font-size: 1.1rem;
+    font-size: 1.125rem;
+    font-weight: 400;
 }
 
 .flowchart-controls {
@@ -229,12 +240,13 @@ body {
     max-width: 1400px;
     margin: 0 auto 2rem;
     display: flex;
+    justify-content: center;
     gap: 1rem;
 }
 
 .btn-reset,
 .btn-export {
-    padding: 0.5rem 1rem;
+    padding: 0.625rem 1.25rem;
     background: var(--bg-primary);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -243,12 +255,16 @@ body {
     color: var(--text-primary);
     cursor: pointer;
     transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-reset:hover,
 .btn-export:hover {
     background: var(--bg-accent);
-    border-color: var(--border-dark);
+    border-color: var(--primary);
+    color: var(--primary);
 }
 
 /* Flowchart Container */
@@ -259,6 +275,7 @@ body {
     margin: 0 auto;
     padding: 2rem 1.5rem;
     min-height: 600px;
+    background: linear-gradient(to bottom, var(--bg-secondary), var(--bg-primary));
 }
 
 .flowchart-connections {
@@ -275,6 +292,8 @@ body {
     fill: none;
     stroke: var(--border-dark);
     stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
     transition: stroke-dashoffset 0.5s ease;
 }
 
@@ -288,14 +307,14 @@ body {
 /* Flowchart Nodes */
 .flowchart-node {
     position: absolute;
-    width: 280px;
+    width: 320px;
     background: var(--bg-primary);
     border: 2px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
     opacity: 0;
-    transform: scale(0.95) translateY(10px);
-    transition: var(--transition-slow);
+    transform: scale(0.9) translateY(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .flowchart-node.node-visible {
@@ -306,78 +325,102 @@ body {
 .node-header {
     padding: 1.25rem;
     border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-.node-header h3 {
-    font-size: 1.1rem;
+.node-icon {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.node-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.node-text h3 {
+    font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 0.25rem;
     color: var(--text-primary);
 }
 
-.node-header p {
-    font-size: 0.9rem;
+.node-text p {
+    font-size: 0.875rem;
     color: var(--text-secondary);
+    line-height: 1.4;
 }
 
-/* Node Types */
+/* Node Types with unique styling */
 .node-start {
     border-color: var(--secondary);
 }
 
-.node-start .node-header {
-    background: rgba(16, 185, 129, 0.05);
+.node-start .node-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--secondary);
 }
 
-.node-decision .node-header {
-    background: var(--bg-accent);
+.node-decision .node-icon {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
 }
 
 .node-transition {
     border-color: var(--warning);
 }
 
-.node-transition .node-header {
-    background: rgba(245, 158, 11, 0.05);
+.node-transition .node-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
 }
 
 .node-endpoint {
     border-color: var(--primary);
 }
 
-.node-endpoint .node-header {
-    background: rgba(37, 99, 235, 0.05);
+.node-endpoint .node-icon {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
 }
 
 /* Node Options */
 .node-options {
-    padding: 0.5rem;
+    padding: 0.75rem;
 }
 
 .node-option {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.875rem 1rem;
     margin-bottom: 0.5rem;
     background: var(--bg-secondary);
-    border: 1px solid var(--border);
+    border: 1.5px solid var(--border);
     border-radius: var(--radius);
     font-size: 0.9rem;
     text-align: left;
     cursor: pointer;
     transition: var(--transition);
+    position: relative;
 }
 
 .node-option:last-child {
     margin-bottom: 0;
 }
 
-.node-option:hover {
+.node-option:hover:not(.disabled) {
     background: var(--bg-accent);
     border-color: var(--primary);
-    transform: translateX(4px);
+    transform: translateX(8px);
 }
 
 .node-option.selected {
@@ -386,26 +429,51 @@ body {
     color: white;
 }
 
+.node-option.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.node-option.disabled:hover {
+    transform: none;
+}
+
 .option-label {
     font-weight: 500;
+    flex: 1;
 }
 
 .option-subtitle {
-    font-size: 0.85rem;
-    opacity: 0.8;
+    font-size: 0.8rem;
+    opacity: 0.7;
     margin-top: 0.25rem;
 }
 
-.node-option.selected .option-subtitle {
-    opacity: 0.9;
+.option-arrow {
+    width: 16px;
+    height: 16px;
+    margin-left: auto;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: var(--transition);
+}
+
+.node-option:hover:not(.disabled) .option-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.node-option.selected .option-arrow {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 /* Node Actions */
 .node-start,
 .node-continue {
-    width: calc(100% - 2rem);
-    margin: 1rem;
-    padding: 0.75rem;
+    width: calc(100% - 1.5rem);
+    margin: 0.75rem;
+    padding: 0.875rem 1rem;
     background: var(--primary);
     border: none;
     border-radius: var(--radius);
@@ -414,13 +482,29 @@ body {
     color: white;
     cursor: pointer;
     transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.node-start:hover,
-.node-continue:hover {
+.node-start svg,
+.node-continue svg {
+    width: 18px;
+    height: 18px;
+}
+
+.node-start:hover:not(:disabled),
+.node-continue:hover:not(:disabled) {
     background: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.node-start:disabled,
+.node-continue:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .node-start.clicked,
@@ -429,22 +513,32 @@ body {
 }
 
 .node-reset {
-    width: calc(100% - 2rem);
-    margin: 0 1rem 1rem;
-    padding: 0.5rem;
+    width: calc(100% - 1.5rem);
+    margin: 0 0.75rem 0.75rem;
+    padding: 0.75rem;
     background: none;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
     transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.node-reset svg {
+    width: 16px;
+    height: 16px;
 }
 
 .node-reset:hover {
     background: var(--bg-accent);
     color: var(--text-primary);
+    border-color: var(--text-primary);
 }
 
 /* Node Recommendations */
@@ -453,10 +547,21 @@ body {
 }
 
 .recommendation-item {
-    padding: 0.5rem 0;
+    padding: 0.625rem 0;
     font-size: 0.9rem;
     color: var(--text-secondary);
     line-height: 1.5;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.recommendation-item svg {
+    width: 16px;
+    height: 16px;
+    color: var(--secondary);
+    flex-shrink: 0;
+    margin-top: 2px;
 }
 
 /* Other Sections */
@@ -486,6 +591,12 @@ body {
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.info-block:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
 }
 
 .info-block h3 {
@@ -497,6 +608,7 @@ body {
 .info-block p {
     color: var(--text-secondary);
     margin-bottom: 1.5rem;
+    line-height: 1.6;
 }
 
 .info-icon {
@@ -519,7 +631,8 @@ body {
     top: 8px;
     bottom: 8px;
     width: 2px;
-    background: var(--border);
+    background: linear-gradient(to bottom, var(--primary), var(--secondary));
+    border-radius: 1px;
 }
 
 .timeline-item {
@@ -542,10 +655,11 @@ body {
 .timeline-content h4 {
     font-size: 1rem;
     margin-bottom: 0.25rem;
+    font-weight: 600;
 }
 
 .timeline-content p {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: var(--text-secondary);
 }
 
@@ -554,7 +668,7 @@ body {
     padding: 2rem;
     background: var(--bg-primary);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     margin-top: 2rem;
 }
 
@@ -573,9 +687,15 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.75rem;
+    padding: 0.875rem;
     background: var(--bg-secondary);
     border-radius: var(--radius);
+    transition: var(--transition);
+}
+
+.practice-item:hover {
+    background: var(--bg-accent);
+    transform: translateY(-2px);
 }
 
 .practice-icon {
@@ -594,6 +714,11 @@ body {
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    transition: var(--transition);
+}
+
+.faq-item:hover {
+    box-shadow: var(--shadow-md);
 }
 
 .faq-question {
@@ -678,6 +803,12 @@ body {
     background: var(--bg-primary);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
+    transition: var(--transition);
+}
+
+.resource-category:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
 }
 
 .category-header {
@@ -692,7 +823,7 @@ body {
 }
 
 .category-header h3 {
-    font-size: 1.1rem;
+    font-size: 1.125rem;
 }
 
 .resource-list {
@@ -703,15 +834,18 @@ body {
     padding: 0.5rem 0;
     color: var(--text-secondary);
     font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 .resource-list a {
     color: var(--primary);
     text-decoration: none;
+    transition: var(--transition);
 }
 
 .resource-list a:hover {
     text-decoration: underline;
+    color: var(--primary-dark);
 }
 
 /* Footer */
@@ -720,11 +854,12 @@ body {
     border-top: 1px solid var(--border);
     padding: 2rem;
     text-align: center;
+    margin-top: 3rem;
 }
 
 .site-footer p {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
 }
 
 /* Responsive Design */
@@ -737,12 +872,17 @@ body {
         display: flex;
     }
     
+    .section-title {
+        font-size: 2rem;
+    }
+    
     .flowchart-node {
-        width: 240px;
+        width: 280px;
     }
     
     #flowchart-container {
         overflow-x: auto;
+        padding: 1rem;
     }
     
     .info-grid {
@@ -750,24 +890,37 @@ body {
     }
     
     .practice-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    
+    .resource-grid {
         grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 480px) {
     .section-title {
-        font-size: 1.5rem;
+        font-size: 1.75rem;
     }
     
     .flowchart-node {
-        width: 200px;
+        width: 240px;
     }
     
     .node-header {
         padding: 1rem;
     }
     
-    .node-header h3 {
+    .node-icon {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .node-text h3 {
         font-size: 1rem;
+    }
+    
+    .node-text p {
+        font-size: 0.8125rem;
     }
 }
