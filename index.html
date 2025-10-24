@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Literacy Pal - Intervention Flowchart</title>
-    
-    <!-- Google Fonts for better typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -80,26 +74,13 @@
         <!-- Interventions Section with Flowchart -->
         <section id="interventions-section" class="content-section active">
             <div class="interventions-header">
-                <h2 class="section-title">Literacy Intervention Pathway</h2>
-                <p class="section-subtitle">Navigate through the decision tree to find the right intervention strategy</p>
+                <h2 class="section-title">Literacy Intervention Flowchart</h2>
+                <p class="section-subtitle">Follow the path to find the right intervention for your students</p>
             </div>
 
             <div class="flowchart-controls">
-                <button class="btn-reset" onclick="resetFlowchart()">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M1 4v6h6M23 20v-6h-6"/>
-                        <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
-                    </svg>
-                    Start Over
-                </button>
-                <button class="btn-export" onclick="exportFlowchart()">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Export Path
-                </button>
+                <button class="btn-reset" onclick="resetFlowchart()">Start Over</button>
+                <button class="btn-export" onclick="exportFlowchart()">Export Path</button>
             </div>
 
             <div id="flowchart-container"></div>
@@ -120,7 +101,7 @@
                             <path d="M12 6v6l4 2"/>
                         </svg>
                         <h3>Universal Screening</h3>
-                        <p>All students assessed three times per year to identify those at risk</p>
+                        <p>All students assessed three times per year</p>
                         
                         <div class="timeline">
                             <div class="timeline-item">
@@ -152,7 +133,7 @@
                             <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                         </svg>
                         <h3>Progress Monitoring</h3>
-                        <p>Track student growth based on intervention tier</p>
+                        <p>Track student growth based on tier</p>
                         
                         <div class="timeline">
                             <div class="timeline-item">
@@ -166,4 +147,236 @@
                                 <div class="timeline-marker"></div>
                                 <div class="timeline-content">
                                     <h4>Tier 2</h4>
-                                    <p>Bi
+                                    <p>Bi-weekly to monthly</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Tier 3</h4>
+                                    <p>Weekly</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="best-practices">
+                    <h3>Assessment Best Practices</h3>
+                    <div class="practice-grid">
+                        <div class="practice-item">
+                            <span class="practice-icon">🎯</span>
+                            <span>Quiet testing environment</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">⏱️</span>
+                            <span>Consistent timing</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">📊</span>
+                            <span>Multiple data points</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">👥</span>
+                            <span>Trained assessors</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">📝</span>
+                            <span>Clear documentation</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">💬</span>
+                            <span>Team collaboration</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Understanding Scores Section -->
+        <section id="understanding-scores-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">Understanding Assessment Scores</h2>
+                <p class="section-subtitle">Interpreting results and determining next steps</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="info-grid">
+                    <div class="info-block">
+                        <h3>Score Categories</h3>
+                        <p>Understanding benchmark levels</p>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0; color: #10b981;">
+                                <strong>Above Benchmark:</strong> Exceeding expectations
+                            </li>
+                            <li style="padding: 0.5rem 0; color: #10b981;">
+                                <strong>At Benchmark:</strong> Meeting grade-level expectations
+                            </li>
+                            <li style="padding: 0.5rem 0; color: #f59e0b;">
+                                <strong>Below Benchmark:</strong> Some risk, needs monitoring
+                            </li>
+                            <li style="padding: 0.5rem 0; color: #ef4444;">
+                                <strong>Well Below:</strong> High risk, needs intervention
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="info-block">
+                        <h3>Decision Rules</h3>
+                        <p>When to move between tiers</p>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0;">
+                                <strong>Move to Tier 2:</strong> Below benchmark for 2+ screenings
+                            </li>
+                            <li style="padding: 0.5rem 0;">
+                                <strong>Move to Tier 3:</strong> Well below + minimal progress in Tier 2
+                            </li>
+                            <li style="padding: 0.5rem 0;">
+                                <strong>Fade Support:</strong> At benchmark for 3+ progress checks
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQs Section -->
+        <section id="faqs-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-subtitle">Common questions about literacy interventions</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What is RTI/MTSS?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Response to Intervention (RTI) and Multi-Tiered System of Supports (MTSS) are frameworks for providing academic support to all students through increasingly intensive levels of instruction.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span>How long should interventions last?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Interventions should be implemented with fidelity for at least 6-8 weeks before making decisions about effectiveness. Tier 2 typically involves 20-30 minutes daily, while Tier 3 requires 45-60 minutes daily.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What group sizes are recommended?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Tier 1: Whole class instruction. Tier 2: Small groups of 3-6 students with similar needs. Tier 3: Groups of 1-3 students or individual instruction for intensive support.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Should interventions replace core instruction?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>No. Interventions should be provided in addition to, not instead of, high-quality core instruction. All students need access to grade-level content and instruction.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources Section -->
+        <section id="resources-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">Resources</h2>
+                <p class="section-subtitle">Tools and materials for literacy intervention</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="resource-grid">
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">📊</span>
+                            <h3>Assessment Tools</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li><a href="#">DIBELS Assessment Suite</a></li>
+                            <li><a href="#">FastBridge Learning</a></li>
+                            <li><a href="#">AIMSweb Plus</a></li>
+                            <li><a href="#">STAR Reading</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">📚</span>
+                            <h3>Intervention Programs</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li>Wilson Fundations</li>
+                            <li>Orton-Gillingham</li>
+                            <li>UFLI Foundations</li>
+                            <li>95 Percent Group</li>
+                        </ul>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">🎓</span>
+                            <h3>Professional Development</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li><a href="#">LETRS Training</a></li>
+                            <li><a href="#">Reading Rockets</a></li>
+                            <li><a href="#">IDA Certification</a></li>
+                            <li><a href="#">MTSS Implementation</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">💻</span>
+                            <h3>Digital Tools</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li>Lexia Core5</li>
+                            <li>iReady Reading</li>
+                            <li>Raz-Kids</li>
+                            <li>Nessy Learning</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>© 2025 Literacy Pal · Supporting educators in literacy intervention</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        // FAQ Toggle
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            faqItem.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
