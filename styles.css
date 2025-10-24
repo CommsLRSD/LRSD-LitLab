@@ -1,7 +1,9 @@
 /* Reset and Variables */
 :root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
+    /* Modern professional blue palette */
+    --primary: #1e40af;
+    --primary-dark: #1e3a8a;
+    --primary-light: #3b82f6;
     --secondary: #10b981;
     --secondary-dark: #059669;
     --warning: #f59e0b;
@@ -9,21 +11,21 @@
     --danger: #ef4444;
     --danger-dark: #dc2626;
     
-    --text-primary: #111827;
+    --text-primary: #1f2937;
     --text-secondary: #6b7280;
     --text-light: #9ca3af;
     
     --bg-primary: #ffffff;
-    --bg-secondary: #f9fafb;
-    --bg-accent: #f3f4f6;
+    --bg-secondary: #f8fafc;
+    --bg-accent: #f1f5f9;
     
-    --border: #e5e7eb;
-    --border-dark: #d1d5db;
+    --border: #e2e8f0;
+    --border-dark: #cbd5e1;
     
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     
     --radius-sm: 4px;
     --radius: 6px;
@@ -32,11 +34,6 @@
     
     --transition: all 0.2s ease;
     --transition-slow: all 0.3s ease;
-    
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
-    --gradient-bg: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(16, 185, 129, 0.05));
-    --gradient-accent: linear-gradient(to bottom, var(--primary), var(--secondary));
 }
 
 * {
@@ -45,18 +42,19 @@
     box-sizing: border-box;
 }
 
-/* Update body font to Source Sans Pro for better readability */
+/* Modern sans-serif typography */
 body {
-    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
     color: var(--text-primary);
     background: var(--bg-secondary);
     font-size: 16px;
 }
 
-/* Keep header font as Inter for contrast */
+/* Headers with same modern font stack */
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 600;
 }
 
 /* Top Navigation */
@@ -97,7 +95,6 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
 }
 
 .nav-links {
@@ -225,8 +222,8 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 1400px;
     margin: 0 auto;
     text-align: center;
-    background: var(--gradient-bg);
-    border-radius: var(--radius-xl);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border);
 }
 
 .section-title {
@@ -282,7 +279,7 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto;
     padding: 2rem 1.5rem;
     min-height: 600px;
-    background: linear-gradient(to bottom, var(--bg-secondary), var(--bg-primary));
+    background: var(--bg-secondary);
 }
 
 .flowchart-connections {
@@ -316,9 +313,9 @@ h1, h2, h3, h4, h5, h6 {
     position: absolute;
     width: 320px;
     background: var(--bg-primary);
-    border: 2px solid var(--border);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
     opacity: 0;
     transform: scale(0.9) translateY(20px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -346,6 +343,8 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    background: var(--bg-accent);
+    color: var(--primary);
 }
 
 .node-icon svg {
@@ -368,21 +367,21 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Node Types with unique styling */
 .node-start {
-    border-color: var(--secondary);
+    border-color: var(--primary);
 }
 
 .node-start .node-icon {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--secondary);
+    background: var(--bg-accent);
+    color: var(--primary);
 }
 
 .node-decision .node-icon {
-    background: rgba(37, 99, 235, 0.1);
+    background: var(--bg-accent);
     color: var(--primary);
 }
 
 .node-transition {
-    border-color: var(--warning);
+    border-color: var(--border);
 }
 
 .node-transition .node-icon {
@@ -395,7 +394,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .node-endpoint .node-icon {
-    background: rgba(37, 99, 235, 0.1);
+    background: var(--bg-accent);
     color: var(--primary);
 }
 
@@ -411,7 +410,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.875rem 1rem;
     margin-bottom: 0.5rem;
     background: var(--bg-secondary);
-    border: 1.5px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     font-size: 0.9rem;
     text-align: left;
@@ -583,8 +582,8 @@ h1, h2, h3, h4, h5, h6 {
     padding: 3rem 1.5rem;
     max-width: 800px;
     margin: 0 auto 2rem;
-    background: var(--gradient-bg);
-    border-radius: var(--radius-xl);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border);
 }
 
 .info-grid {
@@ -612,7 +611,7 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 4px;
     height: 100%;
-    background: var(--gradient-accent);
+    background: var(--primary);
     transform: scaleY(0);
     transition: transform 0.3s ease;
 }
@@ -659,7 +658,7 @@ h1, h2, h3, h4, h5, h6 {
     top: 8px;
     bottom: 8px;
     width: 2px;
-    background: var(--gradient-accent);
+    background: var(--primary);
     border-radius: 1px;
 }
 
@@ -917,7 +916,7 @@ h1, h2, h3, h4, h5, h6 {
     height: 80px;
     margin: 0 auto 1.5rem;
     padding: 1.5rem;
-    background: var(--gradient-primary);
+    background: var(--primary);
     border-radius: 50%;
     color: white;
 }
@@ -951,7 +950,7 @@ h1, h2, h3, h4, h5, h6 {
     gap: 1.5rem;
     padding: 1.5rem;
     background: var(--bg-secondary);
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: var(--transition);
@@ -972,7 +971,7 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gradient-primary);
+    background: var(--primary);
     color: white;
     font-weight: 700;
     font-size: 0.9rem;
@@ -1075,14 +1074,14 @@ h1, h2, h3, h4, h5, h6 {
     width: 60px;
     height: 60px;
     padding: 1rem;
-    background: var(--gradient-primary);
+    background: var(--primary);
     border-radius: var(--radius-lg);
     color: white;
     flex-shrink: 0;
 }
 
 .step-icon.success {
-    background: linear-gradient(135deg, var(--secondary), #059669);
+    background: var(--secondary);
 }
 
 .step-icon svg {
@@ -1112,7 +1111,7 @@ h1, h2, h3, h4, h5, h6 {
 .screener-card {
     padding: 2rem;
     background: var(--bg-secondary);
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: var(--transition);
@@ -1122,8 +1121,8 @@ h1, h2, h3, h4, h5, h6 {
 .screener-card:hover {
     border-color: var(--primary);
     background: var(--bg-primary);
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
 }
 
 .screener-card h3 {
@@ -1158,7 +1157,7 @@ h1, h2, h3, h4, h5, h6 {
 .area-card {
     padding: 2rem 1.5rem;
     background: var(--bg-secondary);
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: var(--transition);
@@ -1168,8 +1167,8 @@ h1, h2, h3, h4, h5, h6 {
 .area-card:hover {
     border-color: var(--primary);
     background: var(--bg-primary);
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
 }
 
 .area-icon {
@@ -1177,7 +1176,7 @@ h1, h2, h3, h4, h5, h6 {
     height: 50px;
     margin: 0 auto 1rem;
     padding: 0.75rem;
-    background: rgba(37, 99, 235, 0.1);
+    background: var(--bg-accent);
     border-radius: var(--radius-lg);
     color: var(--primary);
 }
@@ -1249,7 +1248,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .pillar-badge {
     padding: 0.375rem 0.75rem;
-    background: rgba(37, 99, 235, 0.1);
+    background: var(--bg-accent);
     color: var(--primary);
     font-size: 0.8rem;
     font-weight: 600;
