@@ -2,394 +2,334 @@
 const appState = {
     interventionsData: null,
     currentTier: null,
-    currentStep: null,
-    stepHistory: [],
-    selectedData: {
-        screener: null,
-        effectiveness: null,
-        percentageUnsuccessful: null,
-        drillDownAssessment: null,
-        interventionChoice: null,
-        progressResult: null
-    }
+    flowchartNodes: [],
+    selectedPath: [],
+    currentDecision: null
 };
 
-// Tier and Step definitions (same as before)
-const TIER_DEFINITIONS = {
-    tier1: {
-        id: 'tier1',
-        name: 'Tier 1 - Universal Classroom Literacy Interventions',
-        steps: [
-            { id: 'tier1-intro', type: 'checklist', title: 'Principles of Explicit and Systematic Instruction' },
-            { id: 'tier1-screener', type: 'selection', title: 'Select Literacy Screener' },
-            { id: 'tier1-effectiveness', type: 'binary-choice', title: 'Evaluate Instruction Effectiveness' },
-            { id: 'tier1-percentage', type: 'binary-choice', title: 'Student Success Rate' },
-            { id: 'tier1-reteach', type: 'final', title: 'Reteach Using Different Strategies' },
-            { id: 'tier1-move-tier2', type: 'final', title: 'Move to Tier 2 Interventions' }
-        ]
+// Flowchart Decision Tree
+const FLOWCHART_TREE = {
+    root: {
+        id: 'start',
+        type: 'start',
+        title: 'Begin Assessment',
+        description: 'Start your literacy intervention journey',
+        next: 'tier-selection'
     },
-    tier2: {
-        id: 'tier2',
-        name: 'Tier 2 - Small Group Interventions',
-        steps: [
-            { id: 'tier2-intro', type: 'checklist', title: 'Small Group Intervention Requirements' },
-            { id: 'tier2-drilldown', type: 'selection', title: 'Select Drill Down Assessments' },
-            { id: 'tier2-intervention', type: 'placeholder', title: 'Choose Interventions' },
-            { id: 'tier2-8weeks', type: 'info', title: '8-Week Intervention Cycle' },
-            { id: 'tier2-progress', type: 'binary-choice', title: 'Progress Monitoring Results' },
-            { id: 'tier2-fade-tier1', type: 'final', title: 'Fade to Tier 1 Supports' },
-            { id: 'tier2-move-tier3', type: 'final', title: 'Move to Tier 3 Interventions' }
+    'tier-selection': {
+        id: 'tier-selection',
+        type: 'decision',
+        title: 'Select Starting Point',
+        description: 'Where would you like to begin?',
+        options: [
+            {
+                id: 'tier1',
+                label: 'Tier 1 - Universal Instruction',
+                subtitle: 'For all students',
+                next: 'tier1-screener'
+            },
+            {
+                id: 'tier2',
+                label: 'Tier 2 - Targeted Support',
+                subtitle: 'For at-risk students',
+                next: 'tier2-assessment'
+            },
+            {
+                id: 'tier3',
+                label: 'Tier 3 - Intensive Intervention',
+                subtitle: 'For high-need students',
+                next: 'tier3-assessment'
+            }
         ]
-    },
-    tier3: {
-        id: 'tier3',
-        name: 'Tier 3 - Personalized Interventions',
-        steps: [
-            { id: 'tier3-intro', type: 'info', title: 'Intensive Personalized Interventions' },
-            { id: 'tier3-drilldown', type: 'selection', title: 'Select Drill Down Assessments' },
-            { id: 'tier3-intervention', type: 'placeholder', title: 'Choose Personalized Interventions' },
-            { id: 'tier3-8weeks', type: 'info', title: '8-Week Intensive Intervention Cycle' },
-            { id: 'tier3-progress', type: 'binary-choice', title: 'Progress Monitoring Results' },
-            { id: 'tier3-fade-tier2', type: 'final', title: 'Fade to Tier 2 Supports' },
-            { id: 'tier3-clinicians', type: 'final', title: 'Meet with Clinicians' }
-        ]
-    }
-};
-
-// Keep STEP_CONTENT the same as before
-const STEP_CONTENT = {
-    'tier1-intro': {
-        title: 'Principles of Explicit and Systematic Instruction',
-        description: 'Ensure these key principles are in place for all students:',
-        checklist: [
-            'Clear learning objectives are stated at the beginning of each lesson',
-            'Skills are taught systematically, following a logical progression',
-            'Teacher models the skill with think-alouds and demonstrations',
-            'Students receive guided practice with immediate feedback',
-            'Independent practice is provided with gradual release of responsibility'
-        ],
-        buttonText: 'Start Assessment'
     },
     'tier1-screener': {
-        title: 'Select Literacy Screener',
-        description: 'Choose the literacy screener used to assess students:',
-        options: ['DIBELS', 'CTOPP-2', 'THaFoL', 'IDAPEL'],
-        buttonText: 'Continue'
+        id: 'tier1-screener',
+        type: 'decision',
+        title: 'Select Screener',
+        description: 'Which assessment tool are you using?',
+        options: [
+            { id: 'dibels', label: 'DIBELS', next: 'tier1-effectiveness' },
+            { id: 'fastbridge', label: 'FastBridge', next: 'tier1-effectiveness' },
+            { id: 'aimsweb', label: 'AIMSweb', next: 'tier1-effectiveness' },
+            { id: 'other', label: 'Other Assessment', next: 'tier1-effectiveness' }
+        ]
     },
     'tier1-effectiveness': {
-        title: 'Evaluate Instruction Effectiveness',
-        description: 'Based on screening results and classroom observations, was the instruction effective?',
+        id: 'tier1-effectiveness',
+        type: 'decision',
+        title: 'Instruction Effectiveness',
+        description: 'Is current instruction meeting student needs?',
         options: [
-            { value: 'effective', label: 'Effective - Students are meeting benchmarks' },
-            { value: 'ineffective', label: 'Ineffective - Students are not meeting benchmarks' }
-        ],
-        buttonText: 'Continue'
+            {
+                id: 'effective',
+                label: 'Yes - Students meeting benchmarks',
+                next: 'maintain-tier1'
+            },
+            {
+                id: 'ineffective',
+                label: 'No - Students below benchmarks',
+                next: 'tier1-percentage'
+            }
+        ]
     },
     'tier1-percentage': {
+        id: 'tier1-percentage',
+        type: 'decision',
         title: 'Student Success Rate',
-        description: 'Was the instruction unsuccessful for more than 20% of students?',
+        description: 'What percentage of students are unsuccessful?',
         options: [
-            { value: 'more-than-20', label: 'Yes - More than 20% unsuccessful' },
-            { value: 'less-than-20', label: 'No - Less than 20% unsuccessful' }
-        ],
-        buttonText: 'Continue'
+            {
+                id: 'less-20',
+                label: 'Less than 20%',
+                next: 'reteach-strategies'
+            },
+            {
+                id: 'more-20',
+                label: 'More than 20%',
+                next: 'move-tier2'
+            }
+        ]
     },
-    'tier1-reteach': {
-        title: 'Reteach Using Different Strategies',
-        description: 'When less than 20% of students are unsuccessful, it indicates that core instruction is generally effective but needs adjustment for a small group.',
-        content: [
-            'Review and adjust your instructional approach',
-            'Use different teaching methods or materials',
-            'Provide additional modeling and scaffolding',
-            'Consider alternative examples and practice activities',
-            'Monitor progress and reteach as needed'
-        ],
-        buttonText: 'Return to Dashboard'
+    'maintain-tier1': {
+        id: 'maintain-tier1',
+        type: 'endpoint',
+        title: 'Continue Current Instruction',
+        description: 'Maintain high-quality core instruction',
+        recommendations: [
+            'Continue current instructional practices',
+            'Monitor progress quarterly',
+            'Differentiate within core instruction',
+            'Celebrate student success'
+        ]
     },
-    'tier1-move-tier2': {
-        title: 'Move to Tier 2 Interventions',
-        description: 'When more than 20% of students are unsuccessful, it indicates a need for more intensive, small-group interventions.',
-        content: [
-            'Students will receive targeted small-group instruction',
-            'Interventions will be provided 20-30 minutes daily',
-            'Progress will be monitored bi-weekly to monthly',
-            'Instruction will be more explicit and systematic'
-        ],
-        buttonText: 'Go to Tier 2',
-        nextTier: 'tier2'
+    'reteach-strategies': {
+        id: 'reteach-strategies',
+        type: 'endpoint',
+        title: 'Reteach with Different Strategies',
+        description: 'Adjust instruction for small group',
+        recommendations: [
+            'Identify specific skill gaps',
+            'Use alternative teaching methods',
+            'Provide additional practice opportunities',
+            'Monitor progress bi-weekly',
+            'Consider flexible grouping'
+        ]
     },
-    'tier2-intro': {
-        title: 'Small Group Intervention Requirements',
-        description: 'Ensure these elements are in place for Tier 2 interventions:',
-        checklist: [
-            'Small groups of 3-6 students with similar needs',
-            '20-30 minutes of intervention daily, in addition to core instruction',
-            'Evidence-based intervention programs and strategies',
-            'Progress monitoring conducted bi-weekly to monthly',
-            'Interventions provided for at least 8 weeks before making changes'
-        ],
-        buttonText: 'Start Assessment'
+    'move-tier2': {
+        id: 'move-tier2',
+        type: 'transition',
+        title: 'Transition to Tier 2',
+        description: 'Students need targeted intervention',
+        next: 'tier2-assessment'
     },
-    'tier2-drilldown': {
-        title: 'Select Drill Down Assessments',
-        description: 'Choose drill-down assessments based on the screener and areas of concern:',
-        placeholder: 'Assessment selection will be based on your screener choice',
-        buttonText: 'Continue'
+    'tier2-assessment': {
+        id: 'tier2-assessment',
+        type: 'decision',
+        title: 'Diagnostic Assessment',
+        description: 'Select area of focus',
+        options: [
+            { id: 'phonemic', label: 'Phonemic Awareness', next: 'tier2-intervention' },
+            { id: 'phonics', label: 'Phonics & Decoding', next: 'tier2-intervention' },
+            { id: 'fluency', label: 'Reading Fluency', next: 'tier2-intervention' },
+            { id: 'comprehension', label: 'Comprehension', next: 'tier2-intervention' },
+            { id: 'vocabulary', label: 'Vocabulary', next: 'tier2-intervention' }
+        ]
+    },
+    'tier2-intervention': {
+        id: 'tier2-intervention',
+        type: 'decision',
+        title: '8-Week Intervention Cycle',
+        description: 'Implement small group intervention',
+        options: [
+            {
+                id: 'progress-made',
+                label: 'Progress Made - Meeting goals',
+                next: 'fade-tier1'
+            },
+            {
+                id: 'some-progress',
+                label: 'Some Progress - Continue intervention',
+                next: 'continue-tier2'
+            },
+            {
+                id: 'no-progress',
+                label: 'Minimal Progress - Intensify support',
+                next: 'move-tier3'
+            }
+        ]
+    },
+    'fade-tier1': {
+        id: 'fade-tier1',
+        type: 'endpoint',
+        title: 'Fade to Tier 1',
+        description: 'Gradually reduce intervention',
+        recommendations: [
+            'Reduce intervention frequency',
+            'Monitor for maintenance',
+            'Ensure strong core instruction',
+            'Plan for booster sessions if needed'
+        ]
+    },
+    'continue-tier2': {
+        id: 'continue-tier2',
+        type: 'endpoint',
+        title: 'Continue Tier 2',
+        description: 'Maintain current intervention',
+        recommendations: [
+            'Continue current intervention',
+            'Adjust group composition if needed',
+            'Review intervention fidelity',
+            'Monitor progress bi-weekly'
+        ]
+    },
+    'move-tier3': {
+        id: 'move-tier3',
+        type: 'transition',
+        title: 'Transition to Tier 3',
+        description: 'Student needs intensive intervention',
+        next: 'tier3-assessment'
+    },
+    'tier3-assessment': {
+        id: 'tier3-assessment',
+        type: 'decision',
+        title: 'Comprehensive Assessment',
+        description: 'Identify specific learning needs',
+        options: [
+            { id: 'dyslexia', label: 'Dyslexia Indicators', next: 'tier3-intervention' },
+            { id: 'language', label: 'Language Processing', next: 'tier3-intervention' },
+            { id: 'executive', label: 'Executive Function', next: 'tier3-intervention' },
+            { id: 'multiple', label: 'Multiple Areas', next: 'tier3-intervention' }
+        ]
+    },
+    'tier3-intervention': {
+        id: 'tier3-intervention',
+        type: 'decision',
+        title: 'Intensive 1:1 Intervention',
+        description: 'Daily intensive support',
+        options: [
+            {
+                id: 'significant-progress',
+                label: 'Significant Progress',
+                next: 'fade-tier2'
+            },
+            {
+                id: 'steady-progress',
+                label: 'Steady Progress - Continue',
+                next: 'continue-tier3'
+            },
+            {
+                id: 'minimal-progress',
+                label: 'Minimal Progress',
+                next: 'special-education'
+            }
+        ]
+    },
+    'fade-tier2': {
+        id: 'fade-tier2',
+        type: 'endpoint',
+        title: 'Fade to Tier 2',
+        description: 'Reduce intervention intensity',
+        recommendations: [
+            'Transition to small group',
+            'Maintain progress monitoring',
+            'Plan transition carefully',
+            'Communicate with all stakeholders'
+        ]
+    },
+    'continue-tier3': {
+        id: 'continue-tier3',
+        type: 'endpoint',
+        title: 'Continue Tier 3',
+        description: 'Maintain intensive support',
+        recommendations: [
+            'Continue 1:1 intervention',
+            'Weekly progress monitoring',
+            'Regular team meetings',
+            'Consider additional assessments'
+        ]
+    },
+    'special-education': {
+        id: 'special-education',
+        type: 'endpoint',
+        title: 'Special Education Referral',
+        description: 'Consider comprehensive evaluation',
+        recommendations: [
+            'Document all interventions tried',
+            'Gather progress monitoring data',
+            'Schedule team meeting',
+            'Consider special education evaluation',
+            'Involve parents in decision'
+        ]
     }
 };
 
-// Initialize the application when DOM is loaded
+// Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     initializeNavigation();
-    initializeTierSelection();
     initializeMobileMenu();
-    initializeAccordions();
-    initializeFAQs();
+    loadInterventionsData();
+    
+    // Start flowchart if on interventions page
+    const interventionsSection = document.getElementById('interventions-section');
+    if (interventionsSection && interventionsSection.classList.contains('active')) {
+        initializeFlowchart();
+    }
 });
 
-// Navigation between main sections
+// Navigation functions
 function initializeNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
     const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
     const sections = document.querySelectorAll('.content-section');
     
-    // Desktop navigation
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            const targetPage = this.getAttribute('data-page');
-            switchSection(targetPage, navLinks);
-        });
-    });
-    
-    // Mobile navigation
-    mobileNavItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const targetPage = this.getAttribute('data-page');
-            switchSection(targetPage, navLinks);
-            closeMobileMenu();
-        });
-    });
-    
-    function switchSection(targetPage, navLinks) {
-        // Hide all sections
+    function switchSection(targetPage) {
         sections.forEach(section => {
             section.classList.remove('active');
         });
         
-        // Show target section
         const targetSection = document.getElementById(targetPage + '-section');
         if (targetSection) {
             targetSection.classList.add('active');
+            
+            // Initialize flowchart if switching to interventions
+            if (targetPage === 'interventions') {
+                setTimeout(() => initializeFlowchart(), 100);
+            }
         }
         
-        // Update active nav link
         navLinks.forEach(link => {
             link.classList.remove('active');
             if (link.getAttribute('data-page') === targetPage) {
                 link.classList.add('active');
             }
         });
-    }
-}
-
-// Tier selection handlers
-function initializeTierSelection() {
-    const tierPaths = document.querySelectorAll('.tier-path');
-    const tierActions = document.querySelectorAll('.tier-action');
-    
-    tierPaths.forEach(path => {
-        const button = path.querySelector('.tier-action');
-        if (button) {
-            button.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const tier = path.getAttribute('data-tier');
-                startTierJourney(tier);
-            });
-        }
-    });
-}
-
-function startTierJourney(tier) {
-    appState.currentTier = tier;
-    appState.currentStep = 0;
-    appState.stepHistory = [];
-    
-    // Show wizard container
-    const wizardContainer = document.getElementById('wizard-container');
-    if (wizardContainer) {
-        wizardContainer.classList.remove('hidden');
-        displayCurrentStep();
         
-        // Scroll to wizard
-        wizardContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-}
-
-function displayCurrentStep() {
-    const wizardContainer = document.getElementById('wizard-container');
-    if (!wizardContainer || !appState.currentTier) return;
-    
-    const tierDef = TIER_DEFINITIONS[appState.currentTier];
-    if (!tierDef) return;
-    
-    const step = tierDef.steps[appState.currentStep];
-    if (!step) return;
-    
-    const stepContent = STEP_CONTENT[step.id];
-    if (!stepContent) return;
-    
-    // Create step HTML
-    let html = `
-        <div class="wizard-step">
-            <div class="wizard-header">
-                <h3>${stepContent.title}</h3>
-                <p>${stepContent.description}</p>
-            </div>
-            <div class="wizard-body">
-    `;
-    
-    // Add content based on step type
-    if (stepContent.checklist) {
-        html += '<ul class="checklist">';
-        stepContent.checklist.forEach(item => {
-            html += `<li>${item}</li>`;
+        // Update mobile nav
+        mobileNavItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('data-page') === targetPage) {
+                item.classList.add('active');
+            }
         });
-        html += '</ul>';
     }
     
-    if (stepContent.options) {
-        if (Array.isArray(stepContent.options) && typeof stepContent.options[0] === 'string') {
-            // Simple string options
-            html += '<div class="options-list">';
-            stepContent.options.forEach(option => {
-                html += `<button class="option-btn" data-value="${option}">${option}</button>`;
-            });
-            html += '</div>';
-        } else if (Array.isArray(stepContent.options)) {
-            // Object options with value and label
-            html += '<div class="options-list">';
-            stepContent.options.forEach(option => {
-                html += `<button class="option-btn" data-value="${option.value}">${option.label}</button>`;
-            });
-            html += '</div>';
-        }
-    }
-    
-    if (stepContent.content) {
-        html += '<ul class="content-list">';
-        stepContent.content.forEach(item => {
-            html += `<li>${item}</li>`;
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            const targetPage = this.getAttribute('data-page');
+            switchSection(targetPage);
         });
-        html += '</ul>';
-    }
+    });
     
-    html += `
-            </div>
-            <div class="wizard-footer">
-    `;
-    
-    // Add back button if not first step
-    if (appState.stepHistory.length > 0) {
-        html += '<button class="wizard-btn wizard-btn-back">Back</button>';
-    }
-    
-    // Add main action button
-    html += `<button class="wizard-btn wizard-btn-primary">${stepContent.buttonText || 'Continue'}</button>`;
-    
-    html += `
-            </div>
-        </div>
-    `;
-    
-    wizardContainer.innerHTML = html;
-    
-    // Attach event listeners
-    attachWizardListeners();
-}
-
-function attachWizardListeners() {
-    // Primary button
-    const primaryBtn = document.querySelector('.wizard-btn-primary');
-    if (primaryBtn) {
-        primaryBtn.addEventListener('click', handlePrimaryAction);
-    }
-    
-    // Back button
-    const backBtn = document.querySelector('.wizard-btn-back');
-    if (backBtn) {
-        backBtn.addEventListener('click', handleBackAction);
-    }
-    
-    // Option buttons
-    const optionBtns = document.querySelectorAll('.option-btn');
-    optionBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Remove selected class from all options
-            optionBtns.forEach(b => b.classList.remove('selected'));
-            // Add selected class to clicked option
-            this.classList.add('selected');
+    mobileNavItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const targetPage = this.getAttribute('data-page');
+            switchSection(targetPage);
+            closeMobileMenu();
         });
     });
 }
 
-function handlePrimaryAction() {
-    const tierDef = TIER_DEFINITIONS[appState.currentTier];
-    const step = tierDef.steps[appState.currentStep];
-    const stepContent = STEP_CONTENT[step.id];
-    
-    // Check if an option needs to be selected
-    const selectedOption = document.querySelector('.option-btn.selected');
-    if (stepContent.options && !selectedOption) {
-        alert('Please select an option before continuing');
-        return;
-    }
-    
-    // Save history
-    appState.stepHistory.push(appState.currentStep);
-    
-    // Move to next step
-    if (appState.currentStep < tierDef.steps.length - 1) {
-        appState.currentStep++;
-        displayCurrentStep();
-    } else {
-        // End of wizard
-        finishWizard();
-    }
-}
-
-function handleBackAction() {
-    if (appState.stepHistory.length > 0) {
-        appState.currentStep = appState.stepHistory.pop();
-        displayCurrentStep();
-    }
-}
-
-function finishWizard() {
-    const wizardContainer = document.getElementById('wizard-container');
-    if (wizardContainer) {
-        wizardContainer.innerHTML = `
-            <div class="wizard-complete">
-                <h3>Journey Complete!</h3>
-                <p>Thank you for using Literacy Pal</p>
-                <button class="wizard-btn wizard-btn-primary" onclick="resetWizard()">Start New Journey</button>
-            </div>
-        `;
-    }
-}
-
-function resetWizard() {
-    appState.currentTier = null;
-    appState.currentStep = null;
-    appState.stepHistory = [];
-    
-    const wizardContainer = document.getElementById('wizard-container');
-    if (wizardContainer) {
-        wizardContainer.classList.add('hidden');
-        wizardContainer.innerHTML = '';
-    }
-}
-
-// Mobile menu handlers
+// Mobile menu functions
 function initializeMobileMenu() {
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
@@ -414,52 +354,302 @@ function closeMobileMenu() {
     }
 }
 
-// FAQ accordion handlers
-function initializeFAQs() {
-    const faqQuestions = document.querySelectorAll('.faq-question');
-    
-    faqQuestions.forEach(question => {
-        question.addEventListener('click', function() {
-            const faqItem = this.parentElement;
-            const isActive = faqItem.classList.contains('active');
-            
-            // Close all FAQs
-            document.querySelectorAll('.faq-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Open clicked FAQ if it wasn't active
-            if (!isActive) {
-                faqItem.classList.add('active');
-            }
-        });
-    });
+// Load interventions data
+async function loadInterventionsData() {
+    try {
+        const response = await fetch('./data/interventions.json');
+        if (response.ok) {
+            appState.interventionsData = await response.json();
+        }
+    } catch (error) {
+        console.error('Error loading interventions data:', error);
+    }
 }
 
-// Assessment tool accordion handlers
-function initializeAccordions() {
-    const accordionTriggers = document.querySelectorAll('.accordion-trigger');
+// Flowchart functions
+function initializeFlowchart() {
+    const container = document.getElementById('flowchart-container');
+    if (!container) return;
     
-    accordionTriggers.forEach(trigger => {
-        trigger.addEventListener('click', function() {
-            const content = this.nextElementSibling;
-            const isActive = this.classList.contains('active');
+    // Clear existing flowchart
+    container.innerHTML = '';
+    appState.flowchartNodes = [];
+    appState.selectedPath = [];
+    
+    // Create SVG for connections
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.classList.add('flowchart-connections');
+    container.appendChild(svg);
+    
+    // Create nodes container
+    const nodesContainer = document.createElement('div');
+    nodesContainer.classList.add('flowchart-nodes');
+    container.appendChild(nodesContainer);
+    
+    // Add start node
+    addFlowchartNode(FLOWCHART_TREE.root, null, 0);
+}
+
+function addFlowchartNode(nodeData, parentId, level) {
+    const nodesContainer = document.querySelector('.flowchart-nodes');
+    if (!nodesContainer) return;
+    
+    // Check if node already exists
+    if (appState.flowchartNodes.find(n => n.id === nodeData.id)) {
+        return;
+    }
+    
+    // Create node element
+    const node = document.createElement('div');
+    node.classList.add('flowchart-node', `node-${nodeData.type}`);
+    node.setAttribute('data-node-id', nodeData.id);
+    node.setAttribute('data-level', level);
+    
+    // Position node
+    const existingAtLevel = appState.flowchartNodes.filter(n => n.level === level);
+    const xOffset = existingAtLevel.length * 320;
+    const yOffset = level * 180;
+    
+    node.style.left = `${xOffset}px`;
+    node.style.top = `${yOffset}px`;
+    
+    // Add node content
+    let nodeContent = `
+        <div class="node-header">
+            <h3>${nodeData.title}</h3>
+            <p>${nodeData.description}</p>
+        </div>
+    `;
+    
+    if (nodeData.type === 'decision' && nodeData.options) {
+        nodeContent += '<div class="node-options">';
+        nodeData.options.forEach(option => {
+            nodeContent += `
+                <button class="node-option" data-option-id="${option.id}" data-next="${option.next || ''}">
+                    <span class="option-label">${option.label}</span>
+                    ${option.subtitle ? `<span class="option-subtitle">${option.subtitle}</span>` : ''}
+                </button>
+            `;
+        });
+        nodeContent += '</div>';
+    } else if (nodeData.type === 'endpoint' && nodeData.recommendations) {
+        nodeContent += '<div class="node-recommendations">';
+        nodeData.recommendations.forEach(rec => {
+            nodeContent += `<div class="recommendation-item">• ${rec}</div>`;
+        });
+        nodeContent += '</div>';
+    } else if (nodeData.type === 'transition') {
+        nodeContent += `
+            <button class="node-continue" data-next="${nodeData.next}">
+                Continue to Next Step →
+            </button>
+        `;
+    } else if (nodeData.type === 'start') {
+        nodeContent += `
+            <button class="node-start" data-next="${nodeData.next}">
+                Begin Assessment
+            </button>
+        `;
+    }
+    
+    node.innerHTML = nodeContent;
+    nodesContainer.appendChild(node);
+    
+    // Animate node appearance
+    setTimeout(() => {
+        node.classList.add('node-visible');
+    }, 50);
+    
+    // Store node data
+    appState.flowchartNodes.push({
+        id: nodeData.id,
+        element: node,
+        level: level,
+        parentId: parentId,
+        data: nodeData
+    });
+    
+    // Draw connection from parent
+    if (parentId) {
+        setTimeout(() => {
+            drawConnection(parentId, nodeData.id);
+        }, 100);
+    }
+    
+    // Attach event listeners
+    attachNodeListeners(node, nodeData);
+    
+    // Adjust container height
+    adjustContainerHeight();
+}
+
+function attachNodeListeners(node, nodeData) {
+    // Handle option clicks
+    const options = node.querySelectorAll('.node-option');
+    options.forEach(option => {
+        option.addEventListener('click', function() {
+            const optionId = this.getAttribute('data-option-id');
+            const nextId = this.getAttribute('data-next');
             
-            // Close all accordions
-            document.querySelectorAll('.accordion-trigger').forEach(t => {
-                t.classList.remove('active');
-                if (t.nextElementSibling) {
-                    t.nextElementSibling.style.maxHeight = null;
-                }
+            // Mark as selected
+            options.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            // Add to path
+            appState.selectedPath.push({
+                nodeId: nodeData.id,
+                optionId: optionId
             });
             
-            // Open clicked accordion if it wasn't active
-            if (!isActive) {
-                this.classList.add('active');
-                if (content) {
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                }
+            // Remove any nodes after this level
+            removeNodesAfterLevel(nodeData.level);
+            
+            // Add next node
+            if (nextId && FLOWCHART_TREE[nextId]) {
+                setTimeout(() => {
+                    addFlowchartNode(FLOWCHART_TREE[nextId], nodeData.id, nodeData.level + 1);
+                }, 300);
             }
         });
     });
+    
+    // Handle continue/start buttons
+    const continueBtn = node.querySelector('.node-continue, .node-start');
+    if (continueBtn) {
+        continueBtn.addEventListener('click', function() {
+            const nextId = this.getAttribute('data-next');
+            
+            this.classList.add('clicked');
+            
+            if (nextId && FLOWCHART_TREE[nextId]) {
+                setTimeout(() => {
+                    addFlowchartNode(FLOWCHART_TREE[nextId], nodeData.id, nodeData.level + 1);
+                }, 300);
+            }
+        });
+    }
+    
+    // Handle reset button (for endpoints)
+    if (nodeData.type === 'endpoint') {
+        const resetBtn = document.createElement('button');
+        resetBtn.className = 'node-reset';
+        resetBtn.textContent = 'Start New Assessment';
+        resetBtn.addEventListener('click', resetFlowchart);
+        node.appendChild(resetBtn);
+    }
+}
+
+function drawConnection(fromId, toId) {
+    const svg = document.querySelector('.flowchart-connections');
+    const fromNode = appState.flowchartNodes.find(n => n.id === fromId);
+    const toNode = appState.flowchartNodes.find(n => n.id === toId);
+    
+    if (!svg || !fromNode || !toNode) return;
+    
+    const fromElement = fromNode.element;
+    const toElement = toNode.element;
+    
+    // Calculate positions
+    const fromRect = fromElement.getBoundingClientRect();
+    const toRect = toElement.getBoundingClientRect();
+    const containerRect = svg.parentElement.getBoundingClientRect();
+    
+    const fromX = fromRect.left - containerRect.left + fromRect.width / 2;
+    const fromY = fromRect.top - containerRect.top + fromRect.height;
+    const toX = toRect.left - containerRect.left + toRect.width / 2;
+    const toY = toRect.top - containerRect.top;
+    
+    // Create path
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const midY = fromY + (toY - fromY) / 2;
+    
+    const d = `M ${fromX} ${fromY} C ${fromX} ${midY}, ${toX} ${midY}, ${toX} ${toY}`;
+    path.setAttribute('d', d);
+    path.classList.add('flowchart-connection');
+    
+    // Animate path
+    const length = path.getTotalLength();
+    path.style.strokeDasharray = length;
+    path.style.strokeDashoffset = length;
+    
+    svg.appendChild(path);
+    
+    setTimeout(() => {
+        path.style.strokeDashoffset = '0';
+    }, 50);
+}
+
+function removeNodesAfterLevel(level) {
+    const nodesToRemove = appState.flowchartNodes.filter(n => n.level > level);
+    const svg = document.querySelector('.flowchart-connections');
+    
+    nodesToRemove.forEach(node => {
+        // Remove element with fade animation
+        node.element.classList.remove('node-visible');
+        setTimeout(() => {
+            node.element.remove();
+        }, 300);
+    });
+    
+    // Remove from state
+    appState.flowchartNodes = appState.flowchartNodes.filter(n => n.level <= level);
+    
+    // Clear connections and redraw
+    if (svg) {
+        svg.innerHTML = '';
+        appState.flowchartNodes.forEach(node => {
+            if (node.parentId) {
+                drawConnection(node.parentId, node.id);
+            }
+        });
+    }
+}
+
+function resetFlowchart() {
+    const container = document.getElementById('flowchart-container');
+    if (!container) return;
+    
+    // Fade out all nodes
+    const nodes = container.querySelectorAll('.flowchart-node');
+    nodes.forEach(node => {
+        node.classList.remove('node-visible');
+    });
+    
+    // Reset after animation
+    setTimeout(() => {
+        initializeFlowchart();
+    }, 300);
+}
+
+function adjustContainerHeight() {
+    const container = document.getElementById('flowchart-container');
+    if (!container) return;
+    
+    const maxY = Math.max(...appState.flowchartNodes.map(n => {
+        const rect = n.element.getBoundingClientRect();
+        return parseInt(n.element.style.top) + rect.height;
+    }), 0);
+    
+    container.style.minHeight = `${maxY + 100}px`;
+}
+
+// Export functionality
+function exportFlowchart() {
+    const data = {
+        timestamp: new Date().toISOString(),
+        path: appState.selectedPath,
+        nodes: appState.flowchartNodes.map(n => ({
+            id: n.id,
+            title: n.data.title,
+            type: n.data.type
+        }))
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `literacy-assessment-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
