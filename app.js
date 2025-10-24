@@ -101,10 +101,10 @@ const STEP_CONTENT = {
         content: `
             <p class="mb-3">Select the literacy screening tool that was administered:</p>
             <div class="selection-grid">
-                <button class="selection-option" onclick="selectScreener('DIBELS')">DIBELS</button>
-                <button class="selection-option" onclick="selectScreener('CTOPP-2')">CTOPP-2</button>
-                <button class="selection-option" onclick="selectScreener('THaFoL')">THaFoL</button>
-                <button class="selection-option" onclick="selectScreener('IDAPEL')">IDAPEL</button>
+                <button class="selection-option" data-value="DIBELS" onclick="selectScreener('DIBELS')">DIBELS</button>
+                <button class="selection-option" data-value="CTOPP-2" onclick="selectScreener('CTOPP-2')">CTOPP-2</button>
+                <button class="selection-option" data-value="THaFoL" onclick="selectScreener('THaFoL')">THaFoL</button>
+                <button class="selection-option" data-value="IDAPEL" onclick="selectScreener('IDAPEL')">IDAPEL</button>
             </div>
         `,
         actions: `
@@ -124,8 +124,8 @@ const STEP_CONTENT = {
                 <p><strong>Ineffective (Yellow/Red):</strong> Students are not meeting benchmarks</p>
             </div>
             <div class="binary-choice">
-                <button class="selection-option" onclick="selectEffectiveness('effective')">Effective</button>
-                <button class="selection-option" onclick="selectEffectiveness('ineffective')">Ineffective</button>
+                <button class="selection-option" data-value="effective" onclick="selectEffectiveness('effective')">Effective</button>
+                <button class="selection-option" data-value="ineffective" onclick="selectEffectiveness('ineffective')">Ineffective</button>
             </div>
         `,
         actions: `
@@ -164,8 +164,8 @@ const STEP_CONTENT = {
         content: `
             <p class="mb-3">Instruction was ineffective. Determine the percentage of students who did not meet benchmarks:</p>
             <div class="binary-choice">
-                <button class="selection-option" onclick="selectStudentRate('20plus')">20% or more of students</button>
-                <button class="selection-option" onclick="selectStudentRate('less20')">Fewer than 20% of students</button>
+                <button class="selection-option" data-value="20plus" onclick="selectStudentRate('20plus')">20% or more of students</button>
+                <button class="selection-option" data-value="less20" onclick="selectStudentRate('less20')">Fewer than 20% of students</button>
             </div>
         `,
         actions: `
@@ -278,11 +278,11 @@ const STEP_CONTENT = {
                 <p><em>Drill-down assessments help pinpoint exactly which sub-skills within broader literacy areas (e.g., phonemic awareness, phonics, fluency) need targeted instruction.</em></p>
             </div>
             <div class="selection-grid mt-3">
-                <button class="selection-option" onclick="selectDrillDown('phonemic')">Phonemic Awareness</button>
-                <button class="selection-option" onclick="selectDrillDown('phonics')">Phonics</button>
-                <button class="selection-option" onclick="selectDrillDown('fluency')">Fluency</button>
-                <button class="selection-option" onclick="selectDrillDown('vocabulary')">Vocabulary</button>
-                <button class="selection-option" onclick="selectDrillDown('comprehension')">Comprehension</button>
+                <button class="selection-option" data-value="phonemic" onclick="selectDrillDown('phonemic')">Phonemic Awareness</button>
+                <button class="selection-option" data-value="phonics" onclick="selectDrillDown('phonics')">Phonics</button>
+                <button class="selection-option" data-value="fluency" onclick="selectDrillDown('fluency')">Fluency</button>
+                <button class="selection-option" data-value="vocabulary" onclick="selectDrillDown('vocabulary')">Vocabulary</button>
+                <button class="selection-option" data-value="comprehension" onclick="selectDrillDown('comprehension')">Comprehension</button>
             </div>
         `,
         actions: `
@@ -349,8 +349,8 @@ const STEP_CONTENT = {
                 <p><strong>Ineffective:</strong> Student continues to struggle despite intervention</p>
             </div>
             <div class="binary-choice">
-                <button class="selection-option" onclick="selectTier2Effectiveness('effective')">Effective</button>
-                <button class="selection-option" onclick="selectTier2Effectiveness('ineffective')">Ineffective</button>
+                <button class="selection-option" data-value="effective" onclick="selectTier2Effectiveness('effective')">Effective</button>
+                <button class="selection-option" data-value="ineffective" onclick="selectTier2Effectiveness('ineffective')">Ineffective</button>
             </div>
         `,
         actions: `
@@ -459,10 +459,10 @@ const STEP_CONTENT = {
                 <p><em>Comprehensive diagnostic assessments provide detailed information about a student's literacy skills across multiple domains. This may include formal assessments, informal reading inventories, and diagnostic batteries.</em></p>
             </div>
             <div class="selection-grid mt-3">
-                <button class="selection-option" onclick="selectTier3DrillDown('comprehensive')">Comprehensive Literacy Assessment</button>
-                <button class="selection-option" onclick="selectTier3DrillDown('phonological')">Phonological Processing</button>
-                <button class="selection-option" onclick="selectTier3DrillDown('decoding')">Decoding Skills</button>
-                <button class="selection-option" onclick="selectTier3DrillDown('language')">Oral Language</button>
+                <button class="selection-option" data-value="comprehensive" onclick="selectTier3DrillDown('comprehensive')">Comprehensive Literacy Assessment</button>
+                <button class="selection-option" data-value="phonological" onclick="selectTier3DrillDown('phonological')">Phonological Processing</button>
+                <button class="selection-option" data-value="decoding" onclick="selectTier3DrillDown('decoding')">Decoding Skills</button>
+                <button class="selection-option" data-value="language" onclick="selectTier3DrillDown('language')">Oral Language</button>
             </div>
         `,
         actions: `
@@ -531,8 +531,8 @@ const STEP_CONTENT = {
                 <p><strong>Ineffective:</strong> Student continues to struggle despite intensive intervention</p>
             </div>
             <div class="binary-choice">
-                <button class="selection-option" onclick="selectTier3Effectiveness('effective')">Effective</button>
-                <button class="selection-option" onclick="selectTier3Effectiveness('ineffective')">Ineffective</button>
+                <button class="selection-option" data-value="effective" onclick="selectTier3Effectiveness('effective')">Effective</button>
+                <button class="selection-option" data-value="ineffective" onclick="selectTier3Effectiveness('ineffective')">Ineffective</button>
             </div>
         `,
         actions: `
@@ -712,7 +712,7 @@ function selectScreener(screener) {
     
     // Update UI to show selection
     document.querySelectorAll('.selection-option').forEach(btn => {
-        btn.classList.toggle('selected', btn.textContent.trim() === screener);
+        btn.classList.toggle('selected', btn.dataset.value === screener);
     });
     
     // Auto-advance after short delay
@@ -726,8 +726,7 @@ function selectEffectiveness(effectiveness) {
     
     // Update UI
     document.querySelectorAll('.selection-option').forEach(btn => {
-        const btnText = btn.textContent.toLowerCase();
-        btn.classList.toggle('selected', btnText === effectiveness);
+        btn.classList.toggle('selected', btn.dataset.value === effectiveness);
     });
     
     // Navigate based on selection
@@ -745,7 +744,7 @@ function selectStudentRate(rate) {
     
     // Update UI
     document.querySelectorAll('.selection-option').forEach(btn => {
-        btn.classList.toggle('selected', btn.onclick.toString().includes(rate));
+        btn.classList.toggle('selected', btn.dataset.value === rate);
     });
     
     // Navigate based on selection
@@ -763,7 +762,7 @@ function selectDrillDown(area) {
     
     // Update UI
     document.querySelectorAll('.selection-option').forEach(btn => {
-        btn.classList.toggle('selected', btn.onclick.toString().includes(area));
+        btn.classList.toggle('selected', btn.dataset.value === area);
     });
     
     // Auto-advance
@@ -777,8 +776,7 @@ function selectTier2Effectiveness(effectiveness) {
     
     // Update UI
     document.querySelectorAll('.selection-option').forEach(btn => {
-        const btnText = btn.textContent.toLowerCase();
-        btn.classList.toggle('selected', btnText === effectiveness);
+        btn.classList.toggle('selected', btn.dataset.value === effectiveness);
     });
     
     // Navigate based on selection
@@ -796,7 +794,7 @@ function selectTier3DrillDown(area) {
     
     // Update UI
     document.querySelectorAll('.selection-option').forEach(btn => {
-        btn.classList.toggle('selected', btn.onclick.toString().includes(area));
+        btn.classList.toggle('selected', btn.dataset.value === area);
     });
     
     // Auto-advance
@@ -810,8 +808,7 @@ function selectTier3Effectiveness(effectiveness) {
     
     // Update UI
     document.querySelectorAll('.selection-option').forEach(btn => {
-        const btnText = btn.textContent.toLowerCase();
-        btn.classList.toggle('selected', btnText === effectiveness);
+        btn.classList.toggle('selected', btn.dataset.value === effectiveness);
     });
     
     // Navigate based on selection
