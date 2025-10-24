@@ -1,655 +1,382 @@
-// Application State
-const appState = {
-    interventionsData: null,
-    currentTier: null,
-    flowchartNodes: [],
-    selectedPath: [],
-    currentDecision: null
-};
-
-// Flowchart Decision Tree
-const FLOWCHART_TREE = {
-    root: {
-        id: 'start',
-        type: 'start',
-        title: 'Begin Assessment',
-        description: 'Start your literacy intervention journey',
-        next: 'tier-selection'
-    },
-    'tier-selection': {
-        id: 'tier-selection',
-        type: 'decision',
-        title: 'Select Starting Point',
-        description: 'Where would you like to begin?',
-        options: [
-            {
-                id: 'tier1',
-                label: 'Tier 1 - Universal Instruction',
-                subtitle: 'For all students',
-                next: 'tier1-screener'
-            },
-            {
-                id: 'tier2',
-                label: 'Tier 2 - Targeted Support',
-                subtitle: 'For at-risk students',
-                next: 'tier2-assessment'
-            },
-            {
-                id: 'tier3',
-                label: 'Tier 3 - Intensive Intervention',
-                subtitle: 'For high-need students',
-                next: 'tier3-assessment'
-            }
-        ]
-    },
-    'tier1-screener': {
-        id: 'tier1-screener',
-        type: 'decision',
-        title: 'Select Screener',
-        description: 'Which assessment tool are you using?',
-        options: [
-            { id: 'dibels', label: 'DIBELS', next: 'tier1-effectiveness' },
-            { id: 'fastbridge', label: 'FastBridge', next: 'tier1-effectiveness' },
-            { id: 'aimsweb', label: 'AIMSweb', next: 'tier1-effectiveness' },
-            { id: 'other', label: 'Other Assessment', next: 'tier1-effectiveness' }
-        ]
-    },
-    'tier1-effectiveness': {
-        id: 'tier1-effectiveness',
-        type: 'decision',
-        title: 'Instruction Effectiveness',
-        description: 'Is current instruction meeting student needs?',
-        options: [
-            {
-                id: 'effective',
-                label: 'Yes - Students meeting benchmarks',
-                next: 'maintain-tier1'
-            },
-            {
-                id: 'ineffective',
-                label: 'No - Students below benchmarks',
-                next: 'tier1-percentage'
-            }
-        ]
-    },
-    'tier1-percentage': {
-        id: 'tier1-percentage',
-        type: 'decision',
-        title: 'Student Success Rate',
-        description: 'What percentage of students are unsuccessful?',
-        options: [
-            {
-                id: 'less-20',
-                label: 'Less than 20%',
-                next: 'reteach-strategies'
-            },
-            {
-                id: 'more-20',
-                label: 'More than 20%',
-                next: 'move-tier2'
-            }
-        ]
-    },
-    'maintain-tier1': {
-        id: 'maintain-tier1',
-        type: 'endpoint',
-        title: 'Continue Current Instruction',
-        description: 'Maintain high-quality core instruction',
-        recommendations: [
-            'Continue current instructional practices',
-            'Monitor progress quarterly',
-            'Differentiate within core instruction',
-            'Celebrate student success'
-        ]
-    },
-    'reteach-strategies': {
-        id: 'reteach-strategies',
-        type: 'endpoint',
-        title: 'Reteach with Different Strategies',
-        description: 'Adjust instruction for small group',
-        recommendations: [
-            'Identify specific skill gaps',
-            'Use alternative teaching methods',
-            'Provide additional practice opportunities',
-            'Monitor progress bi-weekly',
-            'Consider flexible grouping'
-        ]
-    },
-    'move-tier2': {
-        id: 'move-tier2',
-        type: 'transition',
-        title: 'Transition to Tier 2',
-        description: 'Students need targeted intervention',
-        next: 'tier2-assessment'
-    },
-    'tier2-assessment': {
-        id: 'tier2-assessment',
-        type: 'decision',
-        title: 'Diagnostic Assessment',
-        description: 'Select area of focus',
-        options: [
-            { id: 'phonemic', label: 'Phonemic Awareness', next: 'tier2-intervention' },
-            { id: 'phonics', label: 'Phonics & Decoding', next: 'tier2-intervention' },
-            { id: 'fluency', label: 'Reading Fluency', next: 'tier2-intervention' },
-            { id: 'comprehension', label: 'Comprehension', next: 'tier2-intervention' },
-            { id: 'vocabulary', label: 'Vocabulary', next: 'tier2-intervention' }
-        ]
-    },
-    'tier2-intervention': {
-        id: 'tier2-intervention',
-        type: 'decision',
-        title: '8-Week Intervention Cycle',
-        description: 'Implement small group intervention',
-        options: [
-            {
-                id: 'progress-made',
-                label: 'Progress Made - Meeting goals',
-                next: 'fade-tier1'
-            },
-            {
-                id: 'some-progress',
-                label: 'Some Progress - Continue intervention',
-                next: 'continue-tier2'
-            },
-            {
-                id: 'no-progress',
-                label: 'Minimal Progress - Intensify support',
-                next: 'move-tier3'
-            }
-        ]
-    },
-    'fade-tier1': {
-        id: 'fade-tier1',
-        type: 'endpoint',
-        title: 'Fade to Tier 1',
-        description: 'Gradually reduce intervention',
-        recommendations: [
-            'Reduce intervention frequency',
-            'Monitor for maintenance',
-            'Ensure strong core instruction',
-            'Plan for booster sessions if needed'
-        ]
-    },
-    'continue-tier2': {
-        id: 'continue-tier2',
-        type: 'endpoint',
-        title: 'Continue Tier 2',
-        description: 'Maintain current intervention',
-        recommendations: [
-            'Continue current intervention',
-            'Adjust group composition if needed',
-            'Review intervention fidelity',
-            'Monitor progress bi-weekly'
-        ]
-    },
-    'move-tier3': {
-        id: 'move-tier3',
-        type: 'transition',
-        title: 'Transition to Tier 3',
-        description: 'Student needs intensive intervention',
-        next: 'tier3-assessment'
-    },
-    'tier3-assessment': {
-        id: 'tier3-assessment',
-        type: 'decision',
-        title: 'Comprehensive Assessment',
-        description: 'Identify specific learning needs',
-        options: [
-            { id: 'dyslexia', label: 'Dyslexia Indicators', next: 'tier3-intervention' },
-            { id: 'language', label: 'Language Processing', next: 'tier3-intervention' },
-            { id: 'executive', label: 'Executive Function', next: 'tier3-intervention' },
-            { id: 'multiple', label: 'Multiple Areas', next: 'tier3-intervention' }
-        ]
-    },
-    'tier3-intervention': {
-        id: 'tier3-intervention',
-        type: 'decision',
-        title: 'Intensive 1:1 Intervention',
-        description: 'Daily intensive support',
-        options: [
-            {
-                id: 'significant-progress',
-                label: 'Significant Progress',
-                next: 'fade-tier2'
-            },
-            {
-                id: 'steady-progress',
-                label: 'Steady Progress - Continue',
-                next: 'continue-tier3'
-            },
-            {
-                id: 'minimal-progress',
-                label: 'Minimal Progress',
-                next: 'special-education'
-            }
-        ]
-    },
-    'fade-tier2': {
-        id: 'fade-tier2',
-        type: 'endpoint',
-        title: 'Fade to Tier 2',
-        description: 'Reduce intervention intensity',
-        recommendations: [
-            'Transition to small group',
-            'Maintain progress monitoring',
-            'Plan transition carefully',
-            'Communicate with all stakeholders'
-        ]
-    },
-    'continue-tier3': {
-        id: 'continue-tier3',
-        type: 'endpoint',
-        title: 'Continue Tier 3',
-        description: 'Maintain intensive support',
-        recommendations: [
-            'Continue 1:1 intervention',
-            'Weekly progress monitoring',
-            'Regular team meetings',
-            'Consider additional assessments'
-        ]
-    },
-    'special-education': {
-        id: 'special-education',
-        type: 'endpoint',
-        title: 'Special Education Referral',
-        description: 'Consider comprehensive evaluation',
-        recommendations: [
-            'Document all interventions tried',
-            'Gather progress monitoring data',
-            'Schedule team meeting',
-            'Consider special education evaluation',
-            'Involve parents in decision'
-        ]
-    }
-};
-
-// Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
-    initializeNavigation();
-    initializeMobileMenu();
-    loadInterventionsData();
-    
-    // Start flowchart if on interventions page
-    const interventionsSection = document.getElementById('interventions-section');
-    if (interventionsSection && interventionsSection.classList.contains('active')) {
-        initializeFlowchart();
-    }
-});
-
-// Navigation functions
-function initializeNavigation() {
-    const navLinks = document.querySelectorAll('.nav-link');
-    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
-    const sections = document.querySelectorAll('.content-section');
-    
-    function switchSection(targetPage) {
-        sections.forEach(section => {
-            section.classList.remove('active');
-        });
-        
-        const targetSection = document.getElementById(targetPage + '-section');
-        if (targetSection) {
-            targetSection.classList.add('active');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literacy Pal - Intervention Flowchart</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                </svg>
+                <h1 class="logo-text">Literacy Pal</h1>
+            </div>
             
-            // Initialize flowchart if switching to interventions
-            if (targetPage === 'interventions') {
-                setTimeout(() => initializeFlowchart(), 100);
-            }
-        }
-        
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('data-page') === targetPage) {
-                link.classList.add('active');
-            }
-        });
-        
-        // Update mobile nav
-        mobileNavItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('data-page') === targetPage) {
-                item.classList.add('active');
-            }
-        });
-    }
-    
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            const targetPage = this.getAttribute('data-page');
-            switchSection(targetPage);
-        });
-    });
-    
-    mobileNavItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const targetPage = this.getAttribute('data-page');
-            switchSection(targetPage);
-            closeMobileMenu();
-        });
-    });
-}
+            <div class="nav-links">
+                <button class="nav-link active" data-page="interventions">Interventions</button>
+                <button class="nav-link" data-page="assessment-schedules">Assessments</button>
+                <button class="nav-link" data-page="understanding-scores">Scores</button>
+                <button class="nav-link" data-page="faqs">FAQs</button>
+                <button class="nav-link" data-page="resources">Resources</button>
+            </div>
 
-// Mobile menu functions
-function initializeMobileMenu() {
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
-    
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', function() {
-            mobileMenuBtn.classList.toggle('active');
-            mobileNavOverlay.classList.toggle('active');
-        });
-    }
-}
-
-function closeMobileMenu() {
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
-    
-    if (mobileMenuBtn) {
-        mobileMenuBtn.classList.remove('active');
-    }
-    if (mobileNavOverlay) {
-        mobileNavOverlay.classList.remove('active');
-    }
-}
-
-// Load interventions data
-async function loadInterventionsData() {
-    try {
-        const response = await fetch('./data/interventions.json');
-        if (response.ok) {
-            appState.interventionsData = await response.json();
-        }
-    } catch (error) {
-        console.error('Error loading interventions data:', error);
-    }
-}
-
-// Flowchart functions
-function initializeFlowchart() {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    // Clear existing flowchart
-    container.innerHTML = '';
-    appState.flowchartNodes = [];
-    appState.selectedPath = [];
-    
-    // Create SVG for connections
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.classList.add('flowchart-connections');
-    container.appendChild(svg);
-    
-    // Create nodes container
-    const nodesContainer = document.createElement('div');
-    nodesContainer.classList.add('flowchart-nodes');
-    container.appendChild(nodesContainer);
-    
-    // Add start node
-    addFlowchartNode(FLOWCHART_TREE.root, null, 0);
-}
-
-function addFlowchartNode(nodeData, parentId, level) {
-    const nodesContainer = document.querySelector('.flowchart-nodes');
-    if (!nodesContainer) return;
-    
-    // Check if node already exists
-    if (appState.flowchartNodes.find(n => n.id === nodeData.id)) {
-        return;
-    }
-    
-    // Create node element
-    const node = document.createElement('div');
-    node.classList.add('flowchart-node', `node-${nodeData.type}`);
-    node.setAttribute('data-node-id', nodeData.id);
-    node.setAttribute('data-level', level);
-    
-    // Position node
-    const existingAtLevel = appState.flowchartNodes.filter(n => n.level === level);
-    const xOffset = existingAtLevel.length * 320;
-    const yOffset = level * 180;
-    
-    node.style.left = `${xOffset}px`;
-    node.style.top = `${yOffset}px`;
-    
-    // Add node content
-    let nodeContent = `
-        <div class="node-header">
-            <h3>${nodeData.title}</h3>
-            <p>${nodeData.description}</p>
+            <button class="mobile-menu-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+            </button>
         </div>
-    `;
-    
-    if (nodeData.type === 'decision' && nodeData.options) {
-        nodeContent += '<div class="node-options">';
-        nodeData.options.forEach(option => {
-            nodeContent += `
-                <button class="node-option" data-option-id="${option.id}" data-next="${option.next || ''}">
-                    <span class="option-label">${option.label}</span>
-                    ${option.subtitle ? `<span class="option-subtitle">${option.subtitle}</span>` : ''}
-                </button>
-            `;
-        });
-        nodeContent += '</div>';
-    } else if (nodeData.type === 'endpoint' && nodeData.recommendations) {
-        nodeContent += '<div class="node-recommendations">';
-        nodeData.recommendations.forEach(rec => {
-            nodeContent += `<div class="recommendation-item">• ${rec}</div>`;
-        });
-        nodeContent += '</div>';
-    } else if (nodeData.type === 'transition') {
-        nodeContent += `
-            <button class="node-continue" data-next="${nodeData.next}">
-                Continue to Next Step →
+    </nav>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay">
+        <div class="mobile-nav-content">
+            <button class="mobile-nav-item active" data-page="interventions">
+                <span>Interventions</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
             </button>
-        `;
-    } else if (nodeData.type === 'start') {
-        nodeContent += `
-            <button class="node-start" data-next="${nodeData.next}">
-                Begin Assessment
+            <button class="mobile-nav-item" data-page="assessment-schedules">
+                <span>Assessments</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
             </button>
-        `;
-    }
-    
-    node.innerHTML = nodeContent;
-    nodesContainer.appendChild(node);
-    
-    // Animate node appearance
-    setTimeout(() => {
-        node.classList.add('node-visible');
-    }, 50);
-    
-    // Store node data
-    appState.flowchartNodes.push({
-        id: nodeData.id,
-        element: node,
-        level: level,
-        parentId: parentId,
-        data: nodeData
-    });
-    
-    // Draw connection from parent
-    if (parentId) {
-        setTimeout(() => {
-            drawConnection(parentId, nodeData.id);
-        }, 100);
-    }
-    
-    // Attach event listeners
-    attachNodeListeners(node, nodeData);
-    
-    // Adjust container height
-    adjustContainerHeight();
-}
+            <button class="mobile-nav-item" data-page="understanding-scores">
+                <span>Understanding Scores</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+            <button class="mobile-nav-item" data-page="faqs">
+                <span>FAQs</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+            <button class="mobile-nav-item" data-page="resources">
+                <span>Resources</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+    </div>
 
-function attachNodeListeners(node, nodeData) {
-    // Handle option clicks
-    const options = node.querySelectorAll('.node-option');
-    options.forEach(option => {
-        option.addEventListener('click', function() {
-            const optionId = this.getAttribute('data-option-id');
-            const nextId = this.getAttribute('data-next');
-            
-            // Mark as selected
-            options.forEach(opt => opt.classList.remove('selected'));
-            this.classList.add('selected');
-            
-            // Add to path
-            appState.selectedPath.push({
-                nodeId: nodeData.id,
-                optionId: optionId
-            });
-            
-            // Remove any nodes after this level
-            removeNodesAfterLevel(nodeData.level);
-            
-            // Add next node
-            if (nextId && FLOWCHART_TREE[nextId]) {
-                setTimeout(() => {
-                    addFlowchartNode(FLOWCHART_TREE[nextId], nodeData.id, nodeData.level + 1);
-                }, 300);
-            }
-        });
-    });
-    
-    // Handle continue/start buttons
-    const continueBtn = node.querySelector('.node-continue, .node-start');
-    if (continueBtn) {
-        continueBtn.addEventListener('click', function() {
-            const nextId = this.getAttribute('data-next');
-            
-            this.classList.add('clicked');
-            
-            if (nextId && FLOWCHART_TREE[nextId]) {
-                setTimeout(() => {
-                    addFlowchartNode(FLOWCHART_TREE[nextId], nodeData.id, nodeData.level + 1);
-                }, 300);
-            }
-        });
-    }
-    
-    // Handle reset button (for endpoints)
-    if (nodeData.type === 'endpoint') {
-        const resetBtn = document.createElement('button');
-        resetBtn.className = 'node-reset';
-        resetBtn.textContent = 'Start New Assessment';
-        resetBtn.addEventListener('click', resetFlowchart);
-        node.appendChild(resetBtn);
-    }
-}
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Interventions Section with Flowchart -->
+        <section id="interventions-section" class="content-section active">
+            <div class="interventions-header">
+                <h2 class="section-title">Literacy Intervention Flowchart</h2>
+                <p class="section-subtitle">Follow the path to find the right intervention for your students</p>
+            </div>
 
-function drawConnection(fromId, toId) {
-    const svg = document.querySelector('.flowchart-connections');
-    const fromNode = appState.flowchartNodes.find(n => n.id === fromId);
-    const toNode = appState.flowchartNodes.find(n => n.id === toId);
-    
-    if (!svg || !fromNode || !toNode) return;
-    
-    const fromElement = fromNode.element;
-    const toElement = toNode.element;
-    
-    // Calculate positions
-    const fromRect = fromElement.getBoundingClientRect();
-    const toRect = toElement.getBoundingClientRect();
-    const containerRect = svg.parentElement.getBoundingClientRect();
-    
-    const fromX = fromRect.left - containerRect.left + fromRect.width / 2;
-    const fromY = fromRect.top - containerRect.top + fromRect.height;
-    const toX = toRect.left - containerRect.left + toRect.width / 2;
-    const toY = toRect.top - containerRect.top;
-    
-    // Create path
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const midY = fromY + (toY - fromY) / 2;
-    
-    const d = `M ${fromX} ${fromY} C ${fromX} ${midY}, ${toX} ${midY}, ${toX} ${toY}`;
-    path.setAttribute('d', d);
-    path.classList.add('flowchart-connection');
-    
-    // Animate path
-    const length = path.getTotalLength();
-    path.style.strokeDasharray = length;
-    path.style.strokeDashoffset = length;
-    
-    svg.appendChild(path);
-    
-    setTimeout(() => {
-        path.style.strokeDashoffset = '0';
-    }, 50);
-}
+            <div class="flowchart-controls">
+                <button class="btn-reset" onclick="resetFlowchart()">Start Over</button>
+                <button class="btn-export" onclick="exportFlowchart()">Export Path</button>
+            </div>
 
-function removeNodesAfterLevel(level) {
-    const nodesToRemove = appState.flowchartNodes.filter(n => n.level > level);
-    const svg = document.querySelector('.flowchart-connections');
-    
-    nodesToRemove.forEach(node => {
-        // Remove element with fade animation
-        node.element.classList.remove('node-visible');
-        setTimeout(() => {
-            node.element.remove();
-        }, 300);
-    });
-    
-    // Remove from state
-    appState.flowchartNodes = appState.flowchartNodes.filter(n => n.level <= level);
-    
-    // Clear connections and redraw
-    if (svg) {
-        svg.innerHTML = '';
-        appState.flowchartNodes.forEach(node => {
-            if (node.parentId) {
-                drawConnection(node.parentId, node.id);
-            }
-        });
-    }
-}
+            <div id="flowchart-container"></div>
+        </section>
 
-function resetFlowchart() {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    // Fade out all nodes
-    const nodes = container.querySelectorAll('.flowchart-node');
-    nodes.forEach(node => {
-        node.classList.remove('node-visible');
-    });
-    
-    // Reset after animation
-    setTimeout(() => {
-        initializeFlowchart();
-    }, 300);
-}
+        <!-- Assessment Schedules Section -->
+        <section id="assessment-schedules-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">Assessment Schedules</h2>
+                <p class="section-subtitle">Timing and frequency guidelines for literacy assessments</p>
+            </div>
 
-function adjustContainerHeight() {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    const maxY = Math.max(...appState.flowchartNodes.map(n => {
-        const rect = n.element.getBoundingClientRect();
-        return parseInt(n.element.style.top) + rect.height;
-    }), 0);
-    
-    container.style.minHeight = `${maxY + 100}px`;
-}
+            <div class="content-wrapper">
+                <div class="info-grid">
+                    <div class="info-block">
+                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                        <h3>Universal Screening</h3>
+                        <p>All students assessed three times per year</p>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Fall</h4>
+                                    <p>First 3 weeks of school</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Winter</h4>
+                                    <p>Mid-January</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Spring</h4>
+                                    <p>Early April</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-// Export functionality
-function exportFlowchart() {
-    const data = {
-        timestamp: new Date().toISOString(),
-        path: appState.selectedPath,
-        nodes: appState.flowchartNodes.map(n => ({
-            id: n.id,
-            title: n.data.title,
-            type: n.data.type
-        }))
-    };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `literacy-assessment-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
+                    <div class="info-block">
+                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        <h3>Progress Monitoring</h3>
+                        <p>Track student growth based on tier</p>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Tier 1</h4>
+                                    <p>Quarterly (with universal screening)</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Tier 2</h4>
+                                    <p>Bi-weekly to monthly</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Tier 3</h4>
+                                    <p>Weekly</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="best-practices">
+                    <h3>Assessment Best Practices</h3>
+                    <div class="practice-grid">
+                        <div class="practice-item">
+                            <span class="practice-icon">🎯</span>
+                            <span>Quiet testing environment</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">⏱️</span>
+                            <span>Consistent timing</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">📊</span>
+                            <span>Multiple data points</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">👥</span>
+                            <span>Trained assessors</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">📝</span>
+                            <span>Clear documentation</span>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-icon">💬</span>
+                            <span>Team collaboration</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Understanding Scores Section -->
+        <section id="understanding-scores-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">Understanding Assessment Scores</h2>
+                <p class="section-subtitle">Interpreting results and determining next steps</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="info-grid">
+                    <div class="info-block">
+                        <h3>Score Categories</h3>
+                        <p>Understanding benchmark levels</p>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0; color: #10b981;">
+                                <strong>Above Benchmark:</strong> Exceeding expectations
+                            </li>
+                            <li style="padding: 0.5rem 0; color: #10b981;">
+                                <strong>At Benchmark:</strong> Meeting grade-level expectations
+                            </li>
+                            <li style="padding: 0.5rem 0; color: #f59e0b;">
+                                <strong>Below Benchmark:</strong> Some risk, needs monitoring
+                            </li>
+                            <li style="padding: 0.5rem 0; color: #ef4444;">
+                                <strong>Well Below:</strong> High risk, needs intervention
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="info-block">
+                        <h3>Decision Rules</h3>
+                        <p>When to move between tiers</p>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0;">
+                                <strong>Move to Tier 2:</strong> Below benchmark for 2+ screenings
+                            </li>
+                            <li style="padding: 0.5rem 0;">
+                                <strong>Move to Tier 3:</strong> Well below + minimal progress in Tier 2
+                            </li>
+                            <li style="padding: 0.5rem 0;">
+                                <strong>Fade Support:</strong> At benchmark for 3+ progress checks
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQs Section -->
+        <section id="faqs-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-subtitle">Common questions about literacy interventions</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What is RTI/MTSS?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Response to Intervention (RTI) and Multi-Tiered System of Supports (MTSS) are frameworks for providing academic support to all students through increasingly intensive levels of instruction.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span>How long should interventions last?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Interventions should be implemented with fidelity for at least 6-8 weeks before making decisions about effectiveness. Tier 2 typically involves 20-30 minutes daily, while Tier 3 requires 45-60 minutes daily.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What group sizes are recommended?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Tier 1: Whole class instruction. Tier 2: Small groups of 3-6 students with similar needs. Tier 3: Groups of 1-3 students or individual instruction for intensive support.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Should interventions replace core instruction?</span>
+                            <div class="faq-icon">
+                                <span class="plus"></span>
+                            </div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>No. Interventions should be provided in addition to, not instead of, high-quality core instruction. All students need access to grade-level content and instruction.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources Section -->
+        <section id="resources-section" class="content-section">
+            <div class="hero-area">
+                <h2 class="section-title">Resources</h2>
+                <p class="section-subtitle">Tools and materials for literacy intervention</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="resource-grid">
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">📊</span>
+                            <h3>Assessment Tools</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li><a href="#">DIBELS Assessment Suite</a></li>
+                            <li><a href="#">FastBridge Learning</a></li>
+                            <li><a href="#">AIMSweb Plus</a></li>
+                            <li><a href="#">STAR Reading</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">📚</span>
+                            <h3>Intervention Programs</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li>Wilson Fundations</li>
+                            <li>Orton-Gillingham</li>
+                            <li>UFLI Foundations</li>
+                            <li>95 Percent Group</li>
+                        </ul>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">🎓</span>
+                            <h3>Professional Development</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li><a href="#">LETRS Training</a></li>
+                            <li><a href="#">Reading Rockets</a></li>
+                            <li><a href="#">IDA Certification</a></li>
+                            <li><a href="#">MTSS Implementation</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="resource-category">
+                        <div class="category-header">
+                            <span class="category-icon">💻</span>
+                            <h3>Digital Tools</h3>
+                        </div>
+                        <ul class="resource-list">
+                            <li>Lexia Core5</li>
+                            <li>iReady Reading</li>
+                            <li>Raz-Kids</li>
+                            <li>Nessy Learning</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>© 2025 Literacy Pal · Supporting educators in literacy intervention</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        // FAQ Toggle
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            faqItem.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
