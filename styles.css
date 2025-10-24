@@ -220,6 +220,8 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 1400px;
     margin: 0 auto;
     text-align: center;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(16, 185, 129, 0.05));
+    border-radius: var(--radius-xl);
 }
 
 .section-title {
@@ -575,7 +577,9 @@ h1, h2, h3, h4, h5, h6 {
     text-align: center;
     padding: 3rem 1.5rem;
     max-width: 800px;
-    margin: 0 auto;
+    margin: 0 auto 2rem;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(16, 185, 129, 0.05));
+    border-radius: var(--radius-xl);
 }
 
 .info-grid {
@@ -592,11 +596,30 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
     transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.info-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--primary), var(--secondary));
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
 }
 
 .info-block:hover {
     box-shadow: var(--shadow-md);
     border-color: var(--primary);
+    transform: translateY(-4px);
+}
+
+.info-block:hover::before {
+    transform: scaleY(1);
 }
 
 .info-block h3 {
@@ -855,6 +878,16 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     min-height: 500px;
     padding: 2rem;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .start-card {
