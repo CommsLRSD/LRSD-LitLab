@@ -1,474 +1,869 @@
-// Literacy Pal - Main Application JavaScript
-// Modern, functional implementation with smooth animations and interactions
+// ==========================================
+// Literacy Interventions Guide - Application
+// ==========================================
 
-// ============================================
-// State Management
-// ============================================
+// Application State
 const appState = {
-    currentPage: 'interventions',
-    mobileMenuOpen: false,
-    flowchartData: null,
-    currentPath: [],
-    interventionHistory: []
+    currentTier: 'tier1',
+    currentStep: 'start',
+    history: [],
+    selections: {}
 };
 
-// ============================================
+// Tier Definitions with Steps
+const TIER_DEFINITIONS = {
+    tier1: {
+        name: 'Tier 1: Universal Classroom Literacy Interventions',
+        steps: [
+            'start',
+            'principles',
+            'screener',
+            'effectiveness',
+            'studentRate',
+            'reteach',
+            'moveToTier2',
+            'continueMonitor'
+        ]
+    },
+    tier2: {
+        name: 'Tier 2: Small Group Interventions',
+        steps: [
+            'start',
+            'requirements',
+            'drillDown',
+            'interventions',
+            'eightWeek',
+            'progressMonitor',
+            'fadeToTier1',
+            'moveToTier3'
+        ]
+    },
+    tier3: {
+        name: 'Tier 3: Personalized Interventions',
+        steps: [
+            'start',
+            'introduction',
+            'drillDown',
+            'interventions',
+            'eightWeek',
+            'progressMonitor',
+            'fadeToTier2',
+            'meetClinicians'
+        ]
+    }
+};
+
+// Step Content Definitions
+const STEP_CONTENT = {
+    // ===== TIER 1 STEPS =====
+    tier1_start: {
+        title: 'Tier 1: Universal Classroom Literacy Interventions',
+        description: 'High-quality instruction for all students (80%)',
+        content: `
+            <p class="mb-3">This tier focuses on providing high-quality, evidence-based instruction to all students in the general education classroom.</p>
+            <div class="info-box">
+                <h3>Target Population</h3>
+                <p>All students receive Tier 1 instruction as the foundation of the Multi-Tiered System of Supports (MTSS).</p>
+            </div>
+        `,
+        actions: `
+            <button class="btn btn-primary btn-full" onclick="navigateToStep('principles')">Begin Tier 1</button>
+        `
+    },
+    
+    tier1_principles: {
+        title: 'Principles of Explicit and Systematic Instruction',
+        description: 'Review the 8 key principles before beginning',
+        content: `
+            <p class="mb-3">Ensure your instruction incorporates these evidence-based principles:</p>
+            <ul class="checklist">
+                <li class="checklist-item">Model the skill or strategy explicitly</li>
+                <li class="checklist-item">Provide guided practice with immediate feedback</li>
+                <li class="checklist-item">Include multiple opportunities for independent practice</li>
+                <li class="checklist-item">Use systematic and sequential instruction</li>
+                <li class="checklist-item">Incorporate cumulative review of previously learned skills</li>
+                <li class="checklist-item">Provide corrective feedback promptly</li>
+                <li class="checklist-item">Monitor student progress regularly</li>
+                <li class="checklist-item">Adjust instruction based on student data</li>
+            </ul>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="navigateToStep('screener')">Next: Select Screener</button>
+            </div>
+        `
+    },
+    
+    tier1_screener: {
+        title: 'Select Literacy Screener',
+        description: 'Choose the assessment tool you used',
+        content: `
+            <p class="mb-3">Select the literacy screening tool that was administered:</p>
+            <div class="selection-grid">
+                <button class="selection-option" onclick="selectScreener('DIBELS')">DIBELS</button>
+                <button class="selection-option" onclick="selectScreener('CTOPP-2')">CTOPP-2</button>
+                <button class="selection-option" onclick="selectScreener('THaFoL')">THaFoL</button>
+                <button class="selection-option" onclick="selectScreener('IDAPEL')">IDAPEL</button>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+            </div>
+        `
+    },
+    
+    tier1_effectiveness: {
+        title: 'Evaluate Instruction Effectiveness',
+        description: 'Based on screener results, was instruction effective?',
+        content: `
+            <p class="mb-3">Review the screening data and determine if the instruction was effective:</p>
+            <div class="info-box mb-3">
+                <p><strong>Effective (Blue/Green):</strong> Students are meeting or exceeding benchmarks</p>
+                <p><strong>Ineffective (Yellow/Red):</strong> Students are not meeting benchmarks</p>
+            </div>
+            <div class="binary-choice">
+                <button class="selection-option" onclick="selectEffectiveness('effective')">Effective</button>
+                <button class="selection-option" onclick="selectEffectiveness('ineffective')">Ineffective</button>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+            </div>
+        `
+    },
+    
+    tier1_continueMonitor: {
+        title: 'Continue and Monitor',
+        description: 'Instruction is effective',
+        content: `
+            <div class="success-box">
+                <h3>✓ Excellent Progress!</h3>
+                <p>Students are responding well to Tier 1 instruction. Continue with the general curriculum and monitor progress regularly through universal screening.</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>Next Steps</h3>
+                <p>• Continue high-quality Tier 1 instruction</p>
+                <p>• Monitor all students through universal screening (3 times per year)</p>
+                <p>• Adjust instruction based on ongoing assessment data</p>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="resetWizard()">Complete</button>
+            </div>
+        `
+    },
+    
+    tier1_studentRate: {
+        title: 'Student Success Rate',
+        description: 'What percentage of students were unsuccessful?',
+        content: `
+            <p class="mb-3">Instruction was ineffective. Determine the percentage of students who did not meet benchmarks:</p>
+            <div class="binary-choice">
+                <button class="selection-option" onclick="selectStudentRate('20plus')">20% or more of students</button>
+                <button class="selection-option" onclick="selectStudentRate('less20')">Fewer than 20% of students</button>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+            </div>
+        `
+    },
+    
+    tier1_reteach: {
+        title: 'Reteach General Curriculum',
+        description: '20% or more students unsuccessful',
+        content: `
+            <div class="warning-box">
+                <h3>Core Instruction Adjustment Needed</h3>
+                <p>When 20% or more students are unsuccessful, the core instruction needs to be adjusted for the whole class.</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>Next Steps</h3>
+                <p><strong>Reteach using different strategies:</strong></p>
+                <ul class="checklist mt-2">
+                    <li class="checklist-item">Review and adjust your instructional approach</li>
+                    <li class="checklist-item">Incorporate more explicit modeling and guided practice</li>
+                    <li class="checklist-item">Increase opportunities for student response</li>
+                    <li class="checklist-item">Provide additional visual supports and scaffolding</li>
+                </ul>
+            </div>
+            <p class="mt-3">Select interventions based on your screener (Screener: ${() => appState.selections.screener || 'Not selected'}):</p>
+            <div class="info-box">
+                <p><em>Intervention recommendations would be displayed here based on the selected screener and specific skill deficits identified.</em></p>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="resetWizard()">Complete</button>
+            </div>
+        `
+    },
+    
+    tier1_moveToTier2: {
+        title: 'Move to Tier 2 Interventions',
+        description: 'Fewer than 20% students unsuccessful',
+        content: `
+            <div class="info-box">
+                <h3>Tier 2 Interventions Recommended</h3>
+                <p>When fewer than 20% of students are unsuccessful, those students need additional targeted support through Tier 2 interventions.</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>What This Means</h3>
+                <p>• The core instruction is working for most students</p>
+                <p>• A small group needs supplemental support</p>
+                <p>• Students will receive Tier 1 + Tier 2 instruction</p>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="switchToTier('tier2')">Begin Tier 2</button>
+            </div>
+        `
+    },
+    
+    // ===== TIER 2 STEPS =====
+    tier2_start: {
+        title: 'Tier 2: Small Group Interventions',
+        description: 'Targeted support for students at risk (15%)',
+        content: `
+            <p class="mb-3">Tier 2 provides additional, targeted support for students who need more than Tier 1 instruction alone.</p>
+            <div class="info-box">
+                <h3>Tier 2 Characteristics</h3>
+                <p><strong>Delivery:</strong> Small groups (3-6 students)</p>
+                <p><strong>Duration:</strong> 20-30 minutes daily</p>
+                <p><strong>Setting:</strong> In addition to Tier 1 core instruction</p>
+                <p><strong>Target:</strong> Approximately 15% of students</p>
+            </div>
+        `,
+        actions: `
+            <button class="btn btn-primary btn-full" onclick="navigateToStep('requirements')">Begin Tier 2</button>
+        `
+    },
+    
+    tier2_requirements: {
+        title: 'Tier 2 Requirements Checklist',
+        description: 'Review key elements for effective Tier 2 interventions',
+        content: `
+            <p class="mb-3">Ensure your Tier 2 interventions include these elements:</p>
+            <ul class="checklist">
+                <li class="checklist-item">Small group instruction (3-6 students with similar needs)</li>
+                <li class="checklist-item">20-30 minutes of daily instruction</li>
+                <li class="checklist-item">Evidence-based interventions targeting specific skill deficits</li>
+                <li class="checklist-item">Progress monitoring every 2 weeks</li>
+                <li class="checklist-item">Delivered in addition to Tier 1 core instruction</li>
+            </ul>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="navigateToStep('drillDown')">Next: Select Assessment</button>
+            </div>
+        `
+    },
+    
+    tier2_drillDown: {
+        title: 'Drill Down Assessment',
+        description: 'Select diagnostic assessment to identify specific skill deficits',
+        content: `
+            <p class="mb-3">Use a drill-down assessment to identify the specific literacy skills that need intervention:</p>
+            <div class="info-box">
+                <p><em>Drill-down assessments help pinpoint exactly which sub-skills within broader literacy areas (e.g., phonemic awareness, phonics, fluency) need targeted instruction.</em></p>
+            </div>
+            <div class="selection-grid mt-3">
+                <button class="selection-option" onclick="selectDrillDown('phonemic')">Phonemic Awareness</button>
+                <button class="selection-option" onclick="selectDrillDown('phonics')">Phonics</button>
+                <button class="selection-option" onclick="selectDrillDown('fluency')">Fluency</button>
+                <button class="selection-option" onclick="selectDrillDown('vocabulary')">Vocabulary</button>
+                <button class="selection-option" onclick="selectDrillDown('comprehension')">Comprehension</button>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+            </div>
+        `
+    },
+    
+    tier2_interventions: {
+        title: 'Select Interventions',
+        description: 'Choose evidence-based interventions for targeted instruction',
+        content: `
+            <p class="mb-3">Based on your drill-down assessment, select appropriate interventions:</p>
+            <div class="info-box">
+                <h3>Selected Area: <span id="selectedDrillDown"></span></h3>
+                <p class="mt-2"><em>Evidence-based intervention options for this skill area would be displayed here, including program names, materials needed, and implementation guidance.</em></p>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="navigateToStep('eightWeek')">Next: Begin 8-Week Cycle</button>
+            </div>
+        `
+    },
+    
+    tier2_eightWeek: {
+        title: '8-Week Intervention Cycle',
+        description: 'Implement interventions with fidelity',
+        content: `
+            <div class="info-box">
+                <h3>Implementation Guidelines</h3>
+                <p><strong>Duration:</strong> 8 weeks of daily intervention</p>
+                <p><strong>Frequency:</strong> 20-30 minutes per day, 5 days per week</p>
+                <p><strong>Fidelity:</strong> Implement the intervention as designed</p>
+                <p><strong>Progress Monitoring:</strong> Assess progress every 2 weeks</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>During the 8-Week Cycle</h3>
+                <ul class="checklist mt-2">
+                    <li class="checklist-item">Deliver small group instruction consistently</li>
+                    <li class="checklist-item">Use evidence-based intervention materials</li>
+                    <li class="checklist-item">Monitor student engagement and response</li>
+                    <li class="checklist-item">Adjust as needed based on progress monitoring data</li>
+                </ul>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="navigateToStep('progressMonitor')">Complete 8 Weeks</button>
+            </div>
+        `
+    },
+    
+    tier2_progressMonitor: {
+        title: 'Progress Monitoring Results',
+        description: 'Evaluate student progress after 8 weeks',
+        content: `
+            <p class="mb-3">After 8 weeks of Tier 2 intervention, assess student progress using your screening tool:</p>
+            <div class="info-box mb-3">
+                <p><strong>Effective:</strong> Student is making adequate progress and meeting benchmarks</p>
+                <p><strong>Ineffective:</strong> Student continues to struggle despite intervention</p>
+            </div>
+            <div class="binary-choice">
+                <button class="selection-option" onclick="selectTier2Effectiveness('effective')">Effective</button>
+                <button class="selection-option" onclick="selectTier2Effectiveness('ineffective')">Ineffective</button>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+            </div>
+        `
+    },
+    
+    tier2_fadeToTier1: {
+        title: 'Fade to Tier 1 Supports',
+        description: 'Student is making adequate progress',
+        content: `
+            <div class="success-box">
+                <h3>✓ Excellent Progress!</h3>
+                <p>The student has responded well to Tier 2 interventions and is now ready to transition back to Tier 1 instruction only.</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>Next Steps</h3>
+                <p>• Gradually fade Tier 2 supports</p>
+                <p>• Continue monitoring progress through universal screening</p>
+                <p>• Be prepared to reinstate Tier 2 supports if needed</p>
+                <p>• Communicate success with student and family</p>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="resetWizard()">Complete</button>
+            </div>
+        `
+    },
+    
+    tier2_moveToTier3: {
+        title: 'Move to Tier 3 Interventions',
+        description: 'More intensive support needed',
+        content: `
+            <div class="warning-box">
+                <h3>Tier 3 Interventions Recommended</h3>
+                <p>The student has not made adequate progress with Tier 2 interventions and needs more intensive, individualized support.</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>What This Means</h3>
+                <p>• The student needs more intensive intervention</p>
+                <p>• Instruction will be more individualized (1-on-1 or pairs)</p>
+                <p>• Frequency and duration will increase</p>
+                <p>• Students will receive Tier 1 + Tier 3 instruction</p>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="switchToTier('tier3')">Begin Tier 3</button>
+            </div>
+        `
+    },
+    
+    // ===== TIER 3 STEPS =====
+    tier3_start: {
+        title: 'Tier 3: Personalized Interventions',
+        description: 'Intensive, individualized support (5%)',
+        content: `
+            <p class="mb-3">Tier 3 provides the most intensive level of support for students with significant needs.</p>
+            <div class="info-box">
+                <h3>Tier 3 Characteristics</h3>
+                <p><strong>Delivery:</strong> 1-on-1 or pairs</p>
+                <p><strong>Duration:</strong> 45-60 minutes daily</p>
+                <p><strong>Setting:</strong> In addition to Tier 1 core instruction</p>
+                <p><strong>Target:</strong> Approximately 5% of students</p>
+                <p><strong>Assessment:</strong> Comprehensive diagnostic evaluation</p>
+            </div>
+        `,
+        actions: `
+            <button class="btn btn-primary btn-full" onclick="navigateToStep('introduction')">Begin Tier 3</button>
+        `
+    },
+    
+    tier3_introduction: {
+        title: 'Intensive Intervention Characteristics',
+        description: 'Understanding Tier 3 requirements',
+        content: `
+            <p class="mb-3">Tier 3 interventions are characterized by:</p>
+            <ul class="checklist">
+                <li class="checklist-item">Highly individualized instruction based on comprehensive assessment</li>
+                <li class="checklist-item">Increased instructional time (45-60 minutes daily)</li>
+                <li class="checklist-item">Smaller group size (1-on-1 or pairs)</li>
+                <li class="checklist-item">More frequent progress monitoring (weekly)</li>
+                <li class="checklist-item">Specialized interventions targeting specific deficits</li>
+                <li class="checklist-item">May involve specialists (reading specialist, special education)</li>
+            </ul>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="navigateToStep('drillDown')">Next: Comprehensive Assessment</button>
+            </div>
+        `
+    },
+    
+    tier3_drillDown: {
+        title: 'Comprehensive Diagnostic Assessment',
+        description: 'In-depth evaluation of literacy skills',
+        content: `
+            <p class="mb-3">Conduct a comprehensive diagnostic assessment to identify all areas of need:</p>
+            <div class="info-box">
+                <p><em>Comprehensive diagnostic assessments provide detailed information about a student's literacy skills across multiple domains. This may include formal assessments, informal reading inventories, and diagnostic batteries.</em></p>
+            </div>
+            <div class="selection-grid mt-3">
+                <button class="selection-option" onclick="selectTier3DrillDown('comprehensive')">Comprehensive Literacy Assessment</button>
+                <button class="selection-option" onclick="selectTier3DrillDown('phonological')">Phonological Processing</button>
+                <button class="selection-option" onclick="selectTier3DrillDown('decoding')">Decoding Skills</button>
+                <button class="selection-option" onclick="selectTier3DrillDown('language')">Oral Language</button>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+            </div>
+        `
+    },
+    
+    tier3_interventions: {
+        title: 'Select Personalized Interventions',
+        description: 'Intensive, individualized intervention strategies',
+        content: `
+            <p class="mb-3">Based on comprehensive assessment results, select intensive interventions:</p>
+            <div class="info-box">
+                <h3>Assessment Area: <span id="selectedTier3DrillDown"></span></h3>
+                <p class="mt-2"><em>Intensive, research-based intervention programs and strategies for this area would be displayed here. These interventions are typically more specialized and may require additional training or materials.</em></p>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="navigateToStep('eightWeek')">Next: Begin 8-Week Cycle</button>
+            </div>
+        `
+    },
+    
+    tier3_eightWeek: {
+        title: '8-Week Intensive Intervention Cycle',
+        description: 'Implement interventions with high fidelity',
+        content: `
+            <div class="info-box">
+                <h3>Implementation Guidelines</h3>
+                <p><strong>Duration:</strong> 8 weeks of daily intervention</p>
+                <p><strong>Frequency:</strong> 45-60 minutes per day, 5 days per week</p>
+                <p><strong>Group Size:</strong> 1-on-1 or pairs only</p>
+                <p><strong>Fidelity:</strong> Implement with high fidelity - specialist delivery recommended</p>
+                <p><strong>Progress Monitoring:</strong> Assess progress weekly</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>During the 8-Week Cycle</h3>
+                <ul class="checklist mt-2">
+                    <li class="checklist-item">Deliver intensive, individualized instruction</li>
+                    <li class="checklist-item">Use specialized intervention materials and programs</li>
+                    <li class="checklist-item">Monitor progress weekly with curriculum-based measures</li>
+                    <li class="checklist-item">Adjust intervention based on data</li>
+                    <li class="checklist-item">Collaborate with specialists and families</li>
+                </ul>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="navigateToStep('progressMonitor')">Complete 8 Weeks</button>
+            </div>
+        `
+    },
+    
+    tier3_progressMonitor: {
+        title: 'Progress Monitoring Results',
+        description: 'Evaluate student progress after 8 weeks',
+        content: `
+            <p class="mb-3">After 8 weeks of intensive Tier 3 intervention, assess student progress:</p>
+            <div class="info-box mb-3">
+                <p><strong>Effective:</strong> Student is making adequate progress toward goals</p>
+                <p><strong>Ineffective:</strong> Student continues to struggle despite intensive intervention</p>
+            </div>
+            <div class="binary-choice">
+                <button class="selection-option" onclick="selectTier3Effectiveness('effective')">Effective</button>
+                <button class="selection-option" onclick="selectTier3Effectiveness('ineffective')">Ineffective</button>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+            </div>
+        `
+    },
+    
+    tier3_fadeToTier2: {
+        title: 'Fade to Tier 2 Supports',
+        description: 'Student is making adequate progress',
+        content: `
+            <div class="success-box">
+                <h3>✓ Significant Progress!</h3>
+                <p>The student has responded well to Tier 3 interventions and is ready to transition to less intensive Tier 2 supports.</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>Next Steps</h3>
+                <p>• Gradually transition to Tier 2 small group instruction</p>
+                <p>• Continue progress monitoring every 2 weeks</p>
+                <p>• Be prepared to reinstate Tier 3 if needed</p>
+                <p>• Celebrate progress with student and family</p>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="resetWizard()">Complete</button>
+            </div>
+        `
+    },
+    
+    tier3_meetClinicians: {
+        title: 'Meet with Clinicians',
+        description: 'Comprehensive evaluation recommended',
+        content: `
+            <div class="warning-box">
+                <h3>Comprehensive Evaluation Needed</h3>
+                <p>The student has not made adequate progress despite intensive Tier 3 interventions. A comprehensive evaluation by clinicians is recommended.</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>Next Steps</h3>
+                <p>• Convene a team meeting (parents, teachers, specialists)</p>
+                <p>• Consider referral for comprehensive evaluation</p>
+                <p>• Review all intervention data and student work samples</p>
+                <p>• Determine if additional assessments are needed</p>
+                <p>• Explore additional support services and resources</p>
+                <p>• Continue Tier 3 interventions while evaluation is in progress</p>
+            </div>
+            <div class="info-box mt-3">
+                <h3>Important</h3>
+                <p>This level of need may indicate a learning disability or other condition that requires specialized services. Collaboration with special education, school psychologists, and other specialists is essential.</p>
+            </div>
+        `,
+        actions: `
+            <div class="wizard-actions">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="resetWizard()">Complete</button>
+            </div>
+        `
+    }
+};
+
+// ==========================================
 // Initialization
-// ============================================
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Literacy Pal - Initializing...');
-    
-    // Load intervention data
-    await loadInterventionData();
-    
-    // Setup navigation
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Literacy Interventions Guide - Initializing...');
     setupNavigation();
-    
-    // Setup mobile menu
     setupMobileMenu();
-    
-    // Initialize flowchart
-    initializeFlowchart();
-    
-    console.log('✅ Literacy Pal - Ready!');
+    loadTier('tier1');
+    console.log('✅ Ready!');
 });
 
-// ============================================
-// Data Loading
-// ============================================
-async function loadInterventionData() {
-    try {
-        const response = await fetch('data/interventions.json');
-        if (!response.ok) throw new Error('Failed to load intervention data');
-        appState.flowchartData = await response.json();
-        console.log('📊 Intervention data loaded successfully');
-    } catch (error) {
-        console.error('❌ Error loading intervention data:', error);
-        appState.flowchartData = { tiers: [] };
+// ==========================================
+// Navigation
+// ==========================================
+function setupNavigation() {
+    document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            const tier = e.currentTarget.dataset.tier;
+            switchToTier(tier);
+        });
+    });
+}
+
+function switchToTier(tierId) {
+    appState.currentTier = tierId;
+    appState.currentStep = 'start';
+    appState.history = [];
+    appState.selections = {};
+    
+    // Update sidebar active state
+    document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.tier === tierId);
+    });
+    
+    loadTier(tierId);
+}
+
+function loadTier(tierId) {
+    renderStep(`${tierId}_start`);
+}
+
+// ==========================================
+// Step Navigation
+// ==========================================
+function navigateToStep(stepName) {
+    appState.history.push(appState.currentStep);
+    appState.currentStep = stepName;
+    renderStep(`${appState.currentTier}_${stepName}`);
+}
+
+function goBack() {
+    if (appState.history.length > 0) {
+        appState.currentStep = appState.history.pop();
+        renderStep(`${appState.currentTier}_${appState.currentStep}`);
     }
 }
 
-// ============================================
-// Navigation
-// ============================================
-function setupNavigation() {
-    // Desktop navigation
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            const page = e.currentTarget.dataset.page;
-            navigateToPage(page);
-        });
-    });
-    
-    // Mobile navigation
-    document.querySelectorAll('.mobile-nav-item').forEach(link => {
-        link.addEventListener('click', (e) => {
-            const page = e.currentTarget.dataset.page;
-            navigateToPage(page);
-            closeMobileMenu();
-        });
-    });
+function resetWizard() {
+    switchToTier('tier1');
 }
 
-function navigateToPage(pageName) {
-    // Update state
-    appState.currentPage = pageName;
+// ==========================================
+// Step Rendering
+// ==========================================
+function renderStep(stepKey) {
+    const step = STEP_CONTENT[stepKey];
+    if (!step) {
+        console.error(`Step not found: ${stepKey}`);
+        return;
+    }
     
-    // Update active states in desktop nav
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.toggle('active', link.dataset.page === pageName);
-    });
+    const container = document.getElementById('wizardContainer');
     
-    // Update active states in mobile nav
-    document.querySelectorAll('.mobile-nav-item').forEach(link => {
-        link.classList.toggle('active', link.dataset.page === pageName);
-    });
+    container.innerHTML = `
+        <div class="wizard-container">
+            <div class="wizard-header">
+                <h2>${step.title}</h2>
+                <p>${step.description}</p>
+            </div>
+            <div class="wizard-step active">
+                ${step.content}
+                ${step.actions}
+            </div>
+        </div>
+    `;
     
-    // Show/hide sections
-    document.querySelectorAll('.content-section').forEach(section => {
-        const sectionId = section.id.replace('-section', '');
-        section.classList.toggle('active', sectionId === pageName);
-    });
+    // Update any dynamic content
+    updateDynamicContent();
     
-    // Smooth scroll to top
+    // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ============================================
-// Mobile Menu
-// ============================================
-function setupMobileMenu() {
-    const menuBtn = document.querySelector('.mobile-menu-btn');
-    if (menuBtn) {
-        menuBtn.addEventListener('click', toggleMobileMenu);
+function updateDynamicContent() {
+    // Update selected drill down area for Tier 2
+    const drillDownEl = document.getElementById('selectedDrillDown');
+    if (drillDownEl && appState.selections.drillDown) {
+        drillDownEl.textContent = appState.selections.drillDown;
+    }
+    
+    // Update selected drill down area for Tier 3
+    const tier3DrillDownEl = document.getElementById('selectedTier3DrillDown');
+    if (tier3DrillDownEl && appState.selections.tier3DrillDown) {
+        tier3DrillDownEl.textContent = appState.selections.tier3DrillDown;
     }
 }
 
-function toggleMobileMenu() {
-    appState.mobileMenuOpen = !appState.mobileMenuOpen;
-    const menuBtn = document.querySelector('.mobile-menu-btn');
-    const overlay = document.querySelector('.mobile-nav-overlay');
+// ==========================================
+// Selection Handlers
+// ==========================================
+function selectScreener(screener) {
+    appState.selections.screener = screener;
     
-    menuBtn?.classList.toggle('active', appState.mobileMenuOpen);
-    overlay?.classList.toggle('active', appState.mobileMenuOpen);
-}
-
-function closeMobileMenu() {
-    appState.mobileMenuOpen = false;
-    document.querySelector('.mobile-menu-btn')?.classList.remove('active');
-    document.querySelector('.mobile-nav-overlay')?.classList.remove('active');
-}
-
-// ============================================
-// Flowchart Implementation
-// ============================================
-function initializeFlowchart() {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    renderFlowchartStart();
-}
-
-function renderFlowchartStart() {
-    const container = document.getElementById('flowchart-container');
-    if (!container || !appState.flowchartData) return;
-    
-    container.innerHTML = `
-        <div class="flowchart-start">
-            <div class="start-card">
-                <div class="start-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                    </svg>
-                </div>
-                <h2>Select Your Starting Tier</h2>
-                <p>Choose the appropriate intervention tier based on student needs and assessment data</p>
-                
-                <div class="tier-selection">
-                    ${appState.flowchartData.tiers.map(tier => `
-                        <button class="tier-option" onclick="selectTier('${tier.id}')">
-                            <div class="tier-badge">${tier.name.split('-')[0].trim()}</div>
-                            <div class="tier-info">
-                                <h3>${tier.name}</h3>
-                                <p>${tier.description}</p>
-                            </div>
-                            <svg class="tier-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Animate in
-    setTimeout(() => {
-        document.querySelector('.start-card')?.classList.add('visible');
-    }, 100);
-}
-
-function selectTier(tierId) {
-    const tier = appState.flowchartData.tiers.find(t => t.id === tierId);
-    if (!tier) return;
-    
-    appState.currentPath = [{ type: 'tier', id: tierId, name: tier.name }];
-    renderScreenerSelection(tier);
-}
-
-function renderScreenerSelection(tier) {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="flowchart-step">
-            <button class="back-button" onclick="resetFlowchart()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Back to Start
-            </button>
-            
-            <div class="step-card">
-                <div class="step-header">
-                    <div class="step-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h2>Select Literacy Assessment</h2>
-                        <p>Choose the screening tool used to assess student literacy skills</p>
-                    </div>
-                </div>
-                
-                <div class="screener-grid">
-                    ${tier.screeners.map(screener => `
-                        <button class="screener-card" onclick="selectScreener('${tier.id}', '${screener.id}')">
-                            <h3>${screener.name}</h3>
-                            <p>${screener.description}</p>
-                            <div class="card-badge">${screener.testAreas.length} test areas</div>
-                        </button>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    setTimeout(() => {
-        document.querySelector('.step-card')?.classList.add('visible');
-    }, 100);
-}
-
-function selectScreener(tierId, screenerId) {
-    const tier = appState.flowchartData.tiers.find(t => t.id === tierId);
-    const screener = tier?.screeners.find(s => s.id === screenerId);
-    
-    if (!screener) return;
-    
-    appState.currentPath.push({ type: 'screener', id: screenerId, name: screener.name });
-    renderTestAreaSelection(tier, screener);
-}
-
-function renderTestAreaSelection(tier, screener) {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="flowchart-step">
-            <button class="back-button" onclick="goBackInFlow()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Back
-            </button>
-            
-            <div class="step-card">
-                <div class="step-header">
-                    <div class="step-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h2>Select Focus Area</h2>
-                        <p>Choose the literacy skill area that needs intervention</p>
-                    </div>
-                </div>
-                
-                <div class="area-grid">
-                    ${screener.testAreas.map(area => `
-                        <button class="area-card" onclick="selectTestArea('${tier.id}', '${screener.id}', '${area.id}')">
-                            <div class="area-icon">
-                                ${getAreaIcon(area.name)}
-                            </div>
-                            <h3>${area.name}</h3>
-                            <p>${area.pillars.length} intervention strategies available</p>
-                        </button>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    setTimeout(() => {
-        document.querySelector('.step-card')?.classList.add('visible');
-    }, 100);
-}
-
-function selectTestArea(tierId, screenerId, areaId) {
-    const tier = appState.flowchartData.tiers.find(t => t.id === tierId);
-    const screener = tier?.screeners.find(s => s.id === screenerId);
-    const area = screener?.testAreas.find(a => a.id === areaId);
-    
-    if (!area) return;
-    
-    appState.currentPath.push({ type: 'area', id: areaId, name: area.name });
-    renderInterventionStrategies(tier, screener, area);
-}
-
-function renderInterventionStrategies(tier, screener, area) {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    // Collect all interventions from all pillars
-    const allInterventions = area.pillars.flatMap(pillar => 
-        pillar.interventions.map(intervention => ({
-            ...intervention,
-            pillar: pillar.name
-        }))
-    );
-    
-    container.innerHTML = `
-        <div class="flowchart-step">
-            <button class="back-button" onclick="goBackInFlow()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Back
-            </button>
-            
-            <div class="step-card wide">
-                <div class="step-header">
-                    <div class="step-icon success">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h2>Recommended Interventions</h2>
-                        <p>Evidence-based strategies for ${area.name}</p>
-                    </div>
-                </div>
-                
-                <div class="intervention-list">
-                    ${allInterventions.map((intervention, index) => `
-                        <div class="intervention-card" style="animation-delay: ${index * 0.1}s">
-                            <div class="intervention-header">
-                                <h3>${intervention.name}</h3>
-                                <span class="pillar-badge">${intervention.pillar}</span>
-                            </div>
-                            <p class="intervention-description">${intervention.description}</p>
-                            <div class="intervention-meta">
-                                <div class="meta-item">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <path d="M12 6v6l4 2"/>
-                                    </svg>
-                                    <span>${intervention.duration}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                                        <circle cx="9" cy="7" r="4"/>
-                                    </svg>
-                                    <span>${intervention.groupSize}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                        <line x1="16" y1="2" x2="16" y2="6"/>
-                                        <line x1="8" y1="2" x2="8" y2="6"/>
-                                        <line x1="3" y1="10" x2="21" y2="10"/>
-                                    </svg>
-                                    <span>${intervention.frequency}</span>
-                                </div>
-                            </div>
-                            ${intervention.resources ? `
-                                <div class="intervention-resources">
-                                    <strong>Resources:</strong> ${intervention.resources}
-                                </div>
-                            ` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="btn-secondary" onclick="exportInterventions()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Export to PDF
-                    </button>
-                    <button class="btn-primary" onclick="resetFlowchart()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/>
-                            <path d="M21 3v5h-5"/>
-                        </svg>
-                        Start New Assessment
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    setTimeout(() => {
-        document.querySelector('.step-card')?.classList.add('visible');
-    }, 100);
-}
-
-function getAreaIcon(areaName) {
-    const icons = {
-        'Phonemic Awareness': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>',
-        'Phonics': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>',
-        'Fluency': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
-        'Vocabulary': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>',
-        'Comprehension': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>'
-    };
-    return icons[areaName] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>';
-}
-
-function goBackInFlow() {
-    appState.currentPath.pop();
-    
-    if (appState.currentPath.length === 0) {
-        resetFlowchart();
-        return;
-    }
-    
-    const lastStep = appState.currentPath[appState.currentPath.length - 1];
-    const tier = appState.flowchartData.tiers.find(t => t.id === appState.currentPath[0].id);
-    
-    if (lastStep.type === 'tier') {
-        renderScreenerSelection(tier);
-    } else if (lastStep.type === 'screener') {
-        const screener = tier.screeners.find(s => s.id === lastStep.id);
-        renderTestAreaSelection(tier, screener);
-    } else if (lastStep.type === 'area') {
-        const screener = tier.screeners.find(s => s.id === appState.currentPath[1].id);
-        renderTestAreaSelection(tier, screener);
-    }
-}
-
-function resetFlowchart() {
-    appState.currentPath = [];
-    renderFlowchartStart();
-}
-
-function exportFlowchart() {
-    if (appState.currentPath.length === 0) {
-        alert('Please complete a pathway first before exporting.');
-        return;
-    }
-    
-    const pathText = appState.currentPath.map(step => step.name).join(' → ');
-    alert(`Current Path:\n\n${pathText}\n\nExport to PDF feature coming soon!`);
-}
-
-function exportInterventions() {
-    alert('Export to PDF feature coming soon!\n\nYou can currently print this page using your browser\'s print function (Ctrl/Cmd + P)');
-}
-
-// ============================================
-// FAQ Functionality
-// ============================================
-function toggleFAQ(element) {
-    const faqItem = element.closest('.faq-item');
-    const wasActive = faqItem.classList.contains('active');
-    
-    // Close all FAQs
-    document.querySelectorAll('.faq-item').forEach(item => {
-        item.classList.remove('active');
+    // Update UI to show selection
+    document.querySelectorAll('.selection-option').forEach(btn => {
+        btn.classList.toggle('selected', btn.textContent.trim() === screener);
     });
     
-    // Open clicked FAQ if it wasn't active
-    if (!wasActive) {
-        faqItem.classList.add('active');
-    }
+    // Auto-advance after short delay
+    setTimeout(() => {
+        navigateToStep('effectiveness');
+    }, 500);
 }
 
-// ============================================
-// Export for global use
-// ============================================
-window.navigateToPage = navigateToPage;
-window.selectTier = selectTier;
-window.selectScreener = selectScreener;
-window.selectTestArea = selectTestArea;
-window.goBackInFlow = goBackInFlow;
-window.resetFlowchart = resetFlowchart;
-window.exportFlowchart = exportFlowchart;
-window.exportInterventions = exportInterventions;
-window.toggleFAQ = toggleFAQ;
+function selectEffectiveness(effectiveness) {
+    appState.selections.effectiveness = effectiveness;
+    
+    // Update UI
+    document.querySelectorAll('.selection-option').forEach(btn => {
+        const btnText = btn.textContent.toLowerCase();
+        btn.classList.toggle('selected', btnText === effectiveness);
+    });
+    
+    // Navigate based on selection
+    setTimeout(() => {
+        if (effectiveness === 'effective') {
+            navigateToStep('continueMonitor');
+        } else {
+            navigateToStep('studentRate');
+        }
+    }, 500);
+}
+
+function selectStudentRate(rate) {
+    appState.selections.studentRate = rate;
+    
+    // Update UI
+    document.querySelectorAll('.selection-option').forEach(btn => {
+        btn.classList.toggle('selected', btn.onclick.toString().includes(rate));
+    });
+    
+    // Navigate based on selection
+    setTimeout(() => {
+        if (rate === '20plus') {
+            navigateToStep('reteach');
+        } else {
+            navigateToStep('moveToTier2');
+        }
+    }, 500);
+}
+
+function selectDrillDown(area) {
+    appState.selections.drillDown = area.charAt(0).toUpperCase() + area.slice(1);
+    
+    // Update UI
+    document.querySelectorAll('.selection-option').forEach(btn => {
+        btn.classList.toggle('selected', btn.onclick.toString().includes(area));
+    });
+    
+    // Auto-advance
+    setTimeout(() => {
+        navigateToStep('interventions');
+    }, 500);
+}
+
+function selectTier2Effectiveness(effectiveness) {
+    appState.selections.tier2Effectiveness = effectiveness;
+    
+    // Update UI
+    document.querySelectorAll('.selection-option').forEach(btn => {
+        const btnText = btn.textContent.toLowerCase();
+        btn.classList.toggle('selected', btnText === effectiveness);
+    });
+    
+    // Navigate based on selection
+    setTimeout(() => {
+        if (effectiveness === 'effective') {
+            navigateToStep('fadeToTier1');
+        } else {
+            navigateToStep('moveToTier3');
+        }
+    }, 500);
+}
+
+function selectTier3DrillDown(area) {
+    appState.selections.tier3DrillDown = area.charAt(0).toUpperCase() + area.slice(1).replace(/([A-Z])/g, ' $1').trim();
+    
+    // Update UI
+    document.querySelectorAll('.selection-option').forEach(btn => {
+        btn.classList.toggle('selected', btn.onclick.toString().includes(area));
+    });
+    
+    // Auto-advance
+    setTimeout(() => {
+        navigateToStep('interventions');
+    }, 500);
+}
+
+function selectTier3Effectiveness(effectiveness) {
+    appState.selections.tier3Effectiveness = effectiveness;
+    
+    // Update UI
+    document.querySelectorAll('.selection-option').forEach(btn => {
+        const btnText = btn.textContent.toLowerCase();
+        btn.classList.toggle('selected', btnText === effectiveness);
+    });
+    
+    // Navigate based on selection
+    setTimeout(() => {
+        if (effectiveness === 'effective') {
+            navigateToStep('fadeToTier2');
+        } else {
+            navigateToStep('meetClinicians');
+        }
+    }, 500);
+}
+
+// ==========================================
+// Mobile Menu
+// ==========================================
+function setupMobileMenu() {
+    const toggle = document.getElementById('mobileToggle');
+    const overlay = document.getElementById('sidebarOverlay');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (window.innerWidth <= 768) {
+        toggle.style.display = 'flex';
+    }
+    
+    toggle?.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('show');
+    });
+    
+    overlay?.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+    });
+    
+    // Close sidebar when nav item clicked on mobile
+    document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+            }
+        });
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth <= 768) {
+            toggle.style.display = 'flex';
+        } else {
+            toggle.style.display = 'none';
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+    });
+}

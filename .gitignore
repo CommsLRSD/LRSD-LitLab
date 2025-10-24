@@ -31,3 +31,5 @@ temp/
 *.tmp
 app-old.js
 index-old.html
+*-backup.*
+*-old.*
