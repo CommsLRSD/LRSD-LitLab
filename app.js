@@ -598,8 +598,331 @@ function updateTier1Progress() {
 
 function proceedToTier1Screener() {
     console.log('Proceeding to Tier 1 screener selection');
-    // This would continue the flowchart - placeholder for now
-    alert('Tier 1 flowchart implementation in progress. This will guide you through:\n\n1. Selecting a literacy screener\n2. Inputting results\n3. Evaluating effectiveness\n4. Determining next steps based on class performance');
+    
+    const flowchartData = appState.tierFlowchartData?.tier1;
+    if (!flowchartData || !flowchartData.screeners) {
+        console.error('Tier 1 flowchart data not loaded');
+        return;
+    }
+    
+    const container = document.getElementById('flowchart-container');
+    container.innerHTML = `
+        <div class="flowchart-tier-view">
+            <div class="flowchart-header">
+                <button class="back-button" onclick="backToTier1Step1()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </button>
+                <h2>Tier 1: Select Literacy Screener</h2>
+            </div>
+            
+            <div class="flowchart-content">
+                <div class="flowchart-step-wrapper active">
+                    <div class="step-indicator">Step 2</div>
+                    <div class="step-content-box">
+                        <h3>Choose Your Literacy Screener</h3>
+                        <p>Select the assessment tool you're using for universal screening:</p>
+                        
+                        <div class="screener-selection-grid">
+                            ${flowchartData.screeners.map(screener => `
+                                <button class="screener-option" onclick="selectTier1Screener('${screener.id}', '${screener.name}')">
+                                    <div class="screener-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                            <path d="M9 12l2 2 4-4"/>
+                                        </svg>
+                                    </div>
+                                    <h4>${screener.name}</h4>
+                                    <p>${screener.description}</p>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function backToTier1Step1() {
+    startTier1Flowchart();
+}
+
+function selectTier1Screener(screenerId, screenerName) {
+    console.log(`Selected screener: ${screenerName}`);
+    appState.currentTierFlow = { tier: 1, screener: screenerId, screenerName: screenerName };
+    
+    const container = document.getElementById('flowchart-container');
+    container.innerHTML = `
+        <div class="flowchart-tier-view">
+            <div class="flowchart-header">
+                <button class="back-button" onclick="proceedToTier1Screener()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </button>
+                <h2>Tier 1: Evaluate Effectiveness</h2>
+            </div>
+            
+            <div class="flowchart-content">
+                <div class="flowchart-step-wrapper active">
+                    <div class="step-indicator">Step 3</div>
+                    <div class="step-content-box">
+                        <h3>Is the instruction effective for most students?</h3>
+                        <p>Based on ${screenerName} results and classroom observations:</p>
+                        
+                        <div class="info-callout">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4m0-4h.01"/>
+                            </svg>
+                            <div>
+                                <h4>Consider These Indicators</h4>
+                                <ul class="indicator-list">
+                                    <li>Are 80% or more students meeting benchmarks?</li>
+                                    <li>Is student engagement high during lessons?</li>
+                                    <li>Are learning objectives being achieved?</li>
+                                    <li>Is progress evident through formative assessments?</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="decision-buttons">
+                            <button class="decision-btn success" onclick="tier1InstructionEffective()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <div>
+                                    <strong>Yes, Instruction is Effective</strong>
+                                    <span>80%+ students meeting benchmarks</span>
+                                </div>
+                            </button>
+                            
+                            <button class="decision-btn warning" onclick="tier1InstructionIneffective()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                <div>
+                                    <strong>No, Needs Improvement</strong>
+                                    <span>More than 20% students struggling</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function tier1InstructionEffective() {
+    const container = document.getElementById('flowchart-container');
+    container.innerHTML = `
+        <div class="flowchart-tier-view">
+            <div class="flowchart-header">
+                <button class="back-button" onclick="closeTierFlowchart()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Interventions
+                </button>
+                <h2>Tier 1: Success!</h2>
+            </div>
+            
+            <div class="flowchart-content">
+                <div class="success-message">
+                    <div class="success-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h2>Core Instruction is Effective!</h2>
+                    <p>Your explicit and systematic instruction is working well for the majority of students.</p>
+                    
+                    <div class="recommendation-box">
+                        <h3>Next Steps:</h3>
+                        <ul>
+                            <li>Continue with current instructional practices</li>
+                            <li>Monitor progress through regular formative assessments</li>
+                            <li>Conduct universal screening at the next benchmark period</li>
+                            <li>For the small percentage of struggling students, consider Tier 2 interventions</li>
+                        </ul>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="closeTierFlowchart()">
+                        Return to Interventions
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function tier1InstructionIneffective() {
+    const container = document.getElementById('flowchart-container');
+    container.innerHTML = `
+        <div class="flowchart-tier-view">
+            <div class="flowchart-header">
+                <button class="back-button" onclick="selectTier1Screener('${appState.currentTierFlow?.screener}', '${appState.currentTierFlow?.screenerName}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </button>
+                <h2>Tier 1: Determine Student Success Rate</h2>
+            </div>
+            
+            <div class="flowchart-content">
+                <div class="flowchart-step-wrapper active">
+                    <div class="step-indicator">Step 4</div>
+                    <div class="step-content-box">
+                        <h3>What percentage of students are unsuccessful?</h3>
+                        <p>Based on assessment data, how many students are below benchmark?</p>
+                        
+                        <div class="decision-buttons">
+                            <button class="decision-btn primary" onclick="tier1LessThan20Percent()">
+                                <div>
+                                    <strong>Less than 20% Unsuccessful</strong>
+                                    <span>Most students are on track, small group needs support</span>
+                                </div>
+                            </button>
+                            
+                            <button class="decision-btn warning" onclick="tier1MoreThan20Percent()">
+                                <div>
+                                    <strong>20% or More Unsuccessful</strong>
+                                    <span>Significant number of students need re-teaching</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function tier1LessThan20Percent() {
+    const container = document.getElementById('flowchart-container');
+    container.innerHTML = `
+        <div class="flowchart-tier-view">
+            <div class="flowchart-header">
+                <button class="back-button" onclick="closeTierFlowchart()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Interventions
+                </button>
+                <h2>Tier 1: Move to Tier 2</h2>
+            </div>
+            
+            <div class="flowchart-content">
+                <div class="info-message">
+                    <div class="info-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h2>Small Group Intervention Recommended</h2>
+                    <p>A small percentage of students need additional targeted support.</p>
+                    
+                    <div class="recommendation-box">
+                        <h3>Next Steps:</h3>
+                        <ul>
+                            <li>Continue Tier 1 core instruction for all students</li>
+                            <li>Implement Tier 2 small group interventions for struggling students (typically 15% or less)</li>
+                            <li>Use evidence-based intervention strategies</li>
+                            <li>Monitor progress every 2-4 weeks</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="startTier2Flowchart()">
+                            Start Tier 2 Flowchart
+                        </button>
+                        <button class="btn-secondary" onclick="closeTierFlowchart()">
+                            Return to Interventions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function tier1MoreThan20Percent() {
+    const container = document.getElementById('flowchart-container');
+    container.innerHTML = `
+        <div class="flowchart-tier-view">
+            <div class="flowchart-header">
+                <button class="back-button" onclick="closeTierFlowchart()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Interventions
+                </button>
+                <h2>Tier 1: Re-teach with Different Strategies</h2>
+            </div>
+            
+            <div class="flowchart-content">
+                <div class="warning-message">
+                    <div class="warning-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <h2>Core Instruction Needs Adjustment</h2>
+                    <p>When more than 20% of students are unsuccessful, the core instruction may need to be re-examined and adjusted.</p>
+                    
+                    <div class="recommendation-box">
+                        <h3>Recommended Actions:</h3>
+                        <ul>
+                            <li><strong>Re-teach</strong> using different instructional strategies</li>
+                            <li><strong>Review</strong> the 8 principles of explicit instruction</li>
+                            <li><strong>Differentiate</strong> instruction within Tier 1</li>
+                            <li><strong>Increase</strong> modeling and guided practice opportunities</li>
+                            <li><strong>Adjust</strong> pacing to ensure concept mastery</li>
+                            <li><strong>Collaborate</strong> with colleagues to refine approaches</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-callout">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4m0-4h.01"/>
+                        </svg>
+                        <div>
+                            <h4>After Re-teaching</h4>
+                            <p>Re-assess students and return to this flowchart to determine if Tier 1 instruction is now effective or if students need Tier 2 support.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="startTier1Flowchart()">
+                            Start Tier 1 Again
+                        </button>
+                        <button class="btn-secondary" onclick="closeTierFlowchart()">
+                            Return to Interventions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function startTier2Flowchart() {
@@ -783,3 +1106,9 @@ window.updateTier2Progress = updateTier2Progress;
 window.proceedToTier1Screener = proceedToTier1Screener;
 window.proceedToTier2Assessment = proceedToTier2Assessment;
 window.proceedToTier3Assessment = proceedToTier3Assessment;
+window.backToTier1Step1 = backToTier1Step1;
+window.selectTier1Screener = selectTier1Screener;
+window.tier1InstructionEffective = tier1InstructionEffective;
+window.tier1InstructionIneffective = tier1InstructionIneffective;
+window.tier1LessThan20Percent = tier1LessThan20Percent;
+window.tier1MoreThan20Percent = tier1MoreThan20Percent;
