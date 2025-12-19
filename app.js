@@ -8,8 +8,10 @@ const appState = {
     currentPage: 'home',
     mobileMenuOpen: false,
     flowchartData: null,
+    tierFlowchartData: null,
     currentPath: [],
-    interventionHistory: []
+    interventionHistory: [],
+    currentTierFlow: null
 };
 
 // ============================================
@@ -20,6 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Load intervention data
     await loadInterventionData();
+    
+    // Load tier flowchart data
+    await loadTierFlowchartData();
     
     // Setup navigation
     setupNavigation();
@@ -48,6 +53,18 @@ async function loadInterventionData() {
     } catch (error) {
         console.error('❌ Error loading intervention data:', error);
         appState.flowchartData = { tiers: [] };
+    }
+}
+
+async function loadTierFlowchartData() {
+    try {
+        const response = await fetch('data/tier-flowcharts.json');
+        if (!response.ok) throw new Error('Failed to load tier flowchart data');
+        appState.tierFlowchartData = await response.json();
+        console.log('📊 Tier flowchart data loaded successfully');
+    } catch (error) {
+        console.error('❌ Error loading tier flowchart data:', error);
+        appState.tierFlowchartData = { tier1: {}, tier2: {}, tier3: {} };
     }
 }
 

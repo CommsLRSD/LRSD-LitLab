@@ -1,0 +1,57 @@
+{
+  "tier1": {
+    "name": "Tier 1 - Universal Screening & Core Instruction",
+    "principles": [
+      "Clear learning objectives are stated",
+      "Instruction is sequenced and scaffolded",
+      "Teacher models skills explicitly",
+      "Guided practice with feedback is provided",
+      "Independent practice opportunities are given",
+      "Regular assessment and progress monitoring",
+      "Cumulative review is integrated",
+      "Instruction is responsive to student needs"
+    ],
+    "screeners": [
+      {
+        "id": "dibels",
+        "name": "DIBELS",
+        "description": "Dynamic Indicators of Basic Early Literacy Skills"
+      },
+      {
+        "id": "ctopp2",
+        "name": "CTOPP-2",
+        "description": "Comprehensive Test of Phonological Processing"
+      },
+      {
+        "id": "thafol",
+        "name": "THaFoL",
+        "description": "Test des Habiletés Fondamentales en Lecture (French)"
+      },
+      {
+        "id": "idapel",
+        "name": "IDAPEL",
+        "description": "Indicateurs Dynamiques d'Apprentissage Précoce de la Lecture (French)"
+      }
+    ]
+  },
+  "tier2": {
+    "name": "Tier 2 - Small Group Intervention",
+    "principles": [
+      "Small group instruction (3-6 students)",
+      "Daily sessions of 20-30 minutes",
+      "Targeted skill instruction based on assessment data",
+      "Progress monitoring every 2-4 weeks",
+      "Evidence-based intervention program"
+    ]
+  },
+  "tier3": {
+    "name": "Tier 3 - Intensive Individual Intervention",
+    "characteristics": [
+      "Individual or very small group (1-3 students)",
+      "Intensive daily sessions (45-60 minutes)",
+      "Highly specialized, research-based programs",
+      "Weekly progress monitoring",
+      "Collaboration with specialists and clinicians"
+    ]
+  }
+}
