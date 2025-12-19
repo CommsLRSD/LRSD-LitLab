@@ -80,6 +80,14 @@ function setupNavigation() {
         });
     });
     
+    // Sidebar navigation
+    document.querySelectorAll('.sidebar-item').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const page = e.currentTarget.dataset.page;
+            navigateToPage(page);
+        });
+    });
+    
     // Mobile navigation
     document.querySelectorAll('.mobile-nav-item').forEach(link => {
         link.addEventListener('click', (e) => {
@@ -96,6 +104,11 @@ function navigateToPage(pageName) {
     
     // Update active states in desktop nav
     document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.toggle('active', link.dataset.page === pageName);
+    });
+    
+    // Update active states in sidebar
+    document.querySelectorAll('.sidebar-item').forEach(link => {
         link.classList.toggle('active', link.dataset.page === pageName);
     });
     
