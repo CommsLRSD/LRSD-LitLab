@@ -144,8 +144,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nav-links {
-    display: flex;
-    gap: 0.25rem;
+    display: none; /* Hidden on desktop - sidebar serves as primary navigation */
 }
 
 .nav-link {
@@ -174,7 +173,7 @@ h1, h2, h3, h4, h5, h6 {
 .mobile-menu-btn {
     display: none;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
     padding: 8px;
     background: none;
     border: none;
@@ -189,12 +188,9 @@ h1, h2, h3, h4, h5, h6 {
     transition: var(--transition);
 }
 
-.mobile-menu-btn.active span:first-child {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.mobile-menu-btn.active span:last-child {
-    transform: rotate(-45deg) translate(5px, -5px);
+/* Simple hamburger - no animation, just opacity change */
+.mobile-menu-btn.active span {
+    background: var(--primary);
 }
 
 .mobile-nav-overlay {
@@ -323,6 +319,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .content-section {
     display: none;
+    scroll-margin-top: 70px; /* Account for fixed header height + small buffer */
 }
 
 .content-section.active {
@@ -331,7 +328,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Interventions Section - Flowchart */
 .interventions-header {
-    padding: 3rem 1.5rem 2rem;
+    padding: 2rem 1.5rem 1.5rem;
     max-width: 1400px;
     margin: 0 auto;
     text-align: center;
@@ -340,7 +337,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .section-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     color: var(--text-primary);
@@ -393,6 +390,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 2rem 1.5rem;
     min-height: 600px;
     background: var(--bg-secondary);
+    scroll-margin-top: 70px; /* Account for fixed header */
 }
 
 .flowchart-connections {
@@ -692,9 +690,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-area {
     text-align: center;
-    padding: 3rem 1.5rem;
+    padding: 2rem 1.5rem;
     max-width: 800px;
-    margin: 0 auto 2rem;
+    margin: 0 auto 1.5rem;
     background: var(--bg-primary);
     border-bottom: 1px solid var(--border);
 }
@@ -1608,7 +1606,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .home-hero {
     background: linear-gradient(135deg, var(--light-blue) 0%, var(--accent-light) 100%);
-    padding: 4rem 2rem;
+    padding: 2.5rem 1.5rem;
     text-align: center;
     color: var(--text-primary);
     position: relative;
@@ -1690,19 +1688,19 @@ h1, h2, h3, h4, h5, h6 {
 .home-menu {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 3rem 1.5rem;
+    padding: 2rem 1rem;
 }
 
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 3rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .menu-card {
     position: relative;
-    padding: 2rem;
+    padding: 1.5rem;
     background: var(--bg-primary);
     border: 2px solid var(--border);
     border-radius: var(--radius-xl);
@@ -1736,12 +1734,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .menu-card .card-icon {
-    width: 60px;
-    height: 60px;
-    padding: 1rem;
+    width: 48px;
+    height: 48px;
+    padding: 0.75rem;
     background: var(--bg-accent);
     border-radius: var(--radius-lg);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     color: var(--primary);
     transition: var(--transition);
 }
@@ -1758,8 +1756,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .menu-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
     color: var(--text-primary);
 }
 
@@ -1790,8 +1788,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .feedback-section {
     text-align: center;
-    padding: 2rem;
-    margin-top: 2rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
 }
 
 .feedback-button {
@@ -1827,9 +1825,9 @@ h1, h2, h3, h4, h5, h6 {
 .tier-landing-grid {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1rem;
     display: grid;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 .tier-card {
@@ -1846,12 +1844,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .tier-header {
-    padding: 2rem;
+    padding: 1.5rem;
     background: var(--bg-accent);
     color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
     border-bottom: 1px solid var(--border);
 }
 
@@ -1872,14 +1870,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .tier-number {
     flex-shrink: 0;
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.6);
     border-radius: 50%;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--primary);
 }
@@ -1900,20 +1898,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .tier-header h3 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
 }
 
 .tier-body {
-    padding: 2rem;
+    padding: 1.5rem;
 }
 
 .tier-description {
     color: var(--text-secondary);
-    font-size: 1.125rem;
-    line-height: 1.7;
-    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
 }
 
 .tier-actions {
@@ -2130,29 +2128,86 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
     
     .hero-subtitle {
-        font-size: 1rem;
+        font-size: 0.95rem;
+    }
+    
+    /* More compact mobile hero */
+    .home-hero {
+        padding: 1.5rem 1rem;
+    }
+    
+    .hero-icon {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 1rem;
+    }
+    
+    /* Better mobile viewport usage - reduce nested padding */
+    .home-menu {
+        padding: 1rem 0.75rem;
     }
     
     .menu-grid {
         grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .menu-card {
+        padding: 1rem;
+    }
+    
+    .menu-card .card-icon {
+        width: 40px;
+        height: 40px;
+        padding: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .menu-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .menu-card p {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feedback-section {
+        padding: 1rem 0.75rem;
+    }
+    
+    .feedback-button {
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
     }
     
     .tier-header {
         flex-direction: column;
         text-align: center;
+        padding: 1.25rem;
     }
     
     .tier-header h3 {
-        font-size: 1.5rem;
+        font-size: 1.35rem;
+    }
+    
+    .tier-body {
+        padding: 1.25rem;
+    }
+    
+    .tier-landing-grid {
+        padding: 1rem 0.75rem;
+        gap: 1rem;
     }
     
     .schedule-row {
         grid-template-columns: 1fr;
         gap: 0.5rem;
+        padding: 0.75rem 1rem;
     }
     
     .schedule-cell {
@@ -2180,26 +2235,69 @@ h1, h2, h3, h4, h5, h6 {
         font-weight: 600;
         margin-right: 0.5rem;
     }
+    
+    /* Content sections more compact */
+    .content-wrapper {
+        padding: 1.25rem 0.75rem;
+    }
+    
+    .hero-area {
+        padding: 1.5rem 1rem;
+    }
+    
+    .program-header {
+        padding: 1rem;
+    }
+    
+    .program-header h3 {
+        font-size: 1.25rem;
+    }
 }
 
 @media (max-width: 480px) {
     .home-hero {
-        padding: 3rem 1.5rem;
+        padding: 1.25rem 0.75rem;
     }
     
     .hero-title {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.875rem;
     }
     
     .hero-icon {
-        width: 60px;
-        height: 60px;
+        width: 48px;
+        height: 48px;
+        padding: 0.75rem;
+    }
+    
+    .home-menu {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .menu-card {
+        padding: 0.875rem;
     }
     
     .tier-number {
-        width: 60px;
-        height: 60px;
-        font-size: 1.25rem;
+        width: 56px;
+        height: 56px;
+        font-size: 1.125rem;
+    }
+    
+    .tier-header {
+        padding: 1rem;
+    }
+    
+    .tier-body {
+        padding: 1rem;
+    }
+    
+    .tier-action-btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
     }
 }
 
@@ -2214,6 +2312,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 2rem;
     overflow: hidden;
     animation: slideUp 0.4s ease;
+    scroll-margin-top: 70px; /* Account for fixed header */
 }
 
 @keyframes slideUp {
@@ -2703,6 +2802,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 2rem;
     overflow: hidden;
     animation: slideUp 0.4s ease;
+    scroll-margin-top: 70px; /* Account for fixed header */
 }
 
 .visual-flowchart-header {
