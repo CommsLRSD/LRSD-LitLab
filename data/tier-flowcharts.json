@@ -32,6 +32,40 @@
         "name": "IDAPEL",
         "description": "Indicateurs Dynamiques d'Apprentissage Précoce de la Lecture (French)"
       }
+    ],
+    "interventions": [
+      {
+        "id": "phonics-fundamentals",
+        "name": "Phonics Fundamentals",
+        "description": "Explicit instruction in letter-sound relationships and decoding",
+        "targetSkills": ["Phonics", "Decoding"],
+        "duration": "15-20 minutes",
+        "frequency": "Daily"
+      },
+      {
+        "id": "phonemic-awareness-practice",
+        "name": "Phonemic Awareness Practice",
+        "description": "Activities to develop sound awareness and manipulation skills",
+        "targetSkills": ["Phonemic Awareness"],
+        "duration": "10-15 minutes",
+        "frequency": "Daily"
+      },
+      {
+        "id": "fluency-building",
+        "name": "Fluency Building Activities",
+        "description": "Repeated reading and partner reading to increase reading rate",
+        "targetSkills": ["Fluency"],
+        "duration": "15 minutes",
+        "frequency": "Daily"
+      },
+      {
+        "id": "vocabulary-expansion",
+        "name": "Vocabulary Expansion",
+        "description": "Direct vocabulary instruction with context and multiple exposures",
+        "targetSkills": ["Vocabulary"],
+        "duration": "15 minutes",
+        "frequency": "Daily"
+      }
     ]
   },
   "tier2": {
@@ -42,6 +76,83 @@
       "Targeted skill instruction based on assessment data",
       "Progress monitoring every 2-4 weeks",
       "Evidence-based intervention program"
+    ],
+    "drillDownAssessments": [
+      {
+        "id": "phonics-survey",
+        "name": "Phonics Skills Survey",
+        "description": "Assesses mastery of letter sounds, blending, and decoding patterns",
+        "targetSkills": ["Phonics", "Decoding"],
+        "administrationTime": "10-15 minutes"
+      },
+      {
+        "id": "phonological-awareness-test",
+        "name": "Phonological Awareness Diagnostic",
+        "description": "Evaluates phoneme segmentation, blending, and manipulation skills",
+        "targetSkills": ["Phonemic Awareness"],
+        "administrationTime": "10-15 minutes"
+      },
+      {
+        "id": "fluency-probe",
+        "name": "Oral Reading Fluency Probe",
+        "description": "Measures reading accuracy and rate with grade-level passages",
+        "targetSkills": ["Fluency", "Accuracy"],
+        "administrationTime": "5 minutes"
+      },
+      {
+        "id": "comprehension-check",
+        "name": "Reading Comprehension Check",
+        "description": "Assesses understanding through retelling and questions",
+        "targetSkills": ["Comprehension"],
+        "administrationTime": "15 minutes"
+      }
+    ],
+    "interventions": [
+      {
+        "id": "systematic-phonics",
+        "name": "Systematic Phonics Intervention",
+        "description": "Intensive, explicit phonics instruction with decodable texts",
+        "targetSkills": ["Phonics", "Decoding"],
+        "duration": "20-30 minutes",
+        "frequency": "Daily",
+        "groupSize": "3-6 students"
+      },
+      {
+        "id": "sound-partners",
+        "name": "Sound Partners Program",
+        "description": "Research-based phonological awareness intervention",
+        "targetSkills": ["Phonemic Awareness"],
+        "duration": "20-30 minutes",
+        "frequency": "Daily",
+        "groupSize": "3-6 students"
+      },
+      {
+        "id": "repeated-reading",
+        "name": "Repeated Reading Protocol",
+        "description": "Structured repeated reading with progress graphing",
+        "targetSkills": ["Fluency", "Accuracy"],
+        "duration": "20 minutes",
+        "frequency": "4-5 times/week",
+        "groupSize": "3-6 students"
+      },
+      {
+        "id": "vocabulary-intervention",
+        "name": "Targeted Vocabulary Intervention",
+        "description": "Explicit teaching of high-utility words with multiple exposures",
+        "targetSkills": ["Vocabulary", "Comprehension"],
+        "duration": "20-30 minutes",
+        "frequency": "Daily",
+        "groupSize": "3-6 students"
+      },
+      {
+        "id": "comprehension-strategies",
+        "name": "Comprehension Strategy Instruction",
+        "description": "Direct teaching of comprehension strategies with guided practice",
+        "targetSkills": ["Comprehension"],
+        "duration": "25-30 minutes",
+        "frequency": "Daily",
+        "groupSize": "3-6 students"
+      }
     ]
   },
   "tier3": {
@@ -52,6 +163,83 @@
       "Highly specialized, research-based programs",
       "Weekly progress monitoring",
       "Collaboration with specialists and clinicians"
+    ],
+    "drillDownAssessments": [
+      {
+        "id": "comprehensive-phonics",
+        "name": "Comprehensive Phonics Inventory",
+        "description": "In-depth assessment of all phonics patterns and decoding skills",
+        "targetSkills": ["Phonics", "Decoding", "Word Recognition"],
+        "administrationTime": "20-30 minutes"
+      },
+      {
+        "id": "phonological-processing",
+        "name": "Phonological Processing Assessment",
+        "description": "Detailed evaluation of all phonological awareness components",
+        "targetSkills": ["Phonemic Awareness", "Phonological Memory"],
+        "administrationTime": "20-25 minutes"
+      },
+      {
+        "id": "diagnostic-reading",
+        "name": "Diagnostic Reading Assessment",
+        "description": "Comprehensive evaluation of all reading components",
+        "targetSkills": ["All literacy skills"],
+        "administrationTime": "30-45 minutes"
+      },
+      {
+        "id": "language-processing",
+        "name": "Language Processing Evaluation",
+        "description": "Assesses underlying language skills affecting reading",
+        "targetSkills": ["Language", "Comprehension"],
+        "administrationTime": "25-30 minutes"
+      }
+    ],
+    "interventions": [
+      {
+        "id": "wilson-reading",
+        "name": "Wilson Reading System",
+        "description": "Intensive, multisensory structured literacy program",
+        "targetSkills": ["Phonics", "Decoding", "Encoding"],
+        "duration": "45-60 minutes",
+        "frequency": "Daily",
+        "groupSize": "1-3 students"
+      },
+      {
+        "id": "orton-gillingham",
+        "name": "Orton-Gillingham Approach",
+        "description": "Highly individualized, multisensory reading intervention",
+        "targetSkills": ["Phonics", "Decoding", "Spelling"],
+        "duration": "45-60 minutes",
+        "frequency": "Daily",
+        "groupSize": "1-2 students"
+      },
+      {
+        "id": "lindamood-bell",
+        "name": "Lindamood-Bell Programs",
+        "description": "Intensive programs targeting specific reading deficits",
+        "targetSkills": ["Phonemic Awareness", "Fluency", "Comprehension"],
+        "duration": "60 minutes",
+        "frequency": "Daily",
+        "groupSize": "1-3 students"
+      },
+      {
+        "id": "reading-recovery",
+        "name": "Reading Recovery",
+        "description": "One-to-one tutoring for struggling first graders",
+        "targetSkills": ["All literacy skills"],
+        "duration": "30 minutes",
+        "frequency": "Daily",
+        "groupSize": "1 student"
+      },
+      {
+        "id": "specialized-comprehension",
+        "name": "Specialized Comprehension Program",
+        "description": "Intensive intervention for severe comprehension deficits",
+        "targetSkills": ["Comprehension", "Vocabulary", "Language"],
+        "duration": "45-60 minutes",
+        "frequency": "Daily",
+        "groupSize": "1-3 students"
+      }
     ]
   }
 }
