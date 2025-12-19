@@ -76,6 +76,16 @@
     --vf-pattern-size: 100px;
     --vf-dot-offset-1: 25px;
     --vf-dot-offset-2: 75px;
+    
+    /* Geometric Background Pattern - Pastel Rainbow */
+    --geo-pattern-size: 80px;
+    --geo-pattern-pastel-pink: rgba(255, 182, 193, 0.15);
+    --geo-pattern-pastel-peach: rgba(255, 218, 185, 0.15);
+    --geo-pattern-pastel-yellow: rgba(255, 253, 208, 0.15);
+    --geo-pattern-pastel-mint: rgba(189, 252, 201, 0.15);
+    --geo-pattern-pastel-sky: rgba(173, 216, 230, 0.15);
+    --geo-pattern-pastel-lavender: rgba(230, 190, 255, 0.15);
+    --geo-pattern-pastel-rose: rgba(255, 193, 204, 0.15);
 }
 
 * {
@@ -334,6 +344,48 @@ h1, h2, h3, h4, h5, h6 {
     text-align: center;
     background: var(--bg-primary);
     border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add geometric pattern to interventions header */
+.interventions-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: 
+        linear-gradient(45deg, var(--geo-pattern-pastel-sky) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--geo-pattern-pastel-lavender) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--geo-pattern-pastel-mint) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--geo-pattern-pastel-yellow) 75%),
+        linear-gradient(135deg, 
+            var(--geo-pattern-pastel-mint) 0%,
+            var(--geo-pattern-pastel-sky) 33%,
+            var(--geo-pattern-pastel-lavender) 66%,
+            var(--geo-pattern-pastel-rose) 100%
+        );
+    background-size: 
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        100% 100%;
+    background-position: 
+        0 0, 0 0, 
+        calc(var(--geo-pattern-size) / 2) calc(var(--geo-pattern-size) / 2), 
+        calc(var(--geo-pattern-size) / 2) calc(var(--geo-pattern-size) / 2),
+        0 0;
+    opacity: 0.4;
+}
+
+.interventions-header > * {
+    position: relative;
+    z-index: 1;
 }
 
 .section-title {
@@ -695,6 +747,49 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto 1.5rem;
     background: var(--bg-primary);
     border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add geometric pattern to hero-area */
+.hero-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: 
+        linear-gradient(45deg, var(--geo-pattern-pastel-peach) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--geo-pattern-pastel-yellow) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--geo-pattern-pastel-mint) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--geo-pattern-pastel-sky) 75%),
+        linear-gradient(135deg, 
+            var(--geo-pattern-pastel-peach) 0%,
+            var(--geo-pattern-pastel-yellow) 25%,
+            var(--geo-pattern-pastel-mint) 50%,
+            var(--geo-pattern-pastel-sky) 75%,
+            var(--geo-pattern-pastel-lavender) 100%
+        );
+    background-size: 
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        100% 100%;
+    background-position: 
+        0 0, 0 0, 
+        calc(var(--geo-pattern-size) / 2) calc(var(--geo-pattern-size) / 2), 
+        calc(var(--geo-pattern-size) / 2) calc(var(--geo-pattern-size) / 2),
+        0 0;
+    opacity: 0.35;
+}
+
+.hero-area > * {
+    position: relative;
+    z-index: 1;
 }
 
 .info-grid {
@@ -1614,16 +1709,56 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1px solid var(--border);
 }
 
+/* Geometric pattern background for home hero */
 .home-hero::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 500px;
-    height: 500px;
-    background: rgba(44, 125, 160, 0.05);
-    border-radius: 50%;
-    animation: float 20s ease-in-out infinite;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: 
+        /* Diamond pattern - creates rhombus shapes */
+        linear-gradient(45deg, var(--geo-pattern-pastel-pink) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--geo-pattern-pastel-pink) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--geo-pattern-pastel-pink) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--geo-pattern-pastel-pink) 75%),
+        linear-gradient(45deg, var(--geo-pattern-pastel-peach) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--geo-pattern-pastel-peach) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--geo-pattern-pastel-peach) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--geo-pattern-pastel-peach) 75%),
+        /* Pastel rainbow gradient overlay */
+        linear-gradient(135deg, 
+            var(--geo-pattern-pastel-pink) 0%,
+            var(--geo-pattern-pastel-peach) 15%,
+            var(--geo-pattern-pastel-yellow) 30%,
+            var(--geo-pattern-pastel-mint) 45%,
+            var(--geo-pattern-pastel-sky) 60%,
+            var(--geo-pattern-pastel-lavender) 75%,
+            var(--geo-pattern-pastel-rose) 100%
+        );
+    background-size: 
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        calc(var(--geo-pattern-size) * 1.5) calc(var(--geo-pattern-size) * 1.5),
+        calc(var(--geo-pattern-size) * 1.5) calc(var(--geo-pattern-size) * 1.5),
+        calc(var(--geo-pattern-size) * 1.5) calc(var(--geo-pattern-size) * 1.5),
+        calc(var(--geo-pattern-size) * 1.5) calc(var(--geo-pattern-size) * 1.5),
+        100% 100%;
+    background-position: 
+        0 0, 0 0, 
+        calc(var(--geo-pattern-size) / 2) calc(var(--geo-pattern-size) / 2), 
+        calc(var(--geo-pattern-size) / 2) calc(var(--geo-pattern-size) / 2),
+        20px 0, 20px 0,
+        calc(20px + var(--geo-pattern-size) * 0.75) calc(var(--geo-pattern-size) * 0.75),
+        calc(20px + var(--geo-pattern-size) * 0.75) calc(var(--geo-pattern-size) * 0.75),
+        0 0;
+    opacity: 0.7;
+    animation: geo-pattern-shimmer 30s ease-in-out infinite;
 }
 
 .home-hero::after {
@@ -1636,6 +1771,7 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(44, 125, 160, 0.05);
     border-radius: 50%;
     animation: float 15s ease-in-out infinite reverse;
+    z-index: 0;
 }
 
 @keyframes float {
@@ -3629,4 +3765,230 @@ h1, h2, h3, h4, h5, h6 {
     .vf-endpoint h2 {
         font-size: 1.5rem;
     }
+}
+
+/* ============================================
+   GEOMETRIC BACKGROUND PATTERN
+   Pastel Rainbow Gradient with Rhombus/Diamond Shapes
+   ============================================ 
+   
+   USAGE:
+   Add the class "geo-pattern-bg" to any container element to apply the 
+   geometric pattern background with pastel rainbow gradients.
+   
+   EXAMPLES:
+   <div class="geo-pattern-bg">
+       <h1>Your content here</h1>
+   </div>
+   
+   MODIFIERS:
+   - .geo-pattern-bg-strong     - Stronger opacity (0.8)
+   - .geo-pattern-bg-subtle     - Lighter opacity (0.3)
+   - .geo-pattern-bg-small      - Smaller pattern size (50px)
+   - .geo-pattern-bg-large      - Larger pattern size (120px)
+   - .geo-pattern-bg-static     - No animation (better performance)
+   - .geo-pattern-triangular    - Alternative triangular pattern
+   
+   CUSTOMIZATION:
+   Pattern size can be customized using CSS variables:
+   --geo-pattern-size: 80px;  (default)
+   
+   PASTEL COLORS USED:
+   --geo-pattern-pastel-pink
+   --geo-pattern-pastel-peach
+   --geo-pattern-pastel-yellow
+   --geo-pattern-pastel-mint
+   --geo-pattern-pastel-sky
+   --geo-pattern-pastel-lavender
+   --geo-pattern-pastel-rose
+   
+   NOTES:
+   - Pattern is applied via ::before pseudo-element
+   - Content stays above pattern (z-index: 1)
+   - Pattern includes subtle shimmer animation by default
+   - Fully responsive and performant
+   ============================================ */
+
+/* Base geometric pattern using CSS gradients to create diamond/rhombus shapes */
+.geo-pattern-bg {
+    position: relative;
+    overflow: hidden;
+}
+
+.geo-pattern-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: 
+        /* Diamond pattern layer 1 - Pastel Pink */
+        linear-gradient(45deg, var(--geo-pattern-pastel-pink) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--geo-pattern-pastel-pink) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--geo-pattern-pastel-pink) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--geo-pattern-pastel-pink) 75%),
+        
+        /* Diamond pattern layer 2 - Pastel Peach (offset) */
+        linear-gradient(45deg, var(--geo-pattern-pastel-peach) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--geo-pattern-pastel-peach) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--geo-pattern-pastel-peach) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--geo-pattern-pastel-peach) 75%),
+        
+        /* Diamond pattern layer 3 - Pastel Yellow */
+        linear-gradient(45deg, var(--geo-pattern-pastel-yellow) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--geo-pattern-pastel-yellow) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--geo-pattern-pastel-yellow) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--geo-pattern-pastel-yellow) 75%),
+        
+        /* Rainbow gradient overlay for smooth color transitions */
+        linear-gradient(135deg, 
+            var(--geo-pattern-pastel-pink) 0%,
+            var(--geo-pattern-pastel-peach) 15%,
+            var(--geo-pattern-pastel-yellow) 30%,
+            var(--geo-pattern-pastel-mint) 45%,
+            var(--geo-pattern-pastel-sky) 60%,
+            var(--geo-pattern-pastel-lavender) 75%,
+            var(--geo-pattern-pastel-rose) 100%
+        );
+    
+    background-size: 
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        calc(var(--geo-pattern-size) * 1.5) calc(var(--geo-pattern-size) * 1.5),
+        calc(var(--geo-pattern-size) * 1.5) calc(var(--geo-pattern-size) * 1.5),
+        calc(var(--geo-pattern-size) * 1.5) calc(var(--geo-pattern-size) * 1.5),
+        calc(var(--geo-pattern-size) * 1.5) calc(var(--geo-pattern-size) * 1.5),
+        calc(var(--geo-pattern-size) * 2) calc(var(--geo-pattern-size) * 2),
+        calc(var(--geo-pattern-size) * 2) calc(var(--geo-pattern-size) * 2),
+        calc(var(--geo-pattern-size) * 2) calc(var(--geo-pattern-size) * 2),
+        calc(var(--geo-pattern-size) * 2) calc(var(--geo-pattern-size) * 2),
+        100% 100%;
+    
+    background-position: 
+        0 0, 
+        0 0, 
+        calc(var(--geo-pattern-size) / 2) calc(var(--geo-pattern-size) / 2), 
+        calc(var(--geo-pattern-size) / 2) calc(var(--geo-pattern-size) / 2),
+        20px 0,
+        20px 0,
+        calc(20px + var(--geo-pattern-size) * 0.75) calc(var(--geo-pattern-size) * 0.75),
+        calc(20px + var(--geo-pattern-size) * 0.75) calc(var(--geo-pattern-size) * 0.75),
+        40px 0,
+        40px 0,
+        calc(40px + var(--geo-pattern-size)) calc(var(--geo-pattern-size)),
+        calc(40px + var(--geo-pattern-size)) calc(var(--geo-pattern-size)),
+        0 0;
+    
+    opacity: 0.6;
+    animation: geo-pattern-shimmer 30s ease-in-out infinite;
+}
+
+/* Shimmer animation for subtle movement */
+@keyframes geo-pattern-shimmer {
+    0%, 100% {
+        opacity: 0.6;
+        transform: translateX(0) translateY(0);
+    }
+    25% {
+        opacity: 0.5;
+        transform: translateX(5px) translateY(-5px);
+    }
+    50% {
+        opacity: 0.7;
+        transform: translateX(-5px) translateY(5px);
+    }
+    75% {
+        opacity: 0.5;
+        transform: translateX(5px) translateY(5px);
+    }
+}
+
+/* Ensure content is above the pattern */
+.geo-pattern-bg > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Variant with stronger colors for headers */
+.geo-pattern-bg-strong::before {
+    opacity: 0.8;
+}
+
+/* Variant with lighter colors for subtle backgrounds */
+.geo-pattern-bg-subtle::before {
+    opacity: 0.3;
+}
+
+/* Variant with smaller pattern size */
+.geo-pattern-bg-small {
+    --geo-pattern-size: 50px;
+}
+
+/* Variant with larger pattern size */
+.geo-pattern-bg-large {
+    --geo-pattern-size: 120px;
+}
+
+/* Static version (no animation) for performance */
+.geo-pattern-bg-static::before {
+    animation: none;
+}
+
+/* Alternative pattern using more defined triangular shapes */
+.geo-pattern-triangular {
+    position: relative;
+    overflow: hidden;
+}
+
+.geo-pattern-triangular::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: 
+        /* Create triangular pattern */
+        linear-gradient(45deg, var(--geo-pattern-pastel-pink) 50%, transparent 50%),
+        linear-gradient(-45deg, var(--geo-pattern-pastel-peach) 50%, transparent 50%),
+        linear-gradient(135deg, var(--geo-pattern-pastel-yellow) 50%, transparent 50%),
+        linear-gradient(-135deg, var(--geo-pattern-pastel-mint) 50%, transparent 50%),
+        
+        /* Rainbow gradient overlay */
+        linear-gradient(135deg, 
+            var(--geo-pattern-pastel-pink) 0%,
+            var(--geo-pattern-pastel-peach) 20%,
+            var(--geo-pattern-pastel-yellow) 40%,
+            var(--geo-pattern-pastel-mint) 60%,
+            var(--geo-pattern-pastel-sky) 80%,
+            var(--geo-pattern-pastel-lavender) 100%
+        );
+    
+    background-size: 
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        var(--geo-pattern-size) var(--geo-pattern-size),
+        100% 100%;
+    
+    background-position: 
+        0 0, 
+        calc(var(--geo-pattern-size) / 2) 0, 
+        0 calc(var(--geo-pattern-size) / 2), 
+        calc(var(--geo-pattern-size) / 2) calc(var(--geo-pattern-size) / 2),
+        0 0;
+    
+    opacity: 0.5;
+}
+
+.geo-pattern-triangular > * {
+    position: relative;
+    z-index: 1;
 }
