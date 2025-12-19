@@ -518,6 +518,15 @@ function toggleFAQ(element) {
 // Visual Flowchart System
 // ============================================
 
+// Visual Flowchart Constants
+const VF_CONSTANTS = {
+    CONNECTION_DISTANCE: 80,          // Distance for connection line end point
+    BEZIER_CONTROL_OFFSET: 30,        // Offset for bezier curve control points
+    ANIMATION_PROGRESS_INCREMENT: 0.02, // Progress increment for dot animation
+    SCROLL_DELAY: 100,                // Delay before scrolling to new node
+    PATH_LENGTH_FALLBACK: 100         // Fallback for SVG path length
+};
+
 // Node data definitions for each tier's flowchart
 const FLOWCHART_DEFINITIONS = {
     tier1: {
@@ -732,6 +741,7 @@ const FLOWCHART_DEFINITIONS = {
                     title: 'Important Note',
                     text: 'Tier 3 interventions are for students who have not responded to two cycles of Tier 2 intervention. Typically, fewer than 10% of students require this level of support.'
                 },
+                featuresTitle: 'Characteristics of Tier 3 Interventions',
                 features: [
                     'Individual or very small group (1-3 students)',
                     'Intensive daily sessions (45-60 minutes)',
@@ -930,14 +940,14 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     
     // End point (estimated - will be top center of the new node)
     const endX = startX;
-    const endY = startY + 80; // Approximate distance
+    const endY = startY + VF_CONSTANTS.CONNECTION_DISTANCE;
     
     // Create SVG path
     const pathId = `path-${fromNodeId}-${toNodeId}`;
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     
     // Create a curved path
-    const controlPointOffset = 30;
+    const controlPointOffset = VF_CONSTANTS.BEZIER_CONTROL_OFFSET;
     const d = `M ${startX} ${startY} C ${startX} ${startY + controlPointOffset} ${endX} ${endY - controlPointOffset} ${endX} ${endY}`;
     
     path.setAttribute('id', pathId);
@@ -947,7 +957,7 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     path.setAttribute('stroke-width', '3');
     
     // Set up animation
-    const pathLength = path.getTotalLength ? path.getTotalLength() : 100;
+    const pathLength = path.getTotalLength ? path.getTotalLength() : VF_CONSTANTS.PATH_LENGTH_FALLBACK;
     path.style.strokeDasharray = pathLength;
     path.style.strokeDashoffset = pathLength;
     
@@ -968,7 +978,7 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     // Animate dot along the path
     let progress = 0;
     const animateDot = () => {
-        progress += 0.02;
+        progress += VF_CONSTANTS.ANIMATION_PROGRESS_INCREMENT;
         if (progress <= 1) {
             const point = getPointOnPath(startX, startY, endX, endY, progress, controlPointOffset);
             dot.setAttribute('cx', point.x);
@@ -1232,6 +1242,8 @@ function createInfoNode(nodeData) {
         </div>
     ` : '';
     
+    const featuresHeading = nodeData.featuresTitle || 'Key Characteristics';
+    
     return `
         <div class="vf-node-header">
             <div class="vf-node-step-badge">${nodeData.title}</div>
@@ -1239,7 +1251,7 @@ function createInfoNode(nodeData) {
         <div class="vf-node-content">
             <h3>${nodeData.subtitle}</h3>
             ${warningBoxHTML}
-            <h4>Characteristics of Tier 3 Interventions</h4>
+            ${nodeData.features ? `<h4>${featuresHeading}</h4>` : ''}
             ${featuresHTML}
             <button class="vf-continue-btn" onclick="proceedFromInfo('${nodeData.id}', '${nodeData.nextNode}')">
                 ${nodeData.buttonText}
@@ -1428,7 +1440,7 @@ function scrollToNode(nodeId) {
         if (node) {
             node.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-    }, 100);
+    }, VF_CONSTANTS.SCROLL_DELAY);
 }
 
 // Update progress indicator

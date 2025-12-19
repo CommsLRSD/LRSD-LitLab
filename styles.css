@@ -71,6 +71,11 @@
     /* Layout */
     --sidebar-width: 260px;
     --sidebar-collapsed-width: 70px;
+    
+    /* Visual Flowchart Pattern */
+    --vf-pattern-size: 100px;
+    --vf-dot-offset-1: 25px;
+    --vf-dot-offset-2: 75px;
 }
 
 * {
@@ -2759,9 +2764,9 @@ h1, h2, h3, h4, h5, h6 {
     min-height: 500px;
     background: var(--bg-secondary);
     background-image: 
-        radial-gradient(circle at 25px 25px, var(--border) 2px, transparent 0),
-        radial-gradient(circle at 75px 75px, var(--border-light) 1px, transparent 0);
-    background-size: 100px 100px;
+        radial-gradient(circle at var(--vf-dot-offset-1) var(--vf-dot-offset-1), var(--border) 2px, transparent 0),
+        radial-gradient(circle at var(--vf-dot-offset-2) var(--vf-dot-offset-2), var(--border-light) 1px, transparent 0);
+    background-size: var(--vf-pattern-size) var(--vf-pattern-size);
 }
 
 .vf-connections {
