@@ -11,7 +11,14 @@ const appState = {
     tierFlowchartData: null,
     currentPath: [],
     interventionHistory: [],
-    currentTierFlow: null
+    currentTierFlow: null,
+    // Visual flowchart state
+    visualFlowchart: {
+        nodes: [],
+        connections: [],
+        currentNodeId: null,
+        selectedPath: []
+    }
 };
 
 // ============================================
@@ -508,82 +515,1033 @@ function toggleFAQ(element) {
 }
 
 // ============================================
-// Tier Flowchart Functions
+// Visual Flowchart System
 // ============================================
-function startTier1Flowchart() {
-    console.log('Starting Tier 1 Flowchart');
+
+// Node data definitions for each tier's flowchart
+const FLOWCHART_DEFINITIONS = {
+    tier1: {
+        title: 'Tier 1: Universal Screening & Core Instruction',
+        startNode: 'tier1-principles',
+        nodes: {
+            'tier1-principles': {
+                id: 'tier1-principles',
+                type: 'checklist',
+                title: 'Step 1: Review Principles',
+                subtitle: 'Review Principles of Explicit and Systematic Instruction',
+                description: 'Check off all 8 principles before proceeding',
+                items: [
+                    'Clear learning objectives are stated',
+                    'Instruction is sequenced and scaffolded',
+                    'Teacher models skills explicitly',
+                    'Guided practice with feedback is provided',
+                    'Independent practice opportunities are given',
+                    'Regular assessment and progress monitoring',
+                    'Cumulative review is integrated',
+                    'Instruction is responsive to student needs'
+                ],
+                nextNode: 'tier1-screener',
+                buttonText: 'Continue to Literacy Screener'
+            },
+            'tier1-screener': {
+                id: 'tier1-screener',
+                type: 'selection',
+                title: 'Step 2: Select Screener',
+                subtitle: 'Choose Your Literacy Screener',
+                description: 'Select the assessment tool you are using for universal screening',
+                options: 'screeners', // Will fetch from tierFlowchartData
+                nextHandler: 'selectTier1ScreenerVisual'
+            },
+            'tier1-effectiveness': {
+                id: 'tier1-effectiveness',
+                type: 'decision',
+                title: 'Step 3: Evaluate Effectiveness',
+                subtitle: 'Is the instruction effective for most students?',
+                description: 'Based on screener results and classroom observations',
+                infoBox: {
+                    title: 'Consider These Indicators',
+                    items: [
+                        'Are 80% or more students meeting benchmarks?',
+                        'Is student engagement high during lessons?',
+                        'Are learning objectives being achieved?',
+                        'Is progress evident through formative assessments?'
+                    ]
+                },
+                choices: [
+                    { id: 'effective', label: 'Yes, Instruction is Effective', sublabel: '80%+ students meeting benchmarks', type: 'success', nextNode: 'tier1-success' },
+                    { id: 'ineffective', label: 'No, Needs Improvement', sublabel: 'More than 20% students struggling', type: 'warning', nextNode: 'tier1-percentage' }
+                ]
+            },
+            'tier1-success': {
+                id: 'tier1-success',
+                type: 'endpoint',
+                status: 'success',
+                title: 'Core Instruction is Effective!',
+                description: 'Your explicit and systematic instruction is working well for the majority of students.',
+                recommendations: [
+                    'Continue with current instructional practices',
+                    'Monitor progress through regular formative assessments',
+                    'Conduct universal screening at the next benchmark period',
+                    'For students still struggling, consider Tier 2 interventions'
+                ]
+            },
+            'tier1-percentage': {
+                id: 'tier1-percentage',
+                type: 'decision',
+                title: 'Step 4: Student Success Rate',
+                subtitle: 'What percentage of students are unsuccessful?',
+                description: 'Based on assessment data, how many students are below benchmark?',
+                choices: [
+                    { id: 'less-20', label: 'Less than 20% Unsuccessful', sublabel: 'Most students on track, small group needs support', type: 'primary', nextNode: 'tier1-move-tier2' },
+                    { id: 'more-20', label: '20% or More Unsuccessful', sublabel: 'Significant number need re-teaching', type: 'warning', nextNode: 'tier1-reteach' }
+                ]
+            },
+            'tier1-move-tier2': {
+                id: 'tier1-move-tier2',
+                type: 'endpoint',
+                status: 'info',
+                title: 'Small Group Intervention Recommended',
+                description: 'A small percentage of students need additional targeted support.',
+                recommendations: [
+                    'Continue Tier 1 core instruction for all students',
+                    'Implement Tier 2 small group interventions for struggling students',
+                    'Use evidence-based intervention strategies',
+                    'Monitor progress every 2-4 weeks'
+                ],
+                actionButton: { text: 'Start Tier 2 Flowchart', action: 'startTier2Visual' }
+            },
+            'tier1-reteach': {
+                id: 'tier1-reteach',
+                type: 'endpoint',
+                status: 'warning',
+                title: 'Core Instruction Needs Adjustment',
+                description: 'When more than 20% of students are unsuccessful, the core instruction may need to be re-examined and adjusted.',
+                recommendations: [
+                    'Re-teach using different instructional strategies',
+                    'Review the 8 principles of explicit instruction',
+                    'Differentiate instruction within Tier 1',
+                    'Increase modeling and guided practice opportunities',
+                    'Adjust pacing to ensure concept mastery',
+                    'Collaborate with colleagues to refine approaches'
+                ],
+                actionButton: { text: 'Start Tier 1 Again', action: 'restartTier1Visual' }
+            }
+        }
+    },
+    tier2: {
+        title: 'Tier 2: Small Group Intervention',
+        startNode: 'tier2-principles',
+        nodes: {
+            'tier2-principles': {
+                id: 'tier2-principles',
+                type: 'checklist',
+                title: 'Step 1: Review Principles',
+                subtitle: 'Review Principles of Tier 2 Intervention',
+                description: 'Check off all 5 principles before proceeding',
+                items: [
+                    'Small group instruction (3-6 students)',
+                    'Daily sessions of 20-30 minutes',
+                    'Targeted skill instruction based on assessment data',
+                    'Progress monitoring every 2-4 weeks',
+                    'Evidence-based intervention program'
+                ],
+                nextNode: 'tier2-assessment',
+                buttonText: 'Continue to Drill Down Assessment'
+            },
+            'tier2-assessment': {
+                id: 'tier2-assessment',
+                type: 'selection',
+                title: 'Step 2: Select Assessment',
+                subtitle: 'Choose a Drill Down Assessment',
+                description: 'Select an assessment that aligns with the areas of weakness identified by the literacy screener',
+                options: 'drillDownAssessments',
+                infoBox: {
+                    title: 'Purpose of Drill Down Assessments',
+                    text: 'These assessments provide more detailed information about specific skill gaps, helping you select the most appropriate intervention.'
+                },
+                nextHandler: 'selectTier2AssessmentVisual'
+            },
+            'tier2-intervention': {
+                id: 'tier2-intervention',
+                type: 'selection',
+                title: 'Step 3: Select Intervention',
+                subtitle: 'Choose an 8-Week Intervention',
+                description: 'Select an evidence-based intervention that matches the student\'s specific needs',
+                options: 'interventions',
+                infoBox: {
+                    title: '8-Week Intervention Cycle',
+                    text: 'Implement the selected intervention for 8 weeks. Monitor student progress regularly during this period using progress monitoring tools.'
+                },
+                nextHandler: 'selectTier2InterventionVisual'
+            },
+            'tier2-progress': {
+                id: 'tier2-progress',
+                type: 'decision',
+                title: 'Step 4: Progress Monitoring',
+                subtitle: 'After 8 Weeks: Did the student show improvement?',
+                description: 'Administer a literacy screener to evaluate student progress',
+                infoBox: {
+                    title: 'Acceptable Screeners',
+                    items: ['DIBELS', 'CTOPP-2', 'THaFoL', 'IDAPEL']
+                },
+                choices: [
+                    { id: 'improved', label: 'Yes, Student Improved', sublabel: 'Blue or Green results - meeting benchmarks', type: 'success', nextNode: 'tier2-success' },
+                    { id: 'no-improvement', label: 'No Improvement', sublabel: 'Yellow or Red results - below benchmark', type: 'warning', nextNode: 'tier2-try-again' }
+                ]
+            },
+            'tier2-success': {
+                id: 'tier2-success',
+                type: 'endpoint',
+                status: 'success',
+                title: 'Student Made Good Progress!',
+                description: 'The 8-week Tier 2 intervention was effective. The student is now meeting benchmarks.',
+                recommendations: [
+                    'Gradually fade the intervention support',
+                    'Continue to monitor progress closely',
+                    'Return to Tier 1 core instruction',
+                    'Celebrate the student\'s success!'
+                ]
+            },
+            'tier2-try-again': {
+                id: 'tier2-try-again',
+                type: 'endpoint',
+                status: 'warning',
+                title: 'Second Intervention Cycle Needed',
+                description: 'The student did not make expected progress. Let\'s try a different intervention approach for another 8-week cycle.',
+                recommendations: [
+                    'Conduct another drill down assessment for more detail',
+                    'Select a different intervention strategy',
+                    'Implement for another 8-week cycle',
+                    'Monitor progress closely'
+                ],
+                actionButton: { text: 'Begin Second 8-Week Cycle', action: 'restartTier2Visual' },
+                secondaryAction: { text: 'Move to Tier 3', action: 'startTier3Visual' }
+            }
+        }
+    },
+    tier3: {
+        title: 'Tier 3: Intensive Individual Intervention',
+        startNode: 'tier3-intro',
+        nodes: {
+            'tier3-intro': {
+                id: 'tier3-intro',
+                type: 'info',
+                title: 'Begin Tier 3',
+                subtitle: 'Intensive Individual Intervention',
+                warningBox: {
+                    title: 'Important Note',
+                    text: 'Tier 3 interventions are for students who have not responded to two cycles of Tier 2 intervention. Typically, fewer than 10% of students require this level of support.'
+                },
+                features: [
+                    'Individual or very small group (1-3 students)',
+                    'Intensive daily sessions (45-60 minutes)',
+                    'Highly specialized, research-based programs',
+                    'Weekly progress monitoring',
+                    'Collaboration with specialists and clinicians'
+                ],
+                nextNode: 'tier3-assessment',
+                buttonText: 'Begin Tier 3 Process'
+            },
+            'tier3-assessment': {
+                id: 'tier3-assessment',
+                type: 'selection',
+                title: 'Step 2: Comprehensive Assessment',
+                subtitle: 'Select Comprehensive Diagnostic Assessment',
+                description: 'Choose a highly targeted assessment to identify specific literacy gaps',
+                options: 'drillDownAssessments',
+                warningBox: {
+                    title: 'Tier 3 Assessment',
+                    text: 'These comprehensive assessments provide very detailed information to guide intensive intervention selection. Consider consulting with specialists.'
+                },
+                nextHandler: 'selectTier3AssessmentVisual'
+            },
+            'tier3-intervention': {
+                id: 'tier3-intervention',
+                type: 'selection',
+                title: 'Step 3: Select Intervention',
+                subtitle: 'Choose an Intensive Intervention Program',
+                description: 'Select a highly specialized, research-based program for intensive support',
+                options: 'interventions',
+                warningBox: {
+                    title: '8-Week Intensive Cycle',
+                    text: 'Implement the intervention for 8 weeks with weekly progress monitoring. These programs often require specialized training.'
+                },
+                nextHandler: 'selectTier3InterventionVisual'
+            },
+            'tier3-progress': {
+                id: 'tier3-progress',
+                type: 'decision',
+                title: 'Step 4: Progress Monitoring',
+                subtitle: 'After 8 Weeks: Evaluate Student Progress',
+                description: 'Administer a literacy screener to determine if the intensive intervention was effective',
+                warningBox: {
+                    title: 'Important',
+                    text: 'You should have been monitoring progress weekly throughout the 8-week cycle. Now it\'s time to evaluate overall progress.'
+                },
+                infoBox: {
+                    title: 'Acceptable Screeners',
+                    items: ['DIBELS', 'CTOPP-2', 'THaFoL', 'IDAPEL']
+                },
+                choices: [
+                    { id: 'improved', label: 'Yes, Student Improved', sublabel: 'Blue or Green results - showing progress', type: 'success', nextNode: 'tier3-success' },
+                    { id: 'no-improvement', label: 'No Improvement', sublabel: 'Yellow or Red results - needs specialist support', type: 'warning', nextNode: 'tier3-specialist' }
+                ]
+            },
+            'tier3-success': {
+                id: 'tier3-success',
+                type: 'endpoint',
+                status: 'success',
+                title: 'Student Showed Improvement!',
+                description: 'The intensive Tier 3 intervention was effective. The student is making progress.',
+                recommendations: [
+                    'Gradually fade intervention support while monitoring closely',
+                    'Consider moving to Tier 2 with reduced intensity',
+                    'Continue progress monitoring frequently',
+                    'Celebrate progress and maintain momentum',
+                    'May return to Tier 1 if sufficient progress is maintained'
+                ],
+                actionButton: { text: 'Move to Tier 2', action: 'startTier2Visual' }
+            },
+            'tier3-specialist': {
+                id: 'tier3-specialist',
+                type: 'endpoint',
+                status: 'danger',
+                title: 'Clinician Consultation Required',
+                description: 'The student has not responded to intensive intervention. Specialized assessment and support is needed.',
+                recommendations: [
+                    'Schedule a meeting with school clinicians and specialists',
+                    'Consider referral to special education staff',
+                    'Consult with speech-language pathologists',
+                    'Work with school psychologists',
+                    'Collaborate with reading specialists',
+                    'Discuss formal special education assessment'
+                ],
+                warningBox: {
+                    title: 'Important Note',
+                    text: 'This student needs specialized support beyond what this app can provide. Work with your school\'s student support team to determine the best path forward.'
+                }
+            }
+        }
+    }
+};
+
+// Initialize the visual flowchart
+function initVisualFlowchart(tierId) {
     const container = document.getElementById('flowchart-container');
     if (!container) return;
     
+    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    if (!flowchartDef) return;
+    
+    // Reset visual flowchart state
+    appState.visualFlowchart = {
+        nodes: [],
+        connections: [],
+        currentNodeId: null,
+        selectedPath: [],
+        tierId: tierId
+    };
+    
     container.classList.remove('flowchart-hidden');
     container.innerHTML = `
-        <div class="flowchart-tier-view">
-            <div class="flowchart-header">
-                <button class="back-button" onclick="closeTierFlowchart()">
+        <div class="visual-flowchart">
+            <div class="visual-flowchart-header">
+                <button class="vf-back-button" onclick="closeVisualFlowchart()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
                     Back to Interventions
                 </button>
-                <h2>Tier 1: Universal Screening & Core Instruction</h2>
-            </div>
-            
-            <div class="flowchart-content">
-                <div class="flowchart-step-wrapper active">
-                    <div class="step-indicator">Step 1</div>
-                    <div class="step-content-box">
-                        <h3>Review Principles of Explicit and Systematic Instruction</h3>
-                        <p>Check off all 8 principles before proceeding:</p>
-                        
-                        <div class="checklist">
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier1Progress()">
-                                <span>Clear learning objectives are stated</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier1Progress()">
-                                <span>Instruction is sequenced and scaffolded</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier1Progress()">
-                                <span>Teacher models skills explicitly</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier1Progress()">
-                                <span>Guided practice with feedback is provided</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier1Progress()">
-                                <span>Independent practice opportunities are given</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier1Progress()">
-                                <span>Regular assessment and progress monitoring</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier1Progress()">
-                                <span>Cumulative review is integrated</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier1Progress()">
-                                <span>Instruction is responsive to student needs</span>
-                            </label>
-                        </div>
-                        
-                        <button id="tier1-continue-btn" class="btn-primary" disabled onclick="proceedToTier1Screener()">
-                            Continue to Literacy Screener
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
-                    </div>
+                <h2>${flowchartDef.title}</h2>
+                <div class="vf-progress-indicator">
+                    <span class="vf-progress-text">Step 1</span>
                 </div>
+            </div>
+            <div class="visual-flowchart-canvas" id="vf-canvas">
+                <svg class="vf-connections" id="vf-connections"></svg>
+                <div class="vf-nodes" id="vf-nodes"></div>
             </div>
         </div>
     `;
     
+    // Show the first node
+    showFlowchartNode(flowchartDef.startNode, null);
+    
     // Smooth scroll to flowchart
     container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Show a flowchart node with animation
+function showFlowchartNode(nodeId, fromNodeId, choiceId = null) {
+    const tierId = appState.visualFlowchart.tierId;
+    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    const nodeData = flowchartDef.nodes[nodeId];
+    
+    if (!nodeData) {
+        console.error(`Node ${nodeId} not found in tier ${tierId}`);
+        return;
+    }
+    
+    const nodesContainer = document.getElementById('vf-nodes');
+    const connectionsContainer = document.getElementById('vf-connections');
+    
+    // Add to path
+    appState.visualFlowchart.selectedPath.push({ nodeId, fromNodeId, choiceId });
+    appState.visualFlowchart.currentNodeId = nodeId;
+    
+    // Update progress indicator
+    updateProgressIndicator();
+    
+    // If there's a source node, draw a connection line first
+    if (fromNodeId) {
+        drawConnectionLine(fromNodeId, nodeId, choiceId, () => {
+            // After line animation completes, show the new node
+            createNodeElement(nodeData, nodesContainer);
+            scrollToNode(nodeId);
+        });
+    } else {
+        // No source node, just show the first node
+        createNodeElement(nodeData, nodesContainer);
+    }
+}
+
+// Draw animated connection line between nodes
+function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
+    const connectionsContainer = document.getElementById('vf-connections');
+    const fromNode = document.querySelector(`[data-node-id="${fromNodeId}"]`);
+    
+    if (!fromNode || !connectionsContainer) {
+        if (onComplete) onComplete();
+        return;
+    }
+    
+    // Create a placeholder for the target node position
+    const nodesContainer = document.getElementById('vf-nodes');
+    const existingNodes = nodesContainer.querySelectorAll('.vf-node');
+    const lastNode = existingNodes[existingNodes.length - 1];
+    
+    // Calculate positions
+    const containerRect = connectionsContainer.getBoundingClientRect();
+    const fromRect = fromNode.getBoundingClientRect();
+    
+    // Start point (bottom center of from node)
+    const startX = fromRect.left + fromRect.width / 2 - containerRect.left;
+    const startY = fromRect.bottom - containerRect.top;
+    
+    // End point (estimated - will be top center of the new node)
+    const endX = startX;
+    const endY = startY + 80; // Approximate distance
+    
+    // Create SVG path
+    const pathId = `path-${fromNodeId}-${toNodeId}`;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    
+    // Create a curved path
+    const controlPointOffset = 30;
+    const d = `M ${startX} ${startY} C ${startX} ${startY + controlPointOffset} ${endX} ${endY - controlPointOffset} ${endX} ${endY}`;
+    
+    path.setAttribute('id', pathId);
+    path.setAttribute('d', d);
+    path.setAttribute('class', `vf-connection-path ${choiceId ? `choice-${choiceId}` : ''}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-width', '3');
+    
+    // Set up animation
+    const pathLength = path.getTotalLength ? path.getTotalLength() : 100;
+    path.style.strokeDasharray = pathLength;
+    path.style.strokeDashoffset = pathLength;
+    
+    connectionsContainer.appendChild(path);
+    
+    // Animate the line drawing
+    requestAnimationFrame(() => {
+        path.style.transition = 'stroke-dashoffset 0.6s ease-out';
+        path.style.strokeDashoffset = '0';
+    });
+    
+    // Add a moving dot animation
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('r', '6');
+    dot.setAttribute('class', 'vf-connection-dot');
+    connectionsContainer.appendChild(dot);
+    
+    // Animate dot along the path
+    let progress = 0;
+    const animateDot = () => {
+        progress += 0.02;
+        if (progress <= 1) {
+            const point = getPointOnPath(startX, startY, endX, endY, progress, controlPointOffset);
+            dot.setAttribute('cx', point.x);
+            dot.setAttribute('cy', point.y);
+            requestAnimationFrame(animateDot);
+        } else {
+            dot.remove();
+            if (onComplete) onComplete();
+        }
+    };
+    
+    requestAnimationFrame(animateDot);
+}
+
+// Get point on cubic bezier curve
+function getPointOnPath(x1, y1, x2, y2, t, offset) {
+    // Simplified bezier calculation
+    const cx1 = x1;
+    const cy1 = y1 + offset;
+    const cx2 = x2;
+    const cy2 = y2 - offset;
+    
+    const t2 = t * t;
+    const t3 = t2 * t;
+    const mt = 1 - t;
+    const mt2 = mt * mt;
+    const mt3 = mt2 * mt;
+    
+    return {
+        x: mt3 * x1 + 3 * mt2 * t * cx1 + 3 * mt * t2 * cx2 + t3 * x2,
+        y: mt3 * y1 + 3 * mt2 * t * cy1 + 3 * mt * t2 * cy2 + t3 * y2
+    };
+}
+
+// Create node element based on type
+function createNodeElement(nodeData, container) {
+    const nodeElement = document.createElement('div');
+    nodeElement.className = `vf-node vf-node-${nodeData.type}`;
+    nodeElement.setAttribute('data-node-id', nodeData.id);
+    
+    let content = '';
+    
+    switch (nodeData.type) {
+        case 'checklist':
+            content = createChecklistNode(nodeData);
+            break;
+        case 'selection':
+            content = createSelectionNode(nodeData);
+            break;
+        case 'decision':
+            content = createDecisionNode(nodeData);
+            break;
+        case 'info':
+            content = createInfoNode(nodeData);
+            break;
+        case 'endpoint':
+            content = createEndpointNode(nodeData);
+            break;
+        default:
+            content = `<div class="vf-node-content"><h3>${nodeData.title}</h3></div>`;
+    }
+    
+    nodeElement.innerHTML = content;
+    container.appendChild(nodeElement);
+    
+    // Trigger entrance animation
+    requestAnimationFrame(() => {
+        nodeElement.classList.add('vf-node-visible');
+    });
+    
+    // Initialize any interactive elements
+    initNodeInteractions(nodeData);
+}
+
+// Create checklist node HTML
+function createChecklistNode(nodeData) {
+    const checklistItems = nodeData.items.map((item, index) => `
+        <label class="vf-checklist-item" data-index="${index}">
+            <input type="checkbox" onchange="updateChecklistProgress('${nodeData.id}')">
+            <span class="vf-checkbox-custom"></span>
+            <span class="vf-checkbox-label">${item}</span>
+        </label>
+    `).join('');
+    
+    return `
+        <div class="vf-node-header">
+            <div class="vf-node-step-badge">${nodeData.title}</div>
+        </div>
+        <div class="vf-node-content">
+            <h3>${nodeData.subtitle}</h3>
+            <p>${nodeData.description}</p>
+            <div class="vf-checklist">
+                ${checklistItems}
+            </div>
+            <button class="vf-continue-btn" disabled onclick="proceedFromChecklist('${nodeData.id}', '${nodeData.nextNode}')">
+                ${nodeData.buttonText}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
+    `;
+}
+
+// Create selection node HTML
+function createSelectionNode(nodeData) {
+    const tierId = appState.visualFlowchart.tierId;
+    const tierData = appState.tierFlowchartData?.[tierId];
+    const options = tierData?.[nodeData.options] || [];
+    
+    const optionsHTML = options.map(option => `
+        <button class="vf-selection-option" onclick="selectFlowchartOption('${nodeData.id}', '${option.id}', '${option.name}', '${nodeData.nextHandler}')">
+            <div class="vf-option-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
+            </div>
+            <div class="vf-option-content">
+                <h4>${option.name}</h4>
+                <p>${option.description}</p>
+                ${option.administrationTime ? `<span class="vf-option-meta">Time: ${option.administrationTime}</span>` : ''}
+                ${option.duration ? `<span class="vf-option-meta">${option.duration} • ${option.frequency}</span>` : ''}
+            </div>
+            <div class="vf-option-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </div>
+        </button>
+    `).join('');
+    
+    const infoBoxHTML = nodeData.infoBox ? `
+        <div class="vf-info-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4m0-4h.01"/>
+            </svg>
+            <div>
+                <h4>${nodeData.infoBox.title}</h4>
+                ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
+                ${nodeData.infoBox.items ? `<ul>${nodeData.infoBox.items.map(i => `<li>${i}</li>`).join('')}</ul>` : ''}
+            </div>
+        </div>
+    ` : '';
+    
+    const warningBoxHTML = nodeData.warningBox ? `
+        <div class="vf-warning-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+                <h4>${nodeData.warningBox.title}</h4>
+                <p>${nodeData.warningBox.text}</p>
+            </div>
+        </div>
+    ` : '';
+    
+    return `
+        <div class="vf-node-header">
+            <div class="vf-node-step-badge">${nodeData.title}</div>
+        </div>
+        <div class="vf-node-content">
+            <h3>${nodeData.subtitle}</h3>
+            <p>${nodeData.description}</p>
+            ${infoBoxHTML}
+            ${warningBoxHTML}
+            <div class="vf-selection-grid">
+                ${optionsHTML}
+            </div>
+        </div>
+    `;
+}
+
+// Create decision node HTML
+function createDecisionNode(nodeData) {
+    const choicesHTML = nodeData.choices.map(choice => `
+        <button class="vf-decision-btn vf-decision-${choice.type}" onclick="makeDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
+            <div class="vf-decision-icon">
+                ${choice.type === 'success' ? `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 13l4 4L19 7"/>
+                    </svg>
+                ` : choice.type === 'warning' ? `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                ` : `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4m0-4h.01"/>
+                    </svg>
+                `}
+            </div>
+            <div class="vf-decision-content">
+                <strong>${choice.label}</strong>
+                <span>${choice.sublabel}</span>
+            </div>
+        </button>
+    `).join('');
+    
+    const infoBoxHTML = nodeData.infoBox ? `
+        <div class="vf-info-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4m0-4h.01"/>
+            </svg>
+            <div>
+                <h4>${nodeData.infoBox.title}</h4>
+                ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
+                ${nodeData.infoBox.items ? `<ul>${nodeData.infoBox.items.map(i => `<li>${i}</li>`).join('')}</ul>` : ''}
+            </div>
+        </div>
+    ` : '';
+    
+    const warningBoxHTML = nodeData.warningBox ? `
+        <div class="vf-warning-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+                <h4>${nodeData.warningBox.title}</h4>
+                <p>${nodeData.warningBox.text}</p>
+            </div>
+        </div>
+    ` : '';
+    
+    return `
+        <div class="vf-node-header">
+            <div class="vf-node-step-badge">${nodeData.title}</div>
+        </div>
+        <div class="vf-node-content">
+            <h3>${nodeData.subtitle}</h3>
+            <p>${nodeData.description}</p>
+            ${warningBoxHTML}
+            ${infoBoxHTML}
+            <div class="vf-decision-grid">
+                ${choicesHTML}
+            </div>
+        </div>
+    `;
+}
+
+// Create info node HTML
+function createInfoNode(nodeData) {
+    const featuresHTML = nodeData.features ? `
+        <ul class="vf-feature-list">
+            ${nodeData.features.map(f => `<li>${f}</li>`).join('')}
+        </ul>
+    ` : '';
+    
+    const warningBoxHTML = nodeData.warningBox ? `
+        <div class="vf-warning-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+                <h4>${nodeData.warningBox.title}</h4>
+                <p>${nodeData.warningBox.text}</p>
+            </div>
+        </div>
+    ` : '';
+    
+    return `
+        <div class="vf-node-header">
+            <div class="vf-node-step-badge">${nodeData.title}</div>
+        </div>
+        <div class="vf-node-content">
+            <h3>${nodeData.subtitle}</h3>
+            ${warningBoxHTML}
+            <h4>Characteristics of Tier 3 Interventions</h4>
+            ${featuresHTML}
+            <button class="vf-continue-btn" onclick="proceedFromInfo('${nodeData.id}', '${nodeData.nextNode}')">
+                ${nodeData.buttonText}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
+    `;
+}
+
+// Create endpoint node HTML
+function createEndpointNode(nodeData) {
+    const statusIcons = {
+        success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>`,
+        warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
+        danger: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>`
+    };
+    
+    const recommendationsHTML = nodeData.recommendations ? `
+        <div class="vf-recommendations">
+            <h4>Next Steps:</h4>
+            <ul>
+                ${nodeData.recommendations.map(r => `<li>${r}</li>`).join('')}
+            </ul>
+        </div>
+    ` : '';
+    
+    const warningBoxHTML = nodeData.warningBox ? `
+        <div class="vf-warning-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+                <h4>${nodeData.warningBox.title}</h4>
+                <p>${nodeData.warningBox.text}</p>
+            </div>
+        </div>
+    ` : '';
+    
+    const actionButtonHTML = nodeData.actionButton ? `
+        <button class="vf-action-btn vf-action-primary" onclick="${nodeData.actionButton.action}()">
+            ${nodeData.actionButton.text}
+        </button>
+    ` : '';
+    
+    const secondaryActionHTML = nodeData.secondaryAction ? `
+        <button class="vf-action-btn vf-action-secondary" onclick="${nodeData.secondaryAction.action}()">
+            ${nodeData.secondaryAction.text}
+        </button>
+    ` : '';
+    
+    return `
+        <div class="vf-endpoint vf-endpoint-${nodeData.status}">
+            <div class="vf-endpoint-icon">
+                ${statusIcons[nodeData.status]}
+            </div>
+            <h2>${nodeData.title}</h2>
+            <p>${nodeData.description}</p>
+            ${warningBoxHTML}
+            ${recommendationsHTML}
+            <div class="vf-endpoint-actions">
+                ${actionButtonHTML}
+                ${secondaryActionHTML}
+                <button class="vf-action-btn vf-action-close" onclick="closeVisualFlowchart()">
+                    Return to Interventions
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Initialize node interactions
+function initNodeInteractions(nodeData) {
+    // Any additional initialization needed for node interactions
+}
+
+// Update checklist progress
+function updateChecklistProgress(nodeId) {
+    const node = document.querySelector(`[data-node-id="${nodeId}"]`);
+    if (!node) return;
+    
+    const checkboxes = node.querySelectorAll('.vf-checklist-item input[type="checkbox"]');
+    const continueBtn = node.querySelector('.vf-continue-btn');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    if (continueBtn) {
+        continueBtn.disabled = !allChecked;
+        if (allChecked) {
+            continueBtn.classList.add('vf-btn-ready');
+        } else {
+            continueBtn.classList.remove('vf-btn-ready');
+        }
+    }
+    
+    // Add visual feedback to checked items
+    checkboxes.forEach((checkbox, index) => {
+        const item = checkbox.closest('.vf-checklist-item');
+        if (checkbox.checked) {
+            item.classList.add('checked');
+        } else {
+            item.classList.remove('checked');
+        }
+    });
+}
+
+// Proceed from checklist node
+function proceedFromChecklist(fromNodeId, toNodeId) {
+    // Mark the from node as completed
+    const fromNode = document.querySelector(`[data-node-id="${fromNodeId}"]`);
+    if (fromNode) {
+        fromNode.classList.add('vf-node-completed');
+        // Disable interactions on completed node
+        const btn = fromNode.querySelector('.vf-continue-btn');
+        if (btn) btn.disabled = true;
+    }
+    
+    // Show next node with connection line
+    showFlowchartNode(toNodeId, fromNodeId, 'continue');
+}
+
+// Proceed from info node
+function proceedFromInfo(fromNodeId, toNodeId) {
+    const fromNode = document.querySelector(`[data-node-id="${fromNodeId}"]`);
+    if (fromNode) {
+        fromNode.classList.add('vf-node-completed');
+        const btn = fromNode.querySelector('.vf-continue-btn');
+        if (btn) btn.disabled = true;
+    }
+    
+    showFlowchartNode(toNodeId, fromNodeId, 'continue');
+}
+
+// Select an option in selection node
+function selectFlowchartOption(nodeId, optionId, optionName, handlerName) {
+    const node = document.querySelector(`[data-node-id="${nodeId}"]`);
+    if (node) {
+        node.classList.add('vf-node-completed');
+        // Highlight selected option
+        const options = node.querySelectorAll('.vf-selection-option');
+        options.forEach(opt => {
+            opt.classList.add('vf-option-disabled');
+        });
+        const selectedOption = node.querySelector(`.vf-selection-option[onclick*="${optionId}"]`);
+        if (selectedOption) {
+            selectedOption.classList.add('vf-option-selected');
+            selectedOption.classList.remove('vf-option-disabled');
+        }
+    }
+    
+    // Store selection in state
+    appState.currentTierFlow = appState.currentTierFlow || {};
+    appState.currentTierFlow[`${nodeId}_selection`] = { id: optionId, name: optionName };
+    
+    // Call the handler
+    if (window[handlerName]) {
+        window[handlerName](nodeId, optionId, optionName);
+    }
+}
+
+// Make a decision in decision node
+function makeDecision(nodeId, choiceId, nextNodeId) {
+    const node = document.querySelector(`[data-node-id="${nodeId}"]`);
+    if (node) {
+        node.classList.add('vf-node-completed');
+        // Highlight selected choice
+        const choices = node.querySelectorAll('.vf-decision-btn');
+        choices.forEach(ch => {
+            ch.classList.add('vf-decision-disabled');
+        });
+        const selectedChoice = node.querySelector(`.vf-decision-btn[onclick*="${choiceId}"]`);
+        if (selectedChoice) {
+            selectedChoice.classList.add('vf-decision-selected');
+            selectedChoice.classList.remove('vf-decision-disabled');
+        }
+    }
+    
+    showFlowchartNode(nextNodeId, nodeId, choiceId);
+}
+
+// Scroll to node
+function scrollToNode(nodeId) {
+    setTimeout(() => {
+        const node = document.querySelector(`[data-node-id="${nodeId}"]`);
+        if (node) {
+            node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 100);
+}
+
+// Update progress indicator
+function updateProgressIndicator() {
+    const progressText = document.querySelector('.vf-progress-text');
+    const pathLength = appState.visualFlowchart.selectedPath.length;
+    if (progressText) {
+        progressText.textContent = `Step ${pathLength}`;
+    }
+}
+
+// Close visual flowchart
+function closeVisualFlowchart() {
+    const container = document.getElementById('flowchart-container');
+    if (container) {
+        container.classList.add('flowchart-hidden');
+        container.innerHTML = '';
+    }
+    
+    // Reset state
+    appState.visualFlowchart = {
+        nodes: [],
+        connections: [],
+        currentNodeId: null,
+        selectedPath: []
+    };
+    appState.currentTierFlow = null;
+    
+    // Scroll back to tier cards
+    const interventionsSection = document.getElementById('interventions-section');
+    if (interventionsSection) {
+        interventionsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Handler functions for tier 1
+function selectTier1ScreenerVisual(nodeId, screenerId, screenerName) {
+    appState.currentTierFlow = appState.currentTierFlow || {};
+    appState.currentTierFlow.screener = screenerId;
+    appState.currentTierFlow.screenerName = screenerName;
+    
+    showFlowchartNode('tier1-effectiveness', nodeId, screenerId);
+}
+
+// Handler functions for tier 2
+function selectTier2AssessmentVisual(nodeId, assessmentId, assessmentName) {
+    appState.currentTierFlow = appState.currentTierFlow || {};
+    appState.currentTierFlow.assessment = assessmentId;
+    appState.currentTierFlow.assessmentName = assessmentName;
+    
+    showFlowchartNode('tier2-intervention', nodeId, assessmentId);
+}
+
+function selectTier2InterventionVisual(nodeId, interventionId, interventionName) {
+    appState.currentTierFlow = appState.currentTierFlow || {};
+    appState.currentTierFlow.intervention = interventionId;
+    appState.currentTierFlow.interventionName = interventionName;
+    
+    showFlowchartNode('tier2-progress', nodeId, interventionId);
+}
+
+// Handler functions for tier 3
+function selectTier3AssessmentVisual(nodeId, assessmentId, assessmentName) {
+    appState.currentTierFlow = appState.currentTierFlow || {};
+    appState.currentTierFlow.assessment = assessmentId;
+    appState.currentTierFlow.assessmentName = assessmentName;
+    
+    showFlowchartNode('tier3-intervention', nodeId, assessmentId);
+}
+
+function selectTier3InterventionVisual(nodeId, interventionId, interventionName) {
+    appState.currentTierFlow = appState.currentTierFlow || {};
+    appState.currentTierFlow.intervention = interventionId;
+    appState.currentTierFlow.interventionName = interventionName;
+    
+    showFlowchartNode('tier3-progress', nodeId, interventionId);
+}
+
+// Action handlers for endpoint buttons
+function startTier2Visual() {
+    closeVisualFlowchart();
+    setTimeout(() => {
+        initVisualFlowchart('tier2');
+    }, 300);
+}
+
+function startTier3Visual() {
+    closeVisualFlowchart();
+    setTimeout(() => {
+        initVisualFlowchart('tier3');
+    }, 300);
+}
+
+function restartTier1Visual() {
+    closeVisualFlowchart();
+    setTimeout(() => {
+        initVisualFlowchart('tier1');
+    }, 300);
+}
+
+function restartTier2Visual() {
+    closeVisualFlowchart();
+    setTimeout(() => {
+        initVisualFlowchart('tier2');
+    }, 300);
+}
+
+// ============================================
+// Tier Flowchart Functions (Legacy - Now using Visual Flowchart)
+// ============================================
+function startTier1Flowchart() {
+    console.log('Starting Tier 1 Visual Flowchart');
+    initVisualFlowchart('tier1');
 }
 
 function updateTier1Progress() {
@@ -926,66 +1884,8 @@ function tier1MoreThan20Percent() {
 }
 
 function startTier2Flowchart() {
-    console.log('Starting Tier 2 Flowchart');
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    container.classList.remove('flowchart-hidden');
-    container.innerHTML = `
-        <div class="flowchart-tier-view">
-            <div class="flowchart-header">
-                <button class="back-button" onclick="closeTierFlowchart()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                    </svg>
-                    Back to Interventions
-                </button>
-                <h2>Tier 2: Small Group Intervention</h2>
-            </div>
-            
-            <div class="flowchart-content">
-                <div class="flowchart-step-wrapper active">
-                    <div class="step-indicator">Step 1</div>
-                    <div class="step-content-box">
-                        <h3>Review Principles of Explicit and Systematic Instruction for Tier 2</h3>
-                        <p>Check off all 5 principles before proceeding:</p>
-                        
-                        <div class="checklist">
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier2Progress()">
-                                <span>Small group instruction (3-6 students)</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier2Progress()">
-                                <span>Daily sessions of 20-30 minutes</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier2Progress()">
-                                <span>Targeted skill instruction based on assessment data</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier2Progress()">
-                                <span>Progress monitoring every 2-4 weeks</span>
-                            </label>
-                            <label class="checklist-item">
-                                <input type="checkbox" onchange="updateTier2Progress()">
-                                <span>Evidence-based intervention program</span>
-                            </label>
-                        </div>
-                        
-                        <button id="tier2-continue-btn" class="btn-primary" disabled onclick="proceedToTier2Assessment()">
-                            Continue to Drill Down Assessment
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    console.log('Starting Tier 2 Visual Flowchart');
+    initVisualFlowchart('tier2');
 }
 
 function updateTier2Progress() {
@@ -1327,60 +2227,8 @@ function startTier2Cycle2() {
 }
 
 function startTier3Flowchart() {
-    console.log('Starting Tier 3 Flowchart');
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    container.classList.remove('flowchart-hidden');
-    container.innerHTML = `
-        <div class="flowchart-tier-view">
-            <div class="flowchart-header">
-                <button class="back-button" onclick="closeTierFlowchart()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                    </svg>
-                    Back to Interventions
-                </button>
-                <h2>Tier 3: Intensive Individual Intervention</h2>
-            </div>
-            
-            <div class="flowchart-content">
-                <div class="flowchart-step-wrapper active">
-                    <div class="step-indicator">Begin Tier 3</div>
-                    <div class="step-content-box">
-                        <div class="info-callout warning">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 8v4m0 4h.01"/>
-                            </svg>
-                            <div>
-                                <h4>Important Note</h4>
-                                <p>Tier 3 interventions are for students who have not responded to two cycles of Tier 2 intervention. Typically, fewer than 10% of students require this level of support.</p>
-                            </div>
-                        </div>
-                        
-                        <h3>Characteristics of Tier 3 Interventions</h3>
-                        <ul class="feature-list">
-                            <li>Individual or very small group (1-3 students)</li>
-                            <li>Intensive daily sessions (45-60 minutes)</li>
-                            <li>Highly specialized, research-based programs</li>
-                            <li>Weekly progress monitoring</li>
-                            <li>Collaboration with specialists and clinicians</li>
-                        </ul>
-                        
-                        <button class="btn-primary" onclick="proceedToTier3Assessment()">
-                            Begin Tier 3 Process
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    console.log('Starting Tier 3 Visual Flowchart');
+    initVisualFlowchart('tier3');
 }
 
 function proceedToTier3Assessment() {
@@ -1928,3 +2776,21 @@ window.selectTier3Intervention = selectTier3Intervention;
 window.proceedToTier3ProgressMonitoring = proceedToTier3ProgressMonitoring;
 window.tier3StudentImproved = tier3StudentImproved;
 window.tier3StudentDidNotImprove = tier3StudentDidNotImprove;
+
+// Visual Flowchart exports
+window.initVisualFlowchart = initVisualFlowchart;
+window.closeVisualFlowchart = closeVisualFlowchart;
+window.updateChecklistProgress = updateChecklistProgress;
+window.proceedFromChecklist = proceedFromChecklist;
+window.proceedFromInfo = proceedFromInfo;
+window.selectFlowchartOption = selectFlowchartOption;
+window.makeDecision = makeDecision;
+window.selectTier1ScreenerVisual = selectTier1ScreenerVisual;
+window.selectTier2AssessmentVisual = selectTier2AssessmentVisual;
+window.selectTier2InterventionVisual = selectTier2InterventionVisual;
+window.selectTier3AssessmentVisual = selectTier3AssessmentVisual;
+window.selectTier3InterventionVisual = selectTier3InterventionVisual;
+window.startTier2Visual = startTier2Visual;
+window.startTier3Visual = startTier3Visual;
+window.restartTier1Visual = restartTier1Visual;
+window.restartTier2Visual = restartTier2Visual;
