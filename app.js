@@ -1073,7 +1073,7 @@ function proceedToTier2Assessment() {
 
 function selectTier2Assessment(assessmentId, assessmentName) {
     console.log(`Selected assessment: ${assessmentName}`);
-    appState.currentTierFlow = { ...appState.currentTierFlow, tier: 2, assessment: assessmentId, assessmentName: assessmentName };
+    appState.currentTierFlow = { ...(appState.currentTierFlow || {}), tier: 2, assessment: assessmentId, assessmentName: assessmentName };
     
     proceedToTier2Intervention();
 }
@@ -1150,7 +1150,7 @@ function proceedToTier2Intervention() {
 
 function selectTier2Intervention(interventionId, interventionName) {
     console.log(`Selected intervention: ${interventionName}`);
-    appState.currentTierFlow = { ...appState.currentTierFlow, intervention: interventionId, interventionName: interventionName };
+    appState.currentTierFlow = { ...(appState.currentTierFlow || {}), intervention: interventionId, interventionName: interventionName };
     
     proceedToTier2ProgressMonitoring();
 }
@@ -1321,7 +1321,7 @@ function tier2StudentDidNotImprove() {
 
 function startTier2Cycle2() {
     console.log('Starting Tier 2 Cycle 2');
-    appState.currentTierFlow = { ...appState.currentTierFlow, cycle: 2 };
+    appState.currentTierFlow = { ...(appState.currentTierFlow || {}), cycle: 2 };
     
     proceedToTier2Assessment();
 }
@@ -1458,7 +1458,7 @@ function proceedToTier3Assessment() {
 
 function selectTier3Assessment(assessmentId, assessmentName) {
     console.log(`Selected assessment: ${assessmentName}`);
-    appState.currentTierFlow = { ...appState.currentTierFlow, tier: 3, assessment: assessmentId, assessmentName: assessmentName };
+    appState.currentTierFlow = { ...(appState.currentTierFlow || {}), tier: 3, assessment: assessmentId, assessmentName: assessmentName };
     
     proceedToTier3Intervention();
 }
@@ -1535,7 +1535,7 @@ function proceedToTier3Intervention() {
 
 function selectTier3Intervention(interventionId, interventionName) {
     console.log(`Selected intervention: ${interventionName}`);
-    appState.currentTierFlow = { ...appState.currentTierFlow, intervention: interventionId, interventionName: interventionName };
+    appState.currentTierFlow = { ...(appState.currentTierFlow || {}), intervention: interventionId, interventionName: interventionName };
     
     proceedToTier3ProgressMonitoring();
 }
