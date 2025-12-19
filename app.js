@@ -5,7 +5,7 @@
 // State Management
 // ============================================
 const appState = {
-    currentPage: 'interventions',
+    currentPage: 'home',
     mobileMenuOpen: false,
     flowchartData: null,
     currentPath: [],
@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Setup mobile menu
     setupMobileMenu();
+    
+    // Setup home menu cards
+    setupHomeMenuCards();
     
     // Initialize flowchart
     initializeFlowchart();
@@ -117,6 +120,20 @@ function closeMobileMenu() {
     appState.mobileMenuOpen = false;
     document.querySelector('.mobile-menu-btn')?.classList.remove('active');
     document.querySelector('.mobile-nav-overlay')?.classList.remove('active');
+}
+
+// ============================================
+// Home Menu Cards
+// ============================================
+function setupHomeMenuCards() {
+    document.querySelectorAll('.menu-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const page = e.currentTarget.dataset.page;
+            if (page) {
+                navigateToPage(page);
+            }
+        });
+    });
 }
 
 // ============================================
@@ -461,6 +478,260 @@ function toggleFAQ(element) {
 }
 
 // ============================================
+// Tier Flowchart Functions
+// ============================================
+function startTier1Flowchart() {
+    console.log('Starting Tier 1 Flowchart');
+    const container = document.getElementById('flowchart-container');
+    if (!container) return;
+    
+    container.classList.remove('flowchart-hidden');
+    container.innerHTML = `
+        <div class="flowchart-tier-view">
+            <div class="flowchart-header">
+                <button class="back-button" onclick="closeTierFlowchart()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Interventions
+                </button>
+                <h2>Tier 1: Universal Screening & Core Instruction</h2>
+            </div>
+            
+            <div class="flowchart-content">
+                <div class="flowchart-step-wrapper active">
+                    <div class="step-indicator">Step 1</div>
+                    <div class="step-content-box">
+                        <h3>Review Principles of Explicit and Systematic Instruction</h3>
+                        <p>Check off all 8 principles before proceeding:</p>
+                        
+                        <div class="checklist">
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier1Progress()">
+                                <span>Clear learning objectives are stated</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier1Progress()">
+                                <span>Instruction is sequenced and scaffolded</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier1Progress()">
+                                <span>Teacher models skills explicitly</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier1Progress()">
+                                <span>Guided practice with feedback is provided</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier1Progress()">
+                                <span>Independent practice opportunities are given</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier1Progress()">
+                                <span>Regular assessment and progress monitoring</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier1Progress()">
+                                <span>Cumulative review is integrated</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier1Progress()">
+                                <span>Instruction is responsive to student needs</span>
+                            </label>
+                        </div>
+                        
+                        <button id="tier1-continue-btn" class="btn-primary" disabled onclick="proceedToTier1Screener()">
+                            Continue to Literacy Screener
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Smooth scroll to flowchart
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updateTier1Progress() {
+    const checkboxes = document.querySelectorAll('.checklist input[type="checkbox"]');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    const continueBtn = document.getElementById('tier1-continue-btn');
+    
+    if (continueBtn) {
+        continueBtn.disabled = !allChecked;
+    }
+}
+
+function proceedToTier1Screener() {
+    console.log('Proceeding to Tier 1 screener selection');
+    // This would continue the flowchart - placeholder for now
+    alert('Tier 1 flowchart implementation in progress. This will guide you through:\n\n1. Selecting a literacy screener\n2. Inputting results\n3. Evaluating effectiveness\n4. Determining next steps based on class performance');
+}
+
+function startTier2Flowchart() {
+    console.log('Starting Tier 2 Flowchart');
+    const container = document.getElementById('flowchart-container');
+    if (!container) return;
+    
+    container.classList.remove('flowchart-hidden');
+    container.innerHTML = `
+        <div class="flowchart-tier-view">
+            <div class="flowchart-header">
+                <button class="back-button" onclick="closeTierFlowchart()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Interventions
+                </button>
+                <h2>Tier 2: Small Group Intervention</h2>
+            </div>
+            
+            <div class="flowchart-content">
+                <div class="flowchart-step-wrapper active">
+                    <div class="step-indicator">Step 1</div>
+                    <div class="step-content-box">
+                        <h3>Review Principles of Explicit and Systematic Instruction for Tier 2</h3>
+                        <p>Check off all 5 principles before proceeding:</p>
+                        
+                        <div class="checklist">
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier2Progress()">
+                                <span>Small group instruction (3-6 students)</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier2Progress()">
+                                <span>Daily sessions of 20-30 minutes</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier2Progress()">
+                                <span>Targeted skill instruction based on assessment data</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier2Progress()">
+                                <span>Progress monitoring every 2-4 weeks</span>
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" onchange="updateTier2Progress()">
+                                <span>Evidence-based intervention program</span>
+                            </label>
+                        </div>
+                        
+                        <button id="tier2-continue-btn" class="btn-primary" disabled onclick="proceedToTier2Assessment()">
+                            Continue to Drill Down Assessment
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updateTier2Progress() {
+    const checkboxes = document.querySelectorAll('.checklist input[type="checkbox"]');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    const continueBtn = document.getElementById('tier2-continue-btn');
+    
+    if (continueBtn) {
+        continueBtn.disabled = !allChecked;
+    }
+}
+
+function proceedToTier2Assessment() {
+    console.log('Proceeding to Tier 2 drill down assessment');
+    alert('Tier 2 flowchart implementation in progress. This will guide you through:\n\n1. Administering drill-down assessments\n2. 8-week intervention cycle\n3. Progress monitoring\n4. Decision-making for next steps');
+}
+
+function startTier3Flowchart() {
+    console.log('Starting Tier 3 Flowchart');
+    const container = document.getElementById('flowchart-container');
+    if (!container) return;
+    
+    container.classList.remove('flowchart-hidden');
+    container.innerHTML = `
+        <div class="flowchart-tier-view">
+            <div class="flowchart-header">
+                <button class="back-button" onclick="closeTierFlowchart()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Interventions
+                </button>
+                <h2>Tier 3: Intensive Individual Intervention</h2>
+            </div>
+            
+            <div class="flowchart-content">
+                <div class="flowchart-step-wrapper active">
+                    <div class="step-indicator">Begin Tier 3</div>
+                    <div class="step-content-box">
+                        <div class="info-callout warning">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 8v4m0 4h.01"/>
+                            </svg>
+                            <div>
+                                <h4>Important Note</h4>
+                                <p>Tier 3 interventions are for students who have not responded to two cycles of Tier 2 intervention. Typically, fewer than 10% of students require this level of support.</p>
+                            </div>
+                        </div>
+                        
+                        <h3>Characteristics of Tier 3 Interventions</h3>
+                        <ul class="feature-list">
+                            <li>Individual or very small group (1-3 students)</li>
+                            <li>Intensive daily sessions (45-60 minutes)</li>
+                            <li>Highly specialized, research-based programs</li>
+                            <li>Weekly progress monitoring</li>
+                            <li>Collaboration with specialists and clinicians</li>
+                        </ul>
+                        
+                        <button class="btn-primary" onclick="proceedToTier3Assessment()">
+                            Begin Tier 3 Process
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function proceedToTier3Assessment() {
+    console.log('Proceeding to Tier 3 drill down assessment');
+    alert('Tier 3 flowchart implementation in progress. This will guide you through:\n\n1. Comprehensive diagnostic assessment\n2. Intensive intervention selection\n3. 8-week intensive cycle with weekly monitoring\n4. Coordination with specialists');
+}
+
+function closeTierFlowchart() {
+    const container = document.getElementById('flowchart-container');
+    if (container) {
+        container.classList.add('flowchart-hidden');
+        container.innerHTML = '';
+    }
+    
+    // Scroll back to tier cards
+    const interventionsSection = document.getElementById('interventions-section');
+    if (interventionsSection) {
+        interventionsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function openInterventionsMenu(tier) {
+    console.log(`Opening Interventions Menu for Tier ${tier}`);
+    alert(`Interventions Menu for Tier ${tier} coming soon!\n\nThis will display:\n• Drill-down assessments for Tier ${tier}\n• Evidence-based intervention strategies\n• Resources and materials\n• Implementation guidelines`);
+}
+
+// ============================================
 // Export for global use
 // ============================================
 window.navigateToPage = navigateToPage;
@@ -472,3 +743,13 @@ window.resetFlowchart = resetFlowchart;
 window.exportFlowchart = exportFlowchart;
 window.exportInterventions = exportInterventions;
 window.toggleFAQ = toggleFAQ;
+window.startTier1Flowchart = startTier1Flowchart;
+window.startTier2Flowchart = startTier2Flowchart;
+window.startTier3Flowchart = startTier3Flowchart;
+window.openInterventionsMenu = openInterventionsMenu;
+window.closeTierFlowchart = closeTierFlowchart;
+window.updateTier1Progress = updateTier1Progress;
+window.updateTier2Progress = updateTier2Progress;
+window.proceedToTier1Screener = proceedToTier1Screener;
+window.proceedToTier2Assessment = proceedToTier2Assessment;
+window.proceedToTier3Assessment = proceedToTier3Assessment;
