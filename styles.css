@@ -1,36 +1,36 @@
 /* Reset and Variables */
 :root {
-    /* Blue palette from Deep Space to Light Blue */
-    --deep-space: #012a4a;
-    --yale-blue: #013a63;
-    --yale-blue-light: #01497c;
-    --dusk-blue: #014f86;
-    --rich-cerulean: #2a6f97;
-    --cerulean: #2c7da0;
-    --blue-green: #468faf;
-    --pacific-blue: #61a5c2;
-    --sky-blue: #89c2d9;
-    --light-blue: #a9d6e5;
+    /* New fun color palette */
+    --deep-space: #3a6a7d;
+    --yale-blue: #4a7b8e;
+    --yale-blue-light: #5A9CB5;
+    --dusk-blue: #5A9CB5;
+    --rich-cerulean: #5A9CB5;
+    --cerulean: #5A9CB5;
+    --blue-green: #5A9CB5;
+    --pacific-blue: #6aacbf;
+    --sky-blue: #7abcc9;
+    --light-blue: #8accd9;
     
-    /* Highlight color - warm coral for contrast */
-    --highlight: #ff6b6b;
-    --highlight-dark: #ee5a52;
-    --highlight-light: #ff8787;
+    /* Highlight color - fun red/pink for contrast */
+    --highlight: #FA6868;
+    --highlight-dark: #f95555;
+    --highlight-light: #fb7b7b;
     
-    /* Primary palette using the blues */
-    --primary: #2c7da0;
-    --primary-dark: #2a6f97;
-    --primary-light: #468faf;
-    --secondary: #61a5c2;
-    --secondary-dark: #2c7da0;
-    --accent: #89c2d9;
-    --accent-light: #a9d6e5;
+    /* Primary palette using the new blue */
+    --primary: #5A9CB5;
+    --primary-dark: #4a8ca5;
+    --primary-light: #6aacbf;
+    --secondary: #FAAC68;
+    --secondary-dark: #f99d55;
+    --accent: #FACE68;
+    --accent-light: #fbdb88;
     
     /* Functional colors */
-    --warning: #f59e0b;
-    --warning-dark: #d97706;
-    --danger: #dc2626;
-    --danger-dark: #b91c1c;
+    --warning: #FAAC68;
+    --warning-dark: #f99d55;
+    --danger: #FA6868;
+    --danger-dark: #f95555;
     --success: #10b981;
     
     /* Text colors */
@@ -45,18 +45,18 @@
     --bg-secondary: #f8fafc;
     --bg-accent: #f1f5f9;
     --bg-muted: #e2e8f0;
-    --bg-dark: #012a4a;
+    --bg-dark: #3a6a7d;
     
     /* Border colors */
     --border: #e2e8f0;
     --border-dark: #cbd5e1;
     --border-light: #f1f5f9;
     
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(1, 42, 74, 0.05);
-    --shadow: 0 1px 3px 0 rgba(1, 42, 74, 0.1), 0 1px 2px -1px rgba(1, 42, 74, 0.08);
-    --shadow-md: 0 4px 6px -1px rgba(1, 42, 74, 0.1), 0 2px 4px -2px rgba(1, 42, 74, 0.08);
-    --shadow-lg: 0 10px 15px -3px rgba(1, 42, 74, 0.1), 0 4px 6px -4px rgba(1, 42, 74, 0.08);
+    /* Shadows - updated to match new palette */
+    --shadow-sm: 0 1px 2px 0 rgba(90, 156, 181, 0.05);
+    --shadow: 0 1px 3px 0 rgba(90, 156, 181, 0.1), 0 1px 2px -1px rgba(90, 156, 181, 0.08);
+    --shadow-md: 0 4px 6px -1px rgba(90, 156, 181, 0.1), 0 2px 4px -2px rgba(90, 156, 181, 0.08);
+    --shadow-lg: 0 10px 15px -3px rgba(90, 156, 181, 0.1), 0 4px 6px -4px rgba(90, 156, 181, 0.08);
     
     /* Border radius */
     --radius-sm: 4px;
