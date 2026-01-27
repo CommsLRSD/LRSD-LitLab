@@ -2931,6 +2931,10 @@ h1, h2, h3, h4, h5, h6 {
     align-items: flex-start;
     gap: 3rem;
     min-width: min-content;
+    /* Add horizontal padding equal to half the viewport width minus half the node width (600px / 2 = 300px)
+       This allows nodes to scroll to center position */
+    padding-left: calc(50vw - 300px); /* 300px = half of .vf-node width (600px) */
+    padding-right: calc(50vw - 300px);
 }
 
 /* Node Base Styles */
@@ -3628,6 +3632,12 @@ h1, h2, h3, h4, h5, h6 {
         flex-direction: column;
         gap: 2rem;
         min-width: 100%;
+        /* Vertical padding to allow centering on mobile 
+           250px = estimated half-height of typical mobile node for initial centering */
+        padding-left: 0;
+        padding-right: 0;
+        padding-top: calc(50vh - 250px);
+        padding-bottom: calc(50vh - 250px);
     }
     
     .vf-node {

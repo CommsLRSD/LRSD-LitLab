@@ -524,7 +524,8 @@ const VF_CONSTANTS = {
     BEZIER_CONTROL_OFFSET: 40,        // Offset for horizontal bezier curve control points
     ANIMATION_PROGRESS_INCREMENT: 0.03, // Progress increment for dot animation (increased for faster animation)
     SCROLL_DELAY: 100,                // Delay before scrolling to new node
-    PATH_LENGTH_FALLBACK: 100         // Fallback for SVG path length
+    PATH_LENGTH_FALLBACK: 100,        // Fallback for SVG path length
+    MOBILE_BREAKPOINT: 768            // Breakpoint for mobile layout (matches CSS media query)
 };
 
 // Node data definitions for each tier's flowchart
@@ -1444,7 +1445,13 @@ function scrollToNode(nodeId) {
     setTimeout(() => {
         const node = document.querySelector(`[data-node-id="${nodeId}"]`);
         if (node) {
-            node.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            // Check if we're on mobile (vertical layout) using constant
+            const isMobile = window.innerWidth <= VF_CONSTANTS.MOBILE_BREAKPOINT;
+            node.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: isMobile ? 'center' : 'nearest', 
+                inline: isMobile ? 'nearest' : 'center' 
+            });
         }
     }, VF_CONSTANTS.SCROLL_DELAY);
 }
