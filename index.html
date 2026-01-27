@@ -205,88 +205,68 @@
         
         <!-- Interventions Section with Flowchart -->
         <section id="interventions-section" class="content-section">
-            <div class="interventions-header">
-                <h2 class="section-title">Literacy Interventions</h2>
-                <p class="section-subtitle">Select your intervention tier to begin</p>
+            <div class="interventions-header-compact">
+                <h2 class="section-title">Interventions</h2>
             </div>
 
-            <div class="tier-landing-grid">
-                <div class="tier-card" data-tier="1">
-                    <div class="tier-header tier-1">
-                        <div class="tier-number">Tier 1</div>
-                        <h3>Universal Screening & Core Instruction</h3>
+            <div class="tier-landing-compact">
+                <div class="tier-card-compact" data-tier="1">
+                    <div class="tier-header-compact tier-1">
+                        <span class="tier-badge">T1</span>
+                        <h3>Universal Screening</h3>
                     </div>
-                    <div class="tier-body">
-                        <p class="tier-description">Universal screening and core instruction level. Applies to all students in the classroom.</p>
-                        <div class="tier-actions">
-                            <button class="tier-action-btn" onclick="startTier1Flowchart()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                </svg>
-                                Start Tier 1 Flowchart
-                            </button>
-                            <button class="tier-action-btn secondary" onclick="openInterventionsMenu(1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 6h16M4 12h16M4 18h16"/>
-                                </svg>
-                                View Tier 1 Interventions
-                            </button>
-                            <button class="tier-action-btn secondary" onclick="navigateToPage('understanding-scores')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <path d="M12 16v-4m0-4h.01"/>
-                                </svg>
-                                Understanding Scores/Percentiles
-                            </button>
-                        </div>
+                    <div class="tier-actions-compact">
+                        <button class="tier-btn-primary" onclick="startTier1Flowchart()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            Start Flowchart
+                        </button>
+                        <button class="tier-btn-secondary" onclick="openInterventionsMenu(1)" title="View Tier 1 Interventions">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
-                <div class="tier-card" data-tier="2">
-                    <div class="tier-header tier-2">
-                        <div class="tier-number">Tier 2</div>
-                        <h3>Small Group Intervention</h3>
+                <div class="tier-card-compact" data-tier="2">
+                    <div class="tier-header-compact tier-2">
+                        <span class="tier-badge">T2</span>
+                        <h3>Small Group</h3>
                     </div>
-                    <div class="tier-body">
-                        <p class="tier-description">Targeted intervention for students who need additional support. Includes 8-week intervention cycles.</p>
-                        <div class="tier-actions">
-                            <button class="tier-action-btn" onclick="startTier2Flowchart()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                </svg>
-                                Start Tier 2 Flowchart
-                            </button>
-                            <button class="tier-action-btn secondary" onclick="openInterventionsMenu(2)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 6h16M4 12h16M4 18h16"/>
-                                </svg>
-                                View Tier 2 Interventions
-                            </button>
-                        </div>
+                    <div class="tier-actions-compact">
+                        <button class="tier-btn-primary" onclick="startTier2Flowchart()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            Start Flowchart
+                        </button>
+                        <button class="tier-btn-secondary" onclick="openInterventionsMenu(2)" title="View Tier 2 Interventions">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
-                <div class="tier-card" data-tier="3">
-                    <div class="tier-header tier-3">
-                        <div class="tier-number">Tier 3</div>
-                        <h3>Intensive Individual Intervention</h3>
+                <div class="tier-card-compact" data-tier="3">
+                    <div class="tier-header-compact tier-3">
+                        <span class="tier-badge">T3</span>
+                        <h3>Intensive</h3>
                     </div>
-                    <div class="tier-body">
-                        <p class="tier-description">Intensive, individualized intervention for students requiring specialized support (typically less than 10% of students).</p>
-                        <div class="tier-actions">
-                            <button class="tier-action-btn" onclick="startTier3Flowchart()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                </svg>
-                                Start Tier 3 Flowchart
-                            </button>
-                            <button class="tier-action-btn secondary" onclick="openInterventionsMenu(3)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 6h16M4 12h16M4 18h16"/>
-                                </svg>
-                                View Tier 3 Interventions
-                            </button>
-                        </div>
+                    <div class="tier-actions-compact">
+                        <button class="tier-btn-primary" onclick="startTier3Flowchart()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            Start Flowchart
+                        </button>
+                        <button class="tier-btn-secondary" onclick="openInterventionsMenu(3)" title="View Tier 3 Interventions">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
