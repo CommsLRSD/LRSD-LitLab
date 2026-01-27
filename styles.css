@@ -2867,7 +2867,7 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
     flex: 1;
     padding: 2rem;
-    min-height: 0;
+    min-height: 0; /* Allow flex child to shrink below content size for proper scrolling */
     background: var(--bg-secondary);
     background-image: 
         radial-gradient(circle at var(--vf-dot-offset-1) var(--vf-dot-offset-1), var(--border) 2px, transparent 0),
