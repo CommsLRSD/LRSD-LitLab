@@ -2867,6 +2867,8 @@ h1, h2, h3, h4, h5, h6 {
         radial-gradient(circle at var(--vf-dot-offset-1) var(--vf-dot-offset-1), var(--border) 2px, transparent 0),
         radial-gradient(circle at var(--vf-dot-offset-2) var(--vf-dot-offset-2), var(--border-light) 1px, transparent 0);
     background-size: var(--vf-pattern-size) var(--vf-pattern-size);
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .vf-connections {
@@ -2906,28 +2908,29 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
     z-index: 2;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 3rem;
+    min-width: min-content;
 }
 
 /* Node Base Styles */
 .vf-node {
-    width: 100%;
-    max-width: 700px;
+    width: 600px;
+    flex-shrink: 0;
     background: var(--bg-primary);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
     border: 2px solid var(--border);
     overflow: hidden;
     opacity: 0;
-    transform: translateY(30px) scale(0.95);
+    transform: translateX(-30px) scale(0.95);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .vf-node-visible {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateX(0) scale(1);
 }
 
 .vf-node-completed {

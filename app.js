@@ -520,8 +520,8 @@ function toggleFAQ(element) {
 
 // Visual Flowchart Constants
 const VF_CONSTANTS = {
-    CONNECTION_DISTANCE: 80,          // Distance for connection line end point
-    BEZIER_CONTROL_OFFSET: 30,        // Offset for bezier curve control points
+    CONNECTION_DISTANCE: 100,         // Distance for horizontal connection line
+    BEZIER_CONTROL_OFFSET: 40,        // Offset for horizontal bezier curve control points
     ANIMATION_PROGRESS_INCREMENT: 0.02, // Progress increment for dot animation
     SCROLL_DELAY: 100,                // Delay before scrolling to new node
     PATH_LENGTH_FALLBACK: 100         // Fallback for SVG path length
@@ -934,13 +934,13 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     const containerRect = connectionsContainer.getBoundingClientRect();
     const fromRect = fromNode.getBoundingClientRect();
     
-    // Start point (bottom center of from node)
-    const startX = fromRect.left + fromRect.width / 2 - containerRect.left;
-    const startY = fromRect.bottom - containerRect.top;
+    // Start point (right center of from node)
+    const startX = fromRect.right - containerRect.left;
+    const startY = fromRect.top + fromRect.height / 2 - containerRect.top;
     
-    // End point (estimated - will be top center of the new node)
-    const endX = startX;
-    const endY = startY + VF_CONSTANTS.CONNECTION_DISTANCE;
+    // End point (estimated - will be left center of the new node)
+    const endX = startX + VF_CONSTANTS.CONNECTION_DISTANCE;
+    const endY = startY;
     
     // Create SVG path
     const pathId = `path-${fromNodeId}-${toNodeId}`;
@@ -948,7 +948,7 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     
     // Create a curved path
     const controlPointOffset = VF_CONSTANTS.BEZIER_CONTROL_OFFSET;
-    const d = `M ${startX} ${startY} C ${startX} ${startY + controlPointOffset} ${endX} ${endY - controlPointOffset} ${endX} ${endY}`;
+    const d = `M ${startX} ${startY} C ${startX + controlPointOffset} ${startY} ${endX - controlPointOffset} ${endY} ${endX} ${endY}`;
     
     path.setAttribute('id', pathId);
     path.setAttribute('d', d);
@@ -995,11 +995,11 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
 
 // Get point on cubic bezier curve
 function getPointOnPath(x1, y1, x2, y2, t, offset) {
-    // Simplified bezier calculation
-    const cx1 = x1;
-    const cy1 = y1 + offset;
-    const cx2 = x2;
-    const cy2 = y2 - offset;
+    // Simplified bezier calculation for horizontal path
+    const cx1 = x1 + offset;
+    const cy1 = y1;
+    const cx2 = x2 - offset;
+    const cy2 = y2;
     
     const t2 = t * t;
     const t3 = t2 * t;
@@ -1438,7 +1438,7 @@ function scrollToNode(nodeId) {
     setTimeout(() => {
         const node = document.querySelector(`[data-node-id="${nodeId}"]`);
         if (node) {
-            node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            node.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
     }, VF_CONSTANTS.SCROLL_DELAY);
 }
