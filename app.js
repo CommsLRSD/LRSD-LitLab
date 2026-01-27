@@ -876,9 +876,6 @@ function initVisualFlowchart(tierId) {
     
     // Show the first node
     showFlowchartNode(flowchartDef.startNode, null);
-    
-    // Smooth scroll to flowchart
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Show a flowchart node with animation
