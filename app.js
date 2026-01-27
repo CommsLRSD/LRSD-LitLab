@@ -524,6 +524,7 @@ const VF_CONSTANTS = {
     BEZIER_CONTROL_OFFSET: 40,        // Offset for horizontal bezier curve control points
     ANIMATION_PROGRESS_INCREMENT: 0.03, // Progress increment for dot animation (increased for faster animation)
     SCROLL_DELAY: 100,                // Delay before scrolling to new node
+    SCROLL_ANIMATION_DURATION: 600,   // Duration of smooth scroll animation in milliseconds
     PATH_LENGTH_FALLBACK: 100,        // Fallback for SVG path length
     MOBILE_BREAKPOINT: 768            // Breakpoint for mobile layout (matches CSS media query)
 };
@@ -1445,13 +1446,52 @@ function scrollToNode(nodeId) {
     setTimeout(() => {
         const node = document.querySelector(`[data-node-id="${nodeId}"]`);
         if (node) {
+            const canvas = document.getElementById('vf-canvas');
+            if (!canvas) return;
+            
             // Check if we're on mobile (vertical layout) using constant
             const isMobile = window.innerWidth <= VF_CONSTANTS.MOBILE_BREAKPOINT;
-            node.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: isMobile ? 'center' : 'nearest', 
-                inline: isMobile ? 'nearest' : 'center' 
-            });
+            
+            if (isMobile) {
+                // On mobile, use vertical centering
+                node.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center', 
+                    inline: 'nearest' 
+                });
+            } else {
+                // On desktop, use custom smooth horizontal scroll for gentler animation
+                const nodeRect = node.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                
+                // Calculate target scroll position to center the node
+                const nodeCenter = nodeRect.left + nodeRect.width / 2;
+                const canvasCenter = canvasRect.left + canvasRect.width / 2;
+                const scrollOffset = nodeCenter - canvasCenter;
+                
+                // Animate scroll with smooth easing
+                const startScroll = canvas.scrollLeft;
+                const targetScroll = startScroll + scrollOffset;
+                const startTime = performance.now();
+                
+                function animateScroll(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / VF_CONSTANTS.SCROLL_ANIMATION_DURATION, 1);
+                    
+                    // Ease-in-out cubic for smooth acceleration and deceleration
+                    const easeProgress = progress < 0.5
+                        ? 4 * progress * progress * progress
+                        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+                    
+                    canvas.scrollLeft = startScroll + (targetScroll - startScroll) * easeProgress;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateScroll);
+                    }
+                }
+                
+                requestAnimationFrame(animateScroll);
+            }
         }
     }, VF_CONSTANTS.SCROLL_DELAY);
 }
