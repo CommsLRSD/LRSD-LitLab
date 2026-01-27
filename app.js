@@ -1444,7 +1444,13 @@ function scrollToNode(nodeId) {
     setTimeout(() => {
         const node = document.querySelector(`[data-node-id="${nodeId}"]`);
         if (node) {
-            node.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            // Check if we're on mobile (vertical layout)
+            const isMobile = window.innerWidth <= 768;
+            node.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: isMobile ? 'center' : 'nearest', 
+                inline: isMobile ? 'nearest' : 'center' 
+            });
         }
     }, VF_CONSTANTS.SCROLL_DELAY);
 }
