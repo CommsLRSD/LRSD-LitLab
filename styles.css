@@ -841,7 +841,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .practice-icon {
-    font-size: 1.25rem;
+    width: 20px;
+    height: 20px;
+    color: var(--primary-600);
+    flex-shrink: 0;
 }
 
 /* FAQ Section */
@@ -961,7 +964,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .category-icon {
-    font-size: 1.5rem;
+    width: 24px;
+    height: 24px;
+    color: var(--primary-600);
+    flex-shrink: 0;
 }
 
 .category-header h3 {
@@ -3785,81 +3791,6 @@ h1, h2, h3, h4, h5, h6 {
     flex: 1;
 }
 
-/* Review summary styles */
-.review-intro {
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-    font-size: 0.9375rem;
-    line-height: 1.6;
-}
-
-.review-path {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.review-step {
-    background: var(--background);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    position: relative;
-}
-
-.review-step-number {
-    position: absolute;
-    top: 1rem;
-    left: 1.25rem;
-    width: 28px;
-    height: 28px;
-    background: var(--primary);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-    font-weight: 700;
-}
-
-.review-step-content {
-    padding-left: 3rem;
-}
-
-.review-step-title {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.375rem;
-    font-weight: 600;
-}
-
-.review-step-value {
-    font-size: 1.0625rem;
-    color: var(--text-primary);
-    font-weight: 500;
-    margin: 0;
-}
-
-.review-step-description {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin: 0.5rem 0 0 0;
-    line-height: 1.5;
-}
-
-.review-step.endpoint {
-    background: linear-gradient(135deg, rgba(44, 125, 160, 0.05) 0%, rgba(44, 125, 160, 0.02) 100%);
-    border-color: var(--primary);
-    border-width: 2px;
-}
-
-.review-step.endpoint .review-step-number {
-    background: var(--success);
-}
-
 /* Modal footer */
 .modal-footer {
     padding: 1.5rem 2rem;
@@ -3927,9 +3858,5 @@ h1, h2, h3, h4, h5, h6 {
     
     .modal-footer button {
         width: 100%;
-    }
-    
-    .review-step-content {
-        padding-left: 2.5rem;
     }
 }
