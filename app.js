@@ -520,7 +520,7 @@ function toggleFAQ(element) {
 
 // Visual Flowchart Constants
 const VF_CONSTANTS = {
-    CONNECTION_DISTANCE: 100,         // Distance for horizontal connection line
+    CONNECTION_DISTANCE: 120,         // Distance for horizontal connection line (approximately 3rem gap)
     BEZIER_CONTROL_OFFSET: 40,        // Offset for horizontal bezier curve control points
     ANIMATION_PROGRESS_INCREMENT: 0.02, // Progress increment for dot animation
     SCROLL_DELAY: 100,                // Delay before scrolling to new node
