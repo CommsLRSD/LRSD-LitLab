@@ -383,14 +383,18 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Flowchart Container */
 #flowchart-container {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
-    min-height: 600px;
-    background: var(--bg-secondary);
-    scroll-margin-top: 70px; /* Account for fixed header */
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    overflow: hidden;
 }
 
 .flowchart-connections {
@@ -1502,10 +1506,6 @@ h1, h2, h3, h4, h5, h6 {
         width: 280px;
     }
     
-    #flowchart-container {
-        padding: 1rem;
-    }
-    
     .info-grid {
         grid-template-columns: 1fr;
     }
@@ -1958,7 +1958,7 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--primary);
 }
 
-.flowchart-hidden {
+#flowchart-container.flowchart-hidden {
     display: none;
 }
 
@@ -2796,13 +2796,18 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .visual-flowchart {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
     background: var(--bg-primary);
-    border-radius: var(--radius-xl);
+    border-radius: 0;
     box-shadow: var(--shadow-lg);
-    margin-top: 2rem;
+    margin: 0;
     overflow: hidden;
-    animation: slideUp 0.4s ease;
-    scroll-margin-top: 70px; /* Account for fixed header */
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease;
 }
 
 .visual-flowchart-header {
@@ -2860,8 +2865,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .visual-flowchart-canvas {
     position: relative;
+    flex: 1;
     padding: 2rem;
-    min-height: 500px;
+    min-height: 0;
     background: var(--bg-secondary);
     background-image: 
         radial-gradient(circle at var(--vf-dot-offset-1) var(--vf-dot-offset-1), var(--border) 2px, transparent 0),
