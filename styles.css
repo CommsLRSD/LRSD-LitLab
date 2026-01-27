@@ -3612,7 +3612,7 @@ h1, h2, h3, h4, h5, h6 {
     
     .visual-flowchart-canvas {
         padding: 1rem;
-        /* Change to vertical scrolling on mobile */
+        /* Change to vertical scrolling on mobile (was: overflow-x: auto, overflow-y: hidden) */
         overflow-x: hidden;
         overflow-y: auto;
     }

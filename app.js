@@ -1642,7 +1642,6 @@ function generateReviewContent() {
                 stepTitle = nodeData.title;
                 // Find the selected option
                 if (pathItem.choiceId) {
-                    const tierId = appState.visualFlowchart.tierId;
                     const tierData = appState.tierFlowchartData?.[tierId];
                     const options = tierData?.[nodeData.options] || [];
                     const selectedOption = options.find(opt => opt.id === pathItem.choiceId);
@@ -1707,18 +1706,20 @@ function generateReviewContent() {
     return reviewHTML;
 }
 
-// Close modal when clicking outside
+// Close modal when clicking outside (using event delegation for efficiency)
 document.addEventListener('click', (e) => {
     const modal = document.getElementById('review-modal');
-    if (modal && e.target === modal) {
+    // Only process if modal is active
+    if (modal && modal.classList.contains('active') && e.target === modal) {
         closeReviewModal();
     }
 });
 
-// Close modal on Escape key
+// Close modal on Escape key (using event delegation for efficiency)
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const modal = document.getElementById('review-modal');
+        // Only process if modal is active
         if (modal && modal.classList.contains('active')) {
             closeReviewModal();
         }
