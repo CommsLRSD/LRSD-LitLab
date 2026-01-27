@@ -522,7 +522,7 @@ function toggleFAQ(element) {
 const VF_CONSTANTS = {
     CONNECTION_DISTANCE: 120,         // Distance for horizontal connection line (approximately 3rem gap)
     BEZIER_CONTROL_OFFSET: 40,        // Offset for horizontal bezier curve control points
-    ANIMATION_PROGRESS_INCREMENT: 0.03, // Progress increment for dot animation (increased for faster animation)
+    ANIMATION_PROGRESS_INCREMENT: 0.05, // Progress increment for dot animation (increased for faster animation)
     SCROLL_DELAY: 100,                // Delay before scrolling to new node
     SCROLL_ANIMATION_DURATION: 600,   // Duration of smooth scroll animation in milliseconds
     PATH_LENGTH_FALLBACK: 100,        // Fallback for SVG path length
@@ -973,7 +973,7 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     
     // Animate the line drawing
     requestAnimationFrame(() => {
-        path.style.transition = 'stroke-dashoffset 0.4s ease-out';
+        path.style.transition = 'stroke-dashoffset 0.25s ease-out';
         path.style.strokeDashoffset = '0';
     });
     
@@ -985,8 +985,16 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     
     // Animate dot along the path
     let progress = 0;
+    let nodeShown = false;
     const animateDot = () => {
         progress += VF_CONSTANTS.ANIMATION_PROGRESS_INCREMENT;
+        
+        // Show the new node when we're halfway through the animation
+        if (!nodeShown && progress >= 0.5 && onComplete) {
+            nodeShown = true;
+            onComplete();
+        }
+        
         if (progress <= 1) {
             const point = getPointOnPath(startX, startY, endX, endY, progress, controlPointOffset);
             dot.setAttribute('cx', point.x);
@@ -994,7 +1002,10 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
             requestAnimationFrame(animateDot);
         } else {
             dot.remove();
-            if (onComplete) onComplete();
+            // Call onComplete if it wasn't called yet (shouldn't happen with progress >= 0.5 check)
+            if (!nodeShown && onComplete) {
+                onComplete();
+            }
         }
     };
     
