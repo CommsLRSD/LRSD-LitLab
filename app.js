@@ -1445,13 +1445,53 @@ function scrollToNode(nodeId) {
     setTimeout(() => {
         const node = document.querySelector(`[data-node-id="${nodeId}"]`);
         if (node) {
+            const canvas = document.getElementById('vf-canvas');
+            if (!canvas) return;
+            
             // Check if we're on mobile (vertical layout) using constant
             const isMobile = window.innerWidth <= VF_CONSTANTS.MOBILE_BREAKPOINT;
-            node.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: isMobile ? 'center' : 'nearest', 
-                inline: isMobile ? 'nearest' : 'center' 
-            });
+            
+            if (isMobile) {
+                // On mobile, use vertical centering
+                node.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center', 
+                    inline: 'nearest' 
+                });
+            } else {
+                // On desktop, use custom smooth horizontal scroll for gentler animation
+                const nodeRect = node.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                
+                // Calculate target scroll position to center the node
+                const nodeCenter = nodeRect.left + nodeRect.width / 2;
+                const canvasCenter = canvasRect.left + canvasRect.width / 2;
+                const scrollOffset = nodeCenter - canvasCenter;
+                
+                // Animate scroll with smooth easing
+                const startScroll = canvas.scrollLeft;
+                const targetScroll = startScroll + scrollOffset;
+                const duration = 600; // Slower, gentler animation
+                const startTime = performance.now();
+                
+                function animateScroll(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Ease-in-out cubic for smooth acceleration and deceleration
+                    const easeProgress = progress < 0.5
+                        ? 4 * progress * progress * progress
+                        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+                    
+                    canvas.scrollLeft = startScroll + (targetScroll - startScroll) * easeProgress;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateScroll);
+                    }
+                }
+                
+                requestAnimationFrame(animateScroll);
+            }
         }
     }, VF_CONSTANTS.SCROLL_DELAY);
 }
