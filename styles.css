@@ -2958,7 +2958,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .vf-node-completed {
     border-color: var(--success);
-    opacity: 0.85;
+    filter: grayscale(0.4) brightness(0.95);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vf-node-completed:hover {
+    filter: grayscale(0.2) brightness(1);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
 }
 
 .vf-node-completed::after {

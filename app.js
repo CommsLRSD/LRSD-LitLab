@@ -522,7 +522,8 @@ function toggleFAQ(element) {
 const VF_CONSTANTS = {
     CONNECTION_DISTANCE: 120,         // Distance for horizontal connection line (approximately 3rem gap)
     BEZIER_CONTROL_OFFSET: 40,        // Offset for horizontal bezier curve control points
-    ANIMATION_PROGRESS_INCREMENT: 0.05, // Progress increment for dot animation (increased for faster animation)
+    ANIMATION_PROGRESS_INCREMENT: 0.06, // Progress increment for dot animation (increased for faster animation)
+    LINE_ANIMATION_DURATION: 250,     // Duration of line drawing animation in milliseconds
     SCROLL_DELAY: 100,                // Delay before scrolling to new node
     SCROLL_ANIMATION_DURATION: 600,   // Duration of smooth scroll animation in milliseconds
     PATH_LENGTH_FALLBACK: 100,        // Fallback for SVG path length
@@ -1384,6 +1385,8 @@ function proceedFromChecklist(fromNodeId, toNodeId) {
     const fromNode = document.querySelector(`[data-node-id="${fromNodeId}"]`);
     if (fromNode) {
         fromNode.classList.add('vf-node-completed');
+        // Add click handler to return to this step
+        fromNode.addEventListener('click', () => returnToStep(fromNodeId));
         // Disable interactions on completed node
         const btn = fromNode.querySelector('.vf-continue-btn');
         if (btn) btn.disabled = true;
@@ -1398,6 +1401,8 @@ function proceedFromInfo(fromNodeId, toNodeId) {
     const fromNode = document.querySelector(`[data-node-id="${fromNodeId}"]`);
     if (fromNode) {
         fromNode.classList.add('vf-node-completed');
+        // Add click handler to return to this step
+        fromNode.addEventListener('click', () => returnToStep(fromNodeId));
         const btn = fromNode.querySelector('.vf-continue-btn');
         if (btn) btn.disabled = true;
     }
@@ -1410,6 +1415,8 @@ function selectFlowchartOption(nodeId, optionId, optionName, handlerName) {
     const node = document.querySelector(`[data-node-id="${nodeId}"]`);
     if (node) {
         node.classList.add('vf-node-completed');
+        // Add click handler to return to this step
+        node.addEventListener('click', () => returnToStep(nodeId));
         // Highlight selected option
         const options = node.querySelectorAll('.vf-selection-option');
         options.forEach(opt => {
@@ -1437,6 +1444,8 @@ function makeDecision(nodeId, choiceId, nextNodeId) {
     const node = document.querySelector(`[data-node-id="${nodeId}"]`);
     if (node) {
         node.classList.add('vf-node-completed');
+        // Add click handler to return to this step
+        node.addEventListener('click', () => returnToStep(nodeId));
         // Highlight selected choice
         const choices = node.querySelectorAll('.vf-decision-btn');
         choices.forEach(ch => {
@@ -1514,6 +1523,80 @@ function updateProgressIndicator() {
     if (progressText) {
         progressText.textContent = `Step ${pathLength}`;
     }
+}
+
+// Return to a previous step in the flowchart
+function returnToStep(nodeId) {
+    // Find the index of this node in the path
+    const pathIndex = appState.visualFlowchart.selectedPath.findIndex(step => step.nodeId === nodeId);
+    
+    if (pathIndex === -1) return; // Node not found in path
+    
+    // If this is the current node, do nothing
+    if (appState.visualFlowchart.currentNodeId === nodeId) return;
+    
+    // Remove all nodes after this one from the DOM
+    const allNodes = document.querySelectorAll('.vf-node');
+    const nodesToRemove = [];
+    
+    allNodes.forEach(node => {
+        const dataNodeId = node.getAttribute('data-node-id');
+        const nodePathIndex = appState.visualFlowchart.selectedPath.findIndex(step => step.nodeId === dataNodeId);
+        if (nodePathIndex > pathIndex) {
+            nodesToRemove.push(node);
+        }
+    });
+    
+    nodesToRemove.forEach(node => node.remove());
+    
+    // Remove connections after this node
+    const connections = document.querySelectorAll('.vf-connection-path, .vf-connection-dot');
+    connections.forEach(conn => {
+        const connId = conn.getAttribute('id');
+        if (connId) {
+            // Check if this connection is after the target node
+            const pathIds = connId.split('-').filter(part => part.startsWith('node'));
+            if (pathIds.length >= 2) {
+                const fromId = pathIds[0];
+                const fromIndex = appState.visualFlowchart.selectedPath.findIndex(step => step.nodeId === fromId);
+                if (fromIndex > pathIndex) {
+                    conn.remove();
+                }
+            }
+        }
+    });
+    
+    // Update the path - remove steps after this one
+    appState.visualFlowchart.selectedPath = appState.visualFlowchart.selectedPath.slice(0, pathIndex + 1);
+    appState.visualFlowchart.currentNodeId = nodeId;
+    
+    // Remove completed class from the clicked node and re-enable it
+    const targetNode = document.querySelector(`[data-node-id="${nodeId}"]`);
+    if (targetNode) {
+        targetNode.classList.remove('vf-node-completed');
+        
+        // Re-enable buttons and options
+        const btn = targetNode.querySelector('.vf-continue-btn');
+        if (btn) btn.disabled = false;
+        
+        const options = targetNode.querySelectorAll('.vf-selection-option');
+        options.forEach(opt => opt.classList.remove('vf-option-disabled'));
+        
+        const choices = targetNode.querySelectorAll('.vf-decision-btn');
+        choices.forEach(ch => ch.classList.remove('vf-decision-disabled'));
+        
+        const checkboxes = targetNode.querySelectorAll('.vf-checklist-item input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = false);
+        if (btn) {
+            btn.disabled = true; // Disable continue button until items are checked again
+        }
+    }
+    
+    // Update progress indicator
+    updateProgressIndicator();
+    
+    // Scroll to the node
+    scrollToNode(nodeId);
 }
 
 // Close visual flowchart
