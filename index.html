@@ -754,6 +754,31 @@
         <p>© 2025 Literacy Pal · Supporting educators in literacy intervention</p>
     </footer>
 
+    <!-- Flowchart Review Modal -->
+    <div class="modal-overlay" id="review-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>
+                    <svg class="modal-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                    Flowchart Review
+                </h2>
+                <button class="modal-close-btn" onclick="closeReviewModal()" aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="review-modal-body">
+                <!-- Review content will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn-secondary" onclick="closeReviewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>

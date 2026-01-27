@@ -1323,6 +1323,12 @@ function createEndpointNode(nodeData) {
             <div class="vf-endpoint-actions">
                 ${actionButtonHTML}
                 ${secondaryActionHTML}
+                <button class="vf-action-btn vf-action-secondary" onclick="openReviewModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; margin-right: 6px;">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                    View Flowchart Review
+                </button>
                 <button class="vf-action-btn vf-action-close" onclick="closeVisualFlowchart()">
                     Return to Interventions
                 </button>
@@ -1553,6 +1559,172 @@ function restartTier2Visual() {
         initVisualFlowchart('tier2');
     }, 300);
 }
+
+// ============================================
+// Flowchart Review Modal
+// ============================================
+
+// Open the review modal and display the flowchart path summary
+function openReviewModal() {
+    const modal = document.getElementById('review-modal');
+    const modalBody = document.getElementById('review-modal-body');
+    
+    if (!modal || !modalBody) {
+        console.error('Review modal elements not found');
+        return;
+    }
+    
+    // Generate review content
+    const reviewContent = generateReviewContent();
+    modalBody.innerHTML = reviewContent;
+    
+    // Show modal
+    modal.classList.add('active');
+    
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+}
+
+// Close the review modal
+function closeReviewModal() {
+    const modal = document.getElementById('review-modal');
+    
+    if (!modal) return;
+    
+    modal.classList.remove('active');
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
+}
+
+// Generate review content from the selected path
+function generateReviewContent() {
+    const { selectedPath, tierId } = appState.visualFlowchart;
+    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    
+    if (!selectedPath || selectedPath.length === 0) {
+        return '<p class="review-intro">No flowchart path available to review.</p>';
+    }
+    
+    // Get tier name
+    const tierName = flowchartDef?.title || `Tier ${tierId.replace('tier', '')}`;
+    
+    // Build the review steps
+    let reviewHTML = `
+        <p class="review-intro">
+            Here's a summary of your path through the <strong>${tierName}</strong> flowchart. 
+            This overview shows the decisions you made and the outcome.
+        </p>
+        <div class="review-path">
+    `;
+    
+    selectedPath.forEach((pathItem, index) => {
+        const nodeData = flowchartDef.nodes[pathItem.nodeId];
+        
+        if (!nodeData) return;
+        
+        const stepNumber = index + 1;
+        const isEndpoint = nodeData.type === 'endpoint';
+        const stepClass = isEndpoint ? 'review-step endpoint' : 'review-step';
+        
+        let stepTitle = '';
+        let stepValue = '';
+        let stepDescription = '';
+        
+        switch (nodeData.type) {
+            case 'checklist':
+                stepTitle = nodeData.title;
+                stepValue = nodeData.subtitle;
+                stepDescription = `Reviewed ${nodeData.items.length} principles`;
+                break;
+                
+            case 'selection':
+                stepTitle = nodeData.title;
+                // Find the selected option
+                if (pathItem.choiceId) {
+                    const tierData = appState.tierFlowchartData?.[tierId];
+                    const options = tierData?.[nodeData.options] || [];
+                    const selectedOption = options.find(opt => opt.id === pathItem.choiceId);
+                    if (selectedOption) {
+                        stepValue = selectedOption.name;
+                        stepDescription = selectedOption.description;
+                    } else {
+                        stepValue = 'Selection made';
+                    }
+                } else {
+                    stepValue = nodeData.subtitle;
+                }
+                break;
+                
+            case 'decision':
+                stepTitle = nodeData.title;
+                // Find the selected choice
+                if (pathItem.choiceId && nodeData.choices) {
+                    const choice = nodeData.choices.find(c => c.id === pathItem.choiceId);
+                    if (choice) {
+                        stepValue = choice.label;
+                        stepDescription = choice.sublabel || '';
+                    } else {
+                        stepValue = 'Decision made';
+                    }
+                } else {
+                    stepValue = nodeData.subtitle;
+                }
+                break;
+                
+            case 'info':
+                stepTitle = nodeData.title;
+                stepValue = nodeData.subtitle;
+                break;
+                
+            case 'endpoint':
+                stepTitle = 'Final Outcome';
+                stepValue = nodeData.title;
+                stepDescription = nodeData.description;
+                break;
+                
+            default:
+                stepTitle = nodeData.title || 'Step';
+                stepValue = nodeData.subtitle || nodeData.description || '';
+                break;
+        }
+        
+        reviewHTML += `
+            <div class="${stepClass}">
+                <div class="review-step-number">${stepNumber}</div>
+                <div class="review-step-content">
+                    <div class="review-step-title">${stepTitle}</div>
+                    <div class="review-step-value">${stepValue}</div>
+                    ${stepDescription ? `<div class="review-step-description">${stepDescription}</div>` : ''}
+                </div>
+            </div>
+        `;
+    });
+    
+    reviewHTML += '</div>';
+    
+    return reviewHTML;
+}
+
+// Close modal when clicking outside (using event delegation for efficiency)
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('review-modal');
+    // Only process if modal is active
+    if (modal && modal.classList.contains('active') && e.target === modal) {
+        closeReviewModal();
+    }
+});
+
+// Close modal on Escape key (using event delegation for efficiency)
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('review-modal');
+        // Only process if modal is active
+        if (modal && modal.classList.contains('active')) {
+            closeReviewModal();
+        }
+    }
+});
 
 // ============================================
 // Tier Flowchart Functions (Legacy - Now using Visual Flowchart)
