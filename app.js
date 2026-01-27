@@ -45,6 +45,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize flowchart
     initializeFlowchart();
     
+    // Add resize listener to update connection line positions
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            updateConnectionLinePositions();
+        }, 150); // Debounce resize events
+    });
+    
     console.log('Literacy Pal - Ready!');
 });
 
@@ -955,6 +964,10 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     const pathId = `path-${fromNodeId}-${toNodeId}`;
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     
+    // Store connection metadata for repositioning
+    path.setAttribute('data-from-node', fromNodeId);
+    path.setAttribute('data-to-node', toNodeId);
+    
     // Create a curved path
     const controlPointOffset = VF_CONSTANTS.BEZIER_CONTROL_OFFSET;
     const d = `M ${startX} ${startY} C ${startX + controlPointOffset} ${startY} ${endX - controlPointOffset} ${endY} ${endX} ${endY}`;
@@ -1031,6 +1044,42 @@ function getPointOnPath(x1, y1, x2, y2, t, offset) {
         x: mt3 * x1 + 3 * mt2 * t * cx1 + 3 * mt * t2 * cx2 + t3 * x2,
         y: mt3 * y1 + 3 * mt2 * t * cy1 + 3 * mt * t2 * cy2 + t3 * y2
     };
+}
+
+// Update all connection line positions (called on resize)
+function updateConnectionLinePositions() {
+    const connectionsContainer = document.getElementById('vf-connections');
+    if (!connectionsContainer) return;
+    
+    const paths = connectionsContainer.querySelectorAll('.vf-connection-path');
+    const containerRect = connectionsContainer.getBoundingClientRect();
+    
+    paths.forEach(path => {
+        const fromNodeId = path.getAttribute('data-from-node');
+        const toNodeId = path.getAttribute('data-to-node');
+        
+        if (!fromNodeId || !toNodeId) return;
+        
+        const fromNode = document.querySelector(`[data-node-id="${fromNodeId}"]`);
+        const toNode = document.querySelector(`[data-node-id="${toNodeId}"]`);
+        
+        if (!fromNode || !toNode) return;
+        
+        const fromRect = fromNode.getBoundingClientRect();
+        const toRect = toNode.getBoundingClientRect();
+        
+        // Calculate new positions
+        const startX = fromRect.right - containerRect.left;
+        const startY = fromRect.top + fromRect.height / 2 - containerRect.top;
+        const endX = toRect.left - containerRect.left;
+        const endY = toRect.top + toRect.height / 2 - containerRect.top;
+        
+        // Update path
+        const controlPointOffset = VF_CONSTANTS.BEZIER_CONTROL_OFFSET;
+        const d = `M ${startX} ${startY} C ${startX + controlPointOffset} ${startY} ${endX - controlPointOffset} ${endY} ${endX} ${endY}`;
+        
+        path.setAttribute('d', d);
+    });
 }
 
 // Create node element based on type
