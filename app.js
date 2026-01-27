@@ -522,7 +522,7 @@ function toggleFAQ(element) {
 const VF_CONSTANTS = {
     CONNECTION_DISTANCE: 120,         // Distance for horizontal connection line (approximately 3rem gap)
     BEZIER_CONTROL_OFFSET: 40,        // Offset for horizontal bezier curve control points
-    ANIMATION_PROGRESS_INCREMENT: 0.02, // Progress increment for dot animation
+    ANIMATION_PROGRESS_INCREMENT: 0.03, // Progress increment for dot animation (increased for faster animation)
     SCROLL_DELAY: 100,                // Delay before scrolling to new node
     PATH_LENGTH_FALLBACK: 100         // Fallback for SVG path length
 };
@@ -874,6 +874,15 @@ function initVisualFlowchart(tierId) {
         </div>
     `;
     
+    // Add horizontal-only scroll behavior
+    const canvas = document.getElementById('vf-canvas');
+    if (canvas) {
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            canvas.scrollLeft += e.deltaY;
+        }, { passive: false });
+    }
+    
     // Show the first node
     showFlowchartNode(flowchartDef.startNode, null);
 }
@@ -962,7 +971,7 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     
     // Animate the line drawing
     requestAnimationFrame(() => {
-        path.style.transition = 'stroke-dashoffset 0.6s ease-out';
+        path.style.transition = 'stroke-dashoffset 0.4s ease-out';
         path.style.strokeDashoffset = '0';
     });
     

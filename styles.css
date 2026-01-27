@@ -2877,6 +2877,13 @@ h1, h2, h3, h4, h5, h6 {
     overflow-y: hidden;
 }
 
+/* Increased margins for full screen desktop */
+@media (min-width: 1024px) {
+    .visual-flowchart-canvas {
+        padding: 3rem;
+    }
+}
+
 .vf-connections {
     position: absolute;
     top: 0;
