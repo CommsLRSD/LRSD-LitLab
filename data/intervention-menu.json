@@ -1002,7 +1002,13 @@
       "literacy_pillar": "Alphabetic Principle",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": "(SharePoint)"
+      "url": "(SharePoint)",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Alphabetic Principle"
+      ]
     },
     {
       "item_id": "ASSESS-002",
@@ -1016,7 +1022,13 @@
       "literacy_pillar": "Phonics",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": "(SharePoint)"
+      "url": "(SharePoint)",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Phonics"
+      ]
     },
     {
       "item_id": "ASSESS-003",
@@ -1030,7 +1042,13 @@
       "literacy_pillar": "Phonics",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": "(SharePoint)"
+      "url": "(SharePoint)",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Phonics"
+      ]
     },
     {
       "item_id": "ASSESS-004",
@@ -1044,7 +1062,13 @@
       "literacy_pillar": "Alphabetic Principle",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": "(SharePoint)"
+      "url": "(SharePoint)",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Alphabetic Principle"
+      ]
     },
     {
       "item_id": "ASSESS-005",
@@ -1058,7 +1082,13 @@
       "literacy_pillar": "Alphabetic Principle",
       "evidence_level": "**",
       "assessment_type": "Diagnostic",
-      "url": "(SharePoint)"
+      "url": "(SharePoint)",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Alphabetic Principle"
+      ]
     },
     {
       "item_id": "ASSESS-006",
@@ -1072,7 +1102,13 @@
       "literacy_pillar": "Alphabetic Principle",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": "(SharePoint)"
+      "url": "(SharePoint)",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Alphabetic Principle"
+      ]
     },
     {
       "item_id": "ASSESS-007",
@@ -1086,7 +1122,13 @@
       "literacy_pillar": "Alphabetic Principle",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": "(SharePoint)"
+      "url": "(SharePoint)",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Alphabetic Principle"
+      ]
     },
     {
       "item_id": "ASSESS-008",
@@ -1100,7 +1142,13 @@
       "literacy_pillar": "Phonics",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": "(SharePoint)"
+      "url": "(SharePoint)",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Phonics"
+      ]
     },
     {
       "item_id": "ASSESS-009",
@@ -1114,7 +1162,13 @@
       "literacy_pillar": "Alphabetic Principle",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": ""
+      "url": "",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Alphabetic Principle"
+      ]
     },
     {
       "item_id": "ASSESS-010",
@@ -1128,7 +1182,13 @@
       "literacy_pillar": "Alphabetic Principle",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": ""
+      "url": "",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Alphabetic Principle"
+      ]
     },
     {
       "item_id": "ASSESS-011",
@@ -1142,7 +1202,13 @@
       "literacy_pillar": "Phonemic Awareness",
       "evidence_level": "**",
       "assessment_type": "Diagnostic",
-      "url": "https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program"
+      "url": "https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program",
+      "tiers": [
+        3
+      ],
+      "literacy_pillars": [
+        "Phonemic Awareness"
+      ]
     },
     {
       "item_id": "ASSESS-012",
@@ -1156,7 +1222,13 @@
       "literacy_pillar": "Orthography",
       "evidence_level": "none",
       "assessment_type": "Diagnostic",
-      "url": "https://lindamoodbell.com/program/seeing-stars-program"
+      "url": "https://lindamoodbell.com/program/seeing-stars-program",
+      "tiers": [
+        3
+      ],
+      "literacy_pillars": [
+        "Orthography"
+      ]
     },
     {
       "item_id": "ASSESS-013",
@@ -1170,7 +1242,13 @@
       "literacy_pillar": "Orthography",
       "evidence_level": "**",
       "assessment_type": "Diagnostic",
-      "url": "https://bartonreading.com/"
+      "url": "https://bartonreading.com/",
+      "tiers": [
+        3
+      ],
+      "literacy_pillars": [
+        "Orthography"
+      ]
     },
     {
       "item_id": "ASSESS-014",
@@ -1184,7 +1262,13 @@
       "literacy_pillar": "Phonemic Awareness",
       "evidence_level": "**",
       "assessment_type": "Diagnostic",
-      "url": ""
+      "url": "",
+      "tiers": [
+        3
+      ],
+      "literacy_pillars": [
+        "Phonemic Awareness"
+      ]
     },
     {
       "item_id": "ASSESS-015",
@@ -1198,7 +1282,13 @@
       "literacy_pillar": "Reading Fluency",
       "evidence_level": "*",
       "assessment_type": "Diagnostic",
-      "url": "(Nelson)"
+      "url": "(Nelson)",
+      "tiers": [
+        2
+      ],
+      "literacy_pillars": [
+        "Reading Fluency"
+      ]
     }
   ],
   "literacy_pillars": [
