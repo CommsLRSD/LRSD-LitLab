@@ -1792,6 +1792,159 @@ h1, h2, h3, h4, h5, h6 {
     height: 100%;
 }
 
+/* Interventions Options Grid */
+.interventions-options {
+    padding: 2rem;
+}
+
+.interventions-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.intervention-option-card {
+    position: relative;
+    padding: 2rem;
+    background: var(--bg-primary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: var(--transition-slow);
+    text-align: left;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.intervention-option-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.intervention-option-card:hover::before {
+    transform: scaleX(1);
+}
+
+.intervention-option-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.intervention-option-card:focus,
+.intervention-option-card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    border-color: var(--primary);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.intervention-option-card .option-icon {
+    width: 56px;
+    height: 56px;
+    padding: 1rem;
+    background: var(--bg-accent);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.25rem;
+    color: var(--primary);
+    transition: var(--transition);
+}
+
+.intervention-option-card:hover .option-icon {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1) rotate(5deg);
+}
+
+.intervention-option-card .option-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.intervention-option-card h3 {
+    font-size: 1.375rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.intervention-option-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    flex: 1;
+}
+
+.intervention-option-card .card-arrow {
+    width: 24px;
+    height: 24px;
+    color: var(--primary);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: var(--transition);
+}
+
+.intervention-option-card:hover .card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.intervention-option-card .card-arrow svg {
+    width: 100%;
+    height: 100%;
+}
+
+.interventions-detail-view {
+    padding: 2rem;
+}
+
+.interventions-detail-view .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.interventions-detail-view .back-button:hover {
+    background: var(--bg-primary);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateX(-4px);
+}
+
+.interventions-detail-view .back-button:focus,
+.interventions-detail-view .back-button:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    background: var(--bg-primary);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.interventions-detail-view .back-button svg {
+    width: 18px;
+    height: 18px;
+}
+
 .feedback-section {
     text-align: center;
     padding: 1.5rem;
