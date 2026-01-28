@@ -210,15 +210,15 @@
                 <p class="section-subtitle">Search for literacy interventions and drill-down assessments based on your screening results</p>
                 
                 <!-- View Toggle -->
-                <div class="view-toggle-container" style="margin-top: 1.5rem;">
+                <div class="view-toggle-container">
                     <button id="menu-view-btn" class="view-toggle-btn active" onclick="showInterventionView('menu')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; margin-right: 0.5rem;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
                         Menu
                     </button>
                     <button id="flowchart-view-btn" class="view-toggle-btn" onclick="showInterventionView('flowchart')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; margin-right: 0.5rem;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M12 5l0 14M12 5l-7 7M12 5l7 7"/>
                         </svg>
                         Flowchart
@@ -278,8 +278,8 @@
                     </div>
 
                     <div class="filter-actions-compact">
-                        <button id="search-btn" class="btn-primary" style="padding: 0.75rem 1.5rem;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; margin-right: 0.5rem;">
+                        <button id="search-btn" class="btn-primary btn-search">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <circle cx="11" cy="11" r="8"/>
                                 <path d="M21 21l-4.35-4.35"/>
                             </svg>
@@ -316,7 +316,7 @@
             </div>
             
             <!-- Flowchart View Container -->
-            <div id="flowchart-container" style="display: none;"></div>
+            <div id="flowchart-container" class="flowchart-view-hidden"></div>
         </section>
 
         <!-- Assessment Schedules Section -->

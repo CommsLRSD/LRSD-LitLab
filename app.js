@@ -3063,13 +3063,13 @@ function showInterventionView(view) {
     const flowchartBtn = document.getElementById('flowchart-view-btn');
     
     if (view === 'menu') {
-        if (menuView) menuView.style.display = 'block';
-        if (flowchartView) flowchartView.style.display = 'none';
+        if (menuView) menuView.classList.remove('flowchart-view-hidden');
+        if (flowchartView) flowchartView.classList.add('flowchart-view-hidden');
         if (menuBtn) menuBtn.classList.add('active');
         if (flowchartBtn) flowchartBtn.classList.remove('active');
     } else if (view === 'flowchart') {
-        if (menuView) menuView.style.display = 'none';
-        if (flowchartView) flowchartView.style.display = 'block';
+        if (menuView) menuView.classList.add('flowchart-view-hidden');
+        if (flowchartView) flowchartView.classList.remove('flowchart-view-hidden');
         if (menuBtn) menuBtn.classList.remove('active');
         if (flowchartBtn) flowchartBtn.classList.add('active');
         
@@ -3281,7 +3281,7 @@ function displayCompactResults(results, filters) {
                             <div class="result-info"><strong>Type:</strong> ${item.assessment_type}</div>
                         `}
                     </div>
-                    ${item.url && item.url !== '(local resource)' && item.url !== '(SharePoint)' && item.url !== '(Nelson)' ? `
+                    ${item.url && item.url !== '' && item.url !== '(local resource)' && item.url !== '(SharePoint)' && item.url !== '(Nelson)' ? `
                         <a href="${item.url}" target="_blank" class="result-link-compact">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
@@ -3290,14 +3290,14 @@ function displayCompactResults(results, filters) {
                             </svg>
                             View Resource
                         </a>
-                    ` : `
+                    ` : item.url && item.url !== '' ? `
                         <div class="result-local-compact">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                             ${item.url}
                         </div>
-                    `}
+                    ` : ''}
                 </div>
             `).join('')}
         </div>

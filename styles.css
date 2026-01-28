@@ -2019,6 +2019,17 @@ h1, h2, h3, h4, h5, h6 {
 .view-toggle-btn svg {
     width: 20px;
     height: 20px;
+    margin-right: 0.5rem;
+}
+
+/* Search button specific styling */
+.btn-search {
+    padding: 0.75rem 1.5rem;
+}
+
+/* Flowchart view hidden state */
+.flowchart-view-hidden {
+    display: none;
 }
 
 .tier-landing-compact {
