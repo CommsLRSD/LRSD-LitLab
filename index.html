@@ -205,26 +205,88 @@
         
         <!-- Interventions Section with Filterable Menu -->
         <section id="interventions-section" class="content-section">
-            <div class="interventions-header-compact">
-                <h2 class="section-title">Interventions & Assessments</h2>
-                <p class="section-subtitle">Search for literacy interventions and drill-down assessments based on your screening results</p>
+            <!-- Interventions Options Screen -->
+            <div id="interventions-options-screen" class="interventions-options">
+                <div class="interventions-header-compact">
+                    <h2 class="section-title">Interventions & Assessments</h2>
+                    <p class="section-subtitle">Choose how you would like to access interventions and assessments</p>
+                </div>
                 
-                <!-- View Toggle -->
-                <div class="view-toggle-container">
-                    <button id="menu-view-btn" class="view-toggle-btn active" onclick="showInterventionView('menu')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                        Menu
+                <div class="interventions-options-grid">
+                    <button class="intervention-option-card" onclick="openTierFlowchart('tier1')">
+                        <div class="option-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5l0 14M12 5l-7 7M12 5l7 7"/>
+                            </svg>
+                        </div>
+                        <h3>Tier 1 Flowchart</h3>
+                        <p>Universal screening and core instruction guidance</p>
+                        <div class="card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
                     </button>
-                    <button id="flowchart-view-btn" class="view-toggle-btn" onclick="showInterventionView('flowchart')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path d="M12 5l0 14M12 5l-7 7M12 5l7 7"/>
-                        </svg>
-                        Flowchart
+
+                    <button class="intervention-option-card" onclick="openTierFlowchart('tier2')">
+                        <div class="option-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5l0 14M12 5l-7 7M12 5l7 7"/>
+                            </svg>
+                        </div>
+                        <h3>Tier 2 Flowchart</h3>
+                        <p>Small group intervention resources and decision tree</p>
+                        <div class="card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <button class="intervention-option-card" onclick="openTierFlowchart('tier3')">
+                        <div class="option-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5l0 14M12 5l-7 7M12 5l7 7"/>
+                            </svg>
+                        </div>
+                        <h3>Tier 3 Flowchart</h3>
+                        <p>Intensive individual intervention support and guidance</p>
+                        <div class="card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <button class="intervention-option-card" onclick="openInterventionsMenuView()">
+                        <div class="option-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </div>
+                        <h3>Interventions Menu</h3>
+                        <p>Search and filter interventions and assessments by criteria</p>
+                        <div class="card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
                     </button>
                 </div>
             </div>
+
+            <!-- Interventions Menu View (hidden by default) -->
+            <div id="interventions-menu-full-view" class="interventions-detail-view" style="display: none;">
+                <div class="interventions-header-compact">
+                    <button class="back-button" onclick="returnToInterventionsOptions()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Back to Options
+                    </button>
+                    <h2 class="section-title">Interventions & Assessments Menu</h2>
+                    <p class="section-subtitle">Search for literacy interventions and drill-down assessments based on your screening results</p>
+                </div>
 
             <div class="intervention-menu-container" id="intervention-menu-view">
                 <!-- Compact Filter Bar -->
@@ -317,6 +379,7 @@
             
             <!-- Flowchart View Container -->
             <div id="flowchart-container" class="flowchart-view-hidden"></div>
+            </div>
         </section>
 
         <!-- Assessment Schedules Section -->

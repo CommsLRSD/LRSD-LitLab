@@ -2826,14 +2826,12 @@ function closeTierFlowchart() {
     const container = document.getElementById('flowchart-container');
     if (container) {
         container.classList.add('flowchart-hidden');
+        container.style.display = 'none';
         container.innerHTML = '';
     }
     
-    // Scroll back to tier cards
-    const interventionsSection = document.getElementById('interventions-section');
-    if (interventionsSection) {
-        interventionsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Return to interventions options screen
+    returnToInterventionsOptions();
 }
 
 function openInterventionsMenu(tier, mode = 'interventions') {
@@ -3342,6 +3340,102 @@ function resetInterventionMenu() {
 }
 
 // ============================================
+// Interventions Options Screen Functions
+// ============================================
+function openTierFlowchart(tierName) {
+    console.log(`Opening ${tierName} flowchart directly`);
+    
+    // Hide the options screen
+    const optionsScreen = document.getElementById('interventions-options-screen');
+    if (optionsScreen) {
+        optionsScreen.style.display = 'none';
+    }
+    
+    // Hide the menu view
+    const menuView = document.getElementById('interventions-menu-full-view');
+    if (menuView) {
+        menuView.style.display = 'none';
+    }
+    
+    // Show and initialize the flowchart container
+    const flowchartContainer = document.getElementById('flowchart-container');
+    if (flowchartContainer) {
+        flowchartContainer.classList.remove('flowchart-view-hidden');
+        flowchartContainer.style.display = 'block';
+    }
+    
+    // Start the appropriate tier flowchart
+    if (tierName === 'tier1') {
+        startTier1Flowchart();
+    } else if (tierName === 'tier2') {
+        startTier2Flowchart();
+    } else if (tierName === 'tier3') {
+        startTier3Flowchart();
+    }
+    
+    // Scroll to the top of the flowchart
+    if (flowchartContainer) {
+        flowchartContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function openInterventionsMenuView() {
+    console.log('Opening Interventions Menu View');
+    
+    // Hide the options screen
+    const optionsScreen = document.getElementById('interventions-options-screen');
+    if (optionsScreen) {
+        optionsScreen.style.display = 'none';
+    }
+    
+    // Show the menu view
+    const menuView = document.getElementById('interventions-menu-full-view');
+    if (menuView) {
+        menuView.style.display = 'block';
+    }
+    
+    // Hide the flowchart
+    const flowchartContainer = document.getElementById('flowchart-container');
+    if (flowchartContainer) {
+        flowchartContainer.classList.add('flowchart-view-hidden');
+        flowchartContainer.style.display = 'none';
+    }
+    
+    // Scroll to the menu view
+    if (menuView) {
+        menuView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function returnToInterventionsOptions() {
+    console.log('Returning to Interventions Options');
+    
+    // Show the options screen
+    const optionsScreen = document.getElementById('interventions-options-screen');
+    if (optionsScreen) {
+        optionsScreen.style.display = 'block';
+    }
+    
+    // Hide the menu view
+    const menuView = document.getElementById('interventions-menu-full-view');
+    if (menuView) {
+        menuView.style.display = 'none';
+    }
+    
+    // Hide the flowchart
+    const flowchartContainer = document.getElementById('flowchart-container');
+    if (flowchartContainer) {
+        flowchartContainer.classList.add('flowchart-view-hidden');
+        flowchartContainer.style.display = 'none';
+    }
+    
+    // Scroll to the options screen
+    if (optionsScreen) {
+        optionsScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// ============================================
 // Export for global use
 // ============================================
 window.navigateToPage = navigateToPage;
@@ -3401,3 +3495,7 @@ window.startTier3Visual = startTier3Visual;
 window.restartTier1Visual = restartTier1Visual;
 window.restartTier2Visual = restartTier2Visual;
 window.showInterventionView = showInterventionView;
+window.openTierFlowchart = openTierFlowchart;
+window.openInterventionsMenuView = openInterventionsMenuView;
+window.returnToInterventionsOptions = returnToInterventionsOptions;
+
