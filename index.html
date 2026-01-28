@@ -211,93 +211,65 @@
             </div>
 
             <div class="intervention-menu-container">
-                <!-- Filter Controls -->
-                <div class="filter-panel">
-                    <div class="filter-step">
-                        <h3 class="filter-step-title">
-                            <span class="step-number">1</span>
-                            Select Language
-                        </h3>
-                        <div class="filter-options">
-                            <label class="radio-option">
-                                <input type="radio" name="language" value="English" checked>
-                                <span>English</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="language" value="French">
-                                <span>French Immersion</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="filter-step">
-                        <h3 class="filter-step-title">
-                            <span class="step-number">2</span>
-                            Select Screener
-                        </h3>
-                        <select id="screener-select" class="filter-select">
-                            <option value="">Choose a screener...</option>
+                <!-- Compact Filter Bar -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label class="filter-label">Tier</label>
+                        <select id="tier-select" class="filter-select-compact">
+                            <option value="">All Tiers</option>
+                            <option value="1">Tier 1</option>
+                            <option value="2">Tier 2</option>
+                            <option value="3">Tier 3</option>
                         </select>
                     </div>
 
-                    <div class="filter-step" id="subtest-filter" style="display: none;">
-                        <h3 class="filter-step-title">
-                            <span class="step-number">3</span>
-                            Select Subtest
-                        </h3>
-                        <select id="subtest-select" class="filter-select">
-                            <option value="">Choose a subtest...</option>
+                    <div class="filter-group">
+                        <label class="filter-label">Language</label>
+                        <select id="language-select" class="filter-select-compact">
+                            <option value="English">English</option>
+                            <option value="French">French</option>
                         </select>
-                        <div id="subtest-info" class="subtest-info"></div>
                     </div>
 
-                    <div class="filter-step" id="pillar-filter" style="display: none;">
-                        <h3 class="filter-step-title">
-                            <span class="step-number">4</span>
-                            Select Literacy Pillar
-                        </h3>
-                        <div id="pillar-options" class="filter-options"></div>
+                    <div class="filter-group">
+                        <label class="filter-label">Screener</label>
+                        <select id="screener-select" class="filter-select-compact">
+                            <option value="">All Screeners</option>
+                        </select>
                     </div>
 
-                    <div class="filter-step" id="type-filter" style="display: none;">
-                        <h3 class="filter-step-title">
-                            <span class="step-number">5</span>
-                            Choose Item Type
-                        </h3>
-                        <div class="filter-options">
-                            <label class="radio-option">
-                                <input type="radio" name="item-type" value="Assessment">
-                                <span>
-                                    <strong>Assessment</strong>
-                                    <small>Drill-down diagnostic tools</small>
-                                </span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="item-type" value="Intervention">
-                                <span>
-                                    <strong>Intervention</strong>
-                                    <small>Instructional programs</small>
-                                </span>
-                            </label>
-                        </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Subtest</label>
+                        <select id="subtest-select" class="filter-select-compact">
+                            <option value="">All Subtests</option>
+                        </select>
                     </div>
 
-                    <div class="filter-actions">
-                        <button id="search-btn" class="btn-primary" disabled>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"/>
-                                <path d="M21 21l-4.35-4.35"/>
-                            </svg>
-                            View Results
-                        </button>
-                        <button id="reset-btn" class="btn-secondary">
+                    <div class="filter-group">
+                        <label class="filter-label">Literacy Pillar</label>
+                        <select id="pillar-select" class="filter-select-compact">
+                            <option value="">All Pillars</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Type</label>
+                        <select id="type-select" class="filter-select-compact">
+                            <option value="">All Types</option>
+                            <option value="Assessment">Assessment</option>
+                            <option value="Intervention">Intervention</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-actions-compact">
+                        <button id="reset-btn" class="btn-reset-compact" title="Reset all filters">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
                                 <path d="M21 3v5h-5"/>
                                 <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
                                 <path d="M3 21v-5h5"/>
                             </svg>
-                            Reset Filters
+                            Reset
                         </button>
                     </div>
                 </div>
