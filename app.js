@@ -2991,7 +2991,7 @@ function initializeInterventionMenu() {
     const tierSelect = document.getElementById('tier-select');
     if (tierSelect) {
         tierSelect.addEventListener('change', () => {
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3001,7 +3001,7 @@ function initializeInterventionMenu() {
         languageSelect.addEventListener('change', (e) => {
             appState.interventionMenu.language = e.target.value;
             updateScreenerOptions();
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3010,7 +3010,7 @@ function initializeInterventionMenu() {
     if (screenerSelect) {
         screenerSelect.addEventListener('change', (e) => {
             updateSubtestOptions();
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3018,7 +3018,7 @@ function initializeInterventionMenu() {
     const subtestSelect = document.getElementById('subtest-select');
     if (subtestSelect) {
         subtestSelect.addEventListener('change', () => {
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3026,7 +3026,7 @@ function initializeInterventionMenu() {
     const pillarSelect = document.getElementById('pillar-select');
     if (pillarSelect) {
         pillarSelect.addEventListener('change', () => {
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3034,8 +3034,14 @@ function initializeInterventionMenu() {
     const typeSelect = document.getElementById('type-select');
     if (typeSelect) {
         typeSelect.addEventListener('change', () => {
-            performCompactSearch();
+            // Don't auto-search anymore
         });
+    }
+
+    // Search button
+    const searchBtn = document.getElementById('search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', performCompactSearch);
     }
 
     // Reset button
@@ -3044,8 +3050,34 @@ function initializeInterventionMenu() {
         resetBtn.addEventListener('click', resetInterventionMenu);
     }
 
-    // Initial search to show all items
-    performCompactSearch();
+    // Don't perform initial search - let user make choices first
+}
+
+// ============================================
+// View Toggle for Interventions Section
+// ============================================
+function showInterventionView(view) {
+    const menuView = document.getElementById('intervention-menu-view');
+    const flowchartView = document.getElementById('flowchart-container');
+    const menuBtn = document.getElementById('menu-view-btn');
+    const flowchartBtn = document.getElementById('flowchart-view-btn');
+    
+    if (view === 'menu') {
+        if (menuView) menuView.style.display = 'block';
+        if (flowchartView) flowchartView.style.display = 'none';
+        if (menuBtn) menuBtn.classList.add('active');
+        if (flowchartBtn) flowchartBtn.classList.remove('active');
+    } else if (view === 'flowchart') {
+        if (menuView) menuView.style.display = 'none';
+        if (flowchartView) flowchartView.style.display = 'block';
+        if (menuBtn) menuBtn.classList.remove('active');
+        if (flowchartBtn) flowchartBtn.classList.add('active');
+        
+        // Initialize flowchart if not already initialized
+        if (flowchartView && !flowchartView.hasChildNodes()) {
+            renderFlowchartStart();
+        }
+    }
 }
 
 function updateScreenerOptions() {
@@ -3292,8 +3324,21 @@ function resetInterventionMenu() {
     updateScreenerOptions();
     updateSubtestOptions();
     
-    // Refresh results
-    performCompactSearch();
+    // Clear results instead of searching
+    const resultsPanel = document.querySelector('.results-panel');
+    if (resultsPanel) {
+        resultsPanel.innerHTML = `
+            <div class="results-container">
+                <div class="results-empty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <p>Select your filters and click Search to find interventions and assessments</p>
+                </div>
+            </div>
+        `;
+    }
 }
 
 // ============================================
@@ -3355,3 +3400,4 @@ window.startTier2Visual = startTier2Visual;
 window.startTier3Visual = startTier3Visual;
 window.restartTier1Visual = restartTier1Visual;
 window.restartTier2Visual = restartTier2Visual;
+window.showInterventionView = showInterventionView;
