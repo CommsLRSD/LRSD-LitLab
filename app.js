@@ -3205,12 +3205,13 @@ function performCompactSearch() {
 
             // Tier match
             if (filters.tier) {
-                if (!item.tiers.includes(parseInt(filters.tier))) return false;
+                if (!item.tiers || !item.tiers.includes(parseInt(filters.tier))) return false;
             }
 
             // Pillar match
             if (pillarsToSearch.length > 0) {
-                if (!item.literacy_pillars.some(p => pillarsToSearch.includes(p))) return false;
+                const itemPillars = item.literacy_pillars || [];
+                if (!itemPillars.some(p => pillarsToSearch.includes(p))) return false;
             }
 
             return true;
