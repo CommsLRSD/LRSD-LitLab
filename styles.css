@@ -2117,8 +2117,9 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--primary);
 }
 
-#flowchart-container.flowchart-hidden {
-    display: none;
+#flowchart-container.flowchart-hidden,
+#flowchart-container.flowchart-view-hidden {
+    display: none !important;
 }
 
 /* ============================================
@@ -2178,11 +2179,6 @@ h1, h2, h3, h4, h5, h6 {
 /* Search button specific styling */
 .btn-search {
     padding: 0.75rem 1.5rem;
-}
-
-/* Flowchart view hidden state */
-.flowchart-view-hidden {
-    display: none;
 }
 
 .tier-landing-compact {
