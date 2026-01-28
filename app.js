@@ -54,9 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup home menu cards
     setupHomeMenuCards();
     
-    // Initialize flowchart
-    initializeFlowchart();
-    
     // Initialize intervention menu
     initializeInterventionMenu();
     
@@ -1692,11 +1689,8 @@ function closeVisualFlowchart() {
     };
     appState.currentTierFlow = null;
     
-    // Scroll back to tier cards
-    const interventionsSection = document.getElementById('interventions-section');
-    if (interventionsSection) {
-        interventionsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Return to interventions options screen
+    returnToInterventionsOptions();
 }
 
 // Handler functions for tier 1
