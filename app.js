@@ -3345,6 +3345,12 @@ function resetInterventionMenu() {
 function openTierFlowchart(tierName) {
     console.log(`Opening ${tierName} flowchart directly`);
     
+    // Validate tierName
+    if (!['tier1', 'tier2', 'tier3'].includes(tierName)) {
+        console.error(`Invalid tier name: ${tierName}`);
+        return;
+    }
+    
     // Hide the options screen
     const optionsScreen = document.getElementById('interventions-options-screen');
     if (optionsScreen) {

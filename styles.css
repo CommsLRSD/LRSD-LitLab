@@ -1842,6 +1842,15 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: var(--shadow-lg);
 }
 
+.intervention-option-card:focus,
+.intervention-option-card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    border-color: var(--primary);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
 .intervention-option-card .option-icon {
     width: 56px;
     height: 56px;
@@ -1920,6 +1929,15 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--primary);
     color: var(--primary);
     transform: translateX(-4px);
+}
+
+.interventions-detail-view .back-button:focus,
+.interventions-detail-view .back-button:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    background: var(--bg-primary);
+    border-color: var(--primary);
+    color: var(--primary);
 }
 
 .interventions-detail-view .back-button svg {
