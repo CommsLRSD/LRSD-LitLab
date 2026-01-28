@@ -2991,7 +2991,7 @@ function initializeInterventionMenu() {
     const tierSelect = document.getElementById('tier-select');
     if (tierSelect) {
         tierSelect.addEventListener('change', () => {
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3001,7 +3001,7 @@ function initializeInterventionMenu() {
         languageSelect.addEventListener('change', (e) => {
             appState.interventionMenu.language = e.target.value;
             updateScreenerOptions();
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3010,7 +3010,7 @@ function initializeInterventionMenu() {
     if (screenerSelect) {
         screenerSelect.addEventListener('change', (e) => {
             updateSubtestOptions();
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3018,7 +3018,7 @@ function initializeInterventionMenu() {
     const subtestSelect = document.getElementById('subtest-select');
     if (subtestSelect) {
         subtestSelect.addEventListener('change', () => {
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3026,7 +3026,7 @@ function initializeInterventionMenu() {
     const pillarSelect = document.getElementById('pillar-select');
     if (pillarSelect) {
         pillarSelect.addEventListener('change', () => {
-            performCompactSearch();
+            // Don't auto-search anymore
         });
     }
 
@@ -3034,8 +3034,14 @@ function initializeInterventionMenu() {
     const typeSelect = document.getElementById('type-select');
     if (typeSelect) {
         typeSelect.addEventListener('change', () => {
-            performCompactSearch();
+            // Don't auto-search anymore
         });
+    }
+
+    // Search button
+    const searchBtn = document.getElementById('search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', performCompactSearch);
     }
 
     // Reset button
@@ -3044,8 +3050,34 @@ function initializeInterventionMenu() {
         resetBtn.addEventListener('click', resetInterventionMenu);
     }
 
-    // Initial search to show all items
-    performCompactSearch();
+    // Don't perform initial search - let user make choices first
+}
+
+// ============================================
+// View Toggle for Interventions Section
+// ============================================
+function showInterventionView(view) {
+    const menuView = document.getElementById('intervention-menu-view');
+    const flowchartView = document.getElementById('flowchart-container');
+    const menuBtn = document.getElementById('menu-view-btn');
+    const flowchartBtn = document.getElementById('flowchart-view-btn');
+    
+    if (view === 'menu') {
+        if (menuView) menuView.classList.remove('flowchart-view-hidden');
+        if (flowchartView) flowchartView.classList.add('flowchart-view-hidden');
+        if (menuBtn) menuBtn.classList.add('active');
+        if (flowchartBtn) flowchartBtn.classList.remove('active');
+    } else if (view === 'flowchart') {
+        if (menuView) menuView.classList.add('flowchart-view-hidden');
+        if (flowchartView) flowchartView.classList.remove('flowchart-view-hidden');
+        if (menuBtn) menuBtn.classList.remove('active');
+        if (flowchartBtn) flowchartBtn.classList.add('active');
+        
+        // Initialize flowchart if not already initialized
+        if (flowchartView && !flowchartView.hasChildNodes()) {
+            renderFlowchartStart();
+        }
+    }
 }
 
 function updateScreenerOptions() {
@@ -3249,7 +3281,7 @@ function displayCompactResults(results, filters) {
                             <div class="result-info"><strong>Type:</strong> ${item.assessment_type}</div>
                         `}
                     </div>
-                    ${item.url && item.url !== '(local resource)' && item.url !== '(SharePoint)' && item.url !== '(Nelson)' ? `
+                    ${item.url && item.url !== '' && item.url !== '(local resource)' && item.url !== '(SharePoint)' && item.url !== '(Nelson)' ? `
                         <a href="${item.url}" target="_blank" class="result-link-compact">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
@@ -3258,14 +3290,14 @@ function displayCompactResults(results, filters) {
                             </svg>
                             View Resource
                         </a>
-                    ` : `
+                    ` : item.url && item.url !== '' ? `
                         <div class="result-local-compact">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                             ${item.url}
                         </div>
-                    `}
+                    ` : ''}
                 </div>
             `).join('')}
         </div>
@@ -3292,8 +3324,21 @@ function resetInterventionMenu() {
     updateScreenerOptions();
     updateSubtestOptions();
     
-    // Refresh results
-    performCompactSearch();
+    // Clear results instead of searching
+    const resultsPanel = document.querySelector('.results-panel');
+    if (resultsPanel) {
+        resultsPanel.innerHTML = `
+            <div class="results-container">
+                <div class="results-empty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <p>Select your filters and click Search to find interventions and assessments</p>
+                </div>
+            </div>
+        `;
+    }
 }
 
 // ============================================
@@ -3355,3 +3400,4 @@ window.startTier2Visual = startTier2Visual;
 window.startTier3Visual = startTier3Visual;
 window.restartTier1Visual = restartTier1Visual;
 window.restartTier2Visual = restartTier2Visual;
+window.showInterventionView = showInterventionView;

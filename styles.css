@@ -1981,6 +1981,57 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0;
 }
 
+/* View Toggle Buttons */
+.view-toggle-container {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.view-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.view-toggle-btn:hover {
+    background: var(--bg-accent);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.view-toggle-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.view-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+}
+
+/* Search button specific styling */
+.btn-search {
+    padding: 0.75rem 1.5rem;
+}
+
+/* Flowchart view hidden state */
+.flowchart-view-hidden {
+    display: none;
+}
+
 .tier-landing-compact {
     max-width: 900px;
     margin: 0 auto;

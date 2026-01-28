@@ -31,7 +31,7 @@ This application provides educators in the Louis Riel School Division (LRSD) wit
 1. **Screener Selection** - Which literacy screening tool they used (DIBELS, CTOPP-2, THaFoL, IDAPEL)
 2. **Subtest Selection** - Which specific subtest was administered
 3. **Literacy Pillar** - Which literacy component was measured by that subtest
-4. **Item Type** - Whether they need an Assessment (drill-down) or Intervention
+4. **Item Type** - Whether they need a Drill Down Assessment or Intervention
 5. **Filtered Results** - A curated list of relevant assessments or interventions
 
 ### Problem It Solves
@@ -93,7 +93,7 @@ This app eliminates that friction by automating the filtering process.
                        ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ STEP 5: CHOOSE ITEM TYPE                                     │
-│ Toggle or Radio Button: Assessment (Drill Down) OR           │
+│ Toggle or Radio Button: Drill Down Assessment OR             │
 │ Intervention (Instruction)                                   │
 └──────────────────────┬──────────────────────────────────────┘
                        ↓
@@ -151,7 +151,7 @@ This app eliminates that friction by automating the filtering process.
 **Implementation Notes:**
 - DIBELS subtests are the first-level menu navigation
 - When user selects "DIBELS: LNF", system extracts "Alphabetic Principle" pillar
-- User then chooses Assessment or Intervention
+- User then chooses Drill Down Assessment or Intervention
 - System filters drill-down assessments and interventions by pillar and grade range
 - DIBELS subtests themselves are NOT in the Assessments Database
 
@@ -241,17 +241,17 @@ Each intervention is listed **ONCE** per unique `NAME + GRADE_RANGE` combination
 | INT-002 | Alec | M-5 | French Immersion | 1, 2 | Alphabetic Principle, Phonics | (no designation) | https://alec-edu.com/ |
 | INT-003 | Amira Learning | K-8 | English | 2, 3 | Phonics, Reading Fluency | * | https://amiralearning.com/amira-reading |
 | INT-004 | Barton Reading and Spelling | 3-12 | English | 2, 3 | Phonemic Awareness, Phonics, Vocabulary, Orthography | ** | https://bartonreading.com/ |
-| INT-005 | Handwriting Without Tears | K-2 | English | 1, 2 | Orthography | (no designation) | (local resource) |
+| INT-005 | Handwriting Without Tears | K-2 | English | 1, 2 | Orthography | (no designation) |  |
 | INT-006 | Heggerty | K-2 | English | 1, 2, 3 | Alphabetic Principle, Phonemic Awareness | ** | https://heggerty.org/ |
-| INT-007 | Kilpatrick -- Equipped for Reading Success | K-2 | English | 2, 3 | Phonemic Awareness | ** | (local resource) |
+| INT-007 | Kilpatrick -- Equipped for Reading Success | K-2 | English | 2, 3 | Phonemic Awareness | ** |  |
 | INT-008 | Lexia Core 5 | K-5 | French Immersion | 1 | Alphabetic Principle, Phonemic Awareness, Phonics, Reading Fluency, Vocabulary, Reading Comprehension, Orthography | * | https://www.lexialearning.com/core5 |
 | INT-009 | Lexia Power Up | 6-12 | English | 2, 3 | Phonics, Reading Fluency, Vocabulary, Reading Comprehension, Orthography | * | https://www.lexialearning.com/powerup |
 | INT-010 | Lindamood Bell's Seeing Stars | 2-12 | English | 2, 3 | Orthography | (no designation) | https://lindamoodbell.com/program/seeing-stars-program |
 | INT-011 | Lindamood Phoneme Sequencing | K-3 | English | 3 | Phonemic Awareness | ** | https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program |
 | INT-012 | Orton-Gillingham | K-12 | English | 1, 2, 3 | Alphabetic Principle, Phonemic Awareness, Reading Fluency, Reading Comprehension, Orthography | ** | https://www.ortonacademy.org/ |
-| INT-013 | Page par Page | M-2 | French Immersion | 1, 2, 3 | Alphabetic Principle, Phonics, Reading Fluency, Reading Comprehension | (no designation) | (local resource) |
-| INT-014 | Phonémique -- Version 1 | M-3 | French Immersion | 1, 2, 3 | Phonemic Awareness | (no designation) | (local resource) |
-| INT-015 | Phonémique -- Version 2 | M-3 | French Immersion | 1, 2, 3 | Phonemic Awareness | (no designation) | (local resource) |
+| INT-013 | Page par Page | M-2 | French Immersion | 1, 2, 3 | Alphabetic Principle, Phonics, Reading Fluency, Reading Comprehension | (no designation) |  |
+| INT-014 | Phonémique -- Version 1 | M-3 | French Immersion | 1, 2, 3 | Phonemic Awareness | (no designation) |  |
+| INT-015 | Phonémique -- Version 2 | M-3 | French Immersion | 1, 2, 3 | Phonemic Awareness | (no designation) |  |
 | INT-016 | Programme d'intervention en lecture et en orthographe (PILO) | M-3 | French Immersion | 2, 3 | Alphabetic Principle, Phonics, Orthography | (no designation) | (SharePoint) |
 | INT-017 | Remediation Plus Systems | K-3 | English | 1, 2 | Phonemic Awareness, Phonics, Reading Fluency, Reading Comprehension, Orthography | * | http://www.remediationplus.com/products/the-remediation-plus-system/ |
 | INT-018 | Remediation Plus Systems | 4-8 | English | 2 | Reading Fluency, Reading Comprehension, Vocabulary | * | http://www.remediationplus.com/products/the-remediation-plus-system/ |
@@ -259,7 +259,7 @@ Each intervention is listed **ONCE** per unique `NAME + GRADE_RANGE` combination
 | INT-020 | Ressource CBE | M-4 | French Immersion | 2 | Alphabetic Principle | (no designation) |(https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?csf=1&web=1&e=mIBlD4&CID=8ec8404f%2D3d7b%2D471d%2Da489%2D43660cc2ad46&FolderCTID=0x012000F20499129962D74E9046ECDF35332B03&id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FLitt%C3%A9ratie%20structur%C3%A9e%2FLa%20phon%C3%A9tique%2FLe%C3%A7ons%20du%20CBE%20pour%20la%20Maternelle%20%C3%A0%20la%206e%20ann%C3%A9e |
 | INT-021 | REWARDS | 4-12 | English | 2, 3 | Reading Fluency, Vocabulary, Orthography | ** | https://www.voyagersopris.com/products/reading/rewards/overview |
 | INT-022 | Saxon Reading Foundations | K-2 | English | 1, 2, 3 | Phonemic Awareness, Reading Fluency, Orthography | ** | https://www.heinemann.com/saxon-reading-foundations/ |
-| INT-023 | Son au graphe | 3-12 | French Immersion | 1, 2, 3 | Alphabetic Principle, Phonics | (no designation) | (local resource) |
+| INT-023 | Son au graphe | 3-12 | French Immersion | 1, 2, 3 | Alphabetic Principle, Phonics | (no designation) |  |
 | INT-024 | SRA Corrective Reading | K-3 | English | 2, 3 | Reading Comprehension, Orthography | * | https://pages.nelson.com/assets/pdf/SC%20BRO%20Corrective%20Reading%20NE_NELSON.pdf |
 | INT-025 | SRA Corrective Reading | 3-12 | English | 2, 3 | Alphabetic Principle, Phonemic Awareness, Phonics, Reading Fluency, Reading Comprehension | * | https://pages.nelson.com/assets/pdf/SC%20BRO%20Corrective%20Reading%20NE_NELSON.pdf |
 | INT-026 | SRA Early Interventions in Reading Skills | K-3 | English | 2 | Phonemic Awareness, Reading Fluency | * | https://www.nelson.com/documents/Assessment/early%20interventions%20in%20reading-brochure.pdf |
@@ -271,7 +271,7 @@ Each intervention is listed **ONCE** per unique `NAME + GRADE_RANGE` combination
 | INT-032 | UFLI Manual | K-8 | English | 2, 3 | Alphabetic Principle, Phonemic Awareness, Phonics, Reading Fluency, Vocabulary, Reading Comprehension, Orthography | ** | https://ufli.education.ufl.edu/foundations-materials/ |
 | INT-033 | Wilson Fundations | K-3 | English | 1, 2 | Alphabetic Principle, Phonemic Awareness, Phonics, Reading Fluency, Vocabulary, Reading Comprehension, Orthography | * | https://www.wilsonlanguage.com/programs/fundations/ |
 | INT-034 | Wilson Reading System | 2-12 | English | 3 | Alphabetic Principle, Orthography | ** | https://www.wilsonlanguage.com/programs/wilson-reading-system/ |
-| INT-035 | Words Their Way | K-12 | English | 1, 2, 3 | Orthography | (no designation) | (local resource) |
+| INT-035 | Words Their Way | K-12 | English | 1, 2, 3 | Orthography | (no designation) |  |
 | INT-036 | WordGen Elementary | 4-5 | English | 1 | Vocabulary | ** | https://www.serpinstitute.org/wordgen-elementary |
 | INT-037 | WordGen Weekly | 6-8 | English | 1 | Vocabulary | ** | https://www.serpinstitute.org/wordgen-weekly |
 
@@ -314,12 +314,12 @@ ASSESS-005 | Heggerty -- Letter Name Sounds | 3-8 | English | 2 | Alphabetic Pri
 ASSESS-006 | Identification du nom et du son des lettres de l'alphabet | M-2 | French Immersion | 2 | Alphabetic Principle | (no designation) | Identification du nom et du son des lettres de l'alphabet
 ASSESS-007 | Letter Identification Assessment | K-2 | English | 2 | Alphabetic Principle | (no designation) | Letter Identification Assessment
 ASSESS-008 | Quick Phonics Screener | K-12 | English | 2 | Phonics | (no designation) | Quick Phonics Screener
-ASSESS-009 | Really Great Reading -- DAER | K | English | 2 | Alphabetic Principle | (no designation) | (local resource)
-ASSESS-010 | Really Great Reading -- DAEES | 1 | English | 2 | Alphabetic Principle | (no designation) | (local resource)
+ASSESS-009 | Really Great Reading -- DAER | K | English | 2 | Alphabetic Principle | (no designation) | 
+ASSESS-010 | Really Great Reading -- DAEES | 1 | English | 2 | Alphabetic Principle | (no designation) | 
 ASSESS-011 | Lindamood Phoneme Sequencing (Assessment) | K-3 | English | 3 | Phonemic Awareness | ** | https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program
 ASSESS-012 | Lindamood Bell's Seeing Stars (Assessment) | 2-12 | English | 3 | Orthography | (no designation) | https://lindamoodbell.com/program/seeing-stars-program
 ASSESS-013 | Barton Reading and Spelling (Assessment) | 3-12 | English | 3 | Orthography | ** | https://bartonreading.com/
-ASSESS-014 | Kilpatrick -- Phonemic Awareness Battery | K-2 | English | 3 | Phonemic Awareness | ** | (local resource)
+ASSESS-014 | Kilpatrick -- Phonemic Awareness Battery | K-2 | English | 3 | Phonemic Awareness | ** | 
 ASSESS-015 | SRA Reading Inventory | K-6 | English | 2 | Reading Fluency | * | (Nelson)
 
 
@@ -862,7 +862,7 @@ Step 2: User selects SUBTEST
 Step 3: User selects LITERACY_PILLAR(S)
 → Store selected pillars in filter object
 
-Step 4: User selects ITEM_TYPE (Assessment or Intervention)
+Step 4: User selects ITEM_TYPE (Drill Down Assessment or Intervention)
 → Query database for items matching:
    - Item type (Assessment OR Intervention)
    - Program (English OR French Immersion, based on screener language)

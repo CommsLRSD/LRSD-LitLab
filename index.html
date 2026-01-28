@@ -206,11 +206,27 @@
         <!-- Interventions Section with Filterable Menu -->
         <section id="interventions-section" class="content-section">
             <div class="interventions-header-compact">
-                <h2 class="section-title">Interventions & Assessments Menu</h2>
+                <h2 class="section-title">Interventions & Assessments</h2>
                 <p class="section-subtitle">Search for literacy interventions and drill-down assessments based on your screening results</p>
+                
+                <!-- View Toggle -->
+                <div class="view-toggle-container">
+                    <button id="menu-view-btn" class="view-toggle-btn active" onclick="showInterventionView('menu')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        Menu
+                    </button>
+                    <button id="flowchart-view-btn" class="view-toggle-btn" onclick="showInterventionView('flowchart')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M12 5l0 14M12 5l-7 7M12 5l7 7"/>
+                        </svg>
+                        Flowchart
+                    </button>
+                </div>
             </div>
 
-            <div class="intervention-menu-container">
+            <div class="intervention-menu-container" id="intervention-menu-view">
                 <!-- Compact Filter Bar -->
                 <div class="filter-bar">
                     <div class="filter-group">
@@ -256,12 +272,19 @@
                         <label class="filter-label">Type</label>
                         <select id="type-select" class="filter-select-compact">
                             <option value="">All Types</option>
-                            <option value="Assessment">Assessment</option>
+                            <option value="Assessment">Drill Down Assessment</option>
                             <option value="Intervention">Intervention</option>
                         </select>
                     </div>
 
                     <div class="filter-actions-compact">
+                        <button id="search-btn" class="btn-primary btn-search">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="M21 21l-4.35-4.35"/>
+                            </svg>
+                            Search
+                        </button>
                         <button id="reset-btn" class="btn-reset-compact" title="Reset all filters">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
@@ -286,11 +309,14 @@
                                 <circle cx="11" cy="11" r="8"/>
                                 <path d="M21 21l-4.35-4.35"/>
                             </svg>
-                            <p>Select filters to search for interventions and assessments</p>
+                            <p>Select your filters and click Search to find interventions and assessments</p>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Flowchart View Container -->
+            <div id="flowchart-container" class="flowchart-view-hidden"></div>
         </section>
 
         <!-- Assessment Schedules Section -->
