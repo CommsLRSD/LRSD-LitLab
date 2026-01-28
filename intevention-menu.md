@@ -305,22 +305,23 @@ These are **diagnostic assessment tools** used for detailed, targeted assessment
 
 Each drill-down assessment is listed **ONCE** per unique `NAME + GRADE_RANGE` combination and measures ONE literacy pillar.
 
-ID | Assessment Name | Grade Range | Program | Tier | Literacy Pillar | Evidence Level | URL
-ASSESS-001 | CC3 & LeNS | K-3 | English | 2 | Alphabetic Principle | (no designation) | CC3 and LeNs
-ASSESS-002 | CORE Phonics Survey | K-12 | English | 2 | Phonics | (no designation) | CORE Phonics Survey
-ASSESS-003 | French CORE Phonics Assessment | K-12 | French Immersion | 2 | Phonics | (no designation) | French CORE Phonics Assessment
-ASSESS-004 | Gallistel-Ellis (Reading) | K-2 | English | 2 | Alphabetic Principle | (no designation) | Gallistel-Ellis
-ASSESS-005 | Heggerty -- Letter Name Sounds | 3-8 | English | 2 | Alphabetic Principle | ** | Heggerty -- Letter Name Sounds
-ASSESS-006 | Identification du nom et du son des lettres de l'alphabet | M-2 | French Immersion | 2 | Alphabetic Principle | (no designation) | Identification du nom et du son des lettres de l'alphabet
-ASSESS-007 | Letter Identification Assessment | K-2 | English | 2 | Alphabetic Principle | (no designation) | Letter Identification Assessment
-ASSESS-008 | Quick Phonics Screener | K-12 | English | 2 | Phonics | (no designation) | Quick Phonics Screener
-ASSESS-009 | Really Great Reading -- DAER | K | English | 2 | Alphabetic Principle | (no designation) | 
-ASSESS-010 | Really Great Reading -- DAEES | 1 | English | 2 | Alphabetic Principle | (no designation) | 
-ASSESS-011 | Lindamood Phoneme Sequencing (Assessment) | K-3 | English | 3 | Phonemic Awareness | ** | https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program
-ASSESS-012 | Lindamood Bell's Seeing Stars (Assessment) | 2-12 | English | 3 | Orthography | (no designation) | https://lindamoodbell.com/program/seeing-stars-program
-ASSESS-013 | Barton Reading and Spelling (Assessment) | 3-12 | English | 3 | Orthography | ** | https://bartonreading.com/
-ASSESS-014 | Kilpatrick -- Phonemic Awareness Battery | K-2 | English | 3 | Phonemic Awareness | ** | 
-ASSESS-015 | SRA Reading Inventory | K-6 | English | 2 | Reading Fluency | * | (Nelson)
+| ID | Assessment Name | Grade Range | Program | Tiers | Literacy Pillars | Evidence Level | URL |
+|-----|-------------------|-------------|---------|-------|------------------|----------------|-----|
+| ASSESS-001 | CC3 & LeNS | K-3 | English | 2 | Alphabetic Principle | (no designation) | (SharePoint) |
+| ASSESS-002 | CORE Phonics Survey | K-12 | English | 2 | Phonics | (no designation) | (SharePoint) |
+| ASSESS-003 | French CORE Phonics Assessment | K-12 | French Immersion | 2 | Phonics | (no designation) | (SharePoint) |
+| ASSESS-004 | Gallistel-Ellis (Reading) | K-2 | English | 2 | Alphabetic Principle | (no designation) | (SharePoint) |
+| ASSESS-005 | Heggerty -- Letter Name Sounds | 3-8 | English | 2 | Alphabetic Principle | ** | (SharePoint) |
+| ASSESS-006 | Identification du nom et du son des lettres de l'alphabet | M-2 | French Immersion | 2 | Alphabetic Principle | (no designation) | (SharePoint) |
+| ASSESS-007 | Letter Identification Assessment | K-2 | English | 2 | Alphabetic Principle | (no designation) | (SharePoint) |
+| ASSESS-008 | Quick Phonics Screener | K-12 | English | 2 | Phonics | (no designation) | (SharePoint) |
+| ASSESS-009 | Really Great Reading -- DAER | K | English | 2 | Alphabetic Principle | (no designation) |  |
+| ASSESS-010 | Really Great Reading -- DAEES | 1 | English | 2 | Alphabetic Principle | (no designation) |  |
+| ASSESS-011 | Lindamood Phoneme Sequencing (Assessment) | K-3 | English | 3 | Phonemic Awareness | ** | https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program |
+| ASSESS-012 | Lindamood Bell's Seeing Stars (Assessment) | 2-12 | English | 3 | Orthography | (no designation) | https://lindamoodbell.com/program/seeing-stars-program |
+| ASSESS-013 | Barton Reading and Spelling (Assessment) | 3-12 | English | 3 | Orthography | ** | https://bartonreading.com/ |
+| ASSESS-014 | Kilpatrick -- Phonemic Awareness Battery | K-2 | English | 3 | Phonemic Awareness | ** |  |
+| ASSESS-015 | SRA Reading Inventory | K-6 | English | 2 | Reading Fluency | * | (Nelson) |
 
 
 
@@ -335,9 +336,10 @@ ASSESS-015 | SRA Reading Inventory | K-6 | English | 2 | Reading Fluency | * | (
   - They live in the Screeners & Subtests section as filter triggers
 
 **Note on Tiers:**
-- Drill-down assessments do NOT have tier designations
-- Assessments are DIAGNOSTIC tools, not intervention delivery methods
-- Interventions are tiered (Tier 1, 2, 3); assessments support all tiers by informing decisions
+- Drill-down assessments are assigned to tiers (primarily Tier 2 and Tier 3) to indicate the appropriate intervention level where they are typically used
+- Tier 2 assessments are used for targeted group interventions
+- Tier 3 assessments are used for intensive individual interventions
+- Assessments are DIAGNOSTIC tools that inform intervention decisions at each tier level
 
 ---
 

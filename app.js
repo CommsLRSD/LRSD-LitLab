@@ -3141,6 +3141,20 @@ function performCompactSearch() {
         type: typeSelect ? typeSelect.value : ''
     };
 
+    // Validate that mandatory filters are selected
+    if (!filters.tier) {
+        displayValidationError('Please select a Tier before searching.');
+        return;
+    }
+    if (!filters.pillar) {
+        displayValidationError('Please select a Literacy Pillar before searching.');
+        return;
+    }
+    if (!filters.type) {
+        displayValidationError('Please select a Type (Assessment or Intervention) before searching.');
+        return;
+    }
+
     let results = [];
     
     // Get pillars to search by
@@ -3167,9 +3181,15 @@ function performCompactSearch() {
             const programMatch = item.program === (filters.language === 'English' ? 'English' : 'French Immersion');
             if (!programMatch) return false;
 
-            // Pillar match
+            // Tier match
+            if (filters.tier) {
+                if (!item.tiers || !item.tiers.includes(parseInt(filters.tier))) return false;
+            }
+
+            // Pillar match - use literacy_pillars array if available, otherwise fall back to literacy_pillar
             if (pillarsToSearch.length > 0) {
-                if (!pillarsToSearch.includes(item.literacy_pillar)) return false;
+                const itemPillars = item.literacy_pillars || [item.literacy_pillar];
+                if (!itemPillars.some(p => pillarsToSearch.includes(p))) return false;
             }
 
             return true;
@@ -3211,6 +3231,25 @@ function performCompactSearch() {
     });
 
     displayCompactResults(results, filters);
+}
+
+function displayValidationError(message) {
+    const resultsPanel = document.querySelector('.results-panel');
+    if (!resultsPanel) return;
+
+    resultsPanel.innerHTML = `
+        <div class="results-header-compact">
+            <div class="results-count">Please select all required filters</div>
+        </div>
+        <div class="results-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4M12 16h.01"/>
+            </svg>
+            <p>${message}</p>
+            <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Required filters: Tier, Literacy Pillar, and Type</p>
+        </div>
+    `;
 }
 
 function displayCompactResults(results, filters) {
@@ -3259,7 +3298,7 @@ function displayCompactResults(results, filters) {
                                 ${item.evidence_level && item.evidence_level !== 'none' 
                                     ? `<span class="badge-evidence">${item.evidence_level}</span>` 
                                     : ''}
-                                ${item.itemType === 'Intervention' 
+                                ${item.tiers && item.tiers.length > 0
                                     ? `<span class="badge-tier">T${item.tiers.join(',')}</span>`
                                     : ''}
                             </div>
@@ -3269,7 +3308,7 @@ function displayCompactResults(results, filters) {
                         ${item.itemType === 'Intervention' ? `
                             <div class="result-info"><strong>Pillars:</strong> ${item.literacy_pillars.join(', ')}</div>
                         ` : `
-                            <div class="result-info"><strong>Pillar:</strong> ${item.literacy_pillar}</div>
+                            <div class="result-info"><strong>Pillar:</strong> ${(item.literacy_pillars || [item.literacy_pillar]).join(', ')}</div>
                             <div class="result-info"><strong>Type:</strong> ${item.assessment_type}</div>
                         `}
                     </div>
