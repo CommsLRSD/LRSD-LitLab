@@ -9,6 +9,7 @@ const appState = {
     mobileMenuOpen: false,
     flowchartData: null,
     tierFlowchartData: null,
+    interventionMenuData: null,
     currentPath: [],
     interventionHistory: [],
     currentTierFlow: null,
@@ -18,6 +19,14 @@ const appState = {
         connections: [],
         currentNodeId: null,
         selectedPath: []
+    },
+    // Intervention menu state
+    interventionMenu: {
+        language: 'English',
+        screener: null,
+        subtest: null,
+        pillars: [],
+        itemType: null
     }
 };
 
@@ -33,6 +42,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load tier flowchart data
     await loadTierFlowchartData();
     
+    // Load intervention menu data
+    await loadInterventionMenuData();
+    
     // Setup navigation
     setupNavigation();
     
@@ -44,6 +56,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Initialize flowchart
     initializeFlowchart();
+    
+    // Initialize intervention menu
+    initializeInterventionMenu();
     
     // Add resize listener to update connection line positions
     let resizeTimeout;
@@ -81,6 +96,18 @@ async function loadTierFlowchartData() {
     } catch (error) {
         console.error('Error loading tier flowchart data:', error);
         appState.tierFlowchartData = { tier1: {}, tier2: {}, tier3: {} };
+    }
+}
+
+async function loadInterventionMenuData() {
+    try {
+        const response = await fetch('data/intervention-menu.json');
+        if (!response.ok) throw new Error('Failed to load intervention menu data');
+        appState.interventionMenuData = await response.json();
+        console.log('Intervention menu data loaded successfully');
+    } catch (error) {
+        console.error('Error loading intervention menu data:', error);
+        appState.interventionMenuData = { screeners: [], interventions: [], assessments: [], literacy_pillars: [] };
     }
 }
 
@@ -2945,6 +2972,328 @@ function openInterventionsMenu(tier, mode = 'interventions') {
     `;
     
     container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ============================================
+// Intervention Menu Functions
+// ============================================
+function initializeInterventionMenu() {
+    if (!appState.interventionMenuData) {
+        console.error('Intervention menu data not loaded');
+        return;
+    }
+
+    // Initialize all filter options
+    updateScreenerOptions();
+    updatePillarOptions();
+    
+    // Tier filter
+    const tierSelect = document.getElementById('tier-select');
+    if (tierSelect) {
+        tierSelect.addEventListener('change', () => {
+            performCompactSearch();
+        });
+    }
+
+    // Language filter
+    const languageSelect = document.getElementById('language-select');
+    if (languageSelect) {
+        languageSelect.addEventListener('change', (e) => {
+            appState.interventionMenu.language = e.target.value;
+            updateScreenerOptions();
+            performCompactSearch();
+        });
+    }
+
+    // Screener select
+    const screenerSelect = document.getElementById('screener-select');
+    if (screenerSelect) {
+        screenerSelect.addEventListener('change', (e) => {
+            updateSubtestOptions();
+            performCompactSearch();
+        });
+    }
+
+    // Subtest select
+    const subtestSelect = document.getElementById('subtest-select');
+    if (subtestSelect) {
+        subtestSelect.addEventListener('change', () => {
+            performCompactSearch();
+        });
+    }
+
+    // Pillar select
+    const pillarSelect = document.getElementById('pillar-select');
+    if (pillarSelect) {
+        pillarSelect.addEventListener('change', () => {
+            performCompactSearch();
+        });
+    }
+
+    // Type select
+    const typeSelect = document.getElementById('type-select');
+    if (typeSelect) {
+        typeSelect.addEventListener('change', () => {
+            performCompactSearch();
+        });
+    }
+
+    // Reset button
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetInterventionMenu);
+    }
+
+    // Initial search to show all items
+    performCompactSearch();
+}
+
+function updateScreenerOptions() {
+    const screenerSelect = document.getElementById('screener-select');
+    if (!screenerSelect || !appState.interventionMenuData) return;
+
+    const languageSelect = document.getElementById('language-select');
+    const language = languageSelect ? languageSelect.value : 'English';
+    
+    const screeners = appState.interventionMenuData.screeners.filter(
+        s => s.language === language
+    );
+
+    screenerSelect.innerHTML = '<option value="">All Screeners</option>' +
+        screeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
+}
+
+function updateSubtestOptions() {
+    const subtestSelect = document.getElementById('subtest-select');
+    const screenerSelect = document.getElementById('screener-select');
+    
+    if (!subtestSelect || !screenerSelect || !appState.interventionMenuData) return;
+
+    const screenerId = screenerSelect.value;
+    
+    if (!screenerId) {
+        subtestSelect.innerHTML = '<option value="">All Subtests</option>';
+        return;
+    }
+
+    const screener = appState.interventionMenuData.screeners.find(
+        s => s.screener_id === screenerId
+    );
+
+    if (!screener) return;
+
+    subtestSelect.innerHTML = '<option value="">All Subtests</option>' +
+        screener.subtests.map(st => 
+            `<option value="${st.subtest_code}">${st.subtest_code} - ${st.subtest_name}</option>`
+        ).join('');
+}
+
+function updatePillarOptions() {
+    const pillarSelect = document.getElementById('pillar-select');
+    if (!pillarSelect || !appState.interventionMenuData) return;
+
+    const pillars = appState.interventionMenuData.literacy_pillars.map(p => p.name);
+    
+    pillarSelect.innerHTML = '<option value="">All Pillars</option>' +
+        pillars.map(p => `<option value="${p}">${p}</option>`).join('');
+}
+
+function performCompactSearch() {
+    if (!appState.interventionMenuData) return;
+
+    const tierSelect = document.getElementById('tier-select');
+    const languageSelect = document.getElementById('language-select');
+    const screenerSelect = document.getElementById('screener-select');
+    const subtestSelect = document.getElementById('subtest-select');
+    const pillarSelect = document.getElementById('pillar-select');
+    const typeSelect = document.getElementById('type-select');
+
+    const filters = {
+        tier: tierSelect ? tierSelect.value : '',
+        language: languageSelect ? languageSelect.value : 'English',
+        screener: screenerSelect ? screenerSelect.value : '',
+        subtest: subtestSelect ? subtestSelect.value : '',
+        pillar: pillarSelect ? pillarSelect.value : '',
+        type: typeSelect ? typeSelect.value : ''
+    };
+
+    let results = [];
+    
+    // Get pillars to search by
+    let pillarsToSearch = [];
+    if (filters.pillar) {
+        pillarsToSearch = [filters.pillar];
+    } else if (filters.subtest && filters.screener) {
+        // Get pillars from subtest
+        const screener = appState.interventionMenuData.screeners.find(
+            s => s.screener_id === filters.screener
+        );
+        if (screener) {
+            const subtest = screener.subtests.find(st => st.subtest_code === filters.subtest);
+            if (subtest) {
+                pillarsToSearch = subtest.literacy_pillars;
+            }
+        }
+    }
+
+    // Collect items based on type filter
+    if (!filters.type || filters.type === 'Assessment') {
+        const assessments = appState.interventionMenuData.assessments.filter(item => {
+            // Program match
+            const programMatch = item.program === (filters.language === 'English' ? 'English' : 'French Immersion');
+            if (!programMatch) return false;
+
+            // Pillar match
+            if (pillarsToSearch.length > 0) {
+                if (!pillarsToSearch.includes(item.literacy_pillar)) return false;
+            }
+
+            return true;
+        });
+        results = results.concat(assessments.map(a => ({ ...a, itemType: 'Assessment' })));
+    }
+
+    if (!filters.type || filters.type === 'Intervention') {
+        const interventions = appState.interventionMenuData.interventions.filter(item => {
+            // Program match
+            const programMatch = item.program === (filters.language === 'English' ? 'English' : 'French Immersion');
+            if (!programMatch) return false;
+
+            // Tier match
+            if (filters.tier) {
+                if (!item.tiers.includes(parseInt(filters.tier))) return false;
+            }
+
+            // Pillar match
+            if (pillarsToSearch.length > 0) {
+                if (!item.literacy_pillars.some(p => pillarsToSearch.includes(p))) return false;
+            }
+
+            return true;
+        });
+        results = results.concat(interventions.map(i => ({ ...i, itemType: 'Intervention' })));
+    }
+
+    // Sort results
+    results.sort((a, b) => {
+        // Sort by evidence level first
+        const evidenceOrder = { '**': 1, '*': 2, 'none': 3 };
+        const aEvidence = evidenceOrder[a.evidence_level] || 3;
+        const bEvidence = evidenceOrder[b.evidence_level] || 3;
+        if (aEvidence !== bEvidence) return aEvidence - bEvidence;
+        
+        // Then by name
+        return a.name.localeCompare(b.name);
+    });
+
+    displayCompactResults(results, filters);
+}
+
+function displayCompactResults(results, filters) {
+    const resultsPanel = document.querySelector('.results-panel');
+    if (!resultsPanel) return;
+
+    let filterSummary = [];
+    if (filters.tier) filterSummary.push(`Tier ${filters.tier}`);
+    if (filters.language) filterSummary.push(filters.language);
+    if (filters.pillar) filterSummary.push(filters.pillar);
+    if (filters.type) filterSummary.push(filters.type);
+
+    const summaryText = filterSummary.length > 0 
+        ? `Showing ${results.length} result${results.length !== 1 ? 's' : ''} for ${filterSummary.join(' • ')}`
+        : `Showing all ${results.length} result${results.length !== 1 ? 's' : ''}`;
+
+    if (results.length === 0) {
+        resultsPanel.innerHTML = `
+            <div class="results-header-compact">
+                <div class="results-count">${summaryText}</div>
+            </div>
+            <div class="results-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4M12 16h.01"/>
+                </svg>
+                <p>No results found matching your filters</p>
+            </div>
+        `;
+        return;
+    }
+
+    resultsPanel.innerHTML = `
+        <div class="results-header-compact">
+            <div class="results-count">${summaryText}</div>
+        </div>
+        <div class="results-grid-compact">
+            ${results.map(item => `
+                <div class="result-card-compact">
+                    <div class="result-header-compact">
+                        <div>
+                            <h4 class="result-name-compact">${item.name}</h4>
+                            <div class="result-meta-compact">
+                                <span class="badge-grade">${item.grade_range.start}-${item.grade_range.end}</span>
+                                <span class="badge-program">${item.program === 'English' ? 'EN' : 'FR'}</span>
+                                ${item.evidence_level && item.evidence_level !== 'none' 
+                                    ? `<span class="badge-evidence">${item.evidence_level}</span>` 
+                                    : ''}
+                                ${item.itemType === 'Intervention' 
+                                    ? `<span class="badge-tier">T${item.tiers.join(',')}</span>`
+                                    : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-details-compact">
+                        ${item.itemType === 'Intervention' ? `
+                            <div class="result-info"><strong>Pillars:</strong> ${item.literacy_pillars.join(', ')}</div>
+                        ` : `
+                            <div class="result-info"><strong>Pillar:</strong> ${item.literacy_pillar}</div>
+                            <div class="result-info"><strong>Type:</strong> ${item.assessment_type}</div>
+                        `}
+                    </div>
+                    ${item.url && item.url !== '(local resource)' && item.url !== '(SharePoint)' && item.url !== '(Nelson)' ? `
+                        <a href="${item.url}" target="_blank" class="result-link-compact">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                                <path d="M15 3h6v6"/>
+                                <path d="M10 14L21 3"/>
+                            </svg>
+                            View Resource
+                        </a>
+                    ` : `
+                        <div class="result-local-compact">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            ${item.url}
+                        </div>
+                    `}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function resetInterventionMenu() {
+    // Reset all dropdowns
+    const tierSelect = document.getElementById('tier-select');
+    const languageSelect = document.getElementById('language-select');
+    const screenerSelect = document.getElementById('screener-select');
+    const subtestSelect = document.getElementById('subtest-select');
+    const pillarSelect = document.getElementById('pillar-select');
+    const typeSelect = document.getElementById('type-select');
+
+    if (tierSelect) tierSelect.value = '';
+    if (languageSelect) languageSelect.value = 'English';
+    if (screenerSelect) screenerSelect.value = '';
+    if (subtestSelect) subtestSelect.value = '';
+    if (pillarSelect) pillarSelect.value = '';
+    if (typeSelect) typeSelect.value = '';
+
+    // Update dependent dropdowns
+    updateScreenerOptions();
+    updateSubtestOptions();
+    
+    // Refresh results
+    performCompactSearch();
 }
 
 // ============================================

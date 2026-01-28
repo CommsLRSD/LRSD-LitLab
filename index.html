@@ -203,76 +203,94 @@
             </div>
         </section>
         
-        <!-- Interventions Section with Flowchart -->
+        <!-- Interventions Section with Filterable Menu -->
         <section id="interventions-section" class="content-section">
             <div class="interventions-header-compact">
-                <h2 class="section-title">Interventions</h2>
+                <h2 class="section-title">Interventions & Assessments Menu</h2>
+                <p class="section-subtitle">Search for literacy interventions and drill-down assessments based on your screening results</p>
             </div>
 
-            <div class="tier-landing-compact">
-                <div class="tier-card-compact" data-tier="1">
-                    <div class="tier-header-compact tier-1">
-                        <span class="tier-badge">T1</span>
-                        <h3>Universal Screening</h3>
+            <div class="intervention-menu-container">
+                <!-- Compact Filter Bar -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label class="filter-label">Tier</label>
+                        <select id="tier-select" class="filter-select-compact">
+                            <option value="">All Tiers</option>
+                            <option value="1">Tier 1</option>
+                            <option value="2">Tier 2</option>
+                            <option value="3">Tier 3</option>
+                        </select>
                     </div>
-                    <div class="tier-actions-compact">
-                        <button class="tier-btn-primary" onclick="startTier1Flowchart()">
+
+                    <div class="filter-group">
+                        <label class="filter-label">Language</label>
+                        <select id="language-select" class="filter-select-compact">
+                            <option value="English">English</option>
+                            <option value="French">French</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Screener</label>
+                        <select id="screener-select" class="filter-select-compact">
+                            <option value="">All Screeners</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Subtest</label>
+                        <select id="subtest-select" class="filter-select-compact">
+                            <option value="">All Subtests</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Literacy Pillar</label>
+                        <select id="pillar-select" class="filter-select-compact">
+                            <option value="">All Pillars</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Type</label>
+                        <select id="type-select" class="filter-select-compact">
+                            <option value="">All Types</option>
+                            <option value="Assessment">Assessment</option>
+                            <option value="Intervention">Intervention</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-actions-compact">
+                        <button id="reset-btn" class="btn-reset-compact" title="Reset all filters">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                                <path d="M21 3v5h-5"/>
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                                <path d="M3 21v-5h5"/>
                             </svg>
-                            Start Flowchart
-                        </button>
-                        <button class="tier-btn-secondary" onclick="openInterventionsMenu(1)" title="View Tier 1 Interventions" aria-label="View Tier 1 Interventions">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
+                            Reset
                         </button>
                     </div>
                 </div>
 
-                <div class="tier-card-compact" data-tier="2">
-                    <div class="tier-header-compact tier-2">
-                        <span class="tier-badge">T2</span>
-                        <h3>Small Group</h3>
+                <!-- Results Display -->
+                <div class="results-panel">
+                    <div id="results-header" class="results-header" style="display: none;">
+                        <h3 class="results-title">Results</h3>
+                        <div class="results-summary" id="results-summary"></div>
                     </div>
-                    <div class="tier-actions-compact">
-                        <button class="tier-btn-primary" onclick="startTier2Flowchart()">
+                    <div id="results-container" class="results-container">
+                        <div class="results-empty">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="M21 21l-4.35-4.35"/>
                             </svg>
-                            Start Flowchart
-                        </button>
-                        <button class="tier-btn-secondary" onclick="openInterventionsMenu(2)" title="View Tier 2 Interventions" aria-label="View Tier 2 Interventions">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="tier-card-compact" data-tier="3">
-                    <div class="tier-header-compact tier-3">
-                        <span class="tier-badge">T3</span>
-                        <h3>Intensive</h3>
-                    </div>
-                    <div class="tier-actions-compact">
-                        <button class="tier-btn-primary" onclick="startTier3Flowchart()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                            </svg>
-                            Start Flowchart
-                        </button>
-                        <button class="tier-btn-secondary" onclick="openInterventionsMenu(3)" title="View Tier 3 Interventions" aria-label="View Tier 3 Interventions">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
-                        </button>
+                            <p>Select filters to search for interventions and assessments</p>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Flowchart Container -->
-            <div id="flowchart-container" class="flowchart-hidden"></div>
         </section>
 
         <!-- Assessment Schedules Section -->
