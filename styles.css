@@ -4532,3 +4532,583 @@ h1, h2, h3, h4, h5, h6 {
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================
+   NEW STEP-BASED INTERVENTION MENU STYLES
+   Minimalist UI/UX for 5-step navigation
+   ============================================ */
+
+/* Progress Indicator */
+.step-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+}
+
+.step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.step-indicator.active .step-number {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1);
+}
+
+.step-indicator.completed .step-number {
+    background: var(--success);
+    color: white;
+}
+
+.step-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.step-indicator.active .step-label {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.step-connector {
+    width: 60px;
+    height: 2px;
+    background: var(--border);
+    margin: 0 0.5rem;
+}
+
+.step-connector.completed {
+    background: var(--success);
+}
+
+/* Menu Steps */
+.menu-step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.menu-step.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.step-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.step-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    color: var(--text-primary);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-back:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary);
+}
+
+.btn-back svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Screener Groups */
+.screener-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.screener-group {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.group-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border);
+}
+
+/* Option Cards */
+.option-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.option-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    font-family: inherit;
+}
+
+.option-card:hover {
+    border-color: var(--primary);
+    background: var(--hover-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.option-card:active {
+    transform: translateY(0);
+}
+
+.option-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.option-details {
+    font-size: 0.9375rem;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.option-meta {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Option List (for subtests) */
+.option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    text-align: left;
+}
+
+.option-item:hover {
+    border-color: var(--primary);
+    background: var(--hover-bg);
+}
+
+.option-item-content {
+    flex: 1;
+}
+
+.option-item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.option-item-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.option-item-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--text-secondary);
+}
+
+/* Pillar Info */
+.pillar-info {
+    background: var(--info-bg, #e8f4f8);
+    border-left: 4px solid var(--primary);
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.pillar-info p {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* Option Checkboxes (for pillars) */
+.option-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.checkbox-option:hover {
+    border-color: var(--primary);
+    background: var(--hover-bg);
+}
+
+.checkbox-option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 1rem;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.checkbox-option label {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.checkbox-option.checked {
+    border-color: var(--primary);
+    background: var(--hover-bg);
+}
+
+/* Type Cards */
+.type-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.type-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.type-card:hover {
+    border-color: var(--primary);
+    background: var(--hover-bg);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.type-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--primary-light, #e8f4f8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.type-icon svg {
+    width: 32px;
+    height: 32px;
+    color: var(--primary);
+}
+
+.type-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.type-description {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Buttons */
+.btn-next {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-next:hover {
+    background: var(--primary-hover, #2d6580);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 125, 160, 0.3);
+}
+
+.btn-next svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-restart {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: white;
+    color: var(--text-primary);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 2rem;
+}
+
+.btn-restart:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary);
+}
+
+.btn-restart svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Results Display */
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.result-card {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.result-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.result-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.result-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.result-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.result-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background: var(--hover-bg);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.result-badge.evidence {
+    background: var(--success-light, #e8f5e9);
+    color: var(--success, #2e7d32);
+}
+
+.result-badge.evidence-based::before {
+    content: "★ ";
+}
+
+.result-badge.research-based::before {
+    content: "★★ ";
+}
+
+.result-pillars {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.result-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+}
+
+.result-link:hover {
+    color: var(--primary-hover, #2d6580);
+    gap: 0.75rem;
+}
+
+.result-link svg {
+    width: 16px;
+    height: 16px;
+}
+
+.results-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.results-empty-state svg {
+    width: 64px;
+    height: 64px;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.results-empty-state p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .step-progress {
+        padding: 1rem 0.5rem;
+    }
+    
+    .step-connector {
+        width: 30px;
+    }
+    
+    .step-label {
+        display: none;
+    }
+    
+    .option-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .type-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .step-header {
+        flex-direction: column;
+    }
+    
+    .btn-back {
+        align-self: flex-start;
+    }
+}
