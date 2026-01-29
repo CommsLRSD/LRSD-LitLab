@@ -3918,7 +3918,6 @@ window.restartTier1Visual = restartTier1Visual;
 window.restartTier2Visual = restartTier2Visual;
 window.showInterventionView = showInterventionView;
 window.openTierFlowchart = openTierFlowchart;
-window.openInterventionsMenuView = openInterventionsMenuView;
 window.returnToInterventionsOptions = returnToInterventionsOptions;
 
 // New step-based intervention menu exports
