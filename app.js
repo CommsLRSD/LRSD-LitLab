@@ -3669,12 +3669,12 @@ function loadPillars() {
         // Multiple pillars - show checkboxes
         menuState.selectedPillars = [...pillars]; // Select all by default
         optionsContainer.innerHTML = pillars.map((pillar, index) => {
-            // Escape pillar name for safe insertion
-            const escapedPillar = pillar.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            // Use proper HTML escaping for attributes
+            const escapedPillar = escapeHtml(pillar);
             return `
                 <div class="checkbox-option checked" data-pillar="${escapedPillar}" data-index="${index}">
                     <input type="checkbox" id="pillar-${index}" checked>
-                    <label for="pillar-${index}">${escapeHtml(pillar)}</label>
+                    <label for="pillar-${index}">${escapedPillar}</label>
                 </div>
             `;
         }).join('');
@@ -3682,7 +3682,9 @@ function loadPillars() {
         // Add event listeners to checkboxes
         optionsContainer.querySelectorAll('.checkbox-option').forEach(option => {
             const checkbox = option.querySelector('input[type="checkbox"]');
-            const pillarName = option.dataset.pillar.replace(/\\'/g, "'");
+            // Get pillar name from the original pillars array using index
+            const pillarIndex = parseInt(option.dataset.index);
+            const pillarName = pillars[pillarIndex];
             
             checkbox.addEventListener('change', (e) => {
                 togglePillarCheckbox(pillarName, option, e.target.checked);
