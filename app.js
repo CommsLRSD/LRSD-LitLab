@@ -3476,6 +3476,445 @@ function returnToInterventionsOptions() {
 }
 
 // ============================================
+// NEW STEP-BASED INTERVENTION MENU
+// ============================================
+
+// Menu state
+const menuState = {
+    currentStep: 1,
+    selectedScreener: null,
+    selectedScreenerData: null,
+    selectedSubtest: null,
+    selectedSubtestData: null,
+    selectedPillars: [],
+    selectedItemType: null
+};
+
+// Initialize the step-based menu when view opens
+function initializeStepBasedMenu() {
+    // Reset state
+    menuState.currentStep = 1;
+    menuState.selectedScreener = null;
+    menuState.selectedScreenerData = null;
+    menuState.selectedSubtest = null;
+    menuState.selectedSubtestData = null;
+    menuState.selectedPillars = [];
+    menuState.selectedItemType = null;
+    
+    // Show step 1
+    goToStep(1);
+}
+
+// Navigate to a specific step
+function goToStep(stepNumber) {
+    menuState.currentStep = stepNumber;
+    
+    // Hide all steps
+    document.querySelectorAll('.menu-step').forEach(step => {
+        step.classList.remove('active');
+    });
+    
+    // Show current step
+    const currentStepEl = document.getElementById(`step-${stepNumber}`);
+    if (currentStepEl) {
+        currentStepEl.classList.add('active');
+    }
+    
+    // Update progress indicator
+    updateProgressIndicator(stepNumber);
+    
+    // Scroll to top of menu
+    const menuView = document.getElementById('interventions-menu-full-view');
+    if (menuView) {
+        menuView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Update progress indicator
+function updateProgressIndicator(currentStep) {
+    document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+        const stepNum = index + 1;
+        indicator.classList.remove('active', 'completed');
+        
+        if (stepNum === currentStep) {
+            indicator.classList.add('active');
+        } else if (stepNum < currentStep) {
+            indicator.classList.add('completed');
+        }
+    });
+    
+    document.querySelectorAll('.step-connector').forEach((connector, index) => {
+        connector.classList.remove('completed');
+        if (index < currentStep - 1) {
+            connector.classList.add('completed');
+        }
+    });
+}
+
+// Step 1: Select Screener
+function selectScreener(screenerId) {
+    console.log('Selected screener:', screenerId);
+    
+    if (!appState.interventionMenuData || !appState.interventionMenuData.screeners) {
+        console.error('Intervention menu data not loaded');
+        return;
+    }
+    
+    // Find screener data
+    const screenerData = appState.interventionMenuData.screeners.find(s => s.screener_id === screenerId);
+    if (!screenerData) {
+        console.error('Screener not found:', screenerId);
+        return;
+    }
+    
+    menuState.selectedScreener = screenerId;
+    menuState.selectedScreenerData = screenerData;
+    
+    // Load subtests for step 2
+    loadSubtests();
+    
+    // Go to step 2
+    goToStep(2);
+}
+
+// Load subtests for selected screener
+function loadSubtests() {
+    const container = document.getElementById('subtest-options');
+    const screenerNameEl = document.getElementById('selected-screener-name');
+    
+    if (!container || !menuState.selectedScreenerData) return;
+    
+    // Update screener name
+    if (screenerNameEl) {
+        screenerNameEl.textContent = menuState.selectedScreenerData.screener_name;
+    }
+    
+    // Generate subtest options
+    const subtests = menuState.selectedScreenerData.subtests || [];
+    container.innerHTML = subtests.map(subtest => {
+        const escapedCode = escapeHtml(subtest.subtest_code);
+        const escapedName = escapeHtml(subtest.subtest_name);
+        const escapedDesc = escapeHtml(subtest.description);
+        return `
+            <button class="option-item" data-subtest-code="${escapedCode}">
+                <div class="option-item-content">
+                    <div class="option-item-title">${escapedCode} - ${escapedName}</div>
+                    <div class="option-item-subtitle">
+                        Grades ${subtest.grade_range.start}-${subtest.grade_range.end} • 
+                        ${escapedDesc}
+                    </div>
+                </div>
+                <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        `;
+    }).join('');
+    
+    // Add event listeners
+    container.querySelectorAll('.option-item').forEach(button => {
+        button.addEventListener('click', () => {
+            selectSubtest(button.dataset.subtestCode);
+        });
+    });
+}
+
+// Step 2: Select Subtest
+function selectSubtest(subtestCode) {
+    console.log('Selected subtest:', subtestCode);
+    
+    if (!menuState.selectedScreenerData) return;
+    
+    // Find subtest data
+    const subtestData = menuState.selectedScreenerData.subtests.find(s => s.subtest_code === subtestCode);
+    if (!subtestData) {
+        console.error('Subtest not found:', subtestCode);
+        return;
+    }
+    
+    menuState.selectedSubtest = subtestCode;
+    menuState.selectedSubtestData = subtestData;
+    
+    // Load pillars for step 3
+    loadPillars();
+    
+    // Go to step 3
+    goToStep(3);
+}
+
+// Load pillars for selected subtest
+function loadPillars() {
+    const infoContainer = document.getElementById('pillar-info');
+    const optionsContainer = document.getElementById('pillar-options');
+    
+    if (!infoContainer || !optionsContainer || !menuState.selectedSubtestData) return;
+    
+    const pillars = menuState.selectedSubtestData.literacy_pillars || [];
+    
+    // Show info
+    infoContainer.innerHTML = `
+        <p><strong>${menuState.selectedSubtestData.subtest_name}</strong> measures: ${pillars.join(', ')}</p>
+    `;
+    
+    // If single pillar, auto-select it
+    if (pillars.length === 1) {
+        menuState.selectedPillars = [pillars[0]];
+        optionsContainer.innerHTML = `
+            <div class="checkbox-option checked">
+                <input type="checkbox" id="pillar-0" checked disabled>
+                <label for="pillar-0">${pillars[0]}</label>
+            </div>
+        `;
+    } else {
+        // Multiple pillars - show checkboxes
+        menuState.selectedPillars = [...pillars]; // Select all by default
+        optionsContainer.innerHTML = pillars.map((pillar, index) => {
+            // Use proper HTML escaping for attributes
+            const escapedPillar = escapeHtml(pillar);
+            return `
+                <div class="checkbox-option checked" data-pillar="${escapedPillar}" data-index="${index}">
+                    <input type="checkbox" id="pillar-${index}" checked>
+                    <label for="pillar-${index}">${escapedPillar}</label>
+                </div>
+            `;
+        }).join('');
+        
+        // Add event listeners to checkboxes
+        optionsContainer.querySelectorAll('.checkbox-option').forEach(option => {
+            const checkbox = option.querySelector('input[type="checkbox"]');
+            // Get pillar name from the original pillars array using index
+            const pillarIndex = parseInt(option.dataset.index);
+            const pillarName = pillars[pillarIndex];
+            
+            checkbox.addEventListener('change', (e) => {
+                togglePillarCheckbox(pillarName, option, e.target.checked);
+            });
+        });
+    }
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Toggle pillar checkbox selection
+function togglePillarCheckbox(pillar, element, isChecked) {
+    if (isChecked) {
+        // Add to selection
+        if (!menuState.selectedPillars.includes(pillar)) {
+            menuState.selectedPillars.push(pillar);
+        }
+        element.classList.add('checked');
+    } else {
+        // Remove from selection
+        menuState.selectedPillars = menuState.selectedPillars.filter(p => p !== pillar);
+        element.classList.remove('checked');
+    }
+    
+    console.log('Selected pillars:', menuState.selectedPillars);
+}
+
+// Validate and proceed from step 3
+function proceedFromStep3() {
+    if (menuState.selectedPillars.length === 0) {
+        alert('Please select at least one literacy pillar to continue.');
+        return;
+    }
+    goToStep(4);
+}
+
+// Step 4: Select Item Type
+function selectItemType(type) {
+    console.log('Selected item type:', type);
+    
+    menuState.selectedItemType = type;
+    
+    // Load and display results
+    loadResults();
+    
+    // Go to step 5
+    goToStep(5);
+}
+
+// Helper function to check grade range overlap
+function gradeRangeOverlaps(subtestStart, subtestEnd, itemStart, itemEnd) {
+    // Convert grades to numbers for comparison (K=0, 1=1, etc.)
+    const gradeToNum = (grade) => {
+        if (grade === 'K' || grade === 'M') return 0;
+        return parseInt(grade);
+    };
+    
+    const subStart = gradeToNum(subtestStart);
+    const subEnd = gradeToNum(subtestEnd);
+    const itStart = gradeToNum(itemStart);
+    const itEnd = gradeToNum(itemEnd);
+    
+    // Check if ranges overlap
+    return itStart <= subEnd && itEnd >= subStart;
+}
+
+// Load and display results
+function loadResults() {
+    const breadcrumb = document.getElementById('results-breadcrumb');
+    const summary = document.getElementById('step5-results-summary');
+    const container = document.getElementById('step5-results-container');
+    
+    if (!container || !menuState.selectedScreenerData || !menuState.selectedSubtestData) return;
+    
+    // Update breadcrumb
+    if (breadcrumb) {
+        breadcrumb.innerHTML = `
+            <strong>${menuState.selectedScreenerData.screener_name}</strong> > 
+            <strong>${menuState.selectedSubtestData.subtest_code}</strong> > 
+            <strong>${menuState.selectedPillars.join(', ')}</strong> > 
+            <strong>${menuState.selectedItemType}</strong>
+        `;
+    }
+    
+    // Get program based on screener language
+    const program = menuState.selectedScreenerData.language === 'English' ? 'English' : 'French Immersion';
+    
+    // Get subtest grade range
+    const subtestGradeStart = menuState.selectedSubtestData.grade_range.start;
+    const subtestGradeEnd = menuState.selectedSubtestData.grade_range.end;
+    
+    // Filter results
+    let results = [];
+    if (menuState.selectedItemType === 'Assessment') {
+        results = (appState.interventionMenuData.assessments || []).filter(item => {
+            // Check program match
+            if (item.program !== program) return false;
+            
+            // Check grade range overlap
+            if (!gradeRangeOverlaps(subtestGradeStart, subtestGradeEnd, 
+                                   item.grade_range.start, item.grade_range.end)) {
+                return false;
+            }
+            
+            // Check pillar match
+            const itemPillars = item.literacy_pillars || [item.literacy_pillar];
+            return menuState.selectedPillars.some(pillar => itemPillars.includes(pillar));
+        });
+    } else {
+        // Intervention
+        results = (appState.interventionMenuData.interventions || []).filter(item => {
+            // Check program match
+            if (item.program !== program) return false;
+            
+            // Check grade range overlap
+            if (!gradeRangeOverlaps(subtestGradeStart, subtestGradeEnd,
+                                   item.grade_range.start, item.grade_range.end)) {
+                return false;
+            }
+            
+            // Check pillar match (interventions can have multiple pillars)
+            const itemPillars = item.literacy_pillars || [];
+            return menuState.selectedPillars.some(pillar => itemPillars.includes(pillar));
+        });
+    }
+    
+    // Sort by evidence level, then name
+    results.sort((a, b) => {
+        // Evidence level priority: ** > * > none
+        const evidenceOrder = { '**': 3, '*': 2, 'none': 1 };
+        const aEvidence = evidenceOrder[a.evidence_level] || 1;
+        const bEvidence = evidenceOrder[b.evidence_level] || 1;
+        
+        if (aEvidence !== bEvidence) {
+            return bEvidence - aEvidence; // Higher first
+        }
+        
+        return a.name.localeCompare(b.name);
+    });
+    
+    // Update summary
+    if (summary) {
+        summary.innerHTML = `
+            <p><strong>${results.length}</strong> result${results.length !== 1 ? 's' : ''} found</p>
+        `;
+    }
+    
+    // Display results
+    if (results.length === 0) {
+        container.innerHTML = `
+            <div class="results-empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <p>No results found for this combination. Try selecting different pillars or starting a new search.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = results.map(item => {
+        const pillars = item.literacy_pillars || [item.literacy_pillar];
+        const evidenceClass = item.evidence_level === '**' ? 'research-based' : 
+                             item.evidence_level === '*' ? 'evidence-based' : '';
+        const evidenceLabel = item.evidence_level === '**' ? 'Research-Based' :
+                             item.evidence_level === '*' ? 'Evidence-Based' : '';
+        
+        // Escape and validate data
+        const itemName = escapeHtml(item.name);
+        const itemProgram = escapeHtml(item.program);
+        const escapedPillars = pillars.map(p => escapeHtml(p)).join(', ');
+        
+        // Validate URL (only allow http/https)
+        let safeUrl = '';
+        if (item.url && item.url !== '(SharePoint)') {
+            try {
+                const url = new URL(item.url);
+                if (url.protocol === 'http:' || url.protocol === 'https:') {
+                    safeUrl = item.url;
+                }
+            } catch (e) {
+                // Invalid URL, leave empty
+            }
+        }
+        
+        return `
+            <div class="result-card">
+                <div class="result-header">
+                    <h4 class="result-name">${itemName}</h4>
+                </div>
+                <div class="result-meta">
+                    <span class="result-badge">Grades ${item.grade_range.start}-${item.grade_range.end}</span>
+                    <span class="result-badge">${itemProgram}</span>
+                    ${evidenceLabel ? `<span class="result-badge evidence ${evidenceClass}">${evidenceLabel}</span>` : ''}
+                </div>
+                <div class="result-pillars">
+                    <strong>Addresses:</strong> ${escapedPillars}
+                </div>
+                ${safeUrl ? `
+                    <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="result-link">
+                        View Resource
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
+                        </svg>
+                    </a>
+                ` : '<span style="font-size: 0.875rem; color: var(--text-secondary);">Available on SharePoint</span>'}
+            </div>
+        `;
+    }).join('');
+}
+
+// Restart menu
+function restartMenu() {
+    initializeStepBasedMenu();
+}
+
+// Update openInterventionsMenuView to initialize the new menu
+const originalOpenInterventionsMenuView = openInterventionsMenuView;
+window.openInterventionsMenuView = function() {
+    originalOpenInterventionsMenuView();
+    initializeStepBasedMenu();
+};
+
+// ============================================
 // Export for global use
 // ============================================
 window.navigateToPage = navigateToPage;
@@ -3536,6 +3975,15 @@ window.restartTier1Visual = restartTier1Visual;
 window.restartTier2Visual = restartTier2Visual;
 window.showInterventionView = showInterventionView;
 window.openTierFlowchart = openTierFlowchart;
-window.openInterventionsMenuView = openInterventionsMenuView;
 window.returnToInterventionsOptions = returnToInterventionsOptions;
+
+// New step-based intervention menu exports
+window.initializeStepBasedMenu = initializeStepBasedMenu;
+window.selectScreener = selectScreener;
+window.selectSubtest = selectSubtest;
+window.selectItemType = selectItemType;
+window.goToStep = goToStep;
+window.proceedFromStep3 = proceedFromStep3;
+window.restartMenu = restartMenu;
+
 
