@@ -3591,20 +3591,32 @@ function loadSubtests() {
     
     // Generate subtest options
     const subtests = menuState.selectedScreenerData.subtests || [];
-    container.innerHTML = subtests.map(subtest => `
-        <button class="option-item" onclick="selectSubtest('${subtest.subtest_code}')">
-            <div class="option-item-content">
-                <div class="option-item-title">${subtest.subtest_code} - ${subtest.subtest_name}</div>
-                <div class="option-item-subtitle">
-                    Grades ${subtest.grade_range.start}-${subtest.grade_range.end} • 
-                    ${subtest.description}
+    container.innerHTML = subtests.map(subtest => {
+        const escapedCode = escapeHtml(subtest.subtest_code);
+        const escapedName = escapeHtml(subtest.subtest_name);
+        const escapedDesc = escapeHtml(subtest.description);
+        return `
+            <button class="option-item" data-subtest-code="${escapedCode}">
+                <div class="option-item-content">
+                    <div class="option-item-title">${escapedCode} - ${escapedName}</div>
+                    <div class="option-item-subtitle">
+                        Grades ${subtest.grade_range.start}-${subtest.grade_range.end} • 
+                        ${escapedDesc}
+                    </div>
                 </div>
-            </div>
-            <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
-            </svg>
-        </button>
-    `).join('');
+                <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        `;
+    }).join('');
+    
+    // Add event listeners
+    container.querySelectorAll('.option-item').forEach(button => {
+        button.addEventListener('click', () => {
+            selectSubtest(button.dataset.subtestCode);
+        });
+    });
 }
 
 // Step 2: Select Subtest
@@ -3656,35 +3668,60 @@ function loadPillars() {
     } else {
         // Multiple pillars - show checkboxes
         menuState.selectedPillars = [...pillars]; // Select all by default
-        optionsContainer.innerHTML = pillars.map((pillar, index) => `
-            <div class="checkbox-option checked" onclick="togglePillar('${pillar}', this)">
-                <input type="checkbox" id="pillar-${index}" checked>
-                <label for="pillar-${index}">${pillar}</label>
-            </div>
-        `).join('');
+        optionsContainer.innerHTML = pillars.map((pillar, index) => {
+            // Escape pillar name for safe insertion
+            const escapedPillar = pillar.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            return `
+                <div class="checkbox-option checked" data-pillar="${escapedPillar}" data-index="${index}">
+                    <input type="checkbox" id="pillar-${index}" checked>
+                    <label for="pillar-${index}">${escapeHtml(pillar)}</label>
+                </div>
+            `;
+        }).join('');
+        
+        // Add event listeners to checkboxes
+        optionsContainer.querySelectorAll('.checkbox-option').forEach(option => {
+            const checkbox = option.querySelector('input[type="checkbox"]');
+            const pillarName = option.dataset.pillar.replace(/\\'/g, "'");
+            
+            checkbox.addEventListener('change', (e) => {
+                togglePillarCheckbox(pillarName, option, e.target.checked);
+            });
+        });
     }
 }
 
-// Toggle pillar selection
-function togglePillar(pillar, element) {
-    const checkbox = element.querySelector('input[type="checkbox"]');
-    const isChecked = checkbox.checked;
-    
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Toggle pillar checkbox selection
+function togglePillarCheckbox(pillar, element, isChecked) {
     if (isChecked) {
-        // Remove from selection
-        menuState.selectedPillars = menuState.selectedPillars.filter(p => p !== pillar);
-        element.classList.remove('checked');
-        checkbox.checked = false;
-    } else {
         // Add to selection
         if (!menuState.selectedPillars.includes(pillar)) {
             menuState.selectedPillars.push(pillar);
         }
         element.classList.add('checked');
-        checkbox.checked = true;
+    } else {
+        // Remove from selection
+        menuState.selectedPillars = menuState.selectedPillars.filter(p => p !== pillar);
+        element.classList.remove('checked');
     }
     
     console.log('Selected pillars:', menuState.selectedPillars);
+}
+
+// Validate and proceed from step 3
+function proceedFromStep3() {
+    if (menuState.selectedPillars.length === 0) {
+        alert('Please select at least one literacy pillar to continue.');
+        return;
+    }
+    goToStep(4);
 }
 
 // Step 4: Select Item Type
@@ -3819,21 +3856,39 @@ function loadResults() {
         const evidenceLabel = item.evidence_level === '**' ? 'Research-Based' :
                              item.evidence_level === '*' ? 'Evidence-Based' : '';
         
+        // Escape and validate data
+        const itemName = escapeHtml(item.name);
+        const itemProgram = escapeHtml(item.program);
+        const escapedPillars = pillars.map(p => escapeHtml(p)).join(', ');
+        
+        // Validate URL (only allow http/https)
+        let safeUrl = '';
+        if (item.url && item.url !== '(SharePoint)') {
+            try {
+                const url = new URL(item.url);
+                if (url.protocol === 'http:' || url.protocol === 'https:') {
+                    safeUrl = item.url;
+                }
+            } catch (e) {
+                // Invalid URL, leave empty
+            }
+        }
+        
         return `
             <div class="result-card">
                 <div class="result-header">
-                    <h4 class="result-name">${item.name}</h4>
+                    <h4 class="result-name">${itemName}</h4>
                 </div>
                 <div class="result-meta">
                     <span class="result-badge">Grades ${item.grade_range.start}-${item.grade_range.end}</span>
-                    <span class="result-badge">${item.program}</span>
+                    <span class="result-badge">${itemProgram}</span>
                     ${evidenceLabel ? `<span class="result-badge evidence ${evidenceClass}">${evidenceLabel}</span>` : ''}
                 </div>
                 <div class="result-pillars">
-                    <strong>Addresses:</strong> ${pillars.join(', ')}
+                    <strong>Addresses:</strong> ${escapedPillars}
                 </div>
-                ${item.url && item.url !== '(SharePoint)' ? `
-                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="result-link">
+                ${safeUrl ? `
+                    <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="result-link">
                         View Resource
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
@@ -3921,11 +3976,12 @@ window.openTierFlowchart = openTierFlowchart;
 window.returnToInterventionsOptions = returnToInterventionsOptions;
 
 // New step-based intervention menu exports
+window.initializeStepBasedMenu = initializeStepBasedMenu;
 window.selectScreener = selectScreener;
 window.selectSubtest = selectSubtest;
 window.selectItemType = selectItemType;
 window.goToStep = goToStep;
-window.togglePillar = togglePillar;
+window.proceedFromStep3 = proceedFromStep3;
 window.restartMenu = restartMenu;
 
 
