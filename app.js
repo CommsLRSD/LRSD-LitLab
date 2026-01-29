@@ -3504,6 +3504,15 @@ function initializeStepBasedMenu() {
     menuState.selectedPillars = [];
     menuState.selectedItemType = null;
     
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        // Initialize panel-based wizard
+        goToStep(1);
+        updateStepPills();
+        return;
+    }
+    
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
     if (singlePageMode) {
@@ -3534,10 +3543,30 @@ function initializeStepBasedMenu() {
     }
 }
 
-// Navigate to a specific step
+// Navigate to a specific step (updated for panel-based wizard)
 function goToStep(stepNumber) {
     menuState.currentStep = stepNumber;
     
+    // Check for new panel-based wizard
+    const stepPanels = document.querySelector('.step-panels');
+    if (stepPanels) {
+        // Hide all panels
+        document.querySelectorAll('.step-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        
+        // Show current panel
+        const currentPanel = document.getElementById(`panel-${stepNumber}`);
+        if (currentPanel) {
+            currentPanel.classList.add('active');
+        }
+        
+        // Update step pills
+        updateStepPills();
+        return;
+    }
+    
+    // Legacy code for old multi-step mode
     // Hide all steps
     document.querySelectorAll('.menu-step').forEach(step => {
         step.classList.remove('active');
@@ -3557,6 +3586,42 @@ function goToStep(stepNumber) {
     if (menuView) {
         menuView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+}
+
+// Update step pills in horizontal bar
+function updateStepPills() {
+    const pills = document.querySelectorAll('.step-pill');
+    const connectors = document.querySelectorAll('.step-bar .step-connector');
+    
+    pills.forEach((pill, index) => {
+        const stepNum = index + 1;
+        pill.classList.remove('active', 'completed', 'disabled');
+        
+        if (stepNum === menuState.currentStep) {
+            pill.classList.add('active');
+        } else if (stepNum < menuState.currentStep) {
+            pill.classList.add('completed');
+        } else {
+            // Determine if step should be enabled based on previous steps
+            let enabled = false;
+            if (stepNum === 2 && menuState.selectedScreener) enabled = true;
+            else if (stepNum === 3 && menuState.selectedSubtest) enabled = true;
+            else if (stepNum === 4 && menuState.selectedPillars && menuState.selectedPillars.length > 0) enabled = true;
+            else if (stepNum === 5 && menuState.selectedItemType) enabled = true;
+            
+            if (!enabled) {
+                pill.classList.add('disabled');
+            }
+        }
+    });
+    
+    // Update connectors
+    connectors.forEach((connector, index) => {
+        connector.classList.remove('active');
+        if (index < menuState.currentStep - 1) {
+            connector.classList.add('active');
+        }
+    });
 }
 
 // Update progress indicator
@@ -3605,6 +3670,13 @@ function selectScreener(screenerId) {
     // Update step sections and navigate
     updateStepSections();
     
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        goToStep(2);
+        return;
+    }
+    
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
     if (singlePageMode) {
@@ -3629,30 +3701,49 @@ function loadSubtests() {
         screenerNameEl.textContent = menuState.selectedScreenerData.screener_name;
     }
     
+    // Check if we're using the new panel-based wizard
+    const isNewWizard = document.querySelector('.step-wizard');
+    
     // Generate subtest options
     const subtests = menuState.selectedScreenerData.subtests || [];
-    container.innerHTML = subtests.map(subtest => {
-        const escapedCode = escapeHtml(subtest.subtest_code);
-        const escapedName = escapeHtml(subtest.subtest_name);
-        const escapedDesc = escapeHtml(subtest.description);
-        return `
-            <button class="option-item" data-subtest-code="${escapedCode}">
-                <div class="option-item-content">
-                    <div class="option-item-title">${escapedCode} - ${escapedName}</div>
-                    <div class="option-item-subtitle">
-                        Grades ${subtest.grade_range.start}-${subtest.grade_range.end} • 
-                        ${escapedDesc}
-                    </div>
-                </div>
-                <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6"/>
-                </svg>
-            </button>
-        `;
-    }).join('');
     
-    // Add event listeners
-    container.querySelectorAll('.option-item').forEach(button => {
+    if (isNewWizard) {
+        // New compact button style
+        container.innerHTML = subtests.map(subtest => {
+            const escapedCode = escapeHtml(subtest.subtest_code);
+            const escapedName = escapeHtml(subtest.subtest_name);
+            return `
+                <button class="subtest-btn" data-subtest-code="${escapedCode}">
+                    <strong>${escapedCode}</strong>
+                    <span>${escapedName}</span>
+                </button>
+            `;
+        }).join('');
+    } else {
+        // Legacy card style
+        container.innerHTML = subtests.map(subtest => {
+            const escapedCode = escapeHtml(subtest.subtest_code);
+            const escapedName = escapeHtml(subtest.subtest_name);
+            const escapedDesc = escapeHtml(subtest.description);
+            return `
+                <button class="option-item" data-subtest-code="${escapedCode}">
+                    <div class="option-item-content">
+                        <div class="option-item-title">${escapedCode} - ${escapedName}</div>
+                        <div class="option-item-subtitle">
+                            Grades ${subtest.grade_range.start}-${subtest.grade_range.end} • 
+                            ${escapedDesc}
+                        </div>
+                    </div>
+                    <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+            `;
+        }).join('');
+    }
+    
+    // Add event listeners (for both old and new styles)
+    container.querySelectorAll('.option-item, .subtest-btn').forEach(button => {
         button.addEventListener('click', () => {
             selectSubtest(button.dataset.subtestCode);
         });
@@ -3681,6 +3772,13 @@ function selectSubtest(subtestCode) {
     // Update step sections and navigate
     updateStepSections();
     
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        goToStep(3);
+        return;
+    }
+    
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
     if (singlePageMode) {
@@ -3701,39 +3799,67 @@ function loadPillars() {
     if (!infoContainer || !optionsContainer || !menuState.selectedSubtestData) return;
     
     const pillars = menuState.selectedSubtestData.literacy_pillars || [];
+    const isNewWizard = document.querySelector('.step-wizard');
     
-    // Show info
-    infoContainer.innerHTML = `
-        <p><strong>${menuState.selectedSubtestData.subtest_name}</strong> measures: ${pillars.join(', ')}</p>
-    `;
+    // Show info as chips for new wizard, or as text for legacy
+    if (isNewWizard) {
+        infoContainer.innerHTML = pillars.map(pillar => {
+            const escapedPillar = escapeHtml(pillar);
+            return `<span class="pillar-chip">${escapedPillar}</span>`;
+        }).join('');
+    } else {
+        infoContainer.innerHTML = `
+            <p><strong>${menuState.selectedSubtestData.subtest_name}</strong> measures: ${pillars.join(', ')}</p>
+        `;
+    }
     
     // If single pillar, auto-select it
     if (pillars.length === 1) {
         menuState.selectedPillars = [pillars[0]];
-        optionsContainer.innerHTML = `
-            <div class="checkbox-option checked">
-                <input type="checkbox" id="pillar-0" checked disabled>
-                <label for="pillar-0">${pillars[0]}</label>
-            </div>
-        `;
+        if (isNewWizard) {
+            optionsContainer.innerHTML = `
+                <div class="pillar-checkbox-item">
+                    <input type="checkbox" id="pillar-0" checked disabled>
+                    <label for="pillar-0">${escapeHtml(pillars[0])}</label>
+                </div>
+            `;
+        } else {
+            optionsContainer.innerHTML = `
+                <div class="checkbox-option checked">
+                    <input type="checkbox" id="pillar-0" checked disabled>
+                    <label for="pillar-0">${escapeHtml(pillars[0])}</label>
+                </div>
+            `;
+        }
     } else {
         // Multiple pillars - show checkboxes
         menuState.selectedPillars = [...pillars]; // Select all by default
-        optionsContainer.innerHTML = pillars.map((pillar, index) => {
-            // Use proper HTML escaping for attributes
-            const escapedPillar = escapeHtml(pillar);
-            return `
-                <div class="checkbox-option checked" data-pillar="${escapedPillar}" data-index="${index}">
-                    <input type="checkbox" id="pillar-${index}" checked>
-                    <label for="pillar-${index}">${escapedPillar}</label>
-                </div>
-            `;
-        }).join('');
+        
+        if (isNewWizard) {
+            optionsContainer.innerHTML = pillars.map((pillar, index) => {
+                const escapedPillar = escapeHtml(pillar);
+                return `
+                    <div class="pillar-checkbox-item" data-pillar="${escapedPillar}" data-index="${index}">
+                        <input type="checkbox" id="pillar-${index}" checked>
+                        <label for="pillar-${index}">${escapedPillar}</label>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            optionsContainer.innerHTML = pillars.map((pillar, index) => {
+                const escapedPillar = escapeHtml(pillar);
+                return `
+                    <div class="checkbox-option checked" data-pillar="${escapedPillar}" data-index="${index}">
+                        <input type="checkbox" id="pillar-${index}" checked>
+                        <label for="pillar-${index}">${escapedPillar}</label>
+                    </div>
+                `;
+            }).join('');
+        }
         
         // Add event listeners to checkboxes
-        optionsContainer.querySelectorAll('.checkbox-option').forEach(option => {
+        optionsContainer.querySelectorAll('.checkbox-option, .pillar-checkbox-item').forEach(option => {
             const checkbox = option.querySelector('input[type="checkbox"]');
-            // Get pillar name from the original pillars array using index
             const pillarIndex = parseInt(option.dataset.index);
             const pillarName = pillars[pillarIndex];
             
@@ -3778,6 +3904,13 @@ function proceedFromStep3() {
     // Update step sections
     updateStepSections();
     
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        goToStep(4);
+        return;
+    }
+    
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
     if (singlePageMode) {
@@ -3801,6 +3934,13 @@ function selectItemType(type) {
     
     // Update step sections
     updateStepSections();
+    
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        goToStep(5);
+        return;
+    }
     
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
@@ -4223,5 +4363,305 @@ window.proceedFromStep3 = proceedFromStep3;
 window.restartMenu = restartMenu;
 window.toggleStepSection = toggleStepSection;
 window.toggleResultExpand = toggleResultExpand;
+
+// ============================================
+// DROPDOWN WIZARD FUNCTIONS
+// ============================================
+
+function onScreenerDropdownChange(screenerId) {
+    if (!screenerId) {
+        resetDropdownsFrom('subtest');
+        return;
+    }
+    
+    console.log('Dropdown: Selected screener:', screenerId);
+    
+    if (!appState.interventionMenuData || !appState.interventionMenuData.screeners) {
+        console.error('Intervention menu data not loaded');
+        return;
+    }
+    
+    const screenerData = appState.interventionMenuData.screeners.find(s => s.screener_id === screenerId);
+    if (!screenerData) {
+        console.error('Screener not found:', screenerId);
+        return;
+    }
+    
+    menuState.selectedScreener = screenerId;
+    menuState.selectedScreenerData = screenerData;
+    
+    // Populate subtest dropdown
+    const subtestSelect = document.getElementById('subtest-select');
+    if (subtestSelect) {
+        subtestSelect.innerHTML = '<option value="">Select...</option>';
+        const subtests = screenerData.subtests || [];
+        subtests.forEach(subtest => {
+            const option = document.createElement('option');
+            option.value = subtest.subtest_code;
+            option.textContent = `${subtest.subtest_code} - ${subtest.subtest_name}`;
+            subtestSelect.appendChild(option);
+        });
+        subtestSelect.disabled = false;
+    }
+    
+    // Reset downstream dropdowns
+    resetDropdownsFrom('pillar');
+}
+
+function onSubtestDropdownChange(subtestCode) {
+    if (!subtestCode) {
+        resetDropdownsFrom('pillar');
+        return;
+    }
+    
+    console.log('Dropdown: Selected subtest:', subtestCode);
+    
+    if (!menuState.selectedScreenerData) return;
+    
+    const subtestData = menuState.selectedScreenerData.subtests.find(s => s.subtest_code === subtestCode);
+    if (!subtestData) {
+        console.error('Subtest not found:', subtestCode);
+        return;
+    }
+    
+    menuState.selectedSubtest = subtestCode;
+    menuState.selectedSubtestData = subtestData;
+    
+    // Populate pillar dropdown
+    const pillarSelect = document.getElementById('pillar-select');
+    if (pillarSelect) {
+        pillarSelect.innerHTML = '<option value="">Select...</option>';
+        const pillars = subtestData.literacy_pillars || [];
+        
+        // Add "All Pillars" option if multiple
+        if (pillars.length > 1) {
+            const allOption = document.createElement('option');
+            allOption.value = 'ALL';
+            allOption.textContent = 'All Pillars';
+            pillarSelect.appendChild(allOption);
+        }
+        
+        pillars.forEach(pillar => {
+            const option = document.createElement('option');
+            option.value = pillar;
+            option.textContent = pillar;
+            pillarSelect.appendChild(option);
+        });
+        
+        pillarSelect.disabled = false;
+        
+        // Auto-select if only one pillar
+        if (pillars.length === 1) {
+            pillarSelect.value = pillars[0];
+            onPillarDropdownChange(pillars[0]);
+            return; // Don't reset type dropdown when auto-selecting
+        }
+    }
+    
+    // Reset downstream dropdowns
+    resetDropdownsFrom('type');
+}
+
+function onPillarDropdownChange(pillarValue) {
+    if (!pillarValue) {
+        resetDropdownsFrom('type');
+        return;
+    }
+    
+    console.log('Dropdown: Selected pillar:', pillarValue);
+    
+    if (pillarValue === 'ALL') {
+        menuState.selectedPillars = [...(menuState.selectedSubtestData?.literacy_pillars || [])];
+    } else {
+        menuState.selectedPillars = [pillarValue];
+    }
+    
+    // Enable type dropdown
+    const typeSelect = document.getElementById('type-select');
+    if (typeSelect) {
+        typeSelect.disabled = false;
+    }
+    
+    // Hide results
+    const resultsSection = document.getElementById('dropdown-results');
+    if (resultsSection) {
+        resultsSection.style.display = 'none';
+    }
+}
+
+function onTypeDropdownChange(typeValue) {
+    if (!typeValue) {
+        const resultsSection = document.getElementById('dropdown-results');
+        if (resultsSection) {
+            resultsSection.style.display = 'none';
+        }
+        return;
+    }
+    
+    console.log('Dropdown: Selected type:', typeValue);
+    
+    menuState.selectedItemType = typeValue;
+    
+    // Load and display results
+    loadDropdownResults();
+}
+
+function loadDropdownResults() {
+    const resultsSection = document.getElementById('dropdown-results');
+    const countEl = document.getElementById('results-count-compact');
+    const listEl = document.getElementById('results-list-compact');
+    
+    if (!resultsSection || !listEl || !menuState.selectedSubtestData) return;
+    
+    // Get program based on screener language
+    const program = menuState.selectedScreenerData?.language === 'English' ? 'English' : 'French Immersion';
+    
+    // Get subtest grade range
+    const subtestStart = menuState.selectedSubtestData.grade_range?.start;
+    const subtestEnd = menuState.selectedSubtestData.grade_range?.end;
+    
+    // Get items from the correct data source
+    let items = [];
+    if (menuState.selectedItemType === 'Assessment') {
+        items = appState.interventionMenuData?.assessments || [];
+    } else {
+        items = appState.interventionMenuData?.interventions || [];
+    }
+    
+    // Filter by program
+    let filtered = items.filter(item => item.program === program);
+    
+    // Filter by grade range
+    filtered = filtered.filter(item => {
+        const itemStart = item.grade_range?.start;
+        const itemEnd = item.grade_range?.end;
+        return gradeRangeOverlaps(subtestStart, subtestEnd, itemStart, itemEnd);
+    });
+    
+    // Filter by selected pillars
+    if (menuState.selectedPillars && menuState.selectedPillars.length > 0) {
+        filtered = filtered.filter(item => {
+            const itemPillars = item.literacy_pillars || [item.literacy_pillar];
+            return menuState.selectedPillars.some(p => itemPillars.includes(p));
+        });
+    }
+    
+    // Update count
+    if (countEl) {
+        countEl.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`;
+    }
+    
+    // Render compact results
+    listEl.innerHTML = filtered.map(item => {
+        const gradeText = `${item.grade_range?.start || 'K'}-${item.grade_range?.end || '12'}`;
+        const langBadge = program === 'French Immersion' ? 'FR' : 'EN';
+        
+        return `
+            <div class="result-row">
+                <span class="result-name-compact">${escapeHtml(item.name)}</span>
+                <div class="result-badges">
+                    <span class="result-badge grade">${gradeText}</span>
+                    <span class="result-badge lang">${langBadge}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Show results
+    resultsSection.style.display = 'block';
+}
+
+function resetDropdownsFrom(startFrom) {
+    const order = ['subtest', 'pillar', 'type'];
+    const startIndex = order.indexOf(startFrom);
+    
+    if (startIndex === -1) return;
+    
+    for (let i = startIndex; i < order.length; i++) {
+        const select = document.getElementById(`${order[i]}-select`);
+        if (select) {
+            select.value = '';
+            select.disabled = true;
+            if (order[i] !== 'type') {
+                select.innerHTML = '<option value="">Select...</option>';
+            }
+        }
+    }
+    
+    // Clear state
+    if (startFrom === 'subtest' || startFrom === 'pillar' || startFrom === 'type') {
+        if (startFrom === 'subtest') {
+            menuState.selectedSubtest = null;
+            menuState.selectedSubtestData = null;
+        }
+        if (startFrom === 'subtest' || startFrom === 'pillar') {
+            menuState.selectedPillars = [];
+        }
+        if (startFrom === 'subtest' || startFrom === 'pillar' || startFrom === 'type') {
+            menuState.selectedItemType = null;
+        }
+    }
+    
+    // Hide results
+    const resultsSection = document.getElementById('dropdown-results');
+    if (resultsSection) {
+        resultsSection.style.display = 'none';
+    }
+}
+
+function initializeDropdownWizard() {
+    // Reset all state
+    menuState.currentStep = 1;
+    menuState.selectedScreener = null;
+    menuState.selectedScreenerData = null;
+    menuState.selectedSubtest = null;
+    menuState.selectedSubtestData = null;
+    menuState.selectedPillars = [];
+    menuState.selectedItemType = null;
+    
+    // Reset all dropdowns
+    const screenerSelect = document.getElementById('screener-select');
+    if (screenerSelect) {
+        screenerSelect.value = '';
+    }
+    
+    resetDropdownsFrom('subtest');
+}
+
+// Override restartMenu to work with dropdown wizard
+const originalRestartMenu = restartMenu;
+function restartMenu() {
+    const dropdownWizard = document.querySelector('.dropdown-wizard');
+    if (dropdownWizard) {
+        initializeDropdownWizard();
+    } else {
+        initializeStepBasedMenu();
+    }
+}
+
+// Override openInterventionsMenuView to initialize dropdown wizard
+const originalOpenInterventionsMenuViewForDropdown = window.openInterventionsMenuView;
+window.openInterventionsMenuView = function() {
+    const optionsView = document.getElementById('interventions-options-view');
+    const menuView = document.getElementById('interventions-menu-full-view');
+    
+    if (optionsView) optionsView.style.display = 'none';
+    if (menuView) menuView.style.display = 'block';
+    
+    const dropdownWizard = document.querySelector('.dropdown-wizard');
+    if (dropdownWizard) {
+        initializeDropdownWizard();
+    } else {
+        initializeStepBasedMenu();
+    }
+};
+
+// Export new dropdown functions
+window.onScreenerDropdownChange = onScreenerDropdownChange;
+window.onSubtestDropdownChange = onSubtestDropdownChange;
+window.onPillarDropdownChange = onPillarDropdownChange;
+window.onTypeDropdownChange = onTypeDropdownChange;
+window.initializeDropdownWizard = initializeDropdownWizard;
+window.restartMenu = restartMenu;
 
 
