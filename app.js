@@ -7,7 +7,6 @@
 const appState = {
     currentPage: 'home',
     mobileMenuOpen: false,
-    slidePanelOpen: null,
     flowchartData: null,
     tierFlowchartData: null,
     interventionMenuData: null,
@@ -112,174 +111,37 @@ async function loadInterventionMenuData() {
 // ============================================
 // Navigation
 // ============================================
-
-// Animation duration constant (sync with CSS --card-slide-duration)
-const SLIDE_ANIMATION_DURATION = 400;
-
 function setupNavigation() {
-    // Desktop navigation - also uses slide panels for consistency
+    // Desktop navigation
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
-            if (page === 'home') {
-                closeAllSlidePanels();
-                navigateToPage(page);
-            } else {
-                openSlidePanel(page, e.currentTarget);
-            }
+            navigateToPage(page);
         });
     });
     
-    // Sidebar navigation - triggers slide-out panels for non-home pages
+    // Sidebar navigation
     document.querySelectorAll('.sidebar-item').forEach(link => {
         link.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
-            if (page === 'home') {
-                // Home page doesn't use slide panel
-                closeAllSlidePanels();
-                navigateToPage(page);
-            } else {
-                // Other pages use slide-out card panels
-                openSlidePanel(page, e.currentTarget);
-            }
+            navigateToPage(page);
         });
     });
     
-    // Mobile navigation - also uses slide panels
+    // Mobile navigation
     document.querySelectorAll('.mobile-nav-item').forEach(link => {
         link.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
+            navigateToPage(page);
             closeMobileMenu();
-            if (page === 'home') {
-                closeAllSlidePanels();
-                navigateToPage(page);
-            } else {
-                openSlidePanel(page, e.currentTarget);
-            }
         });
     });
-    
-    // Setup slide panel close buttons
-    setupSlidePanelCloseButtons();
-    
-    // Setup overlay click to close
-    const overlay = document.getElementById('slide-modal-overlay');
-    if (overlay) {
-        overlay.addEventListener('click', () => closeAllSlidePanels());
-    }
-    
-    // Escape key to close panels
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && appState.slidePanelOpen) {
-            closeAllSlidePanels();
-        }
-    });
 }
 
-// ============================================
-// Slide-Out Card Panel System
-// ============================================
-let lastFocusedElement = null;
-
-function setupSlidePanelCloseButtons() {
-    document.querySelectorAll('.slide-card-close').forEach(btn => {
-        btn.addEventListener('click', () => closeAllSlidePanels());
-    });
-}
-
-function openSlidePanel(pageName, triggerElement = null) {
-    // Store the triggering element for focus restoration
-    lastFocusedElement = triggerElement || document.activeElement;
-    
-    // Close any open panels first without navigating home
-    closeAllSlidePanels(false);
-    
-    // Get the panel and overlay
-    const panel = document.getElementById(`slide-panel-${pageName}`);
-    const overlay = document.getElementById('slide-modal-overlay');
-    
-    if (!panel) {
-        // Fallback to regular navigation if no slide panel exists
-        navigateToPage(pageName);
-        return;
-    }
-    
-    // Populate panel content with section content (using safe cloning)
-    populateSlidePanelContent(pageName);
-    
-    // Update active states
-    updateNavigationActiveStates(pageName);
-    
-    // Update ARIA states
-    overlay?.setAttribute('aria-hidden', 'false');
-    panel.setAttribute('aria-hidden', 'false');
-    
-    // Show overlay and panel
-    overlay?.classList.add('active');
-    panel.classList.add('active', 'sliding-in');
-    
-    // Update app state
+function navigateToPage(pageName) {
+    // Update state
     appState.currentPage = pageName;
-    appState.slidePanelOpen = pageName;
     
-    // Focus the close button for keyboard accessibility
-    const closeBtn = panel.querySelector('.slide-card-close');
-    setTimeout(() => {
-        panel.classList.remove('sliding-in');
-        closeBtn?.focus();
-    }, SLIDE_ANIMATION_DURATION);
-}
-
-function closeAllSlidePanels(navigateHome = true) {
-    const overlay = document.getElementById('slide-modal-overlay');
-    overlay?.classList.remove('active');
-    overlay?.setAttribute('aria-hidden', 'true');
-    
-    document.querySelectorAll('.slide-card-panel.active').forEach(panel => {
-        panel.classList.add('sliding-out');
-        panel.classList.remove('active');
-        panel.setAttribute('aria-hidden', 'true');
-        
-        setTimeout(() => {
-            panel.classList.remove('sliding-out');
-        }, SLIDE_ANIMATION_DURATION);
-    });
-    
-    appState.slidePanelOpen = null;
-    
-    // Restore focus to the triggering element
-    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-        setTimeout(() => {
-            lastFocusedElement.focus();
-            lastFocusedElement = null;
-        }, SLIDE_ANIMATION_DURATION);
-    }
-    
-    // Optionally navigate back to home
-    if (navigateHome && appState.currentPage !== 'home') {
-        navigateToPage('home');
-    }
-}
-
-function populateSlidePanelContent(pageName) {
-    const section = document.getElementById(`${pageName}-section`);
-    const panelContent = document.getElementById(`slide-content-${pageName}`);
-    
-    if (section && panelContent) {
-        // Clear previous content
-        panelContent.innerHTML = '';
-        
-        // Clone the section content using cloneNode for safer DOM manipulation
-        const clonedContent = section.cloneNode(true);
-        
-        // Move all children from cloned section to panel content
-        while (clonedContent.firstChild) {
-            panelContent.appendChild(clonedContent.firstChild);
-        }
-    }
-}
-
-function updateNavigationActiveStates(pageName) {
     // Update active states in desktop nav
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.toggle('active', link.dataset.page === pageName);
@@ -294,14 +156,6 @@ function updateNavigationActiveStates(pageName) {
     document.querySelectorAll('.mobile-nav-item').forEach(link => {
         link.classList.toggle('active', link.dataset.page === pageName);
     });
-}
-
-function navigateToPage(pageName) {
-    // Update state
-    appState.currentPage = pageName;
-    
-    // Update navigation active states (reuse the helper function)
-    updateNavigationActiveStates(pageName);
     
     // Show/hide sections
     document.querySelectorAll('.content-section').forEach(section => {
@@ -346,8 +200,7 @@ function setupHomeMenuCards() {
         card.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
             if (page) {
-                // Use slide-out panel for menu cards too
-                openSlidePanel(page);
+                navigateToPage(page);
             }
         });
     });
