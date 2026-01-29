@@ -3076,15 +3076,30 @@ function updateScreenerOptions() {
     const screenerSelect = document.getElementById('screener-select');
     if (!screenerSelect || !appState.interventionMenuData) return;
 
-    const languageSelect = document.getElementById('language-select');
-    const language = languageSelect ? languageSelect.value : 'English';
-    
-    const screeners = appState.interventionMenuData.screeners.filter(
-        s => s.language === language
+    // Get all screeners, grouped by language
+    const englishScreeners = appState.interventionMenuData.screeners.filter(
+        s => s.language === 'English'
+    );
+    const frenchScreeners = appState.interventionMenuData.screeners.filter(
+        s => s.language === 'French'
     );
 
-    screenerSelect.innerHTML = '<option value="">All Screeners</option>' +
-        screeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
+    // Build the dropdown with all screeners grouped by language
+    let html = '<option value="">Select...</option>';
+    
+    if (englishScreeners.length > 0) {
+        html += '<optgroup label="English">';
+        html += englishScreeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
+        html += '</optgroup>';
+    }
+    
+    if (frenchScreeners.length > 0) {
+        html += '<optgroup label="French Immersion">';
+        html += frenchScreeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
+        html += '</optgroup>';
+    }
+    
+    screenerSelect.innerHTML = html;
 }
 
 function updateSubtestOptions() {
@@ -4619,10 +4634,18 @@ function initializeDropdownWizard() {
     menuState.selectedPillars = [];
     menuState.selectedItemType = null;
     
-    // Reset all dropdowns
+    // Reset language filter
+    const languageFilter = document.getElementById('language-filter');
+    if (languageFilter) {
+        languageFilter.value = '';
+    }
+    
+    // Reset screener dropdown and repopulate with all screeners
     const screenerSelect = document.getElementById('screener-select');
     if (screenerSelect) {
         screenerSelect.value = '';
+        // Trigger language filter to repopulate all screeners
+        onLanguageFilterChange('');
     }
     
     resetDropdownsFrom('subtest');
@@ -4642,11 +4665,19 @@ function restartMenu() {
 // Override openInterventionsMenuView to initialize dropdown wizard
 const originalOpenInterventionsMenuViewForDropdown = window.openInterventionsMenuView;
 window.openInterventionsMenuView = function() {
-    const optionsView = document.getElementById('interventions-options-view');
+    // Hide the options screen (correct ID)
+    const optionsScreen = document.getElementById('interventions-options-screen');
     const menuView = document.getElementById('interventions-menu-full-view');
     
-    if (optionsView) optionsView.style.display = 'none';
+    if (optionsScreen) optionsScreen.style.display = 'none';
     if (menuView) menuView.style.display = 'block';
+    
+    // Hide the flowchart container if visible
+    const flowchartContainer = document.getElementById('flowchart-container');
+    if (flowchartContainer) {
+        flowchartContainer.classList.add('flowchart-view-hidden');
+        flowchartContainer.style.display = 'none';
+    }
     
     const dropdownWizard = document.querySelector('.dropdown-wizard');
     if (dropdownWizard) {
@@ -4656,11 +4687,54 @@ window.openInterventionsMenuView = function() {
     }
 };
 
+// Language filter function
+function onLanguageFilterChange(language) {
+    console.log('Language filter changed:', language);
+    
+    const screenerSelect = document.getElementById('screener-select');
+    if (!screenerSelect || !appState.interventionMenuData) return;
+    
+    // Get screeners filtered by language (or all if empty)
+    let englishScreeners = [];
+    let frenchScreeners = [];
+    
+    if (!language || language === '') {
+        // Show all screeners
+        englishScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'English');
+        frenchScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'French');
+    } else if (language === 'English') {
+        englishScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'English');
+    } else if (language === 'French') {
+        frenchScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'French');
+    }
+    
+    // Build dropdown HTML
+    let html = '<option value="">Select...</option>';
+    
+    if (englishScreeners.length > 0) {
+        html += '<optgroup label="English">';
+        html += englishScreeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
+        html += '</optgroup>';
+    }
+    
+    if (frenchScreeners.length > 0) {
+        html += '<optgroup label="French Immersion">';
+        html += frenchScreeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
+        html += '</optgroup>';
+    }
+    
+    screenerSelect.innerHTML = html;
+    
+    // Reset downstream dropdowns
+    resetDropdownsFrom('subtest');
+}
+
 // Export new dropdown functions
 window.onScreenerDropdownChange = onScreenerDropdownChange;
 window.onSubtestDropdownChange = onSubtestDropdownChange;
 window.onPillarDropdownChange = onPillarDropdownChange;
 window.onTypeDropdownChange = onTypeDropdownChange;
+window.onLanguageFilterChange = onLanguageFilterChange;
 window.initializeDropdownWizard = initializeDropdownWizard;
 window.restartMenu = restartMenu;
 

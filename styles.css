@@ -1706,54 +1706,45 @@ h1, h2, h3, h4, h5, h6 {
 
 .menu-card {
     position: relative;
-    padding: 1.5rem;
+    padding: 1rem 1.25rem;
     background: var(--bg-primary);
-    border: 2px solid var(--border);
-    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    border-radius: 10px;
     cursor: pointer;
-    transition: var(--transition-slow);
+    transition: all 0.2s ease;
     text-align: left;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .menu-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-}
-
-.menu-card:hover::before {
-    transform: scaleX(1);
+    display: none;
 }
 
 .menu-card:hover {
     border-color: var(--primary);
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44, 125, 160, 0.12);
 }
 
 .menu-card .card-icon {
-    width: 48px;
-    height: 48px;
-    padding: 0.75rem;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0.5rem;
     background: var(--bg-accent);
-    border-radius: var(--radius-lg);
-    margin-bottom: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0;
     color: var(--primary);
-    transition: var(--transition);
+    transition: all 0.2s ease;
 }
 
 .menu-card:hover .card-icon {
     background: var(--primary);
     color: white;
-    transform: scale(1.1) rotate(5deg);
+    transform: none;
 }
 
 .menu-card .card-icon svg {
@@ -1761,30 +1752,39 @@ h1, h2, h3, h4, h5, h6 {
     height: 100%;
 }
 
+.menu-card .card-content {
+    flex: 1;
+    min-width: 0;
+}
+
 .menu-card h3 {
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
     color: var(--text-primary);
 }
 
 .menu-card p {
     color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 1rem;
+    line-height: 1.4;
+    margin-bottom: 0;
+    font-size: 0.875rem;
 }
 
 .menu-card .card-arrow {
-    width: 24px;
-    height: 24px;
-    color: var(--primary);
-    opacity: 0;
-    transform: translateX(-10px);
-    transition: var(--transition);
+    width: 20px;
+    height: 20px;
+    color: var(--text-light);
+    opacity: 1;
+    transform: none;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .menu-card:hover .card-arrow {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(3px);
+    color: var(--primary);
 }
 
 .menu-card .card-arrow svg {
@@ -1806,66 +1806,53 @@ h1, h2, h3, h4, h5, h6 {
 
 .intervention-option-card {
     position: relative;
-    padding: 2rem;
+    padding: 1rem 1.25rem;
     background: var(--bg-primary);
-    border: 2px solid var(--border);
-    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    border-radius: 10px;
     cursor: pointer;
-    transition: var(--transition-slow);
+    transition: all 0.2s ease;
     text-align: left;
     overflow: hidden;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
 }
 
 .intervention-option-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-}
-
-.intervention-option-card:hover::before {
-    transform: scaleX(1);
+    display: none;
 }
 
 .intervention-option-card:hover {
     border-color: var(--primary);
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44, 125, 160, 0.12);
 }
 
 .intervention-option-card:focus,
 .intervention-option-card:focus-visible {
-    outline: 3px solid var(--primary);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
     border-color: var(--primary);
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
 }
 
 .intervention-option-card .option-icon {
-    width: 56px;
-    height: 56px;
-    padding: 1rem;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0.5rem;
     background: var(--bg-accent);
-    border-radius: var(--radius-lg);
-    margin-bottom: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 0;
     color: var(--primary);
-    transition: var(--transition);
+    transition: all 0.2s ease;
 }
 
 .intervention-option-card:hover .option-icon {
     background: var(--primary);
     color: white;
-    transform: scale(1.1) rotate(5deg);
+    transform: none;
 }
 
 .intervention-option-card .option-icon svg {
@@ -1873,31 +1860,40 @@ h1, h2, h3, h4, h5, h6 {
     height: 100%;
 }
 
+.intervention-option-card .option-content {
+    flex: 1;
+    min-width: 0;
+}
+
 .intervention-option-card h3 {
-    font-size: 1.375rem;
-    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
     color: var(--text-primary);
 }
 
 .intervention-option-card p {
     color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-    flex: 1;
+    line-height: 1.4;
+    margin-bottom: 0;
+    font-size: 0.875rem;
+    flex: initial;
 }
 
 .intervention-option-card .card-arrow {
-    width: 24px;
-    height: 24px;
-    color: var(--primary);
-    opacity: 0;
-    transform: translateX(-10px);
-    transition: var(--transition);
+    width: 20px;
+    height: 20px;
+    color: var(--text-light);
+    opacity: 1;
+    transform: none;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .intervention-option-card:hover .card-arrow {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(3px);
+    color: var(--primary);
 }
 
 .intervention-option-card .card-arrow svg {
@@ -5806,6 +5802,12 @@ h1, h2, h3, h4, h5, h6 {
 .dropdown-group {
     flex: 1;
     min-width: 0;
+}
+
+.dropdown-group-small {
+    flex: 0 0 auto;
+    min-width: 100px;
+    max-width: 120px;
 }
 
 .dropdown-group label {
