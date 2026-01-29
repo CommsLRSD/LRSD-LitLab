@@ -7,6 +7,7 @@
 const appState = {
     currentPage: 'home',
     mobileMenuOpen: false,
+    slidePanelOpen: null,
     flowchartData: null,
     tierFlowchartData: null,
     interventionMenuData: null,
@@ -120,21 +121,140 @@ function setupNavigation() {
         });
     });
     
-    // Sidebar navigation
+    // Sidebar navigation - now triggers slide-out panels for non-home pages
     document.querySelectorAll('.sidebar-item').forEach(link => {
         link.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
-            navigateToPage(page);
+            if (page === 'home') {
+                // Home page doesn't use slide panel
+                closeAllSlidePanels();
+                navigateToPage(page);
+            } else {
+                // Other pages use slide-out card panels
+                openSlidePanel(page);
+            }
         });
     });
     
-    // Mobile navigation
+    // Mobile navigation - also uses slide panels
     document.querySelectorAll('.mobile-nav-item').forEach(link => {
         link.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
-            navigateToPage(page);
             closeMobileMenu();
+            if (page === 'home') {
+                closeAllSlidePanels();
+                navigateToPage(page);
+            } else {
+                openSlidePanel(page);
+            }
         });
+    });
+    
+    // Setup slide panel close buttons
+    setupSlidePanelCloseButtons();
+    
+    // Setup overlay click to close
+    const overlay = document.getElementById('slide-modal-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', closeAllSlidePanels);
+    }
+    
+    // Escape key to close panels
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeAllSlidePanels();
+        }
+    });
+}
+
+// ============================================
+// Slide-Out Card Panel System
+// ============================================
+function setupSlidePanelCloseButtons() {
+    document.querySelectorAll('.slide-card-close').forEach(btn => {
+        btn.addEventListener('click', closeAllSlidePanels);
+    });
+}
+
+function openSlidePanel(pageName) {
+    // Close any open panels first
+    closeAllSlidePanels(false);
+    
+    // Get the panel and overlay
+    const panel = document.getElementById(`slide-panel-${pageName}`);
+    const overlay = document.getElementById('slide-modal-overlay');
+    
+    if (!panel) {
+        // Fallback to regular navigation if no slide panel exists
+        navigateToPage(pageName);
+        return;
+    }
+    
+    // Populate panel content with section content
+    populateSlidePanelContent(pageName);
+    
+    // Update active states
+    updateNavigationActiveStates(pageName);
+    
+    // Show overlay and panel
+    overlay?.classList.add('active');
+    panel.classList.add('active', 'sliding-in');
+    
+    // Update app state
+    appState.currentPage = pageName;
+    appState.slidePanelOpen = pageName;
+    
+    // Remove animation class after animation completes
+    setTimeout(() => {
+        panel.classList.remove('sliding-in');
+    }, 400);
+}
+
+function closeAllSlidePanels(navigateHome = true) {
+    const overlay = document.getElementById('slide-modal-overlay');
+    overlay?.classList.remove('active');
+    
+    document.querySelectorAll('.slide-card-panel.active').forEach(panel => {
+        panel.classList.add('sliding-out');
+        panel.classList.remove('active');
+        
+        setTimeout(() => {
+            panel.classList.remove('sliding-out');
+        }, 400);
+    });
+    
+    appState.slidePanelOpen = null;
+    
+    // Optionally navigate back to home
+    if (navigateHome && appState.currentPage !== 'home') {
+        navigateToPage('home');
+    }
+}
+
+function populateSlidePanelContent(pageName) {
+    const section = document.getElementById(`${pageName}-section`);
+    const panelContent = document.getElementById(`slide-content-${pageName}`);
+    
+    if (section && panelContent) {
+        // Clone the section content into the slide panel
+        panelContent.innerHTML = section.innerHTML;
+    }
+}
+
+function updateNavigationActiveStates(pageName) {
+    // Update active states in desktop nav
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.toggle('active', link.dataset.page === pageName);
+    });
+    
+    // Update active states in sidebar
+    document.querySelectorAll('.sidebar-item').forEach(link => {
+        link.classList.toggle('active', link.dataset.page === pageName);
+    });
+    
+    // Update active states in mobile nav
+    document.querySelectorAll('.mobile-nav-item').forEach(link => {
+        link.classList.toggle('active', link.dataset.page === pageName);
     });
 }
 
@@ -200,7 +320,8 @@ function setupHomeMenuCards() {
         card.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
             if (page) {
-                navigateToPage(page);
+                // Use slide-out panel for menu cards too
+                openSlidePanel(page);
             }
         });
     });

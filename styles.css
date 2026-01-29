@@ -12,6 +12,12 @@
     --sky-blue: #89c2d9;
     --light-blue: #a9d6e5;
     
+    /* Pencil Drawing Theme - from book-bkg.svg */
+    --pencil-orange: #df8f5a;
+    --pencil-cream: #f7dfc9;
+    --pencil-stroke: #333333;
+    --pencil-paper: #fffef8;
+    
     /* Highlight color - warm coral for contrast */
     --highlight: #ff6b6b;
     --highlight-dark: #ee5a52;
@@ -68,6 +74,10 @@
     --transition: all 0.2s ease;
     --transition-slow: all 0.3s ease;
     
+    /* Card slide transition */
+    --card-slide-duration: 0.4s;
+    --card-slide-timing: cubic-bezier(0.4, 0, 0.2, 1);
+    
     /* Layout */
     --sidebar-width: 260px;
     --sidebar-collapsed-width: 70px;
@@ -101,18 +111,18 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
 }
 
-/* Top Navigation */
+/* Top Navigation - Pencil Theme */
 .top-nav {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--pencil-paper);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-light);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    border-bottom: 2px solid var(--pencil-stroke);
+    box-shadow: 0 3px 0 var(--pencil-stroke);
 }
 
 .nav-container {
@@ -245,7 +255,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
-   SIDEBAR NAVIGATION
+   SIDEBAR NAVIGATION - Pencil Drawing Style
    ============================================ */
 
 .sidebar {
@@ -254,18 +264,37 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     bottom: 0;
     width: var(--sidebar-width);
-    background: var(--bg-primary);
-    border-right: 1px solid var(--border-light);
+    background: var(--pencil-paper);
+    border-right: 2px solid var(--pencil-stroke);
     z-index: 90;
     overflow-y: auto;
     transition: var(--transition-slow);
 }
 
+/* Notebook paper lines effect */
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        transparent,
+        transparent 39px,
+        rgba(44, 125, 160, 0.1) 39px,
+        rgba(44, 125, 160, 0.1) 40px
+    );
+    pointer-events: none;
+}
+
 .sidebar-nav {
+    position: relative;
+    z-index: 1;
     padding: 1rem 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
 }
 
 .sidebar-item {
@@ -273,32 +302,37 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     gap: 0.75rem;
     padding: 0.875rem 1.5rem;
-    background: none;
-    border: none;
-    border-left: 3px solid transparent;
+    margin: 0 0.75rem;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 4px;
     color: var(--text-secondary);
     font-size: 0.9375rem;
     font-weight: 500;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s var(--card-slide-timing);
     text-align: left;
-    width: 100%;
+    position: relative;
 }
 
 .sidebar-item:hover {
-    background: var(--bg-accent);
+    background: var(--pencil-cream);
     color: var(--text-primary);
+    border-color: var(--pencil-stroke);
+    transform: translateX(8px);
+    box-shadow: 3px 3px 0 var(--pencil-stroke);
 }
 
 .sidebar-item.active {
-    background: var(--bg-accent);
-    color: var(--primary);
-    border-left-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+    box-shadow: 3px 3px 0 var(--primary-dark);
 }
 
 .sidebar-icon {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     flex-shrink: 0;
 }
 
@@ -315,6 +349,7 @@ h1, h2, h3, h4, h5, h6 {
     padding-left: var(--sidebar-width);
     min-height: 100vh;
     transition: var(--transition-slow);
+    background: var(--bg-secondary);
 }
 
 .content-section {
@@ -332,8 +367,8 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 1400px;
     margin: 0 auto;
     text-align: center;
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--border);
+    background: var(--pencil-paper);
+    border-bottom: 2px solid var(--pencil-stroke);
 }
 
 .section-title {
@@ -423,14 +458,14 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 2;
 }
 
-/* Flowchart Nodes */
+/* Flowchart Nodes - Pencil Theme */
 .flowchart-node {
     position: absolute;
     width: 320px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
+    background: var(--pencil-paper);
+    border: 2px solid var(--pencil-stroke);
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 var(--pencil-stroke);
     opacity: 0;
     transform: scale(0.9) translateY(20px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -443,22 +478,24 @@ h1, h2, h3, h4, h5, h6 {
 
 .node-header {
     padding: 1.25rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--pencil-stroke);
     display: flex;
     align-items: center;
     gap: 1rem;
+    background: var(--pencil-cream);
 }
 
 .node-icon {
     width: 40px;
     height: 40px;
     padding: 8px;
-    border-radius: var(--radius);
+    border-radius: 4px;
+    border: 2px solid var(--pencil-stroke);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    background: var(--bg-accent);
+    background: var(--pencil-paper);
     color: var(--primary);
 }
 
@@ -483,15 +520,17 @@ h1, h2, h3, h4, h5, h6 {
 /* Node Types with unique styling */
 .node-start {
     border-color: var(--primary);
+    box-shadow: 4px 4px 0 var(--primary-dark);
 }
 
 .node-start .node-icon {
-    background: var(--bg-accent);
-    color: var(--primary);
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
 }
 
 .node-decision .node-icon {
-    background: var(--bg-accent);
+    background: var(--pencil-cream);
     color: var(--primary);
 }
 
@@ -1611,37 +1650,49 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .home-hero {
-    background: linear-gradient(135deg, var(--light-blue) 0%, var(--accent-light) 100%);
-    padding: 2.5rem 1.5rem;
+    background: linear-gradient(135deg, var(--pencil-cream) 0%, var(--pencil-paper) 50%, var(--light-blue) 100%);
+    padding: 3rem 1.5rem;
     text-align: center;
     color: var(--text-primary);
     position: relative;
     overflow: hidden;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--pencil-stroke);
+    min-height: 280px;
 }
 
+/* Book SVG Background */
 .home-hero::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 500px;
-    height: 500px;
-    background: rgba(44, 125, 160, 0.05);
-    border-radius: 50%;
-    animation: float 20s ease-in-out infinite;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('images/book-bkg.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 0.15;
+    pointer-events: none;
 }
 
+/* Pencil texture overlay */
 .home-hero::after {
     content: '';
     position: absolute;
-    bottom: -30%;
-    left: -10%;
-    width: 400px;
-    height: 400px;
-    background: rgba(44, 125, 160, 0.05);
-    border-radius: 50%;
-    animation: float 15s ease-in-out infinite reverse;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(51, 51, 51, 0.02) 2px,
+            rgba(51, 51, 51, 0.02) 4px
+        );
+    pointer-events: none;
 }
 
 @keyframes float {
@@ -1665,15 +1716,16 @@ h1, h2, h3, h4, h5, h6 {
     height: 80px;
     margin: 0 auto 1.5rem;
     padding: 1.25rem;
-    background: rgba(44, 125, 160, 0.1);
+    background: var(--pencil-paper);
+    border: 2px solid var(--pencil-stroke);
     border-radius: 50%;
-    backdrop-filter: blur(10px);
+    box-shadow: 3px 3px 0 var(--pencil-stroke);
 }
 
 .hero-icon svg {
     width: 100%;
     height: 100%;
-    stroke: var(--cerulean);
+    stroke: var(--primary);
 }
 
 .hero-title {
@@ -1681,6 +1733,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     margin-bottom: 1rem;
     color: var(--text-primary);
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .hero-subtitle {
@@ -1706,36 +1759,47 @@ h1, h2, h3, h4, h5, h6 {
 
 .menu-card {
     position: relative;
-    padding: 1rem 1.25rem;
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    background: var(--pencil-paper);
+    border: 2px solid var(--pencil-stroke);
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s var(--card-slide-timing);
     text-align: left;
     overflow: hidden;
     display: flex;
     align-items: center;
     gap: 1rem;
+    box-shadow: 3px 3px 0 var(--pencil-stroke);
 }
 
+/* Sketchy corner effect */
 .menu-card::before {
-    display: none;
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, transparent 50%, var(--pencil-cream) 50%);
+    border-left: 2px solid var(--pencil-stroke);
+    border-bottom: 2px solid var(--pencil-stroke);
 }
 
 .menu-card:hover {
     border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(44, 125, 160, 0.12);
+    transform: translateX(8px);
+    box-shadow: 5px 5px 0 var(--primary);
 }
 
 .menu-card .card-icon {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    padding: 0.5rem;
-    background: var(--bg-accent);
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0.6rem;
+    background: var(--pencil-cream);
+    border: 2px solid var(--pencil-stroke);
+    border-radius: 4px;
     margin-bottom: 0;
     color: var(--primary);
     transition: all 0.2s ease;
@@ -1744,6 +1808,7 @@ h1, h2, h3, h4, h5, h6 {
 .menu-card:hover .card-icon {
     background: var(--primary);
     color: white;
+    border-color: var(--primary);
     transform: none;
 }
 
@@ -1758,7 +1823,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .menu-card h3 {
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 600;
     margin-bottom: 0.25rem;
     color: var(--text-primary);
@@ -1772,18 +1837,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .menu-card .card-arrow {
-    width: 20px;
-    height: 20px;
-    color: var(--text-light);
+    width: 24px;
+    height: 24px;
+    color: var(--pencil-stroke);
     opacity: 1;
     transform: none;
-    transition: all 0.2s ease;
+    transition: all 0.3s var(--card-slide-timing);
     flex-shrink: 0;
 }
 
 .menu-card:hover .card-arrow {
     opacity: 1;
-    transform: translateX(3px);
+    transform: translateX(5px);
     color: var(--primary);
 }
 
@@ -1792,7 +1857,7 @@ h1, h2, h3, h4, h5, h6 {
     height: 100%;
 }
 
-/* Interventions Options Grid */
+/* Interventions Options Grid - Pencil Theme */
 .interventions-options {
     padding: 2rem;
 }
@@ -1806,28 +1871,38 @@ h1, h2, h3, h4, h5, h6 {
 
 .intervention-option-card {
     position: relative;
-    padding: 1rem 1.25rem;
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    background: var(--pencil-paper);
+    border: 2px solid var(--pencil-stroke);
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s var(--card-slide-timing);
     text-align: left;
     overflow: hidden;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 1rem;
+    box-shadow: 3px 3px 0 var(--pencil-stroke);
 }
 
+/* Sketchy corner effect */
 .intervention-option-card::before {
-    display: none;
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, transparent 50%, var(--pencil-cream) 50%);
+    border-left: 2px solid var(--pencil-stroke);
+    border-bottom: 2px solid var(--pencil-stroke);
 }
 
 .intervention-option-card:hover {
     border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(44, 125, 160, 0.12);
+    transform: translateX(8px);
+    box-shadow: 5px 5px 0 var(--primary);
 }
 
 .intervention-option-card:focus,
@@ -1838,12 +1913,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .intervention-option-card .option-icon {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    padding: 0.5rem;
-    background: var(--bg-accent);
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0.6rem;
+    background: var(--pencil-cream);
+    border: 2px solid var(--pencil-stroke);
+    border-radius: 4px;
     margin-bottom: 0;
     color: var(--primary);
     transition: all 0.2s ease;
@@ -1852,6 +1928,7 @@ h1, h2, h3, h4, h5, h6 {
 .intervention-option-card:hover .option-icon {
     background: var(--primary);
     color: white;
+    border-color: var(--primary);
     transform: none;
 }
 
@@ -5961,3 +6038,315 @@ h1, h2, h3, h4, h5, h6 {
         flex: 1 1 100%;
     }
 }
+
+/* ============================================
+   SLIDE-OUT CARD MODAL SYSTEM
+   Pencil Drawing Theme
+   ============================================ */
+
+/* Modal Overlay */
+.slide-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(1, 42, 74, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.slide-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Slide-out Card Panel */
+.slide-card-panel {
+    position: fixed;
+    top: 64px;
+    right: -100%;
+    width: calc(100% - var(--sidebar-width));
+    max-width: 100%;
+    height: calc(100vh - 64px);
+    background: var(--pencil-paper);
+    border-left: 3px solid var(--pencil-stroke);
+    box-shadow: -10px 0 40px rgba(1, 42, 74, 0.2);
+    z-index: 1001;
+    overflow-y: auto;
+    transition: right var(--card-slide-duration) var(--card-slide-timing);
+}
+
+.slide-card-panel.active {
+    right: 0;
+}
+
+/* Card Panel Header */
+.slide-card-header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, var(--pencil-cream) 0%, var(--pencil-paper) 100%);
+    border-bottom: 2px solid var(--pencil-stroke);
+    z-index: 10;
+}
+
+.slide-card-close {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pencil-paper);
+    border: 2px solid var(--pencil-stroke);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 2px 2px 0 var(--pencil-stroke);
+}
+
+.slide-card-close:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--primary-dark);
+}
+
+.slide-card-close svg {
+    width: 20px;
+    height: 20px;
+}
+
+.slide-card-title {
+    flex: 1;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.slide-card-icon {
+    width: 48px;
+    height: 48px;
+    padding: 0.75rem;
+    background: var(--primary);
+    border: 2px solid var(--primary-dark);
+    border-radius: 4px;
+    color: white;
+    box-shadow: 3px 3px 0 var(--primary-dark);
+}
+
+.slide-card-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Card Panel Content */
+.slide-card-content {
+    padding: 2rem;
+    position: relative;
+}
+
+/* Pencil paper effect in content */
+.slide-card-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        transparent,
+        transparent 39px,
+        rgba(44, 125, 160, 0.05) 39px,
+        rgba(44, 125, 160, 0.05) 40px
+    );
+    pointer-events: none;
+}
+
+.slide-card-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Card slide animation from sidebar item */
+@keyframes cardSlideIn {
+    0% {
+        transform: translateX(100%) scale(0.95);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes cardSlideOut {
+    0% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%) scale(0.95);
+        opacity: 0;
+    }
+}
+
+.slide-card-panel.sliding-in {
+    animation: cardSlideIn var(--card-slide-duration) var(--card-slide-timing) forwards;
+}
+
+.slide-card-panel.sliding-out {
+    animation: cardSlideOut var(--card-slide-duration) var(--card-slide-timing) forwards;
+}
+
+/* Mobile Slide Card Panel */
+@media (max-width: 768px) {
+    .slide-card-panel {
+        width: 100%;
+        right: -100%;
+        border-left: none;
+        border-top: 3px solid var(--pencil-stroke);
+    }
+    
+    .slide-card-header {
+        padding: 1rem 1.25rem;
+    }
+    
+    .slide-card-title {
+        font-size: 1.25rem;
+    }
+    
+    .slide-card-content {
+        padding: 1.25rem;
+    }
+    
+    .slide-card-close {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .slide-card-icon {
+        width: 40px;
+        height: 40px;
+        padding: 0.5rem;
+    }
+}
+
+/* Mobile Navigation Cards */
+@media (max-width: 768px) {
+    .mobile-nav-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 1rem 1.25rem;
+        margin-bottom: 0.75rem;
+        background: var(--pencil-paper);
+        border: 2px solid var(--pencil-stroke);
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.3s var(--card-slide-timing);
+        box-shadow: 3px 3px 0 var(--pencil-stroke);
+    }
+
+    .mobile-nav-item:hover {
+        transform: translateX(8px);
+        box-shadow: 5px 5px 0 var(--primary);
+        border-color: var(--primary);
+    }
+
+    .mobile-nav-item.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary-dark);
+        box-shadow: 3px 3px 0 var(--primary-dark);
+    }
+
+    .mobile-nav-overlay {
+        background: var(--pencil-paper);
+    }
+
+    .mobile-nav-content {
+        padding: 1.5rem 1rem;
+    }
+}
+
+/* Top Navigation - Pencil Theme */
+.top-nav {
+    background: var(--pencil-paper);
+    border-bottom: 2px solid var(--pencil-stroke);
+    box-shadow: 0 3px 0 var(--pencil-stroke);
+}
+
+.logo-icon {
+    color: var(--primary);
+}
+
+/* Pencil-style buttons throughout */
+.pencil-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--pencil-paper);
+    border: 2px solid var(--pencil-stroke);
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 3px 3px 0 var(--pencil-stroke);
+}
+
+.pencil-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--pencil-stroke);
+}
+
+.pencil-btn.primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+    box-shadow: 3px 3px 0 var(--primary-dark);
+}
+
+.pencil-btn.primary:hover {
+    box-shadow: 5px 5px 0 var(--primary-dark);
+}
+
+/* Feedback button with pencil style */
+.feedback-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    background: var(--pencil-cream);
+    border: 2px solid var(--pencil-stroke);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 3px 3px 0 var(--pencil-stroke);
+}
+
+.feedback-button:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--primary-dark);
+}
+
+.feedback-button svg {
+    width: 20px;
+    height: 20px;
+}
+
