@@ -70,6 +70,11 @@
     --radius-lg: 8px;
     --radius-xl: 12px;
     
+    /* Pencil theme rounded corners - modern feel */
+    --pencil-radius: 12px;
+    --pencil-radius-lg: 16px;
+    --pencil-radius-sm: 8px;
+    
     /* Transitions */
     --transition: all 0.2s ease;
     --transition-slow: all 0.3s ease;
@@ -79,8 +84,10 @@
     --card-slide-timing: cubic-bezier(0.4, 0, 0.2, 1);
     
     /* Layout */
+    --nav-height: 64px;
     --sidebar-width: 260px;
     --sidebar-collapsed-width: 70px;
+    --notebook-line-spacing: 40px;
     
     /* Visual Flowchart Pattern */
     --vf-pattern-size: 100px;
@@ -305,7 +312,7 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 0.75rem;
     background: transparent;
     border: 2px solid transparent;
-    border-radius: 4px;
+    border-radius: var(--pencil-radius-sm);
     color: var(--text-secondary);
     font-size: 0.9375rem;
     font-weight: 500;
@@ -320,14 +327,14 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-primary);
     border-color: var(--pencil-stroke);
     transform: translateX(8px);
-    box-shadow: 3px 3px 0 var(--pencil-stroke);
+    box-shadow: 4px 4px 0 var(--pencil-stroke);
 }
 
 .sidebar-item.active {
     background: var(--primary);
     color: white;
     border-color: var(--primary-dark);
-    box-shadow: 3px 3px 0 var(--primary-dark);
+    box-shadow: 4px 4px 0 var(--primary-dark);
 }
 
 .sidebar-icon {
@@ -464,7 +471,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 320px;
     background: var(--pencil-paper);
     border: 2px solid var(--pencil-stroke);
-    border-radius: 4px;
+    border-radius: var(--pencil-radius);
     box-shadow: 4px 4px 0 var(--pencil-stroke);
     opacity: 0;
     transform: scale(0.9) translateY(20px);
@@ -479,6 +486,7 @@ h1, h2, h3, h4, h5, h6 {
 .node-header {
     padding: 1.25rem;
     border-bottom: 2px solid var(--pencil-stroke);
+    border-radius: var(--pencil-radius) var(--pencil-radius) 0 0;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -489,7 +497,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 40px;
     height: 40px;
     padding: 8px;
-    border-radius: 4px;
+    border-radius: var(--pencil-radius-sm);
     border: 2px solid var(--pencil-stroke);
     display: flex;
     align-items: center;
@@ -1762,7 +1770,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 1.25rem 1.5rem;
     background: var(--pencil-paper);
     border: 2px solid var(--pencil-stroke);
-    border-radius: 4px;
+    border-radius: var(--pencil-radius);
     cursor: pointer;
     transition: all 0.3s var(--card-slide-timing);
     text-align: left;
@@ -1770,26 +1778,18 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     gap: 1rem;
-    box-shadow: 3px 3px 0 var(--pencil-stroke);
+    box-shadow: 4px 4px 0 var(--pencil-stroke);
 }
 
-/* Sketchy corner effect */
+/* Remove sketchy corner effect for rounded modern look */
 .menu-card::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 20px;
-    height: 20px;
-    background: linear-gradient(135deg, transparent 50%, var(--pencil-cream) 50%);
-    border-left: 2px solid var(--pencil-stroke);
-    border-bottom: 2px solid var(--pencil-stroke);
+    display: none;
 }
 
 .menu-card:hover {
     border-color: var(--primary);
     transform: translateX(8px);
-    box-shadow: 5px 5px 0 var(--primary);
+    box-shadow: 6px 6px 0 var(--primary);
 }
 
 .menu-card .card-icon {
@@ -1799,7 +1799,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.6rem;
     background: var(--pencil-cream);
     border: 2px solid var(--pencil-stroke);
-    border-radius: 4px;
+    border-radius: var(--pencil-radius-sm);
     margin-bottom: 0;
     color: var(--primary);
     transition: all 0.2s ease;
@@ -1874,7 +1874,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 1.25rem 1.5rem;
     background: var(--pencil-paper);
     border: 2px solid var(--pencil-stroke);
-    border-radius: 4px;
+    border-radius: var(--pencil-radius);
     cursor: pointer;
     transition: all 0.3s var(--card-slide-timing);
     text-align: left;
@@ -1883,26 +1883,18 @@ h1, h2, h3, h4, h5, h6 {
     flex-direction: row;
     align-items: center;
     gap: 1rem;
-    box-shadow: 3px 3px 0 var(--pencil-stroke);
+    box-shadow: 4px 4px 0 var(--pencil-stroke);
 }
 
-/* Sketchy corner effect */
+/* Remove sketchy corner effect for rounded modern look */
 .intervention-option-card::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 20px;
-    height: 20px;
-    background: linear-gradient(135deg, transparent 50%, var(--pencil-cream) 50%);
-    border-left: 2px solid var(--pencil-stroke);
-    border-bottom: 2px solid var(--pencil-stroke);
+    display: none;
 }
 
 .intervention-option-card:hover {
     border-color: var(--primary);
     transform: translateX(8px);
-    box-shadow: 5px 5px 0 var(--primary);
+    box-shadow: 6px 6px 0 var(--primary);
 }
 
 .intervention-option-card:focus,
@@ -1919,7 +1911,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.6rem;
     background: var(--pencil-cream);
     border: 2px solid var(--pencil-stroke);
-    border-radius: 4px;
+    border-radius: var(--pencil-radius-sm);
     margin-bottom: 0;
     color: var(--primary);
     transition: all 0.2s ease;
@@ -6068,13 +6060,14 @@ h1, h2, h3, h4, h5, h6 {
 /* Slide-out Card Panel */
 .slide-card-panel {
     position: fixed;
-    top: 64px;
+    top: var(--nav-height);
     right: -100%;
     width: calc(100% - var(--sidebar-width));
     max-width: 100%;
-    height: calc(100vh - 64px);
+    height: calc(100vh - var(--nav-height));
     background: var(--pencil-paper);
     border-left: 3px solid var(--pencil-stroke);
+    border-radius: var(--pencil-radius-lg) 0 0 var(--pencil-radius-lg);
     box-shadow: -10px 0 40px rgba(1, 42, 74, 0.2);
     z-index: 1001;
     overflow-y: auto;
@@ -6095,6 +6088,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 1.5rem 2rem;
     background: linear-gradient(135deg, var(--pencil-cream) 0%, var(--pencil-paper) 100%);
     border-bottom: 2px solid var(--pencil-stroke);
+    border-radius: var(--pencil-radius-lg) 0 0 0;
     z-index: 10;
 }
 
@@ -6106,7 +6100,7 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
     background: var(--pencil-paper);
     border: 2px solid var(--pencil-stroke);
-    border-radius: 4px;
+    border-radius: var(--pencil-radius-sm);
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 2px 2px 0 var(--pencil-stroke);
@@ -6138,7 +6132,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.75rem;
     background: var(--primary);
     border: 2px solid var(--primary-dark);
-    border-radius: 4px;
+    border-radius: var(--pencil-radius-sm);
     color: white;
     box-shadow: 3px 3px 0 var(--primary-dark);
 }
@@ -6251,18 +6245,18 @@ h1, h2, h3, h4, h5, h6 {
         margin-bottom: 0.75rem;
         background: var(--pencil-paper);
         border: 2px solid var(--pencil-stroke);
-        border-radius: 4px;
+        border-radius: var(--pencil-radius);
         font-size: 1rem;
         font-weight: 500;
         color: var(--text-primary);
         cursor: pointer;
         transition: all 0.3s var(--card-slide-timing);
-        box-shadow: 3px 3px 0 var(--pencil-stroke);
+        box-shadow: 4px 4px 0 var(--pencil-stroke);
     }
 
     .mobile-nav-item:hover {
         transform: translateX(8px);
-        box-shadow: 5px 5px 0 var(--primary);
+        box-shadow: 6px 6px 0 var(--primary);
         border-color: var(--primary);
     }
 
@@ -6270,7 +6264,7 @@ h1, h2, h3, h4, h5, h6 {
         background: var(--primary);
         color: white;
         border-color: var(--primary-dark);
-        box-shadow: 3px 3px 0 var(--primary-dark);
+        box-shadow: 4px 4px 0 var(--primary-dark);
     }
 
     .mobile-nav-overlay {
@@ -6298,7 +6292,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.75rem 1.5rem;
     background: var(--pencil-paper);
     border: 2px solid var(--pencil-stroke);
-    border-radius: 4px;
+    border-radius: var(--pencil-radius-sm);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -6329,12 +6323,12 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.875rem 1.75rem;
     background: var(--pencil-cream);
     border: 2px solid var(--pencil-stroke);
-    border-radius: 4px;
+    border-radius: var(--pencil-radius);
     color: var(--text-primary);
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s ease;
-    box-shadow: 3px 3px 0 var(--pencil-stroke);
+    box-shadow: 4px 4px 0 var(--pencil-stroke);
 }
 
 .feedback-button:hover {
@@ -6342,7 +6336,7 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     border-color: var(--primary-dark);
     transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0 var(--primary-dark);
+    box-shadow: 6px 6px 0 var(--primary-dark);
 }
 
 .feedback-button svg {
