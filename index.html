@@ -127,8 +127,8 @@
                     </div>
                     <h1 class="hero-title">Welcome to Literacy Pal</h1>
                     <p class="hero-subtitle">Your comprehensive guide to literacy intervention monitoring and assessment tracking</p>
-                </div>
             </div>
+        </div>
 
             <div class="home-menu">
                 <div class="menu-grid">
@@ -139,8 +139,10 @@
                                 <path d="M12 6v6l4 2"/>
                             </svg>
                         </div>
-                        <h3>Assessment Schedules</h3>
-                        <p>View literacy assessment timing and schedules for different programs and grade levels</p>
+                        <div class="card-content">
+                            <h3>Assessment Schedules</h3>
+                            <p>View literacy assessment timing and schedules</p>
+                        </div>
                         <div class="card-arrow">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 18l6-6-6-6"/>
@@ -154,8 +156,10 @@
                                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
-                        <h3>Interventions</h3>
-                        <p>Navigate intervention selection based on tier level and student needs</p>
+                        <div class="card-content">
+                            <h3>Interventions</h3>
+                            <p>Navigate intervention selection by tier level</p>
+                        </div>
                         <div class="card-arrow">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 18l6-6-6-6"/>
@@ -170,8 +174,10 @@
                                 <path d="M12 16v-4m0-4h.01"/>
                             </svg>
                         </div>
-                        <h3>Info</h3>
-                        <p>Learn about assessment scores, percentiles, and frequently asked questions</p>
+                        <div class="card-content">
+                            <h3>Info</h3>
+                            <p>Assessment scores, percentiles, and FAQs</p>
+                        </div>
                         <div class="card-arrow">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 18l6-6-6-6"/>
@@ -185,8 +191,10 @@
                                 <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
                         </div>
-                        <h3>Resources</h3>
-                        <p>Access external resources, evidence-based interventions, and support materials</p>
+                        <div class="card-content">
+                            <h3>Resources</h3>
+                            <p>External resources and support materials</p>
+                        </div>
                         <div class="card-arrow">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 18l6-6-6-6"/>
@@ -222,8 +230,10 @@
                                 <path d="M12 5l0 14M12 5l-7 7M12 5l7 7"/>
                             </svg>
                         </div>
-                        <h3>Tier 1 Flowchart</h3>
-                        <p>Universal screening and core instruction guidance</p>
+                        <div class="option-content">
+                            <h3>Tier 1 Flowchart</h3>
+                            <p>Universal screening and core instruction</p>
+                        </div>
                         <div class="card-arrow">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M9 18l6-6-6-6"/>
@@ -237,8 +247,10 @@
                                 <path d="M12 5l0 14M12 5l-7 7M12 5l7 7"/>
                             </svg>
                         </div>
-                        <h3>Tier 2 Flowchart</h3>
-                        <p>Small group intervention resources and decision tree</p>
+                        <div class="option-content">
+                            <h3>Tier 2 Flowchart</h3>
+                            <p>Small group intervention resources</p>
+                        </div>
                         <div class="card-arrow">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M9 18l6-6-6-6"/>
@@ -252,8 +264,10 @@
                                 <path d="M12 5l0 14M12 5l-7 7M12 5l7 7"/>
                             </svg>
                         </div>
-                        <h3>Tier 3 Flowchart</h3>
-                        <p>Intensive individual intervention support and guidance</p>
+                        <div class="option-content">
+                            <h3>Tier 3 Flowchart</h3>
+                            <p>Intensive individual intervention</p>
+                        </div>
                         <div class="card-arrow">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M9 18l6-6-6-6"/>
@@ -267,8 +281,10 @@
                                 <path d="M4 6h16M4 12h16M4 18h16"/>
                             </svg>
                         </div>
-                        <h3>Interventions Menu</h3>
-                        <p>Search and filter interventions and assessments by criteria</p>
+                        <div class="option-content">
+                            <h3>Interventions Menu</h3>
+                            <p>Search and filter by criteria</p>
+                        </div>
                         <div class="card-arrow">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M9 18l6-6-6-6"/>
@@ -298,6 +314,15 @@
                     
                     <!-- Inline Dropdowns Row -->
                     <div class="dropdown-row">
+                        <div class="dropdown-group dropdown-group-small">
+                            <label for="language-filter">Program</label>
+                            <select id="language-filter" class="styled-select" onchange="onLanguageFilterChange(this.value)">
+                                <option value="">All</option>
+                                <option value="English">English</option>
+                                <option value="French">French Immersion</option>
+                            </select>
+                        </div>
+                        
                         <div class="dropdown-group">
                             <label for="screener-select">Screener</label>
                             <select id="screener-select" class="styled-select" onchange="onScreenerDropdownChange(this.value)">
