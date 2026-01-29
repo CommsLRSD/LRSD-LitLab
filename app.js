@@ -3926,55 +3926,77 @@ function loadResults() {
         return;
     }
     
-    container.innerHTML = results.map(item => {
-        const pillars = item.literacy_pillars || [item.literacy_pillar];
-        const evidenceClass = item.evidence_level === '**' ? 'research-based' : 
-                             item.evidence_level === '*' ? 'evidence-based' : '';
-        const evidenceLabel = item.evidence_level === '**' ? 'Research-Based' :
-                             item.evidence_level === '*' ? 'Evidence-Based' : '';
-        
-        // Escape and validate data
-        const itemName = escapeHtml(item.name);
-        const itemProgram = escapeHtml(item.program);
-        const escapedPillars = pillars.map(p => escapeHtml(p)).join(', ');
-        
-        // Validate URL (only allow http/https)
-        let safeUrl = '';
-        if (item.url && item.url !== '(SharePoint)') {
-            try {
-                const url = new URL(item.url);
-                if (url.protocol === 'http:' || url.protocol === 'https:') {
-                    safeUrl = item.url;
+    // Render as compact expandable list
+    container.innerHTML = `
+        <div class="results-grid-compact">
+            ${results.map((item, index) => {
+                const pillars = item.literacy_pillars || [item.literacy_pillar];
+                const evidenceLabel = item.evidence_level === '**' ? '★★ Research-Based' :
+                                     item.evidence_level === '*' ? '★ Evidence-Based' : '';
+                
+                // Escape and validate data
+                const itemName = escapeHtml(item.name);
+                const itemProgram = escapeHtml(item.program);
+                const escapedPillars = pillars.map(p => escapeHtml(p)).join(', ');
+                
+                // Validate URL (only allow http/https)
+                let safeUrl = '';
+                let isLocalResource = false;
+                if (item.url) {
+                    if (item.url === '(SharePoint)' || item.url === '(local resource)' || item.url === '(Nelson)') {
+                        isLocalResource = true;
+                    } else {
+                        try {
+                            const url = new URL(item.url);
+                            if (url.protocol === 'http:' || url.protocol === 'https:') {
+                                safeUrl = item.url;
+                            }
+                        } catch (e) {
+                            // Invalid URL, leave empty
+                        }
+                    }
                 }
-            } catch (e) {
-                // Invalid URL, leave empty
-            }
-        }
-        
-        return `
-            <div class="result-card">
-                <div class="result-header">
-                    <h4 class="result-name">${itemName}</h4>
-                </div>
-                <div class="result-meta">
-                    <span class="result-badge">Grades ${item.grade_range.start}-${item.grade_range.end}</span>
-                    <span class="result-badge">${itemProgram}</span>
-                    ${evidenceLabel ? `<span class="result-badge evidence ${evidenceClass}">${evidenceLabel}</span>` : ''}
-                </div>
-                <div class="result-pillars">
-                    <strong>Addresses:</strong> ${escapedPillars}
-                </div>
-                ${safeUrl ? `
-                    <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="result-link">
-                        View Resource
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
-                        </svg>
-                    </a>
-                ` : '<span style="font-size: 0.875rem; color: var(--text-secondary);">Available on SharePoint</span>'}
-            </div>
-        `;
-    }).join('');
+                
+                return `
+                    <div class="result-card-compact" data-index="${index}">
+                        <div class="result-header-compact" onclick="toggleResultExpand(${index})">
+                            <div>
+                                <h4 class="result-name-compact">${itemName}</h4>
+                                <div class="result-meta-compact">
+                                    <span class="badge-grade">${item.grade_range.start}-${item.grade_range.end}</span>
+                                    <span class="badge-program">${itemProgram === 'English' ? 'EN' : 'FR'}</span>
+                                    ${evidenceLabel ? `<span class="badge-evidence">${evidenceLabel}</span>` : ''}
+                                </div>
+                            </div>
+                            <svg class="result-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="result-details-compact">
+                            <div class="result-info"><strong>Addresses:</strong> ${escapedPillars}</div>
+                            ${safeUrl ? `
+                                <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="result-link-compact" onclick="event.stopPropagation()">
+                                    View Resource
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                                        <path d="M15 3h6v6"/>
+                                        <path d="M10 14L21 3"/>
+                                    </svg>
+                                </a>
+                            ` : isLocalResource ? `
+                                <div class="result-local-compact">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Available on ${item.url}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
 }
 
 // Restart menu
