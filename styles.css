@@ -6057,11 +6057,11 @@ h1, h2, h3, h4, h5, h6 {
     visibility: visible;
 }
 
-/* Slide-out Card Panel - Slides from LEFT to RIGHT */
+/* Slide-out Card Panel - Slides from LEFT to RIGHT using transform for performance */
 .slide-card-panel {
     position: fixed;
     top: var(--nav-height);
-    left: -100%;
+    left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
     max-width: 100%;
     height: calc(100vh - var(--nav-height));
@@ -6071,11 +6071,16 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 10px 0 40px rgba(1, 42, 74, 0.2);
     z-index: 1001;
     overflow-y: auto;
-    transition: left var(--card-slide-duration) var(--card-slide-timing);
+    transform: translateX(-100%);
+    transition: transform var(--card-slide-duration) var(--card-slide-timing);
+    pointer-events: none;
+    visibility: hidden;
 }
 
 .slide-card-panel.active {
-    left: var(--sidebar-width);
+    transform: translateX(0);
+    pointer-events: auto;
+    visibility: visible;
 }
 
 /* Card Panel Header */
@@ -6205,14 +6210,15 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 768px) {
     .slide-card-panel {
         width: 100%;
-        left: -100%;
+        left: 0;
+        transform: translateX(-100%);
         border-right: none;
         border-top: 3px solid var(--pencil-stroke);
         border-radius: 0;
     }
     
     .slide-card-panel.active {
-        left: 0;
+        transform: translateX(0);
     }
     
     .slide-card-header {

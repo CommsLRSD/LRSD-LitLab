@@ -171,7 +171,7 @@ function setupNavigation() {
     // Escape key to close panels
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && appState.slidePanelOpen) {
-            closeAllSlidePanels();
+            closeAllSlidePanels(false);
         }
     });
 }
