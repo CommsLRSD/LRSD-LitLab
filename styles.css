@@ -5742,36 +5742,220 @@ h1, h2, h3, h4, h5, h6 {
     height: 16px;
 }
 
-/* Step Wizard Responsive */
-@media (max-width: 768px) {
-    .step-bar {
+/* ============================================
+   DROPDOWN WIZARD - Ultra Compact Design
+   ============================================ */
+
+.dropdown-wizard {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.dropdown-wizard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.wizard-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.back-btn-minimal,
+.reset-btn-minimal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.back-btn-minimal:hover,
+.reset-btn-minimal:hover {
+    background: var(--bg-accent);
+    border-color: var(--primary);
+}
+
+.back-btn-minimal svg,
+.reset-btn-minimal svg {
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+}
+
+/* Dropdown Row */
+.dropdown-row {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: white;
+}
+
+.dropdown-group {
+    flex: 1;
+    min-width: 0;
+}
+
+.dropdown-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-light);
+    margin-bottom: 6px;
+}
+
+.styled-select {
+    width: 100%;
+    padding: 10px 32px 10px 12px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+.styled-select:hover:not(:disabled) {
+    border-color: var(--primary);
+}
+
+.styled-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(44, 125, 160, 0.1);
+}
+
+.styled-select:disabled {
+    background: var(--bg-secondary);
+    color: var(--text-light);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.styled-select option {
+    padding: 8px;
+}
+
+/* Compact Results */
+.dropdown-results {
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+}
+
+.results-header-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.results-list-compact {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.result-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: white;
+    border-bottom: 1px solid var(--border-light);
+    transition: background 0.1s ease;
+}
+
+.result-row:hover {
+    background: var(--bg-accent);
+}
+
+.result-row:last-child {
+    border-bottom: none;
+}
+
+.result-name-compact {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.result-badges {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.result-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.result-badge.grade {
+    background: var(--bg-accent);
+    color: var(--text-secondary);
+}
+
+.result-badge.lang {
+    background: var(--primary);
+    color: white;
+}
+
+.result-badge.evidence {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+/* Responsive Dropdown */
+@media (max-width: 900px) {
+    .dropdown-row {
         flex-wrap: wrap;
-        gap: 8px;
     }
     
-    .step-connector {
-        display: none;
+    .dropdown-group {
+        flex: 1 1 calc(50% - 6px);
+        min-width: 140px;
     }
-    
-    .step-pill {
-        padding: 6px 12px;
-    }
-    
-    .step-label {
-        display: none;
-    }
-    
-    .screener-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .type-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .panel-header {
+}
+
+@media (max-width: 600px) {
+    .dropdown-row {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+    }
+    
+    .dropdown-group {
+        flex: 1 1 100%;
     }
 }

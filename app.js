@@ -4364,4 +4364,304 @@ window.restartMenu = restartMenu;
 window.toggleStepSection = toggleStepSection;
 window.toggleResultExpand = toggleResultExpand;
 
+// ============================================
+// DROPDOWN WIZARD FUNCTIONS
+// ============================================
+
+function onScreenerDropdownChange(screenerId) {
+    if (!screenerId) {
+        resetDropdownsFrom('subtest');
+        return;
+    }
+    
+    console.log('Dropdown: Selected screener:', screenerId);
+    
+    if (!appState.interventionMenuData || !appState.interventionMenuData.screeners) {
+        console.error('Intervention menu data not loaded');
+        return;
+    }
+    
+    const screenerData = appState.interventionMenuData.screeners.find(s => s.screener_id === screenerId);
+    if (!screenerData) {
+        console.error('Screener not found:', screenerId);
+        return;
+    }
+    
+    menuState.selectedScreener = screenerId;
+    menuState.selectedScreenerData = screenerData;
+    
+    // Populate subtest dropdown
+    const subtestSelect = document.getElementById('subtest-select');
+    if (subtestSelect) {
+        subtestSelect.innerHTML = '<option value="">Select...</option>';
+        const subtests = screenerData.subtests || [];
+        subtests.forEach(subtest => {
+            const option = document.createElement('option');
+            option.value = subtest.subtest_code;
+            option.textContent = `${subtest.subtest_code} - ${subtest.subtest_name}`;
+            subtestSelect.appendChild(option);
+        });
+        subtestSelect.disabled = false;
+    }
+    
+    // Reset downstream dropdowns
+    resetDropdownsFrom('pillar');
+}
+
+function onSubtestDropdownChange(subtestCode) {
+    if (!subtestCode) {
+        resetDropdownsFrom('pillar');
+        return;
+    }
+    
+    console.log('Dropdown: Selected subtest:', subtestCode);
+    
+    if (!menuState.selectedScreenerData) return;
+    
+    const subtestData = menuState.selectedScreenerData.subtests.find(s => s.subtest_code === subtestCode);
+    if (!subtestData) {
+        console.error('Subtest not found:', subtestCode);
+        return;
+    }
+    
+    menuState.selectedSubtest = subtestCode;
+    menuState.selectedSubtestData = subtestData;
+    
+    // Populate pillar dropdown
+    const pillarSelect = document.getElementById('pillar-select');
+    if (pillarSelect) {
+        pillarSelect.innerHTML = '<option value="">Select...</option>';
+        const pillars = subtestData.literacy_pillars || [];
+        
+        // Add "All Pillars" option if multiple
+        if (pillars.length > 1) {
+            const allOption = document.createElement('option');
+            allOption.value = 'ALL';
+            allOption.textContent = 'All Pillars';
+            pillarSelect.appendChild(allOption);
+        }
+        
+        pillars.forEach(pillar => {
+            const option = document.createElement('option');
+            option.value = pillar;
+            option.textContent = pillar;
+            pillarSelect.appendChild(option);
+        });
+        
+        pillarSelect.disabled = false;
+        
+        // Auto-select if only one pillar
+        if (pillars.length === 1) {
+            pillarSelect.value = pillars[0];
+            onPillarDropdownChange(pillars[0]);
+            return; // Don't reset type dropdown when auto-selecting
+        }
+    }
+    
+    // Reset downstream dropdowns
+    resetDropdownsFrom('type');
+}
+
+function onPillarDropdownChange(pillarValue) {
+    if (!pillarValue) {
+        resetDropdownsFrom('type');
+        return;
+    }
+    
+    console.log('Dropdown: Selected pillar:', pillarValue);
+    
+    if (pillarValue === 'ALL') {
+        menuState.selectedPillars = [...(menuState.selectedSubtestData?.literacy_pillars || [])];
+    } else {
+        menuState.selectedPillars = [pillarValue];
+    }
+    
+    // Enable type dropdown
+    const typeSelect = document.getElementById('type-select');
+    if (typeSelect) {
+        typeSelect.disabled = false;
+    }
+    
+    // Hide results
+    const resultsSection = document.getElementById('dropdown-results');
+    if (resultsSection) {
+        resultsSection.style.display = 'none';
+    }
+}
+
+function onTypeDropdownChange(typeValue) {
+    if (!typeValue) {
+        const resultsSection = document.getElementById('dropdown-results');
+        if (resultsSection) {
+            resultsSection.style.display = 'none';
+        }
+        return;
+    }
+    
+    console.log('Dropdown: Selected type:', typeValue);
+    
+    menuState.selectedItemType = typeValue;
+    
+    // Load and display results
+    loadDropdownResults();
+}
+
+function loadDropdownResults() {
+    const resultsSection = document.getElementById('dropdown-results');
+    const countEl = document.getElementById('results-count-compact');
+    const listEl = document.getElementById('results-list-compact');
+    
+    if (!resultsSection || !listEl || !menuState.selectedSubtestData) return;
+    
+    // Get program based on screener language
+    const program = menuState.selectedScreenerData?.language === 'English' ? 'English' : 'French Immersion';
+    
+    // Get subtest grade range
+    const subtestStart = menuState.selectedSubtestData.grade_range?.start;
+    const subtestEnd = menuState.selectedSubtestData.grade_range?.end;
+    
+    // Get items from the correct data source
+    let items = [];
+    if (menuState.selectedItemType === 'Assessment') {
+        items = appState.interventionMenuData?.assessments || [];
+    } else {
+        items = appState.interventionMenuData?.interventions || [];
+    }
+    
+    // Filter by program
+    let filtered = items.filter(item => item.program === program);
+    
+    // Filter by grade range
+    filtered = filtered.filter(item => {
+        const itemStart = item.grade_range?.start;
+        const itemEnd = item.grade_range?.end;
+        return gradeRangeOverlaps(subtestStart, subtestEnd, itemStart, itemEnd);
+    });
+    
+    // Filter by selected pillars
+    if (menuState.selectedPillars && menuState.selectedPillars.length > 0) {
+        filtered = filtered.filter(item => {
+            const itemPillars = item.literacy_pillars || [item.literacy_pillar];
+            return menuState.selectedPillars.some(p => itemPillars.includes(p));
+        });
+    }
+    
+    // Update count
+    if (countEl) {
+        countEl.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`;
+    }
+    
+    // Render compact results
+    listEl.innerHTML = filtered.map(item => {
+        const gradeText = `${item.grade_range?.start || 'K'}-${item.grade_range?.end || '12'}`;
+        const langBadge = program === 'French Immersion' ? 'FR' : 'EN';
+        
+        return `
+            <div class="result-row">
+                <span class="result-name-compact">${escapeHtml(item.name)}</span>
+                <div class="result-badges">
+                    <span class="result-badge grade">${gradeText}</span>
+                    <span class="result-badge lang">${langBadge}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Show results
+    resultsSection.style.display = 'block';
+}
+
+function resetDropdownsFrom(startFrom) {
+    const order = ['subtest', 'pillar', 'type'];
+    const startIndex = order.indexOf(startFrom);
+    
+    if (startIndex === -1) return;
+    
+    for (let i = startIndex; i < order.length; i++) {
+        const select = document.getElementById(`${order[i]}-select`);
+        if (select) {
+            select.value = '';
+            select.disabled = true;
+            if (order[i] !== 'type') {
+                select.innerHTML = '<option value="">Select...</option>';
+            }
+        }
+    }
+    
+    // Clear state
+    if (startFrom === 'subtest' || startFrom === 'pillar' || startFrom === 'type') {
+        if (startFrom === 'subtest') {
+            menuState.selectedSubtest = null;
+            menuState.selectedSubtestData = null;
+        }
+        if (startFrom === 'subtest' || startFrom === 'pillar') {
+            menuState.selectedPillars = [];
+        }
+        if (startFrom === 'subtest' || startFrom === 'pillar' || startFrom === 'type') {
+            menuState.selectedItemType = null;
+        }
+    }
+    
+    // Hide results
+    const resultsSection = document.getElementById('dropdown-results');
+    if (resultsSection) {
+        resultsSection.style.display = 'none';
+    }
+}
+
+function initializeDropdownWizard() {
+    // Reset all state
+    menuState.currentStep = 1;
+    menuState.selectedScreener = null;
+    menuState.selectedScreenerData = null;
+    menuState.selectedSubtest = null;
+    menuState.selectedSubtestData = null;
+    menuState.selectedPillars = [];
+    menuState.selectedItemType = null;
+    
+    // Reset all dropdowns
+    const screenerSelect = document.getElementById('screener-select');
+    if (screenerSelect) {
+        screenerSelect.value = '';
+    }
+    
+    resetDropdownsFrom('subtest');
+}
+
+// Override restartMenu to work with dropdown wizard
+const originalRestartMenu = restartMenu;
+function restartMenu() {
+    const dropdownWizard = document.querySelector('.dropdown-wizard');
+    if (dropdownWizard) {
+        initializeDropdownWizard();
+    } else {
+        initializeStepBasedMenu();
+    }
+}
+
+// Override openInterventionsMenuView to initialize dropdown wizard
+const originalOpenInterventionsMenuViewForDropdown = window.openInterventionsMenuView;
+window.openInterventionsMenuView = function() {
+    const optionsView = document.getElementById('interventions-options-view');
+    const menuView = document.getElementById('interventions-menu-full-view');
+    
+    if (optionsView) optionsView.style.display = 'none';
+    if (menuView) menuView.style.display = 'block';
+    
+    const dropdownWizard = document.querySelector('.dropdown-wizard');
+    if (dropdownWizard) {
+        initializeDropdownWizard();
+    } else {
+        initializeStepBasedMenu();
+    }
+};
+
+// Export new dropdown functions
+window.onScreenerDropdownChange = onScreenerDropdownChange;
+window.onSubtestDropdownChange = onSubtestDropdownChange;
+window.onPillarDropdownChange = onPillarDropdownChange;
+window.onTypeDropdownChange = onTypeDropdownChange;
+window.initializeDropdownWizard = initializeDropdownWizard;
+window.restartMenu = restartMenu;
+
 
