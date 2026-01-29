@@ -1582,5 +1582,5 @@ select:focus-visible {
 .tier-card,
 .faq-question,
 button {
-    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
 }
