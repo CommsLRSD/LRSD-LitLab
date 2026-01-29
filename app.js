@@ -3075,16 +3075,28 @@ function showInterventionView(view) {
 function updateScreenerOptions() {
     const screenerSelect = document.getElementById('screener-select');
     if (!screenerSelect || !appState.interventionMenuData) return;
+    
+    // Use shared helper to build dropdown with all screeners
+    screenerSelect.innerHTML = buildScreenerDropdownHtml('');
+}
 
-    // Get all screeners, grouped by language
-    const englishScreeners = appState.interventionMenuData.screeners.filter(
-        s => s.language === 'English'
-    );
-    const frenchScreeners = appState.interventionMenuData.screeners.filter(
-        s => s.language === 'French'
-    );
-
-    // Build the dropdown with all screeners grouped by language
+// Shared helper function to build screener dropdown HTML
+function buildScreenerDropdownHtml(languageFilter) {
+    if (!appState.interventionMenuData) return '<option value="">Select...</option>';
+    
+    let englishScreeners = [];
+    let frenchScreeners = [];
+    
+    if (!languageFilter || languageFilter === '') {
+        // Show all screeners
+        englishScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'English');
+        frenchScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'French');
+    } else if (languageFilter === 'English') {
+        englishScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'English');
+    } else if (languageFilter === 'French') {
+        frenchScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'French');
+    }
+    
     let html = '<option value="">Select...</option>';
     
     if (englishScreeners.length > 0) {
@@ -3099,7 +3111,7 @@ function updateScreenerOptions() {
         html += '</optgroup>';
     }
     
-    screenerSelect.innerHTML = html;
+    return html;
 }
 
 function updateSubtestOptions() {
@@ -4652,7 +4664,6 @@ function initializeDropdownWizard() {
 }
 
 // Override restartMenu to work with dropdown wizard
-const originalRestartMenu = restartMenu;
 function restartMenu() {
     const dropdownWizard = document.querySelector('.dropdown-wizard');
     if (dropdownWizard) {
@@ -4663,7 +4674,6 @@ function restartMenu() {
 }
 
 // Override openInterventionsMenuView to initialize dropdown wizard
-const originalOpenInterventionsMenuViewForDropdown = window.openInterventionsMenuView;
 window.openInterventionsMenuView = function() {
     // Hide the options screen (correct ID)
     const optionsScreen = document.getElementById('interventions-options-screen');
@@ -4689,41 +4699,11 @@ window.openInterventionsMenuView = function() {
 
 // Language filter function
 function onLanguageFilterChange(language) {
-    console.log('Language filter changed:', language);
-    
     const screenerSelect = document.getElementById('screener-select');
-    if (!screenerSelect || !appState.interventionMenuData) return;
+    if (!screenerSelect) return;
     
-    // Get screeners filtered by language (or all if empty)
-    let englishScreeners = [];
-    let frenchScreeners = [];
-    
-    if (!language || language === '') {
-        // Show all screeners
-        englishScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'English');
-        frenchScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'French');
-    } else if (language === 'English') {
-        englishScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'English');
-    } else if (language === 'French') {
-        frenchScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'French');
-    }
-    
-    // Build dropdown HTML
-    let html = '<option value="">Select...</option>';
-    
-    if (englishScreeners.length > 0) {
-        html += '<optgroup label="English">';
-        html += englishScreeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
-        html += '</optgroup>';
-    }
-    
-    if (frenchScreeners.length > 0) {
-        html += '<optgroup label="French Immersion">';
-        html += frenchScreeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
-        html += '</optgroup>';
-    }
-    
-    screenerSelect.innerHTML = html;
+    // Use shared helper to build dropdown HTML
+    screenerSelect.innerHTML = buildScreenerDropdownHtml(language);
     
     // Reset downstream dropdowns
     resetDropdownsFrom('subtest');
