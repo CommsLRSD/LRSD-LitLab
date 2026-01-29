@@ -3288,9 +3288,9 @@ function displayCompactResults(results, filters) {
             <div class="results-count">${summaryText}</div>
         </div>
         <div class="results-grid-compact">
-            ${results.map(item => `
-                <div class="result-card-compact">
-                    <div class="result-header-compact">
+            ${results.map((item, index) => `
+                <div class="result-card-compact" data-index="${index}">
+                    <div class="result-header-compact" onclick="toggleResultExpand(${index})">
                         <div>
                             <h4 class="result-name-compact">${item.name}</h4>
                             <div class="result-meta-compact">
@@ -3304,32 +3304,35 @@ function displayCompactResults(results, filters) {
                                     : ''}
                             </div>
                         </div>
+                        <svg class="result-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 9l-7 7-7-7"/>
+                        </svg>
                     </div>
                     <div class="result-details-compact">
                         ${item.itemType === 'Intervention' ? `
-                            <div class="result-info"><strong>Pillars:</strong> ${item.literacy_pillars.join(', ')}</div>
+                            <div class="result-info"><strong>Addresses:</strong> ${item.literacy_pillars.join(', ')}</div>
                         ` : `
                             <div class="result-info"><strong>Pillar:</strong> ${(item.literacy_pillars || [item.literacy_pillar]).join(', ')}</div>
                             <div class="result-info"><strong>Type:</strong> ${item.assessment_type}</div>
                         `}
+                        ${item.url && item.url !== '' && item.url !== '(local resource)' && item.url !== '(SharePoint)' && item.url !== '(Nelson)' ? `
+                            <a href="${item.url}" target="_blank" class="result-link-compact" onclick="event.stopPropagation()">
+                                View Resource
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                                    <path d="M15 3h6v6"/>
+                                    <path d="M10 14L21 3"/>
+                                </svg>
+                            </a>
+                        ` : item.url && item.url !== '' ? `
+                            <div class="result-local-compact">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Available on ${item.url}
+                            </div>
+                        ` : ''}
                     </div>
-                    ${item.url && item.url !== '' && item.url !== '(local resource)' && item.url !== '(SharePoint)' && item.url !== '(Nelson)' ? `
-                        <a href="${item.url}" target="_blank" class="result-link-compact">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
-                                <path d="M15 3h6v6"/>
-                                <path d="M10 14L21 3"/>
-                            </svg>
-                            View Resource
-                        </a>
-                    ` : item.url && item.url !== '' ? `
-                        <div class="result-local-compact">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            ${item.url}
-                        </div>
-                    ` : ''}
                 </div>
             `).join('')}
         </div>
@@ -3501,8 +3504,34 @@ function initializeStepBasedMenu() {
     menuState.selectedPillars = [];
     menuState.selectedItemType = null;
     
-    // Show step 1
-    goToStep(1);
+    // Check if we're in single-page mode
+    const singlePageMode = document.querySelector('.single-page-steps');
+    if (singlePageMode) {
+        // Set up single-page accordion mode
+        // Step 1 should be active and enabled
+        const step1 = document.querySelector('.menu-step-section[data-step="1"]');
+        if (step1) {
+            step1.classList.add('active');
+            step1.classList.remove('disabled', 'completed');
+        }
+        
+        // All other steps should be collapsed and disabled
+        for (let i = 2; i <= 5; i++) {
+            const step = document.querySelector(`.menu-step-section[data-step="${i}"]`);
+            if (step) {
+                step.classList.remove('active', 'completed');
+                step.classList.add('disabled');
+            }
+        }
+        
+        // Clear selections
+        document.querySelectorAll('.step-section-selection').forEach(el => {
+            el.textContent = '';
+        });
+    } else {
+        // Old multi-page mode
+        goToStep(1);
+    }
 }
 
 // Navigate to a specific step
@@ -3573,8 +3602,19 @@ function selectScreener(screenerId) {
     // Load subtests for step 2
     loadSubtests();
     
-    // Go to step 2
-    goToStep(2);
+    // Update step sections and navigate
+    updateStepSections();
+    
+    // Check if we're in single-page mode
+    const singlePageMode = document.querySelector('.single-page-steps');
+    if (singlePageMode) {
+        // Collapse step 1 and expand step 2
+        toggleStepSection(1);
+        toggleStepSection(2);
+    } else {
+        // Old multi-page mode
+        goToStep(2);
+    }
 }
 
 // Load subtests for selected screener
@@ -3638,8 +3678,19 @@ function selectSubtest(subtestCode) {
     // Load pillars for step 3
     loadPillars();
     
-    // Go to step 3
-    goToStep(3);
+    // Update step sections and navigate
+    updateStepSections();
+    
+    // Check if we're in single-page mode
+    const singlePageMode = document.querySelector('.single-page-steps');
+    if (singlePageMode) {
+        // Collapse step 2 and expand step 3
+        toggleStepSection(2);
+        toggleStepSection(3);
+    } else {
+        // Old multi-page mode
+        goToStep(3);
+    }
 }
 
 // Load pillars for selected subtest
@@ -3723,7 +3774,20 @@ function proceedFromStep3() {
         alert('Please select at least one literacy pillar to continue.');
         return;
     }
-    goToStep(4);
+    
+    // Update step sections
+    updateStepSections();
+    
+    // Check if we're in single-page mode
+    const singlePageMode = document.querySelector('.single-page-steps');
+    if (singlePageMode) {
+        // Collapse step 3 and expand step 4
+        toggleStepSection(3);
+        toggleStepSection(4);
+    } else {
+        // Old multi-page mode
+        goToStep(4);
+    }
 }
 
 // Step 4: Select Item Type
@@ -3735,8 +3799,19 @@ function selectItemType(type) {
     // Load and display results
     loadResults();
     
-    // Go to step 5
-    goToStep(5);
+    // Update step sections
+    updateStepSections();
+    
+    // Check if we're in single-page mode
+    const singlePageMode = document.querySelector('.single-page-steps');
+    if (singlePageMode) {
+        // Collapse step 4 and expand step 5
+        toggleStepSection(4);
+        toggleStepSection(5);
+    } else {
+        // Old multi-page mode
+        goToStep(5);
+    }
 }
 
 // Helper function to check grade range overlap
@@ -3907,6 +3982,145 @@ function restartMenu() {
     initializeStepBasedMenu();
 }
 
+// ===== NEW SINGLE-PAGE ACCORDION FUNCTIONS =====
+
+function toggleStepSection(stepNumber) {
+    const section = document.querySelector(`.menu-step-section[data-step="${stepNumber}"]`);
+    if (!section) return;
+    
+    // Don't allow toggling if section is disabled
+    if (section.classList.contains('disabled')) return;
+    
+    // Toggle active class
+    const wasActive = section.classList.contains('active');
+    
+    // Close all other sections
+    document.querySelectorAll('.menu-step-section').forEach(s => {
+        if (s !== section) {
+            s.classList.remove('active');
+        }
+    });
+    
+    // Toggle this section
+    if (wasActive) {
+        section.classList.remove('active');
+    } else {
+        section.classList.add('active');
+        // Scroll section into view
+        setTimeout(() => {
+            section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+}
+
+function updateStepSections() {
+    // Update step 1
+    const step1 = document.querySelector('.menu-step-section[data-step="1"]');
+    if (step1) {
+        const selection1 = document.getElementById('step-1-selection');
+        if (menuState.selectedScreenerData) {
+            if (selection1) selection1.textContent = menuState.selectedScreenerData.name;
+            step1.classList.add('completed');
+            step1.classList.remove('disabled');
+        } else {
+            if (selection1) selection1.textContent = '';
+            step1.classList.remove('completed');
+        }
+    }
+    
+    // Update step 2
+    const step2 = document.querySelector('.menu-step-section[data-step="2"]');
+    if (step2) {
+        const selection2 = document.getElementById('step-2-selection');
+        if (menuState.selectedSubtestData) {
+            if (selection2) selection2.textContent = menuState.selectedSubtestData.name;
+            step2.classList.add('completed');
+            step2.classList.remove('disabled');
+        } else {
+            if (selection2) selection2.textContent = '';
+            step2.classList.remove('completed');
+        }
+        
+        // Enable/disable step 2 based on step 1
+        if (menuState.selectedScreener) {
+            step2.classList.remove('disabled');
+        } else {
+            step2.classList.add('disabled');
+        }
+    }
+    
+    // Update step 3
+    const step3 = document.querySelector('.menu-step-section[data-step="3"]');
+    if (step3) {
+        const selection3 = document.getElementById('step-3-selection');
+        if (menuState.selectedPillars && menuState.selectedPillars.length > 0) {
+            if (selection3) selection3.textContent = menuState.selectedPillars.join(', ');
+            step3.classList.add('completed');
+            step3.classList.remove('disabled');
+        } else {
+            if (selection3) selection3.textContent = '';
+            step3.classList.remove('completed');
+        }
+        
+        // Enable/disable step 3 based on step 2
+        if (menuState.selectedSubtest) {
+            step3.classList.remove('disabled');
+        } else {
+            step3.classList.add('disabled');
+        }
+    }
+    
+    // Update step 4
+    const step4 = document.querySelector('.menu-step-section[data-step="4"]');
+    if (step4) {
+        const selection4 = document.getElementById('step-4-selection');
+        if (menuState.selectedItemType) {
+            if (selection4) selection4.textContent = menuState.selectedItemType;
+            step4.classList.add('completed');
+            step4.classList.remove('disabled');
+        } else {
+            if (selection4) selection4.textContent = '';
+            step4.classList.remove('completed');
+        }
+        
+        // Enable/disable step 4 based on step 3
+        if (menuState.selectedPillars && menuState.selectedPillars.length > 0) {
+            step4.classList.remove('disabled');
+        } else {
+            step4.classList.add('disabled');
+        }
+    }
+    
+    // Update step 5
+    const step5 = document.querySelector('.menu-step-section[data-step="5"]');
+    if (step5) {
+        const selection5 = document.getElementById('step-5-selection');
+        
+        // Enable/disable step 5 based on step 4
+        if (menuState.selectedItemType) {
+            step5.classList.remove('disabled');
+            if (selection5) {
+                const breadcrumb = `${menuState.selectedScreenerData?.name} > ${menuState.selectedSubtestData?.name} > ${menuState.selectedPillars?.join(', ')} > ${menuState.selectedItemType}`;
+                selection5.textContent = '';
+            }
+        } else {
+            step5.classList.add('disabled');
+            if (selection5) selection5.textContent = '';
+        }
+    }
+}
+
+function toggleResultExpand(index) {
+    const card = document.querySelectorAll('.result-card-compact')[index];
+    if (card) {
+        card.classList.toggle('expanded');
+    }
+}
+
+function restartMenu() {
+    initializeStepBasedMenu();
+}
+
 // Update openInterventionsMenuView to initialize the new menu
 const originalOpenInterventionsMenuView = openInterventionsMenuView;
 window.openInterventionsMenuView = function() {
@@ -3985,5 +4199,7 @@ window.selectItemType = selectItemType;
 window.goToStep = goToStep;
 window.proceedFromStep3 = proceedFromStep3;
 window.restartMenu = restartMenu;
+window.toggleStepSection = toggleStepSection;
+window.toggleResultExpand = toggleResultExpand;
 
 

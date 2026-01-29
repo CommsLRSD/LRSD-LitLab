@@ -288,37 +288,22 @@
                     <p class="section-subtitle">Find literacy interventions and assessments based on your screening results</p>
                 </div>
 
-                <!-- Progress Indicator -->
-                <div class="step-progress" id="step-progress">
-                    <div class="step-indicator" data-step="1">
-                        <div class="step-number">1</div>
-                        <div class="step-label">Screener</div>
-                    </div>
-                    <div class="step-connector"></div>
-                    <div class="step-indicator" data-step="2">
-                        <div class="step-number">2</div>
-                        <div class="step-label">Subtest</div>
-                    </div>
-                    <div class="step-connector"></div>
-                    <div class="step-indicator" data-step="3">
-                        <div class="step-number">3</div>
-                        <div class="step-label">Pillar</div>
-                    </div>
-                    <div class="step-connector"></div>
-                    <div class="step-indicator" data-step="4">
-                        <div class="step-number">4</div>
-                        <div class="step-label">Type</div>
-                    </div>
-                    <div class="step-connector"></div>
-                    <div class="step-indicator" data-step="5">
-                        <div class="step-number">5</div>
-                        <div class="step-label">Results</div>
-                    </div>
-                </div>
-
+                <!-- Single-Page Progressive Steps -->
+                <div class="single-page-steps">
+                
                 <!-- Step 1: Screener Selection -->
-                <div id="step-1" class="menu-step active">
-                    <h3 class="step-title">Step 1: Select Your Literacy Screener</h3>
+                <div id="step-1" class="menu-step-section active" data-step="1">
+                    <div class="step-section-header" onclick="toggleStepSection(1)">
+                        <div class="step-section-number">1</div>
+                        <div class="step-section-title-group">
+                            <h3 class="step-section-title">Select Your Literacy Screener</h3>
+                            <p class="step-section-selection" id="step-1-selection"></p>
+                        </div>
+                        <svg class="step-section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                    <div class="step-section-content">
                     <p class="step-description">Which screener did you administer to your student?</p>
                     
                     <div class="screener-groups">
@@ -354,67 +339,66 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
 
                 <!-- Step 2: Subtest Selection -->
-                <div id="step-2" class="menu-step">
-                    <div class="step-header">
-                        <button class="btn-back" onclick="goToStep(1)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                            Back
-                        </button>
-                        <div>
-                            <h3 class="step-title">Step 2: Select the Subtest</h3>
-                            <p class="step-description">You selected <strong id="selected-screener-name"></strong>. Which subtest did you administer?</p>
+                <div id="step-2" class="menu-step-section" data-step="2">
+                    <div class="step-section-header" onclick="toggleStepSection(2)">
+                        <div class="step-section-number">2</div>
+                        <div class="step-section-title-group">
+                            <h3 class="step-section-title">Select the Subtest</h3>
+                            <p class="step-section-selection" id="step-2-selection"></p>
                         </div>
+                        <svg class="step-section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 9l-7 7-7-7"/>
+                        </svg>
                     </div>
-                    
+                    <div class="step-section-content">
+                    <p class="step-description">Select which subtest you administered</p>
                     <div id="subtest-options" class="option-list"></div>
+                    </div>
                 </div>
 
                 <!-- Step 3: Pillar Selection -->
-                <div id="step-3" class="menu-step">
-                    <div class="step-header">
-                        <button class="btn-back" onclick="goToStep(2)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                            Back
-                        </button>
-                        <div>
-                            <h3 class="step-title">Step 3: Literacy Pillar(s)</h3>
-                            <p class="step-description">Your selected subtest measures the following literacy pillar(s):</p>
+                <div id="step-3" class="menu-step-section" data-step="3">
+                    <div class="step-section-header" onclick="toggleStepSection(3)">
+                        <div class="step-section-number">3</div>
+                        <div class="step-section-title-group">
+                            <h3 class="step-section-title">Literacy Pillar(s)</h3>
+                            <p class="step-section-selection" id="step-3-selection"></p>
                         </div>
+                        <svg class="step-section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 9l-7 7-7-7"/>
+                        </svg>
                     </div>
-                    
+                    <div class="step-section-content">
+                    <p class="step-description">Your selected subtest measures the following literacy pillar(s):</p>
                     <div id="pillar-info" class="pillar-info"></div>
                     <div id="pillar-options" class="option-checkboxes"></div>
-                    
                     <button class="btn-primary btn-next" onclick="proceedFromStep3()">
                         Continue
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7"/>
                         </svg>
                     </button>
+                    </div>
                 </div>
 
                 <!-- Step 4: Item Type Selection -->
-                <div id="step-4" class="menu-step">
-                    <div class="step-header">
-                        <button class="btn-back" onclick="goToStep(3)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                            Back
-                        </button>
-                        <div>
-                            <h3 class="step-title">Step 4: What Are You Looking For?</h3>
-                            <p class="step-description">Choose whether you need a drill-down assessment or an intervention strategy</p>
+                <div id="step-4" class="menu-step-section" data-step="4">
+                    <div class="step-section-header" onclick="toggleStepSection(4)">
+                        <div class="step-section-number">4</div>
+                        <div class="step-section-title-group">
+                            <h3 class="step-section-title">What Are You Looking For?</h3>
+                            <p class="step-section-selection" id="step-4-selection"></p>
                         </div>
+                        <svg class="step-section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 9l-7 7-7-7"/>
+                        </svg>
                     </div>
-                    
+                    <div class="step-section-content">
+                    <p class="step-description">Choose whether you need a drill-down assessment or an intervention strategy</p>
                     <div class="type-cards">
                         <button class="type-card" onclick="selectItemType('Assessment')">
                             <div class="type-icon">
@@ -437,26 +421,24 @@
                             <div class="type-description">A teaching strategy or program to address this skill</div>
                         </button>
                     </div>
+                    </div>
                 </div>
 
                 <!-- Step 5: Results Display -->
-                <div id="step-5" class="menu-step">
-                    <div class="step-header">
-                        <button class="btn-back" onclick="goToStep(4)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                            Back
-                        </button>
-                        <div>
-                            <h3 class="step-title">Results</h3>
-                            <p class="step-description" id="results-breadcrumb"></p>
+                <div id="step-5" class="menu-step-section" data-step="5">
+                    <div class="step-section-header" onclick="toggleStepSection(5)">
+                        <div class="step-section-number">5</div>
+                        <div class="step-section-title-group">
+                            <h3 class="step-section-title">Results</h3>
+                            <p class="step-section-selection" id="step-5-selection"></p>
                         </div>
+                        <svg class="step-section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 9l-7 7-7-7"/>
+                        </svg>
                     </div>
-                    
+                    <div class="step-section-content">
                     <div class="results-summary" id="step5-results-summary"></div>
                     <div id="step5-results-container" class="results-list"></div>
-                    
                     <button class="btn-secondary btn-restart" onclick="restartMenu()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
@@ -464,7 +446,10 @@
                         </svg>
                         Start New Search
                     </button>
+                    </div>
                 </div>
+                
+                </div><!-- End single-page-steps -->
             </div>
             
             <!-- Flowchart View Container -->
