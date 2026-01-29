@@ -3504,6 +3504,15 @@ function initializeStepBasedMenu() {
     menuState.selectedPillars = [];
     menuState.selectedItemType = null;
     
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        // Initialize panel-based wizard
+        goToStep(1);
+        updateStepPills();
+        return;
+    }
+    
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
     if (singlePageMode) {
@@ -3534,10 +3543,30 @@ function initializeStepBasedMenu() {
     }
 }
 
-// Navigate to a specific step
+// Navigate to a specific step (updated for panel-based wizard)
 function goToStep(stepNumber) {
     menuState.currentStep = stepNumber;
     
+    // Check for new panel-based wizard
+    const stepPanels = document.querySelector('.step-panels');
+    if (stepPanels) {
+        // Hide all panels
+        document.querySelectorAll('.step-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        
+        // Show current panel
+        const currentPanel = document.getElementById(`panel-${stepNumber}`);
+        if (currentPanel) {
+            currentPanel.classList.add('active');
+        }
+        
+        // Update step pills
+        updateStepPills();
+        return;
+    }
+    
+    // Legacy code for old multi-step mode
     // Hide all steps
     document.querySelectorAll('.menu-step').forEach(step => {
         step.classList.remove('active');
@@ -3557,6 +3586,42 @@ function goToStep(stepNumber) {
     if (menuView) {
         menuView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+}
+
+// Update step pills in horizontal bar
+function updateStepPills() {
+    const pills = document.querySelectorAll('.step-pill');
+    const connectors = document.querySelectorAll('.step-bar .step-connector');
+    
+    pills.forEach((pill, index) => {
+        const stepNum = index + 1;
+        pill.classList.remove('active', 'completed', 'disabled');
+        
+        if (stepNum === menuState.currentStep) {
+            pill.classList.add('active');
+        } else if (stepNum < menuState.currentStep) {
+            pill.classList.add('completed');
+        } else {
+            // Determine if step should be enabled based on previous steps
+            let enabled = false;
+            if (stepNum === 2 && menuState.selectedScreener) enabled = true;
+            else if (stepNum === 3 && menuState.selectedSubtest) enabled = true;
+            else if (stepNum === 4 && menuState.selectedPillars && menuState.selectedPillars.length > 0) enabled = true;
+            else if (stepNum === 5 && menuState.selectedItemType) enabled = true;
+            
+            if (!enabled) {
+                pill.classList.add('disabled');
+            }
+        }
+    });
+    
+    // Update connectors
+    connectors.forEach((connector, index) => {
+        connector.classList.remove('active');
+        if (index < menuState.currentStep - 1) {
+            connector.classList.add('active');
+        }
+    });
 }
 
 // Update progress indicator
@@ -3605,6 +3670,13 @@ function selectScreener(screenerId) {
     // Update step sections and navigate
     updateStepSections();
     
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        goToStep(2);
+        return;
+    }
+    
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
     if (singlePageMode) {
@@ -3629,30 +3701,49 @@ function loadSubtests() {
         screenerNameEl.textContent = menuState.selectedScreenerData.screener_name;
     }
     
+    // Check if we're using the new panel-based wizard
+    const isNewWizard = document.querySelector('.step-wizard');
+    
     // Generate subtest options
     const subtests = menuState.selectedScreenerData.subtests || [];
-    container.innerHTML = subtests.map(subtest => {
-        const escapedCode = escapeHtml(subtest.subtest_code);
-        const escapedName = escapeHtml(subtest.subtest_name);
-        const escapedDesc = escapeHtml(subtest.description);
-        return `
-            <button class="option-item" data-subtest-code="${escapedCode}">
-                <div class="option-item-content">
-                    <div class="option-item-title">${escapedCode} - ${escapedName}</div>
-                    <div class="option-item-subtitle">
-                        Grades ${subtest.grade_range.start}-${subtest.grade_range.end} • 
-                        ${escapedDesc}
-                    </div>
-                </div>
-                <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6"/>
-                </svg>
-            </button>
-        `;
-    }).join('');
     
-    // Add event listeners
-    container.querySelectorAll('.option-item').forEach(button => {
+    if (isNewWizard) {
+        // New compact button style
+        container.innerHTML = subtests.map(subtest => {
+            const escapedCode = escapeHtml(subtest.subtest_code);
+            const escapedName = escapeHtml(subtest.subtest_name);
+            return `
+                <button class="subtest-btn" data-subtest-code="${escapedCode}">
+                    <strong>${escapedCode}</strong>
+                    <span>${escapedName}</span>
+                </button>
+            `;
+        }).join('');
+    } else {
+        // Legacy card style
+        container.innerHTML = subtests.map(subtest => {
+            const escapedCode = escapeHtml(subtest.subtest_code);
+            const escapedName = escapeHtml(subtest.subtest_name);
+            const escapedDesc = escapeHtml(subtest.description);
+            return `
+                <button class="option-item" data-subtest-code="${escapedCode}">
+                    <div class="option-item-content">
+                        <div class="option-item-title">${escapedCode} - ${escapedName}</div>
+                        <div class="option-item-subtitle">
+                            Grades ${subtest.grade_range.start}-${subtest.grade_range.end} • 
+                            ${escapedDesc}
+                        </div>
+                    </div>
+                    <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+            `;
+        }).join('');
+    }
+    
+    // Add event listeners (for both old and new styles)
+    container.querySelectorAll('.option-item, .subtest-btn').forEach(button => {
         button.addEventListener('click', () => {
             selectSubtest(button.dataset.subtestCode);
         });
@@ -3681,6 +3772,13 @@ function selectSubtest(subtestCode) {
     // Update step sections and navigate
     updateStepSections();
     
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        goToStep(3);
+        return;
+    }
+    
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
     if (singlePageMode) {
@@ -3701,39 +3799,67 @@ function loadPillars() {
     if (!infoContainer || !optionsContainer || !menuState.selectedSubtestData) return;
     
     const pillars = menuState.selectedSubtestData.literacy_pillars || [];
+    const isNewWizard = document.querySelector('.step-wizard');
     
-    // Show info
-    infoContainer.innerHTML = `
-        <p><strong>${menuState.selectedSubtestData.subtest_name}</strong> measures: ${pillars.join(', ')}</p>
-    `;
+    // Show info as chips for new wizard, or as text for legacy
+    if (isNewWizard) {
+        infoContainer.innerHTML = pillars.map(pillar => {
+            const escapedPillar = escapeHtml(pillar);
+            return `<span class="pillar-chip">${escapedPillar}</span>`;
+        }).join('');
+    } else {
+        infoContainer.innerHTML = `
+            <p><strong>${menuState.selectedSubtestData.subtest_name}</strong> measures: ${pillars.join(', ')}</p>
+        `;
+    }
     
     // If single pillar, auto-select it
     if (pillars.length === 1) {
         menuState.selectedPillars = [pillars[0]];
-        optionsContainer.innerHTML = `
-            <div class="checkbox-option checked">
-                <input type="checkbox" id="pillar-0" checked disabled>
-                <label for="pillar-0">${pillars[0]}</label>
-            </div>
-        `;
+        if (isNewWizard) {
+            optionsContainer.innerHTML = `
+                <div class="pillar-checkbox-item">
+                    <input type="checkbox" id="pillar-0" checked disabled>
+                    <label for="pillar-0">${escapeHtml(pillars[0])}</label>
+                </div>
+            `;
+        } else {
+            optionsContainer.innerHTML = `
+                <div class="checkbox-option checked">
+                    <input type="checkbox" id="pillar-0" checked disabled>
+                    <label for="pillar-0">${escapeHtml(pillars[0])}</label>
+                </div>
+            `;
+        }
     } else {
         // Multiple pillars - show checkboxes
         menuState.selectedPillars = [...pillars]; // Select all by default
-        optionsContainer.innerHTML = pillars.map((pillar, index) => {
-            // Use proper HTML escaping for attributes
-            const escapedPillar = escapeHtml(pillar);
-            return `
-                <div class="checkbox-option checked" data-pillar="${escapedPillar}" data-index="${index}">
-                    <input type="checkbox" id="pillar-${index}" checked>
-                    <label for="pillar-${index}">${escapedPillar}</label>
-                </div>
-            `;
-        }).join('');
+        
+        if (isNewWizard) {
+            optionsContainer.innerHTML = pillars.map((pillar, index) => {
+                const escapedPillar = escapeHtml(pillar);
+                return `
+                    <div class="pillar-checkbox-item" data-pillar="${escapedPillar}" data-index="${index}">
+                        <input type="checkbox" id="pillar-${index}" checked>
+                        <label for="pillar-${index}">${escapedPillar}</label>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            optionsContainer.innerHTML = pillars.map((pillar, index) => {
+                const escapedPillar = escapeHtml(pillar);
+                return `
+                    <div class="checkbox-option checked" data-pillar="${escapedPillar}" data-index="${index}">
+                        <input type="checkbox" id="pillar-${index}" checked>
+                        <label for="pillar-${index}">${escapedPillar}</label>
+                    </div>
+                `;
+            }).join('');
+        }
         
         // Add event listeners to checkboxes
-        optionsContainer.querySelectorAll('.checkbox-option').forEach(option => {
+        optionsContainer.querySelectorAll('.checkbox-option, .pillar-checkbox-item').forEach(option => {
             const checkbox = option.querySelector('input[type="checkbox"]');
-            // Get pillar name from the original pillars array using index
             const pillarIndex = parseInt(option.dataset.index);
             const pillarName = pillars[pillarIndex];
             
@@ -3778,6 +3904,13 @@ function proceedFromStep3() {
     // Update step sections
     updateStepSections();
     
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        goToStep(4);
+        return;
+    }
+    
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
     if (singlePageMode) {
@@ -3801,6 +3934,13 @@ function selectItemType(type) {
     
     // Update step sections
     updateStepSections();
+    
+    // Check for new panel-based wizard
+    const stepWizard = document.querySelector('.step-wizard');
+    if (stepWizard) {
+        goToStep(5);
+        return;
+    }
     
     // Check if we're in single-page mode
     const singlePageMode = document.querySelector('.single-page-steps');
