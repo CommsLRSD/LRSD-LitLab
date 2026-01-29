@@ -7,6 +7,7 @@
 const appState = {
     currentPage: 'home',
     mobileMenuOpen: false,
+    slidePanelOpen: null,
     flowchartData: null,
     tierFlowchartData: null,
     interventionMenuData: null,
@@ -111,37 +112,284 @@ async function loadInterventionMenuData() {
 // ============================================
 // Navigation
 // ============================================
+
+// Animation duration constant (sync with CSS --card-slide-duration)
+const SLIDE_ANIMATION_DURATION = 400;
+
 function setupNavigation() {
-    // Desktop navigation
+    // Desktop navigation - also uses slide panels for consistency
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
-            navigateToPage(page);
+            if (page === 'home') {
+                closeAllSlidePanels();
+                navigateToPage(page);
+            } else {
+                openSlidePanel(page, e.currentTarget);
+            }
         });
     });
     
-    // Sidebar navigation
+    // Sidebar navigation - triggers slide-out panels for non-home pages
     document.querySelectorAll('.sidebar-item').forEach(link => {
         link.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
-            navigateToPage(page);
+            if (page === 'home') {
+                // Home page doesn't use slide panel
+                closeAllSlidePanels();
+                navigateToPage(page);
+            } else {
+                // Other pages use slide-out card panels
+                openSlidePanel(page, e.currentTarget);
+            }
         });
     });
     
-    // Mobile navigation
+    // Mobile navigation - also uses slide panels
     document.querySelectorAll('.mobile-nav-item').forEach(link => {
         link.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
-            navigateToPage(page);
             closeMobileMenu();
+            if (page === 'home') {
+                closeAllSlidePanels();
+                navigateToPage(page);
+            } else {
+                openSlidePanel(page, e.currentTarget);
+            }
         });
+    });
+    
+    // Setup slide panel close buttons
+    setupSlidePanelCloseButtons();
+    
+    // Setup overlay click to close
+    const overlay = document.getElementById('slide-modal-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', () => closeAllSlidePanels());
+    }
+    
+    // Escape key to close panels
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && appState.slidePanelOpen) {
+            closeAllSlidePanels();
+        }
     });
 }
 
-function navigateToPage(pageName) {
-    // Update state
-    appState.currentPage = pageName;
+// ============================================
+// Slide-Out Card Panel System
+// ============================================
+let lastFocusedElement = null;
+
+function setupSlidePanelCloseButtons() {
+    document.querySelectorAll('.slide-card-close').forEach(btn => {
+        btn.addEventListener('click', () => closeAllSlidePanels());
+    });
+}
+
+function openSlidePanel(pageName, triggerElement = null) {
+    // Store the triggering element for focus restoration
+    lastFocusedElement = triggerElement || document.activeElement;
     
+    // Close any open panels first without navigating home
+    closeAllSlidePanels(false);
+    
+    // Get the panel and overlay
+    const panel = document.getElementById(`slide-panel-${pageName}`);
+    const overlay = document.getElementById('slide-modal-overlay');
+    
+    if (!panel) {
+        // Fallback to regular navigation if no slide panel exists
+        navigateToPage(pageName);
+        return;
+    }
+    
+    // Populate panel content with section content (using safe cloning)
+    populateSlidePanelContent(pageName);
+    
+    // Update active states
+    updateNavigationActiveStates(pageName);
+    
+    // Update ARIA states
+    overlay?.setAttribute('aria-hidden', 'false');
+    panel.setAttribute('aria-hidden', 'false');
+    
+    // Show overlay and panel
+    overlay?.classList.add('active');
+    panel.classList.add('active', 'sliding-in');
+    
+    // Update app state
+    appState.currentPage = pageName;
+    appState.slidePanelOpen = pageName;
+    
+    // Focus the close button for keyboard accessibility
+    const closeBtn = panel.querySelector('.slide-card-close');
+    setTimeout(() => {
+        panel.classList.remove('sliding-in');
+        closeBtn?.focus();
+    }, SLIDE_ANIMATION_DURATION);
+}
+
+function closeAllSlidePanels(navigateHome = true) {
+    const overlay = document.getElementById('slide-modal-overlay');
+    overlay?.classList.remove('active');
+    overlay?.setAttribute('aria-hidden', 'true');
+    
+    document.querySelectorAll('.slide-card-panel.active').forEach(panel => {
+        panel.classList.add('sliding-out');
+        panel.classList.remove('active');
+        panel.setAttribute('aria-hidden', 'true');
+        
+        setTimeout(() => {
+            panel.classList.remove('sliding-out');
+        }, SLIDE_ANIMATION_DURATION);
+    });
+    
+    appState.slidePanelOpen = null;
+    
+    // Restore focus to the triggering element
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        setTimeout(() => {
+            lastFocusedElement.focus();
+            lastFocusedElement = null;
+        }, SLIDE_ANIMATION_DURATION);
+    }
+    
+    // Optionally navigate back to home
+    if (navigateHome && appState.currentPage !== 'home') {
+        navigateToPage('home');
+    }
+}
+
+function populateSlidePanelContent(pageName) {
+    const section = document.getElementById(`${pageName}-section`);
+    const panelContent = document.getElementById(`slide-content-${pageName}`);
+    
+    if (section && panelContent) {
+        // Clear previous content
+        panelContent.innerHTML = '';
+        
+        // Clone the section content using cloneNode for safer DOM manipulation
+        const clonedContent = section.cloneNode(true);
+        
+        // Move all children from cloned section to panel content
+        while (clonedContent.firstChild) {
+            panelContent.appendChild(clonedContent.firstChild);
+        }
+        
+        // Re-initialize any interactive elements in the cloned content
+        reinitializeInteractiveElements(panelContent);
+    }
+}
+
+function reinitializeInteractiveElements(container) {
+    // Re-attach event listeners for intervention option cards
+    container.querySelectorAll('.intervention-option-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const option = e.currentTarget.dataset.option;
+            if (option && typeof handleInterventionOptionClick === 'function') {
+                handleInterventionOptionClick(option);
+            }
+        });
+    });
+    
+    // Re-attach event listeners for tier cards
+    container.querySelectorAll('.tier-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const tier = e.currentTarget.dataset.tier;
+            if (tier && typeof selectTier === 'function') {
+                selectTier(tier);
+            }
+        });
+    });
+    
+    // Re-attach intervention menu event listeners if they exist
+    const interventionMenuContainer = container.querySelector('.intervention-menu-container');
+    if (interventionMenuContainer && typeof reinitializeInterventionMenu === 'function') {
+        reinitializeInterventionMenu(container);
+    }
+    
+    // Re-attach any accordion functionality
+    container.querySelectorAll('.accordion-header, .collapsible-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const parent = header.parentElement;
+            parent?.classList.toggle('active');
+            parent?.classList.toggle('open');
+        });
+    });
+    
+    // Re-attach tab functionality
+    container.querySelectorAll('.tab-btn, .info-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            const tabId = e.currentTarget.dataset.tab;
+            if (tabId) {
+                activateTab(tabId, container);
+            }
+        });
+    });
+    
+    // Re-attach visual flowchart functionality
+    container.querySelectorAll('.vf-node').forEach(node => {
+        node.addEventListener('click', (e) => {
+            const nodeId = e.currentTarget.dataset.nodeId;
+            if (nodeId && typeof handleVisualFlowchartNodeClick === 'function') {
+                handleVisualFlowchartNodeClick(nodeId);
+            }
+        });
+    });
+    
+    // Re-attach external links to open in new tab
+    container.querySelectorAll('a[href^="http"]').forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+    });
+}
+
+function activateTab(tabId, container) {
+    // Deactivate all tabs in this container
+    container.querySelectorAll('.tab-btn, .info-tab').forEach(t => t.classList.remove('active'));
+    container.querySelectorAll('.tab-content, .info-tab-content').forEach(c => c.classList.remove('active'));
+    
+    // Activate the clicked tab
+    container.querySelectorAll(`[data-tab="${tabId}"]`).forEach(t => t.classList.add('active'));
+    const tabContent = container.querySelector(`#${tabId}`);
+    tabContent?.classList.add('active');
+}
+
+function reinitializeInterventionMenu(container) {
+    // Re-attach language toggle
+    container.querySelectorAll('.language-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const lang = e.currentTarget.dataset.lang;
+            if (lang) {
+                setInterventionMenuLanguage(lang);
+            }
+        });
+    });
+    
+    // Re-attach screener select
+    const screenerSelect = container.querySelector('#screener-select');
+    if (screenerSelect) {
+        screenerSelect.addEventListener('change', (e) => {
+            handleScreenerChange(e.target.value);
+        });
+    }
+    
+    // Re-attach subtest select
+    const subtestSelect = container.querySelector('#subtest-select');
+    if (subtestSelect) {
+        subtestSelect.addEventListener('change', (e) => {
+            handleSubtestChange(e.target.value);
+        });
+    }
+    
+    // Re-attach pillar checkboxes
+    container.querySelectorAll('.pillar-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updatePillarSelection);
+    });
+}
+
+function updateNavigationActiveStates(pageName) {
     // Update active states in desktop nav
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.toggle('active', link.dataset.page === pageName);
@@ -156,6 +404,14 @@ function navigateToPage(pageName) {
     document.querySelectorAll('.mobile-nav-item').forEach(link => {
         link.classList.toggle('active', link.dataset.page === pageName);
     });
+}
+
+function navigateToPage(pageName) {
+    // Update state
+    appState.currentPage = pageName;
+    
+    // Update navigation active states (reuse the helper function)
+    updateNavigationActiveStates(pageName);
     
     // Show/hide sections
     document.querySelectorAll('.content-section').forEach(section => {
@@ -200,7 +456,8 @@ function setupHomeMenuCards() {
         card.addEventListener('click', (e) => {
             const page = e.currentTarget.dataset.page;
             if (page) {
-                navigateToPage(page);
+                // Use slide-out panel for menu cards too
+                openSlidePanel(page);
             }
         });
     });
