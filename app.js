@@ -57,12 +57,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize intervention menu
     initializeInterventionMenu();
     
-    // Add resize listener to update connection line positions
+    // Add resize listener to update connection line positions and tier titles
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
             updateConnectionLinePositions();
+            updateTierTitleOnResize();
         }, 150); // Debounce resize events
     });
     
@@ -563,6 +564,37 @@ const VF_CONSTANTS = {
     MOBILE_BREAKPOINT: 768            // Breakpoint for mobile layout (matches CSS media query)
 };
 
+// Helper function to get shortened tier title for mobile
+function getTierTitle(fullTitle, isMobile = window.innerWidth <= 768) {
+    if (!isMobile) return fullTitle;
+    
+    // Extract just the tier number (e.g., "Tier 1" from "Tier 1: Universal Screening & Core Instruction")
+    const match = fullTitle.match(/^(Tier \d+)/);
+    return match ? match[1] : fullTitle;
+}
+
+// Function to update tier title when resizing between mobile and desktop
+function updateTierTitleOnResize() {
+    const header = document.querySelector('.visual-flowchart-header h2');
+    if (!header) return;
+    
+    const currentText = header.textContent;
+    // Check if we have a tier title pattern
+    if (currentText.match(/^Tier \d+/)) {
+        const isMobile = window.innerWidth <= 768;
+        // Get the full title from FLOWCHART_DEFINITIONS if needed
+        const tierMatch = currentText.match(/^Tier (\d+)/);
+        if (tierMatch) {
+            const tierNum = tierMatch[1];
+            const tierKey = `tier${tierNum}`;
+            if (FLOWCHART_DEFINITIONS[tierKey]) {
+                const fullTitle = FLOWCHART_DEFINITIONS[tierKey].title;
+                header.textContent = getTierTitle(fullTitle, isMobile);
+            }
+        }
+    }
+}
+
 // Node data definitions for each tier's flowchart
 const FLOWCHART_DEFINITIONS = {
     tier1: {
@@ -896,9 +928,9 @@ function initVisualFlowchart(tierId) {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
-                    Back to Interventions
+                    <span class="vf-back-text">Back to Interventions</span>
                 </button>
-                <h2>${flowchartDef.title}</h2>
+                <h2>${getTierTitle(flowchartDef.title)}</h2>
                 <div class="vf-progress-indicator">
                     <span class="vf-progress-text">Step 1</span>
                 </div>
