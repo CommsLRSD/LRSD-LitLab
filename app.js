@@ -57,6 +57,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize intervention menu
     initializeInterventionMenu();
     
+    // Initialize assessment schedules
+    await initializeAssessmentSchedules();
+    
     // Add resize listener to update connection line positions and tier titles
     let resizeTimeout;
     window.addEventListener('resize', () => {
@@ -4751,3 +4754,344 @@ window.initializeDropdownWizard = initializeDropdownWizard;
 window.restartMenu = restartMenu;
 
 
+
+// ============================================
+// ASSESSMENT SCHEDULES MODULE
+// ============================================
+
+// Store schedules data
+let schedulesData = null;
+
+// Fetch assessment schedules data
+async function fetchSchedules() {
+    try {
+        const response = await fetch('data/assessment-schedules.json');
+        if (!response.ok) throw new Error('Failed to load assessment schedules data');
+        schedulesData = await response.json();
+        console.log('Assessment schedules data loaded successfully');
+        return schedulesData;
+    } catch (error) {
+        console.error('Error loading assessment schedules data:', error);
+        return null;
+    }
+}
+
+// Render the calendar view
+function renderScheduleCalendar(data) {
+    const container = document.getElementById('calendar-container');
+    if (!container || !data) return;
+    
+    let html = '';
+    
+    // Render each program
+    data.programs.forEach(program => {
+        html += `
+            <div class="calendar-program">
+                <div class="calendar-program-header">
+                    <svg class="calendar-program-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        ${program.id === 'english' 
+                            ? '<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'
+                            : '<path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01M16 17h.01"/>'
+                        }
+                    </svg>
+                    <h3 class="calendar-program-title">${safeText(program.name)}</h3>
+                </div>
+                <div class="calendar-wrapper">
+                    <div class="calendar-grid" role="table" aria-label="${safeText(program.name)} Assessment Schedule">
+        `;
+        
+        // Header row
+        html += '<div class="calendar-row">';
+        html += '<div class="calendar-cell header grade-label">Grade Level</div>';
+        data.months.forEach(month => {
+            html += `<div class="calendar-cell header">${safeText(month)}</div>`;
+        });
+        html += '</div>';
+        
+        // Grade rows
+        program.grades.forEach(grade => {
+            html += '<div class="calendar-row">';
+            html += `<div class="calendar-cell grade-label">${safeText(grade.label)}</div>`;
+            
+            // Month cells
+            data.months.forEach((month, monthIndex) => {
+                html += '<div class="calendar-cell">';
+                
+                // Add assessment badges for this month
+                const assessments = grade.events.filter(e => 
+                    e.type === 'assessment' && e.months && e.months.includes(month)
+                );
+                
+                assessments.forEach(assessment => {
+                    const colorClass = data.legend.assessmentColors[assessment.label] || 'badge-blue';
+                    html += `
+                        <span class="badge ${colorClass}" 
+                              title="${safeText(assessment.note || assessment.label)}"
+                              role="img"
+                              aria-label="${safeText(assessment.label)} assessment in ${month} for ${safeText(grade.label)}">
+                            ${safeText(assessment.label)}
+                        </span>
+                    `;
+                });
+                
+                // Add report card icon for this month
+                const reports = grade.events.filter(e => 
+                    e.type === 'report' && e.months && e.months.includes(month)
+                );
+                
+                if (reports.length > 0) {
+                    html += `
+                        <span class="rc-icon" 
+                              title="Report card due"
+                              role="img"
+                              aria-label="Report card due in ${month} for ${safeText(grade.label)}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M9 11l3 3 5-5"/>
+                            </svg>
+                        </span>
+                    `;
+                }
+                
+                // Add intervention period bar
+                const interventions = grade.events.filter(e => 
+                    e.type === 'intervention' && e.span
+                );
+                
+                interventions.forEach(intervention => {
+                    const startIdx = data.months.indexOf(intervention.span[0]);
+                    const endIdx = data.months.indexOf(intervention.span[1]);
+                    
+                    if (monthIndex >= startIdx && monthIndex <= endIdx) {
+                        html += `<div class="intervention-bar" 
+                                     role="presentation"
+                                     aria-label="Intervention period"></div>`;
+                    }
+                });
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+        });
+        
+        html += `
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    
+    // Render legend
+    renderLegend(data);
+}
+
+// Render the legend
+function renderLegend(data) {
+    const container = document.getElementById('calendar-legend');
+    if (!container || !data) return;
+    
+    // Get unique assessment types
+    const assessmentTypes = {};
+    Object.keys(data.legend.assessmentColors).forEach(key => {
+        // Remove asterisk for display
+        const cleanKey = key.replace('*', '');
+        if (!assessmentTypes[cleanKey]) {
+            assessmentTypes[cleanKey] = data.legend.assessmentColors[key];
+        }
+    });
+    
+    let html = `
+        <div class="legend-section">
+            <div class="legend-title">Assessments</div>
+            <div class="legend-items">
+    `;
+    
+    Object.entries(assessmentTypes).forEach(([label, colorClass]) => {
+        html += `
+            <div class="legend-item">
+                <span class="badge ${colorClass}">${safeText(label)}</span>
+            </div>
+        `;
+    });
+    
+    html += `
+            </div>
+        </div>
+        <div class="legend-section">
+            <div class="legend-title">Other</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <span class="rc-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M9 11l3 3 5-5"/>
+                        </svg>
+                    </span>
+                    <span>Report Card</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-bar"></div>
+                    <span>Intervention Period</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    if (data.notes && data.notes.length > 0) {
+        html += `
+            <div class="legend-section" style="width: 100%;">
+                <div class="legend-title">Notes</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+        `;
+        
+        data.notes.forEach(note => {
+            html += `<div style="margin-bottom: 0.5rem;">• ${safeText(note)}</div>`;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+// Render the table view
+function renderScheduleTable(data) {
+    const container = document.getElementById('table-container');
+    if (!container || !data) return;
+    
+    let html = '';
+    
+    // Render each program
+    data.programs.forEach(program => {
+        html += `
+            <div class="program-block">
+                <div class="program-header">
+                    <svg class="program-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        ${program.id === 'english' 
+                            ? '<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'
+                            : '<path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01M16 17h.01"/>'
+                        }
+                    </svg>
+                    <h3>${safeText(program.name)}</h3>
+                </div>
+                <div class="schedule-table">
+                    <div class="schedule-row header">
+                        <div class="schedule-cell">Grade Level</div>
+                        <div class="schedule-cell">Assessments</div>
+                        <div class="schedule-cell">Timing</div>
+                    </div>
+        `;
+        
+        program.grades.forEach(grade => {
+            const assessments = grade.events.filter(e => e.type === 'assessment');
+            const assessmentsList = assessments.map(a => a.label).join(', ');
+            const timingList = [...new Set(assessments.flatMap(a => a.months || []))].join(', ');
+            
+            html += `
+                <div class="schedule-row">
+                    <div class="schedule-cell"><strong>${safeText(grade.label)}</strong></div>
+                    <div class="schedule-cell">${safeText(assessmentsList)}</div>
+                    <div class="schedule-cell">${safeText(timingList)}</div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Setup schedule toggle
+function applyScheduleToggle() {
+    const toggleButtons = document.querySelectorAll('.toggle-segment');
+    const calendarView = document.getElementById('schedule-calendar-view');
+    const tableView = document.getElementById('schedule-table-view');
+    
+    if (!toggleButtons.length || !calendarView || !tableView) return;
+    
+    // Restore saved preference or default to calendar
+    const savedView = localStorage.getItem('schedule_view_preference') || 'calendar';
+    
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const view = button.dataset.view;
+            
+            // Update active state
+            toggleButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            button.classList.add('active');
+            button.setAttribute('aria-selected', 'true');
+            
+            // Show/hide views
+            if (view === 'calendar') {
+                calendarView.classList.add('active');
+                tableView.classList.remove('active');
+                calendarView.removeAttribute('hidden');
+                tableView.setAttribute('hidden', '');
+            } else {
+                calendarView.classList.remove('active');
+                tableView.classList.add('active');
+                calendarView.setAttribute('hidden', '');
+                tableView.removeAttribute('hidden');
+            }
+            
+            // Save preference
+            localStorage.setItem('schedule_view_preference', view);
+        });
+        
+        // Set initial state
+        if (button.dataset.view === savedView) {
+            button.click();
+        }
+    });
+    
+    // Add keyboard navigation for toggle
+    const toggleContainer = document.querySelector('.schedule-toggle');
+    if (toggleContainer) {
+        toggleContainer.addEventListener('keydown', (e) => {
+            const buttons = Array.from(toggleButtons);
+            const currentIndex = buttons.findIndex(btn => btn.classList.contains('active'));
+            
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                const nextIndex = e.key === 'ArrowLeft' 
+                    ? (currentIndex - 1 + buttons.length) % buttons.length
+                    : (currentIndex + 1) % buttons.length;
+                buttons[nextIndex].click();
+                buttons[nextIndex].focus();
+            }
+        });
+    }
+}
+
+// Safe text helper to prevent XSS
+function safeText(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Initialize assessment schedules
+async function initializeAssessmentSchedules() {
+    const data = await fetchSchedules();
+    if (data) {
+        renderScheduleCalendar(data);
+        renderScheduleTable(data);
+        applyScheduleToggle();
+    }
+}
+
+// Export functions
+window.initializeAssessmentSchedules = initializeAssessmentSchedules;
