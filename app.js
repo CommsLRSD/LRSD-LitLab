@@ -4776,10 +4776,43 @@ async function fetchSchedules() {
     }
 }
 
-// Render the calendar view - COMPLETELY REDESIGNED
+// Render the calendar view - CHRONOLOGICAL CALENDAR LAYOUT
 function renderScheduleCalendar(data) {
     const container = document.getElementById('calendar-container');
     if (!container || !data) return;
+    
+    // Define school year months in chronological order
+    const schoolYearMonths = [
+        { id: 'before', label: 'Before School', short: 'Before' },
+        { id: 'sep', label: 'September', short: 'Sept' },
+        { id: 'oct', label: 'October', short: 'Oct' },
+        { id: 'nov', label: 'November', short: 'Nov' },
+        { id: 'dec', label: 'December', short: 'Dec' },
+        { id: 'jan', label: 'January', short: 'Jan' },
+        { id: 'feb', label: 'February', short: 'Feb' },
+        { id: 'mar', label: 'March', short: 'Mar' },
+        { id: 'apr', label: 'April', short: 'Apr' },
+        { id: 'may', label: 'May', short: 'May' },
+        { id: 'jun', label: 'June', short: 'Jun' }
+    ];
+    
+    // Helper to map periods to months
+    function getMonthsFromPeriod(period) {
+        const p = period.toLowerCase();
+        if (p.includes('before')) return ['before'];
+        if (p.includes('sep') && p.includes('oct')) return ['sep', 'oct'];
+        if (p.includes('sep') || p.includes('fall')) return ['sep', 'oct'];
+        if (p.includes('oct')) return ['oct'];
+        if (p.includes('nov')) return ['nov'];
+        if (p.includes('dec')) return ['dec'];
+        if (p.includes('jan') || p.includes('winter')) return ['jan'];
+        if (p.includes('feb')) return ['feb'];
+        if (p.includes('mar')) return ['mar'];
+        if (p.includes('apr') || p.includes('spring')) return ['apr'];
+        if (p.includes('may')) return ['may'];
+        if (p.includes('jun')) return ['jun'];
+        return [];
+    }
     
     let html = '';
     
@@ -4796,65 +4829,98 @@ function renderScheduleCalendar(data) {
                     </svg>
                     ${safeText(program.name)}
                 </h3>
-                <div class="grade-cards">
+                <div class="calendar-timeline">
         `;
         
-        // Render each grade as a card
+        // Render chronological timeline for each grade
         program.grades.forEach(grade => {
-            const assessments = grade.events.filter(e => e.type === 'assessment');
-            const reports = grade.events.find(e => e.type === 'report');
-            const intervention = grade.events.find(e => e.type === 'intervention');
-            
             html += `
-                <div class="grade-card">
-                    <div class="grade-header">${safeText(grade.label)}</div>
-                    <div class="timeline">
+                <div class="grade-row">
+                    <div class="grade-label">${safeText(grade.label)}</div>
+                    <div class="months-container">
             `;
             
-            // Render assessments
-            assessments.forEach(assessment => {
-                const color = data.legend.assessmentColors[assessment.label] || 'gray';
+            // Render each month
+            schoolYearMonths.forEach(month => {
+                const monthEvents = [];
+                
+                // Find assessments for this month
+                grade.events.filter(e => e.type === 'assessment').forEach(assessment => {
+                    const months = getMonthsFromPeriod(assessment.period);
+                    if (months.includes(month.id)) {
+                        monthEvents.push({
+                            type: 'assessment',
+                            data: assessment,
+                            color: data.legend.assessmentColors[assessment.label] || 'gray'
+                        });
+                    }
+                });
+                
+                // Check for report cards
+                const reports = grade.events.find(e => e.type === 'report');
+                if (reports && reports.periods) {
+                    reports.periods.forEach(reportMonth => {
+                        if (reportMonth.toLowerCase().includes(month.short.toLowerCase().substring(0, 3))) {
+                            monthEvents.push({
+                                type: 'report',
+                                data: { label: 'Report Card' }
+                            });
+                        }
+                    });
+                }
+                
+                // Check for intervention period
+                const intervention = grade.events.find(e => e.type === 'intervention');
+                if (intervention) {
+                    const startMonths = getMonthsFromPeriod(intervention.start);
+                    const endMonths = getMonthsFromPeriod(intervention.end);
+                    const monthIndex = schoolYearMonths.findIndex(m => m.id === month.id);
+                    const startIndex = schoolYearMonths.findIndex(m => startMonths.includes(m.id));
+                    const endIndex = schoolYearMonths.findIndex(m => endMonths.includes(m.id));
+                    
+                    if (monthIndex >= startIndex && monthIndex <= endIndex) {
+                        monthEvents.push({
+                            type: 'intervention',
+                            data: { label: 'Intervention' }
+                        });
+                    }
+                }
+                
+                const hasEvents = monthEvents.length > 0;
                 html += `
-                    <div class="timeline-item">
-                        <div class="assessment-badge ${color}">
-                            ${safeText(assessment.label)}
+                    <div class="month-cell ${hasEvents ? 'has-events' : ''}">
+                        <div class="month-header">${month.short}</div>
+                        <div class="month-events">
+                `;
+                
+                monthEvents.forEach(event => {
+                    if (event.type === 'assessment') {
+                        html += `
+                            <div class="event-badge ${event.color}" title="${safeText(event.data.label)} - ${safeText(event.data.period)}${event.data.note ? ' - ' + safeText(event.data.note) : ''}">
+                                ${safeText(event.data.label)}
+                            </div>
+                        `;
+                    } else if (event.type === 'report') {
+                        html += `
+                            <div class="event-icon report-icon" title="Report Card Due">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <circle cx="8" cy="8" r="6"/>
+                                    <path d="M6 8l2 2 4-4"/>
+                                </svg>
+                            </div>
+                        `;
+                    } else if (event.type === 'intervention') {
+                        html += `
+                            <div class="event-bar intervention-bar" title="Intervention Period"></div>
+                        `;
+                    }
+                });
+                
+                html += `
                         </div>
-                        <div class="period-label">${safeText(assessment.period)}</div>
-                        ${assessment.note ? `<div class="note">${safeText(assessment.note)}</div>` : ''}
                     </div>
                 `;
             });
-            
-            // Render intervention period
-            if (intervention) {
-                html += `
-                    <div class="timeline-item intervention">
-                        <div class="intervention-label">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <rect x="0" y="7" width="16" height="2" rx="1"/>
-                            </svg>
-                            Intervention Period
-                        </div>
-                        <div class="period-label">${intervention.start} - ${intervention.end}</div>
-                    </div>
-                `;
-            }
-            
-            // Render report cards
-            if (reports && reports.periods) {
-                html += `
-                    <div class="timeline-item reports">
-                        <div class="report-label">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="8" cy="8" r="6"/>
-                                <path d="M6 8l2 2 4-4"/>
-                            </svg>
-                            Report Cards
-                        </div>
-                        <div class="period-label">${reports.periods.join(', ')}</div>
-                    </div>
-                `;
-            }
             
             html += `
                     </div>
@@ -4923,122 +4989,6 @@ function renderLegend(data) {
     container.innerHTML = html;
 }
 
-// Render the table view
-function renderScheduleTable(data) {
-    const container = document.getElementById('table-container');
-    if (!container || !data) return;
-    
-    let html = '';
-    
-    // Render each program
-    data.programs.forEach(program => {
-        html += `
-            <div class="program-block">
-                <div class="program-header">
-                    <svg class="program-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        ${program.id === 'english' 
-                            ? '<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'
-                            : '<path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01M16 17h.01"/>'
-                        }
-                    </svg>
-                    <h3>${safeText(program.name)}</h3>
-                </div>
-                <div class="schedule-table">
-                    <div class="schedule-row header">
-                        <div class="schedule-cell">Grade Level</div>
-                        <div class="schedule-cell">Assessments</div>
-                        <div class="schedule-cell">Timing</div>
-                    </div>
-        `;
-        
-        program.grades.forEach(grade => {
-            const assessments = grade.events.filter(e => e.type === 'assessment');
-            const assessmentsList = assessments.map(a => a.label).join(', ');
-            const timingList = [...new Set(assessments.map(a => a.period))].join(', ');
-            
-            html += `
-                <div class="schedule-row">
-                    <div class="schedule-cell"><strong>${safeText(grade.label)}</strong></div>
-                    <div class="schedule-cell">${safeText(assessmentsList)}</div>
-                    <div class="schedule-cell">${safeText(timingList)}</div>
-                </div>
-            `;
-        });
-        
-        html += `
-                </div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
-
-// Setup schedule toggle
-function applyScheduleToggle() {
-    const toggleButtons = document.querySelectorAll('.toggle-segment');
-    const calendarView = document.getElementById('schedule-calendar-view');
-    const tableView = document.getElementById('schedule-table-view');
-    
-    if (!toggleButtons.length || !calendarView || !tableView) return;
-    
-    // Restore saved preference or default to calendar
-    const savedView = localStorage.getItem('schedule_view_preference') || 'calendar';
-    
-    toggleButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const view = button.dataset.view;
-            
-            // Update active state
-            toggleButtons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.setAttribute('aria-selected', 'false');
-            });
-            button.classList.add('active');
-            button.setAttribute('aria-selected', 'true');
-            
-            // Show/hide views
-            if (view === 'calendar') {
-                calendarView.classList.add('active');
-                tableView.classList.remove('active');
-                calendarView.removeAttribute('hidden');
-                tableView.setAttribute('hidden', '');
-            } else {
-                calendarView.classList.remove('active');
-                tableView.classList.add('active');
-                calendarView.setAttribute('hidden', '');
-                tableView.removeAttribute('hidden');
-            }
-            
-            // Save preference
-            localStorage.setItem('schedule_view_preference', view);
-        });
-        
-        // Set initial state
-        if (button.dataset.view === savedView) {
-            button.click();
-        }
-    });
-    
-    // Add keyboard navigation for toggle
-    const toggleContainer = document.querySelector('.schedule-toggle');
-    if (toggleContainer) {
-        toggleContainer.addEventListener('keydown', (e) => {
-            const buttons = Array.from(toggleButtons);
-            const currentIndex = buttons.findIndex(btn => btn.classList.contains('active'));
-            
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                e.preventDefault();
-                const nextIndex = e.key === 'ArrowLeft' 
-                    ? (currentIndex - 1 + buttons.length) % buttons.length
-                    : (currentIndex + 1) % buttons.length;
-                buttons[nextIndex].click();
-                buttons[nextIndex].focus();
-            }
-        });
-    }
-}
-
 // Safe text helper to prevent XSS
 function safeText(text) {
     const div = document.createElement('div');
@@ -5051,8 +5001,6 @@ async function initializeAssessmentSchedules() {
     const data = await fetchSchedules();
     if (data) {
         renderScheduleCalendar(data);
-        renderScheduleTable(data);
-        applyScheduleToggle();
     }
 }
 
