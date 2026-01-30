@@ -1,4 +1,4 @@
-// Literacy Pal - Main Application JavaScript
+// Literacy Interventions - Main Application JavaScript
 // Modern, functional implementation with smooth animations and interactions
 
 // ============================================
@@ -34,7 +34,7 @@ const appState = {
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Literacy Pal - Initializing...');
+    console.log('Literacy Interventions - Initializing...');
     
     // Load intervention data
     await loadInterventionData();
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 150); // Debounce resize events
     });
     
-    console.log('Literacy Pal - Ready!');
+    console.log('Literacy Interventions - Ready!');
 });
 
 // ============================================

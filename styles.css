@@ -90,14 +90,26 @@ body {
     line-height: 1.6;
     color: var(--text-primary);
     background: var(--bg-secondary);
+    position: relative;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-image: url('images/book-bkg.svg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    font-size: 16px;
-    margin: 0;
-    padding: 0;
+    opacity: 0.5;
+    z-index: -1;
 }
 
 /* Headers with same modern font stack */
@@ -1616,7 +1628,7 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .home-hero {
-    background: linear-gradient(135deg, var(--light-blue) 0%, var(--accent-light) 100%);
+    background: var(--bg-primary);
     padding: 2.5rem 1.5rem;
     text-align: center;
     color: var(--text-primary);
@@ -1700,6 +1712,62 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1rem;
+}
+
+.home-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.content-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.content-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.section-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-light);
+}
+
+.content-card p {
+    margin-bottom: 0.75rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+.content-card p:last-child {
+    margin-bottom: 0;
+}
+
+.content-card ul {
+    margin: 0.75rem 0;
+    padding-left: 1.5rem;
+}
+
+.content-card li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+.content-card strong {
+    color: var(--primary-dark);
+    font-weight: 600;
 }
 
 .menu-grid {
@@ -2512,6 +2580,19 @@ h1, h2, h3, h4, h5, h6 {
     /* Better mobile viewport usage - reduce nested padding */
     .home-menu {
         padding: 1rem 0.75rem;
+    }
+    
+    .home-content {
+        padding: 1rem 0.75rem;
+    }
+    
+    .content-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .section-heading {
+        font-size: 1.1rem;
     }
     
     .menu-grid {
