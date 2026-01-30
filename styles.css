@@ -2373,23 +2373,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
-   ASSESSMENT CALENDAR
+   ASSESSMENT CALENDAR - REDESIGNED
    ============================================ */
-
-/* Badge colors for assessments */
-:root {
-    --badge-blue: #2c7da0;
-    --badge-blue-light: #d0ebf7;
-    --badge-peach: #ff9f7c;
-    --badge-peach-light: #ffe8df;
-    --badge-green: #10b981;
-    --badge-green-light: #d1fae5;
-    --badge-rose: #f43f5e;
-    --badge-rose-light: #ffe4e9;
-    --badge-purple: #8b5cf6;
-    --badge-purple-light: #ede9fe;
-    --intervention-bar: #64748b;
-}
 
 /* Schedule Toggle */
 .schedule-toggle {
@@ -2439,215 +2424,187 @@ h1, h2, h3, h4, h5, h6 {
     display: block;
 }
 
-/* Calendar Container */
+/* Program Container */
 #calendar-container {
     margin-top: 2rem;
 }
 
-.calendar-program {
+.schedule-program {
     margin-bottom: 3rem;
 }
 
-.calendar-program-header {
+.program-title {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem 0;
-    border-bottom: 2px solid var(--primary);
-}
-
-.calendar-program-icon {
-    width: 32px;
-    height: 32px;
-    color: var(--primary);
-}
-
-.calendar-program-title {
+    gap: 0.75rem;
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary);
 }
 
-/* Calendar Grid */
-.calendar-wrapper {
-    overflow-x: auto;
+.program-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+/* Grade Cards Grid */
+.grade-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.grade-card {
+    background: var(--bg-primary);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    background: var(--bg-primary);
+    padding: 1.5rem;
     box-shadow: var(--shadow-sm);
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: 150px repeat(11, minmax(80px, 1fr));
-    min-width: 100%;
-}
-
-.calendar-row {
-    display: contents;
-}
-
-.calendar-cell {
-    padding: 1rem 0.75rem;
-    border-right: 1px solid var(--border-light);
-    border-bottom: 1px solid var(--border-light);
-    min-height: 80px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    position: relative;
-}
-
-.calendar-cell:last-child {
-    border-right: none;
-}
-
-/* Header cells */
-.calendar-cell.header {
-    background: var(--bg-accent);
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 0.85rem;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem 0.5rem;
-    border-bottom: 2px solid var(--border-dark);
-    position: sticky;
-    top: 0;
-    z-index: 2;
-}
-
-/* Grade label cells */
-.calendar-cell.grade-label {
-    background: var(--bg-secondary);
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    padding-left: 1rem;
-    position: sticky;
-    left: 0;
-    z-index: 1;
-    border-right: 2px solid var(--border-dark);
-}
-
-.calendar-cell.header.grade-label {
-    z-index: 3;
-}
-
-/* Assessment Badges */
-.badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.35rem 0.75rem;
-    border-radius: var(--radius-xl);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-align: center;
-    line-height: 1.2;
     transition: var(--transition);
 }
 
-.badge:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
+.grade-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
 }
 
-.badge.badge-blue {
-    background: var(--badge-blue-light);
-    color: var(--badge-blue);
-    border: 1px solid var(--badge-blue);
+.grade-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
 }
 
-.badge.badge-peach {
-    background: var(--badge-peach-light);
-    color: #c55a2f;
-    border: 1px solid var(--badge-peach);
+/* Timeline */
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.badge.badge-green {
-    background: var(--badge-green-light);
-    color: #059669;
-    border: 1px solid var(--badge-green);
+.timeline-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
 }
 
-.badge.badge-rose {
-    background: var(--badge-rose-light);
-    color: #be123c;
-    border: 1px solid var(--badge-rose);
-}
-
-.badge.badge-purple {
-    background: var(--badge-purple-light);
-    color: #6d28d9;
-    border: 1px solid var(--badge-purple);
-}
-
-/* Report Card Icon */
-.rc-icon {
-    width: 20px;
-    height: 20px;
+/* Assessment Badge Styles */
+.assessment-badge {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    width: fit-content;
 }
 
-.rc-icon svg {
-    width: 100%;
-    height: 100%;
-    stroke: var(--primary);
-    fill: none;
-    stroke-width: 2;
+.assessment-badge.blue {
+    background: #dbe9f4;
+    color: #1e5a8e;
 }
 
-/* Intervention Period Bar */
-.intervention-bar {
-    position: absolute;
-    bottom: 8px;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--intervention-bar);
-    opacity: 0.6;
+.assessment-badge.orange {
+    background: #ffe8d9;
+    color: #c55a2f;
 }
 
-.calendar-cell:first-child .intervention-bar {
-    left: 50%;
+.assessment-badge.green {
+    background: #d1fae5;
+    color: #047857;
 }
 
-.calendar-cell:last-child .intervention-bar {
-    right: 50%;
+.assessment-badge.purple {
+    background: #ede9fe;
+    color: #6d28d9;
 }
 
-/* Calendar Legend */
-.calendar-legend {
+.assessment-badge.gray {
+    background: var(--bg-accent);
+    color: var(--text-secondary);
+}
+
+.period-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.note {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    line-height: 1.4;
+}
+
+/* Intervention Label */
+.timeline-item.intervention {
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--border);
+}
+
+.intervention-label {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    padding: 1.5rem 2rem;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.intervention-label svg {
+    color: var(--text-light);
+}
+
+/* Report Label */
+.timeline-item.reports {
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--border);
+}
+
+.report-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.report-label svg {
+    color: var(--primary);
+}
+
+/* Legend */
+.calendar-legend {
+    margin-top: 2rem;
+    padding: 1.5rem;
     background: var(--bg-accent);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    margin-top: 2rem;
 }
 
 .legend-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.legend-section:last-child {
+    margin-bottom: 0;
 }
 
 .legend-title {
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
 }
 
 .legend-items {
@@ -2659,20 +2616,55 @@ h1, h2, h3, h4, h5, h6 {
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
+}
+
+.legend-badge {
+    display: inline-flex;
+    padding: 0.35rem 0.65rem;
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.legend-badge.blue {
+    background: #dbe9f4;
+    color: #1e5a8e;
+}
+
+.legend-badge.orange {
+    background: #ffe8d9;
+    color: #c55a2f;
+}
+
+.legend-badge.green {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.legend-badge.purple {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.legend-badge.gray {
+    background: var(--bg-secondary);
     color: var(--text-secondary);
 }
 
-.legend-item .badge {
-    pointer-events: none;
+.notes-section {
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
 }
 
-.legend-bar {
-    width: 40px;
-    height: 4px;
-    background: var(--intervention-bar);
-    border-radius: 2px;
+.note-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+.note-text:last-child {
+    margin-bottom: 0;
 }
 
 /* Screen reader only text */
@@ -2687,8 +2679,6 @@ h1, h2, h3, h4, h5, h6 {
     white-space: nowrap;
     border-width: 0;
 }
-
-/* ============================================
    INFO SECTION ENHANCEMENTS
    ============================================ */
 
@@ -2864,7 +2854,7 @@ h1, h2, h3, h4, h5, h6 {
         margin-right: 0.5rem;
     }
     
-    /* Assessment Calendar Mobile Styles */
+    /* Assessment Calendar Mobile Styles - REDESIGNED */
     .schedule-toggle {
         width: 100%;
         justify-content: center;
@@ -2875,48 +2865,58 @@ h1, h2, h3, h4, h5, h6 {
         padding: 0.65rem 1rem;
     }
     
-    .calendar-grid {
-        grid-template-columns: 120px repeat(11, minmax(70px, 1fr));
+    .grade-cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
     
-    .calendar-cell {
-        padding: 0.75rem 0.5rem;
-        min-height: 70px;
+    .grade-card {
+        padding: 1.25rem;
+    }
+    
+    .grade-header {
+        font-size: 1rem;
+    }
+    
+    .program-title {
+        font-size: 1.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .assessment-badge {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.65rem;
+    }
+    
+    .period-label {
         font-size: 0.8rem;
     }
     
-    .calendar-cell.header {
+    .note {
         font-size: 0.75rem;
-        padding: 0.75rem 0.25rem;
-    }
-    
-    .calendar-cell.grade-label {
-        font-size: 0.85rem;
-        padding-left: 0.75rem;
-    }
-    
-    .badge {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.6rem;
     }
     
     .calendar-legend {
-        gap: 1.5rem;
-        padding: 1rem 1.25rem;
+        padding: 1rem;
+    }
+    
+    .legend-title {
+        font-size: 0.8rem;
     }
     
     .legend-items {
         gap: 0.75rem;
     }
     
-    .calendar-program-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
+    .legend-badge {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.5rem;
     }
     
-    .calendar-program-title {
-        font-size: 1.25rem;
+    .note-text {
+        font-size: 0.8rem;
     }
     
     /* Content sections more compact */
@@ -6393,45 +6393,21 @@ h1, h2, h3, h4, h5, h6 {
         display: none;
     }
     
-    .calendar-wrapper {
-        border: 1px solid #000;
-        box-shadow: none;
+    .grade-cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
         page-break-inside: avoid;
     }
     
-    .calendar-grid {
-        display: table;
-        width: 100%;
-    }
-    
-    .calendar-row {
-        display: table-row;
-    }
-    
-    .calendar-cell {
-        display: table-cell;
+    .grade-card {
         border: 1px solid #ccc;
-        padding: 0.5rem;
+        box-shadow: none;
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
     }
     
-    .calendar-cell.header {
-        background: #f0f0f0 !important;
-        font-weight: bold;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-    
-    .calendar-cell.grade-label {
-        background: #f5f5f5 !important;
-        font-weight: bold;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-    
-    .badge {
+    .assessment-badge {
         border: 1px solid #000;
-        padding: 0.25rem 0.5rem;
-        display: inline-block;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -6440,10 +6416,12 @@ h1, h2, h3, h4, h5, h6 {
         page-break-before: avoid;
         border: 1px solid #ccc;
         margin-top: 1rem;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
     
-    .intervention-bar {
-        background: #666 !important;
+    .legend-badge {
+        border: 1px solid #000;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }

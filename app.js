@@ -4776,7 +4776,7 @@ async function fetchSchedules() {
     }
 }
 
-// Render the calendar view
+// Render the calendar view - COMPLETELY REDESIGNED
 function renderScheduleCalendar(data) {
     const container = document.getElementById('calendar-container');
     if (!container || !data) return;
@@ -4786,97 +4786,83 @@ function renderScheduleCalendar(data) {
     // Render each program
     data.programs.forEach(program => {
         html += `
-            <div class="calendar-program">
-                <div class="calendar-program-header">
-                    <svg class="calendar-program-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="schedule-program">
+                <h3 class="program-title">
+                    <svg class="program-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         ${program.id === 'english' 
                             ? '<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'
                             : '<path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01M16 17h.01"/>'
                         }
                     </svg>
-                    <h3 class="calendar-program-title">${safeText(program.name)}</h3>
-                </div>
-                <div class="calendar-wrapper">
-                    <div class="calendar-grid" role="table" aria-label="${safeText(program.name)} Assessment Schedule">
+                    ${safeText(program.name)}
+                </h3>
+                <div class="grade-cards">
         `;
         
-        // Header row
-        html += '<div class="calendar-row">';
-        html += '<div class="calendar-cell header grade-label">Grade Level</div>';
-        data.months.forEach(month => {
-            html += `<div class="calendar-cell header">${safeText(month)}</div>`;
-        });
-        html += '</div>';
-        
-        // Grade rows
+        // Render each grade as a card
         program.grades.forEach(grade => {
-            html += '<div class="calendar-row">';
-            html += `<div class="calendar-cell grade-label">${safeText(grade.label)}</div>`;
+            const assessments = grade.events.filter(e => e.type === 'assessment');
+            const reports = grade.events.find(e => e.type === 'report');
+            const intervention = grade.events.find(e => e.type === 'intervention');
             
-            // Month cells
-            data.months.forEach((month, monthIndex) => {
-                html += '<div class="calendar-cell">';
-                
-                // Add assessment badges for this month
-                const assessments = grade.events.filter(e => 
-                    e.type === 'assessment' && e.months && e.months.includes(month)
-                );
-                
-                assessments.forEach(assessment => {
-                    const colorClass = data.legend.assessmentColors[assessment.label] || 'badge-blue';
-                    html += `
-                        <span class="badge ${colorClass}" 
-                              title="${safeText(assessment.note || assessment.label)}"
-                              role="img"
-                              aria-label="${safeText(assessment.label)} assessment in ${month} for ${safeText(grade.label)}">
+            html += `
+                <div class="grade-card">
+                    <div class="grade-header">${safeText(grade.label)}</div>
+                    <div class="timeline">
+            `;
+            
+            // Render assessments
+            assessments.forEach(assessment => {
+                const color = data.legend.assessmentColors[assessment.label] || 'gray';
+                html += `
+                    <div class="timeline-item">
+                        <div class="assessment-badge ${color}">
                             ${safeText(assessment.label)}
-                        </span>
-                    `;
-                });
-                
-                // Add report card icon for this month
-                const reports = grade.events.filter(e => 
-                    e.type === 'report' && e.months && e.months.includes(month)
-                );
-                
-                if (reports.length > 0) {
-                    html += `
-                        <span class="rc-icon" 
-                              title="Report card due"
-                              role="img"
-                              aria-label="Report card due in ${month} for ${safeText(grade.label)}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M9 11l3 3 5-5"/>
-                            </svg>
-                        </span>
-                    `;
-                }
-                
-                // Add intervention period bar
-                const interventions = grade.events.filter(e => 
-                    e.type === 'intervention' && e.span
-                );
-                
-                interventions.forEach(intervention => {
-                    const startIdx = data.months.indexOf(intervention.span[0]);
-                    const endIdx = data.months.indexOf(intervention.span[1]);
-                    
-                    if (monthIndex >= startIdx && monthIndex <= endIdx) {
-                        html += `<div class="intervention-bar" 
-                                     role="presentation"
-                                     aria-label="Intervention period"></div>`;
-                    }
-                });
-                
-                html += '</div>';
+                        </div>
+                        <div class="period-label">${safeText(assessment.period)}</div>
+                        ${assessment.note ? `<div class="note">${safeText(assessment.note)}</div>` : ''}
+                    </div>
+                `;
             });
             
-            html += '</div>';
+            // Render intervention period
+            if (intervention) {
+                html += `
+                    <div class="timeline-item intervention">
+                        <div class="intervention-label">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <rect x="0" y="7" width="16" height="2" rx="1"/>
+                            </svg>
+                            Intervention Period
+                        </div>
+                        <div class="period-label">${intervention.start} - ${intervention.end}</div>
+                    </div>
+                `;
+            }
+            
+            // Render report cards
+            if (reports && reports.periods) {
+                html += `
+                    <div class="timeline-item reports">
+                        <div class="report-label">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="8" cy="8" r="6"/>
+                                <path d="M6 8l2 2 4-4"/>
+                            </svg>
+                            Report Cards
+                        </div>
+                        <div class="period-label">${reports.periods.join(', ')}</div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
         });
         
         html += `
-                    </div>
                 </div>
             </div>
         `;
@@ -4894,25 +4880,22 @@ function renderLegend(data) {
     if (!container || !data) return;
     
     // Get unique assessment types
-    const assessmentTypes = {};
+    const assessmentTypes = new Set();
     Object.keys(data.legend.assessmentColors).forEach(key => {
-        // Remove asterisk for display
-        const cleanKey = key.replace('*', '');
-        if (!assessmentTypes[cleanKey]) {
-            assessmentTypes[cleanKey] = data.legend.assessmentColors[key];
-        }
+        assessmentTypes.add(key.replace('*', ''));
     });
     
     let html = `
         <div class="legend-section">
-            <div class="legend-title">Assessments</div>
+            <h4 class="legend-title">Assessment Types</h4>
             <div class="legend-items">
     `;
     
-    Object.entries(assessmentTypes).forEach(([label, colorClass]) => {
+    Array.from(assessmentTypes).forEach(label => {
+        const color = data.legend.assessmentColors[label] || 'gray';
         html += `
             <div class="legend-item">
-                <span class="badge ${colorClass}">${safeText(label)}</span>
+                <span class="legend-badge ${color}">${safeText(label)}</span>
             </div>
         `;
     });
@@ -4920,39 +4903,19 @@ function renderLegend(data) {
     html += `
             </div>
         </div>
-        <div class="legend-section">
-            <div class="legend-title">Other</div>
-            <div class="legend-items">
-                <div class="legend-item">
-                    <span class="rc-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M9 11l3 3 5-5"/>
-                        </svg>
-                    </span>
-                    <span>Report Card</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-bar"></div>
-                    <span>Intervention Period</span>
-                </div>
-            </div>
-        </div>
     `;
     
     if (data.notes && data.notes.length > 0) {
         html += `
-            <div class="legend-section" style="width: 100%;">
-                <div class="legend-title">Notes</div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">
+            <div class="legend-section notes-section">
+                <h4 class="legend-title">Notes</h4>
         `;
         
         data.notes.forEach(note => {
-            html += `<div style="margin-bottom: 0.5rem;">• ${safeText(note)}</div>`;
+            html += `<p class="note-text">${safeText(note)}</p>`;
         });
         
         html += `
-                </div>
             </div>
         `;
     }
@@ -4991,7 +4954,7 @@ function renderScheduleTable(data) {
         program.grades.forEach(grade => {
             const assessments = grade.events.filter(e => e.type === 'assessment');
             const assessmentsList = assessments.map(a => a.label).join(', ');
-            const timingList = [...new Set(assessments.flatMap(a => a.months || []))].join(', ');
+            const timingList = [...new Set(assessments.map(a => a.period))].join(', ');
             
             html += `
                 <div class="schedule-row">

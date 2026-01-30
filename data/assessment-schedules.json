@@ -11,29 +11,35 @@
             {
               "type": "assessment",
               "label": "K Questionnaire",
-              "months": ["Before"],
+              "period": "Before School",
               "note": "Families complete questionnaire before school starts"
             },
             {
               "type": "assessment",
               "label": "CTOPP-2",
-              "months": ["Sep"],
-              "note": "Given once in fall of Kindergarten (2025-2026 onwards)"
-            },
-            {
-              "type": "report",
-              "months": ["Nov", "Mar", "Jun"]
+              "period": "Sep-Oct",
+              "note": "Given once in fall (mid-September to end of October)"
             },
             {
               "type": "assessment",
               "label": "DIBELS",
-              "months": ["Jan", "Apr"],
-              "note": "Winter and Spring DIBELS include LNF and PSF subtests for all students (2025-2026 onwards)"
+              "period": "Winter (Jan)",
+              "note": "Winter DIBELS includes LNF and PSF subtests"
+            },
+            {
+              "type": "assessment",
+              "label": "DIBELS",
+              "period": "Spring (Apr)",
+              "note": "Spring DIBELS includes LNF and PSF subtests"
+            },
+            {
+              "type": "report",
+              "periods": ["Nov", "Mar", "Jun"]
             },
             {
               "type": "intervention",
-              "span": ["Nov", "Apr"],
-              "label": "Intervention period"
+              "start": "Nov",
+              "end": "Apr"
             }
           ]
         },
@@ -44,17 +50,28 @@
             {
               "type": "assessment",
               "label": "DIBELS",
-              "months": ["Sep", "Jan", "Apr"],
-              "note": "All subtests including PSF administered to all students at all three windows (2025-2026 onwards)"
+              "period": "Fall (Sep-Oct)",
+              "note": "Mid-September to end of October"
+            },
+            {
+              "type": "assessment",
+              "label": "DIBELS",
+              "period": "Winter (Jan)"
+            },
+            {
+              "type": "assessment",
+              "label": "DIBELS",
+              "period": "Spring (Apr)",
+              "note": "All subtests including PSF"
             },
             {
               "type": "report",
-              "months": ["Nov", "Mar", "Jun"]
+              "periods": ["Nov", "Mar", "Jun"]
             },
             {
               "type": "intervention",
-              "span": ["Nov", "Apr"],
-              "label": "Intervention period"
+              "start": "Nov",
+              "end": "Apr"
             }
           ]
         },
@@ -65,23 +82,28 @@
             {
               "type": "assessment",
               "label": "DIBELS",
-              "months": ["Sep", "Jan"],
-              "note": "Fall and Winter assessments"
+              "period": "Fall (Sep-Oct)",
+              "note": "Mid-September to end of October"
+            },
+            {
+              "type": "assessment",
+              "label": "DIBELS",
+              "period": "Winter (Jan)"
             },
             {
               "type": "assessment",
               "label": "*DIBELS",
-              "months": ["Apr"],
-              "note": "All subtests must be administered for students who did not meet Winter benchmark"
+              "period": "Spring (Apr)",
+              "note": "All subtests for students below Winter benchmark"
             },
             {
               "type": "report",
-              "months": ["Nov", "Mar", "Jun"]
+              "periods": ["Nov", "Mar", "Jun"]
             },
             {
               "type": "intervention",
-              "span": ["Nov", "Apr"],
-              "label": "Intervention period"
+              "start": "Nov",
+              "end": "Apr"
             }
           ]
         }
@@ -98,29 +120,32 @@
             {
               "type": "assessment",
               "label": "K Questionnaire",
-              "months": ["Before"],
-              "note": "Families complete questionnaire before school starts"
+              "period": "Before School"
             },
             {
               "type": "assessment",
               "label": "CTOPP-2",
-              "months": ["Sep", "Apr"],
-              "note": "Fall and Spring assessments"
+              "period": "Fall (Sep-Oct)",
+              "note": "All of September and October"
             },
             {
               "type": "assessment",
               "label": "THAFoL",
-              "months": ["Jan"],
-              "note": "Winter French literacy assessment"
+              "period": "Winter (Jan)"
+            },
+            {
+              "type": "assessment",
+              "label": "CTOPP-2",
+              "period": "Spring (Apr)"
             },
             {
               "type": "report",
-              "months": ["Nov", "Mar", "Jun"]
+              "periods": ["Nov", "Mar", "Jun"]
             },
             {
               "type": "intervention",
-              "span": ["Nov", "Apr"],
-              "label": "Intervention period"
+              "start": "Nov",
+              "end": "Apr"
             }
           ]
         },
@@ -131,23 +156,27 @@
             {
               "type": "assessment",
               "label": "THAFoL",
-              "months": ["Sep", "Apr"],
-              "note": "Fall and Spring French literacy assessments"
+              "period": "Fall (Sep-Oct)",
+              "note": "Mid-September to end of October"
             },
             {
               "type": "assessment",
               "label": "CTOPP-2",
-              "months": ["Jan"],
-              "note": "Winter phonological processing assessment"
+              "period": "Winter (Jan)"
+            },
+            {
+              "type": "assessment",
+              "label": "THAFoL",
+              "period": "Spring (Apr)"
             },
             {
               "type": "report",
-              "months": ["Nov", "Mar", "Jun"]
+              "periods": ["Nov", "Mar", "Jun"]
             },
             {
               "type": "intervention",
-              "span": ["Nov", "Apr"],
-              "label": "Intervention period"
+              "start": "Nov",
+              "end": "Apr"
             }
           ]
         },
@@ -158,29 +187,33 @@
             {
               "type": "assessment",
               "label": "THAFoL",
-              "months": ["Sep", "Jan"],
-              "note": "Fall and Winter French literacy assessments"
+              "period": "Fall (Sep-Oct)",
+              "note": "Mid-September to end of October"
+            },
+            {
+              "type": "assessment",
+              "label": "THAFoL",
+              "period": "Winter (Jan)"
             },
             {
               "type": "assessment",
               "label": "DIBELS",
-              "months": ["Apr"],
-              "note": "Spring English literacy assessment"
+              "period": "Spring (Apr)"
             },
             {
               "type": "assessment",
               "label": "*THAFoL",
-              "months": ["Apr"],
-              "note": "All subtests must be administered for students who did not meet Winter benchmark"
+              "period": "Spring (Apr)",
+              "note": "All subtests for students below Winter benchmark"
             },
             {
               "type": "report",
-              "months": ["Nov", "Mar", "Jun"]
+              "periods": ["Nov", "Mar", "Jun"]
             },
             {
               "type": "intervention",
-              "span": ["Nov", "Apr"],
-              "label": "Intervention period"
+              "start": "Nov",
+              "end": "Apr"
             }
           ]
         },
@@ -191,35 +224,45 @@
             {
               "type": "assessment",
               "label": "DIBELS",
-              "months": ["Sep", "Jan"],
-              "note": "Fall and Winter English literacy assessments"
+              "period": "Fall (Sep-Oct)",
+              "note": "Mid-September to end of October"
             },
             {
               "type": "assessment",
               "label": "IDAPEL",
-              "months": ["Sep", "Jan"],
-              "note": "Fall and Winter French literacy assessments"
+              "period": "Fall (Sep-Oct)",
+              "note": "Mid-September to end of October"
+            },
+            {
+              "type": "assessment",
+              "label": "DIBELS",
+              "period": "Winter (Jan)"
+            },
+            {
+              "type": "assessment",
+              "label": "IDAPEL",
+              "period": "Winter (Jan)"
             },
             {
               "type": "assessment",
               "label": "*DIBELS",
-              "months": ["Apr"],
-              "note": "All subtests must be administered for students who did not meet Winter benchmark"
+              "period": "Spring (Apr)",
+              "note": "All subtests for students below Winter benchmark"
             },
             {
               "type": "assessment",
               "label": "*IDAPEL",
-              "months": ["Apr"],
-              "note": "All subtests must be administered for students who did not meet Winter benchmark"
+              "period": "Spring (Apr)",
+              "note": "All subtests for students below Winter benchmark"
             },
             {
               "type": "report",
-              "months": ["Nov", "Mar", "Jun"]
+              "periods": ["Nov", "Mar", "Jun"]
             },
             {
               "type": "intervention",
-              "span": ["Nov", "Apr"],
-              "label": "Intervention period"
+              "start": "Nov",
+              "end": "Apr"
             }
           ]
         },
@@ -230,45 +273,57 @@
             {
               "type": "assessment",
               "label": "DIBELS",
-              "months": ["Sep", "Jan"],
-              "note": "Fall and Winter assessments"
+              "period": "Fall (Sep-Oct)",
+              "note": "Mid-September to end of October"
+            },
+            {
+              "type": "assessment",
+              "label": "DIBELS",
+              "period": "Winter (Jan)"
             },
             {
               "type": "assessment",
               "label": "*DIBELS",
-              "months": ["Apr"],
-              "note": "All subtests must be administered for students who did not meet Winter benchmark"
+              "period": "Spring (Apr)",
+              "note": "All subtests for students below Winter benchmark"
             },
             {
               "type": "report",
-              "months": ["Nov", "Mar", "Jun"]
+              "periods": ["Nov", "Mar", "Jun"]
             },
             {
               "type": "intervention",
-              "span": ["Nov", "Apr"],
-              "label": "Intervention period"
+              "start": "Nov",
+              "end": "Apr"
             }
           ]
         }
       ]
     }
   ],
-  "months": ["Before", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  "periods": [
+    {"id": "before", "label": "Before School", "short": "Before"},
+    {"id": "fall", "label": "Fall (Sep-Oct)", "short": "Fall"},
+    {"id": "winter", "label": "Winter (Jan)", "short": "Winter"},
+    {"id": "spring", "label": "Spring (Apr)", "short": "Spring"},
+    {"id": "reports", "label": "Report Cards", "months": ["Nov", "Mar", "Jun"]}
+  ],
   "legend": {
     "assessmentColors": {
-      "DIBELS": "badge-blue",
-      "*DIBELS": "badge-blue",
-      "CTOPP-2": "badge-peach",
-      "THAFoL": "badge-green",
-      "*THAFoL": "badge-green",
-      "IDAPEL": "badge-rose",
-      "*IDAPEL": "badge-rose",
-      "K Questionnaire": "badge-purple"
+      "DIBELS": "blue",
+      "*DIBELS": "blue",
+      "CTOPP-2": "orange",
+      "THAFoL": "green",
+      "*THAFoL": "green",
+      "IDAPEL": "purple",
+      "*IDAPEL": "purple",
+      "K Questionnaire": "gray"
     }
   },
   "notes": [
-    "Asterisk (*) indicates that all subtests must be administered for students who did not meet the Winter benchmark",
-    "Starting 2025-2026: CTOPP-2 given once in fall of Kindergarten; LNF and PSF subtests of DIBELS required for all K students in Winter and Spring",
-    "Starting 2025-2026: Grade 1 teachers must administer all DIBELS subtests including PSF at all three windows to all students"
+    "* Asterisk indicates all subtests required for students below Winter benchmark",
+    "Fall assessment period: Mid-September to end of October (except K French Immersion: all of Sept-Oct)",
+    "Winter assessments: January",
+    "Spring assessments: April"
   ]
 }
