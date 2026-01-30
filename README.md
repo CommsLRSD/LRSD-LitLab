@@ -160,6 +160,18 @@ For questions or issues, please open an issue on the GitHub repository or contac
 ![Interventions](https://github.com/user-attachments/assets/54ecb85d-6daa-4c08-84d5-8253b9d7e188)
 
 ### Assessment Schedules
+The Assessment Schedules section features an interactive calendar view and table view that display when different literacy assessments occur throughout the school year for both English and French Immersion programs across all grade levels.
+
+**Features:**
+- **Interactive Calendar View**: Visual grid layout showing assessments, report cards, and intervention periods by month and grade level
+- **Table View**: Compact table format with assessment names and timing
+- **Toggle Control**: Switch between calendar and table views with preference persistence
+- **Color-Coded Badges**: Each assessment type (DIBELS, CTOPP-2, THAFoL, IDAPEL) has a distinct color
+- **Visual Indicators**: Report card icons and intervention period bars for easy reference
+- **Responsive Design**: Mobile-friendly with horizontal scrolling and sticky first column
+- **Accessibility**: Full keyboard navigation and screen reader support
+- **Data-Driven**: All content rendered from `data/assessment-schedules.json`
+
 ![Schedules](https://github.com/user-attachments/assets/bb7238e8-18aa-413d-bdee-310b3f318544)
 
 ### Information & Support

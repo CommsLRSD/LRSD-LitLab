@@ -1,5 +1,7 @@
 # English and French Immersion Program Assessment Schedules
 
+> **Note**: This document serves as the human-readable source of assessment schedule information. The interactive calendar and table views in the web application are driven by `data/assessment-schedules.json`, which is derived from the content in this document. Any updates to assessment schedules should be made to both this document and the JSON file to keep them in sync.
+
 This document explains, in plain language, the two visual schedules you shared:
 
 - **English Program Assessment Schedule**
