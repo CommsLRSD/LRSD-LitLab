@@ -563,6 +563,15 @@ const VF_CONSTANTS = {
     MOBILE_BREAKPOINT: 768            // Breakpoint for mobile layout (matches CSS media query)
 };
 
+// Helper function to get shortened tier title for mobile
+function getTierTitle(fullTitle, isMobile = window.innerWidth <= 768) {
+    if (!isMobile) return fullTitle;
+    
+    // Extract just the tier number (e.g., "Tier 1" from "Tier 1: Universal Screening & Core Instruction")
+    const match = fullTitle.match(/^(Tier \d+)/);
+    return match ? match[1] : fullTitle;
+}
+
 // Node data definitions for each tier's flowchart
 const FLOWCHART_DEFINITIONS = {
     tier1: {
@@ -896,9 +905,9 @@ function initVisualFlowchart(tierId) {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
-                    Back to Interventions
+                    <span class="vf-back-text">Back to Interventions</span>
                 </button>
-                <h2>${flowchartDef.title}</h2>
+                <h2>${getTierTitle(flowchartDef.title)}</h2>
                 <div class="vf-progress-indicator">
                     <span class="vf-progress-text">Step 1</span>
                 </div>

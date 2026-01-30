@@ -90,6 +90,11 @@ body {
     line-height: 1.6;
     color: var(--text-primary);
     background: var(--bg-secondary);
+    background-image: url('images/book-bkg.svg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     font-size: 16px;
     margin: 0;
     padding: 0;
@@ -3970,14 +3975,32 @@ h1, h2, h3, h4, h5, h6 {
 /* Visual Flowchart Responsive */
 @media (max-width: 768px) {
     .visual-flowchart-header {
-        padding: 1.25rem;
+        padding: 0.75rem 1rem;
+        gap: 0.75rem;
+    }
+    
+    /* Make back button icon-only on mobile */
+    .vf-back-button {
+        padding: 0.5rem;
+        min-width: 40px;
+        gap: 0;
+    }
+    
+    /* Hide button text on mobile, keep only icon */
+    .vf-back-button .vf-back-text {
+        display: none;
+    }
+    
+    .vf-back-button svg {
+        width: 20px;
+        height: 20px;
+        margin: 0;
     }
     
     .visual-flowchart-header h2 {
-        font-size: 1.25rem;
-        width: 100%;
-        order: -1;
-        margin-bottom: 0.5rem;
+        font-size: 1.125rem;
+        flex: 1;
+        margin: 0;
     }
     
     .visual-flowchart-canvas {
@@ -5960,4 +5983,89 @@ h1, h2, h3, h4, h5, h6 {
     .dropdown-group {
         flex: 1 1 100%;
     }
+}
+
+/* Pencil-drawn style to match book background */
+/* Subtle hand-drawn effects for visual interest */
+
+/* Add slight irregularity to borders for hand-drawn feel */
+.vf-node,
+.flowchart-node,
+.step-content-box,
+.menu-card,
+.home-card {
+    border-radius: var(--radius-lg);
+    position: relative;
+}
+
+/* Add subtle texture overlay to cards */
+.vf-node::before,
+.step-content-box::before,
+.menu-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.01) 2px,
+        rgba(0, 0, 0, 0.01) 4px
+    );
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* Subtle shadow adjustments for depth */
+.visual-flowchart,
+.flowchart-tier-view {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+/* Button hover effects with slight rotation for playfulness */
+.vf-back-button:hover,
+.back-button:hover {
+    transform: translateX(-4px) rotate(-1deg);
+}
+
+.btn-primary:hover,
+.menu-card:hover {
+    transform: translateY(-2px) rotate(0.5deg);
+}
+
+/* Add slight imperfection to progress indicator */
+.vf-progress-indicator {
+    border-radius: 20px;
+}
+
+/* Header with slight gradient for pencil texture */
+.visual-flowchart-header {
+    background: linear-gradient(
+        135deg, 
+        var(--primary) 0%, 
+        var(--primary-dark) 100%
+    );
+    position: relative;
+}
+
+.visual-flowchart-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 3px,
+        rgba(255, 255, 255, 0.02) 3px,
+        rgba(255, 255, 255, 0.02) 6px
+    );
+    pointer-events: none;
 }
