@@ -57,12 +57,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize intervention menu
     initializeInterventionMenu();
     
-    // Add resize listener to update connection line positions
+    // Add resize listener to update connection line positions and tier titles
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
             updateConnectionLinePositions();
+            updateTierTitleOnResize();
         }, 150); // Debounce resize events
     });
     
@@ -570,6 +571,28 @@ function getTierTitle(fullTitle, isMobile = window.innerWidth <= 768) {
     // Extract just the tier number (e.g., "Tier 1" from "Tier 1: Universal Screening & Core Instruction")
     const match = fullTitle.match(/^(Tier \d+)/);
     return match ? match[1] : fullTitle;
+}
+
+// Function to update tier title when resizing between mobile and desktop
+function updateTierTitleOnResize() {
+    const header = document.querySelector('.visual-flowchart-header h2');
+    if (!header) return;
+    
+    const currentText = header.textContent;
+    // Check if we have a tier title pattern
+    if (currentText.match(/^Tier \d+/)) {
+        const isMobile = window.innerWidth <= 768;
+        // Get the full title from FLOWCHART_DEFINITIONS if needed
+        const tierMatch = currentText.match(/^Tier (\d+)/);
+        if (tierMatch) {
+            const tierNum = tierMatch[1];
+            const tierKey = `tier${tierNum}`;
+            if (FLOWCHART_DEFINITIONS[tierKey]) {
+                const fullTitle = FLOWCHART_DEFINITIONS[tierKey].title;
+                header.textContent = getTierTitle(fullTitle, isMobile);
+            }
+        }
+    }
 }
 
 // Node data definitions for each tier's flowchart
