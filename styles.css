@@ -6433,15 +6433,22 @@ h1, h2, h3, h4, h5, h6 {
 
 .integrated-flowchart {
     background: var(--bg-secondary);
-    min-height: 100%;
+    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
 }
 
 /* Glass Header */
 .flowchart-glass-header {
     position: sticky;
-    top: 64px;
+    top: 0;
     z-index: 50;
     display: flex;
     align-items: center;
@@ -6600,19 +6607,38 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
 }
 
-/* Content Area */
+/* Content Area - Horizontal Flow */
 .flowchart-content-area {
     flex: 1;
     padding: 2rem;
-    overflow-y: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    align-items: flex-start;
+    /* Enable horizontal scroll with wheel */
+    scroll-behavior: smooth;
 }
 
 .flowchart-steps {
-    max-width: 800px;
-    margin: 0 auto;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 1.5rem;
+    padding: 1rem;
+    min-height: max-content;
+    align-items: flex-start;
+}
+
+/* Connector lines between steps */
+.flowchart-step-connector {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.flowchart-step-connector svg {
+    width: 40px;
+    height: 40px;
+    color: var(--border-dark);
 }
 
 /* Flowchart Step Cards - Glass Style */
@@ -6627,13 +6653,16 @@ h1, h2, h3, h4, h5, h6 {
         0 1px 3px rgba(0, 0, 0, 0.03);
     overflow: hidden;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateX(20px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 380px;
+    min-width: 380px;
+    flex-shrink: 0;
 }
 
 .flowchart-step.step-visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
 }
 
 .flowchart-step.step-completed {
@@ -6703,45 +6732,49 @@ h1, h2, h3, h4, h5, h6 {
 
 .step-content h3 {
     margin: 0 0 0.5rem 0;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     color: var(--text-primary);
 }
 
 .step-content > p {
-    margin: 0 0 1.25rem 0;
+    margin: 0 0 1rem 0;
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.5;
+    font-size: 0.9rem;
 }
 
-/* Checklist */
+/* Checklist - Circular style */
 .checklist-container {
     display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
-    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .checklist-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.875rem 1rem;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 12px;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid var(--border-dark);
+    border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .checklist-item:hover {
-    background: rgba(255, 255, 255, 0.9);
-    transform: translateX(4px);
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--primary);
+    transform: scale(1.1);
 }
 
 .checklist-item.checked {
-    background: rgba(16, 185, 129, 0.08);
-    border-color: rgba(16, 185, 129, 0.2);
+    background: var(--success);
+    border-color: var(--success);
 }
 
 .checklist-item input[type="checkbox"] {
@@ -6752,31 +6785,50 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
-    background: white;
-    border: 2px solid var(--border);
-    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
     transition: all 0.2s ease;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
 }
 
 .checklist-item.checked .checkbox-icon {
-    background: var(--success);
-    border-color: var(--success);
+    color: white;
 }
 
 .checklist-item.checked .checkbox-icon::after {
     content: '✓';
     color: white;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 700;
 }
 
+/* Hide checkbox label text - use tooltip instead */
 .checkbox-label {
-    flex: 1;
-    font-size: 0.9375rem;
-    color: var(--text-primary);
-    line-height: 1.5;
+    display: none;
+}
+
+/* Tooltip for checklist items on hover */
+.checklist-item[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-dark);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 10;
+    max-width: 200px;
+    white-space: normal;
+    text-align: center;
+    margin-bottom: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 /* Continue Button */
@@ -6784,12 +6836,12 @@ h1, h2, h3, h4, h5, h6 {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.875rem 1.5rem;
+    padding: 0.75rem 1.25rem;
     background: var(--primary);
     color: white;
     border: none;
     border-radius: 12px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -7381,30 +7433,64 @@ h1, h2, h3, h4, h5, h6 {
     flex: 1;
     padding: 1.25rem 1.5rem;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
+/* Flowchart-style summary items */
 .summary-item {
     display: flex;
     flex-direction: column;
-    padding: 0.875rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    position: relative;
 }
 
-.summary-item:last-child {
-    border-bottom: none;
+/* Connector line between summary items */
+.summary-item::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -16px;
+    width: 2px;
+    height: 16px;
+    background: var(--border-dark);
+}
+
+.summary-item:last-child::after {
+    display: none;
+}
+
+/* Arrow at end of connector */
+.summary-item:not(:last-child)::before {
+    content: '▼';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -20px;
+    color: var(--border-dark);
+    font-size: 8px;
+    z-index: 1;
+}
+
+.summary-item + .summary-item {
+    margin-top: 20px;
 }
 
 .summary-step {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.025em;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.125rem;
 }
 
 .summary-choice {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--text-primary);
     font-weight: 500;
 }
@@ -7419,7 +7505,7 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.5rem;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     background: rgba(255, 255, 255, 0.5);
 }
@@ -7431,13 +7517,14 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    overflow-y: auto;
 }
 
 .final-summary {
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
     border-radius: 24px;
-    padding: 3rem 2rem;
+    padding: 2rem 1.5rem;
     text-align: center;
 }
 
@@ -7445,37 +7532,37 @@ h1, h2, h3, h4, h5, h6 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     background: rgba(16, 185, 129, 0.12);
     border-radius: 50%;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .final-summary-icon svg {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     color: var(--success);
 }
 
 .final-summary h2 {
-    margin: 0 0 1rem 0;
-    font-size: 1.75rem;
+    margin: 0 0 0.75rem 0;
+    font-size: 1.375rem;
     font-weight: 700;
     color: var(--text-primary);
 }
 
 .final-summary .summary-tier {
     border: none;
-    padding: 0 0 1.5rem 0;
+    padding: 0 0 1rem 0;
 }
 
 .final-summary .summary-content {
     text-align: left;
     background: rgba(255, 255, 255, 0.5);
     border-radius: 14px;
-    margin-bottom: 1.5rem;
-    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
 }
 
 .final-summary-actions {
