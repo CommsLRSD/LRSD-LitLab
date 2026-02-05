@@ -1107,8 +1107,11 @@ function createIntegratedSelectionNode(nodeData) {
     const tierData = appState.tierFlowchartData?.[tierId];
     const options = tierData?.[nodeData.options] || [];
     
+    // Helper function to escape strings for use in JS string literals
+    const escapeJsString = (str) => String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    
     const optionsHTML = options.map(option => `
-        <button class="selection-option" onclick="selectIntegratedOption('${nodeData.id}', '${option.id}', '${option.name.replace(/'/g, "\\'")}', '${nodeData.nextHandler}')">
+        <button class="selection-option" onclick="selectIntegratedOption('${escapeJsString(nodeData.id)}', '${escapeJsString(option.id)}', '${escapeJsString(option.name)}', '${escapeJsString(nodeData.nextHandler)}')">
             <div class="option-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -1327,13 +1330,16 @@ function createIntegratedEndpointNode(nodeData) {
         </div>
     ` : '';
     
-    const actionButtonHTML = nodeData.actionButton ? `
+    // Whitelist of allowed action names for security
+    const allowedActions = ['startTier2Visual', 'startTier3Visual', 'restartTier1Visual', 'restartTier2Visual'];
+    
+    const actionButtonHTML = nodeData.actionButton && allowedActions.includes(nodeData.actionButton.action) ? `
         <button class="action-btn action-primary" onclick="${nodeData.actionButton.action}Integrated()">
             ${nodeData.actionButton.text}
         </button>
     ` : '';
     
-    const secondaryActionHTML = nodeData.secondaryAction ? `
+    const secondaryActionHTML = nodeData.secondaryAction && allowedActions.includes(nodeData.secondaryAction.action) ? `
         <button class="action-btn action-secondary" onclick="${nodeData.secondaryAction.action}Integrated()">
             ${nodeData.secondaryAction.text}
         </button>
@@ -1408,13 +1414,13 @@ function selectIntegratedOption(nodeId, optionId, optionName, handlerName) {
     markStepCompleted(nodeId);
     
     // Highlight selected option
-    const node = document.querySelector(`[data-node-id="${nodeId}"]`);
+    const node = document.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
     if (node) {
         const options = node.querySelectorAll('.selection-option');
         options.forEach(opt => {
             opt.classList.add('option-disabled');
         });
-        const selectedOption = node.querySelector(`.selection-option[onclick*="${optionId}"]`);
+        const selectedOption = node.querySelector(`.selection-option[onclick*="${CSS.escape(optionId)}"]`);
         if (selectedOption) {
             selectedOption.classList.add('option-selected');
             selectedOption.classList.remove('option-disabled');
@@ -1425,20 +1431,28 @@ function selectIntegratedOption(nodeId, optionId, optionName, handlerName) {
     appState.currentTierFlow = appState.currentTierFlow || {};
     appState.currentTierFlow[`${nodeId}_selection`] = { id: optionId, name: optionName };
     
-    // Call the handler
-    if (window[handlerName + 'Integrated']) {
-        window[handlerName + 'Integrated'](nodeId, optionId, optionName);
-    } else if (window[handlerName]) {
-        // Fallback to old handler if new one doesn't exist
-        window[handlerName](nodeId, optionId, optionName);
+    // Whitelist of allowed handler names for security
+    const allowedHandlers = [
+        'selectTier1ScreenerVisual', 'selectTier2AssessmentVisual', 'selectTier2InterventionVisual',
+        'selectTier3AssessmentVisual', 'selectTier3InterventionVisual'
+    ];
+    
+    // Call the handler only if it's in the allowed list
+    if (allowedHandlers.includes(handlerName)) {
+        if (window[handlerName + 'Integrated']) {
+            window[handlerName + 'Integrated'](nodeId, optionId, optionName);
+        } else if (window[handlerName]) {
+            // Fallback to old handler if new one doesn't exist
+            window[handlerName](nodeId, optionId, optionName);
+        }
     }
 }
 
 // Make a decision in decision node
 function makeIntegratedDecision(nodeId, choiceId, nextNodeId) {
     // Store choice for summary
-    const node = document.querySelector(`[data-node-id="${nodeId}"]`);
-    const choiceBtn = node?.querySelector(`.decision-btn[onclick*="${choiceId}"]`);
+    const node = document.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
+    const choiceBtn = node?.querySelector(`.decision-btn[onclick*="${CSS.escape(choiceId)}"]`);
     const choiceLabel = choiceBtn?.querySelector('strong')?.textContent || choiceId;
     appState.visualFlowchart.choices[nodeId] = { id: choiceId, name: choiceLabel };
     
@@ -1461,7 +1475,7 @@ function makeIntegratedDecision(nodeId, choiceId, nextNodeId) {
 
 // Mark a step as completed
 function markStepCompleted(nodeId) {
-    const node = document.querySelector(`[data-node-id="${nodeId}"]`);
+    const node = document.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
     if (node) {
         node.classList.add('step-completed');
         // Show undo button
