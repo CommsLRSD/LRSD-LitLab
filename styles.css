@@ -6822,13 +6822,19 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
     font-size: 0.75rem;
-    white-space: nowrap;
     z-index: 10;
     max-width: 200px;
     white-space: normal;
     text-align: center;
     margin-bottom: 4px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Checklist hint text */
+.checklist-hint {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
 }
 
 /* Continue Button */
