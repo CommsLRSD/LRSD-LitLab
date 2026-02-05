@@ -980,6 +980,18 @@ function initIntegratedFlowchart(tierId) {
         </div>
     `;
     
+    // Add horizontal scroll wheel behavior
+    const contentArea = document.getElementById('flowchart-content');
+    if (contentArea) {
+        contentArea.addEventListener('wheel', (e) => {
+            // Convert vertical scroll to horizontal
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                contentArea.scrollLeft += e.deltaY;
+            }
+        }, { passive: false });
+    }
+    
     // Show the first node
     showIntegratedNode(flowchartDef.startNode, null);
 }
@@ -1011,17 +1023,31 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null) {
     // Create the node element
     createIntegratedNodeElement(nodeData, stepsContainer);
     
-    // Scroll to new node
+    // Scroll to new node (horizontal scroll)
     setTimeout(() => {
         const newNode = document.querySelector(`[data-node-id="${nodeId}"]`);
-        if (newNode) {
-            newNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const contentArea = document.getElementById('flowchart-content');
+        if (newNode && contentArea) {
+            newNode.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         }
     }, 100);
 }
 
 // Create integrated node element
 function createIntegratedNodeElement(nodeData, container) {
+    // Add connector arrow if not the first node
+    const existingNodes = container.querySelectorAll('.flowchart-step');
+    if (existingNodes.length > 0) {
+        const connector = document.createElement('div');
+        connector.className = 'flowchart-step-connector';
+        connector.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        `;
+        container.appendChild(connector);
+    }
+    
     const nodeElement = document.createElement('div');
     nodeElement.className = `flowchart-step flowchart-step-${nodeData.type}`;
     nodeElement.setAttribute('data-node-id', nodeData.id);
@@ -1067,18 +1093,24 @@ function createIntegratedNodeElement(nodeData, container) {
 
 // Create integrated checklist node
 function createIntegratedChecklistNode(nodeData) {
+    // Sanitize text for use in HTML attributes
+    const sanitizeForAttr = (text) => {
+        const charMap = { '"': '&quot;', '<': '&lt;', '>': '&gt;', '&': '&amp;' };
+        return String(text).split('').map(c => charMap[c] || c).join('');
+    };
+    
     const checklistItems = nodeData.items.map((item, index) => `
-        <label class="checklist-item" data-index="${index}">
+        <label class="checklist-item" data-index="${index}" title="${sanitizeForAttr(item)}">
             <input type="checkbox">
-            <span class="checkbox-icon"></span>
-            <span class="checkbox-label">${item}</span>
+            <span class="checkbox-icon">${index + 1}</span>
+            <span class="checkbox-label">${sanitizeForAttr(item)}</span>
         </label>
     `).join('');
     
     return `
         <div class="step-header">
             <div class="step-badge">${nodeData.title}</div>
-            <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
+            <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
                     <path d="M21 3v5h-5"/>
@@ -1088,6 +1120,7 @@ function createIntegratedChecklistNode(nodeData) {
         <div class="step-content">
             <h3>${nodeData.subtitle}</h3>
             <p>${nodeData.description}</p>
+            <p class="checklist-hint">Click circles to check off (hover for details):</p>
             <div class="checklist-container">
                 ${checklistItems}
             </div>
@@ -4133,11 +4166,11 @@ function performCompactSearch() {
     }
 
     // Collect items based on type filter
+    // Language filter removed - show both English and French Immersion items
     if (!filters.type || filters.type === 'Assessment') {
         const assessments = appState.interventionMenuData.assessments.filter(item => {
-            // Program match
-            const programMatch = item.program === (filters.language === 'English' ? 'English' : 'French Immersion');
-            if (!programMatch) return false;
+            // Program match - show all programs if no language filter
+            // (Language filter hidden, so always show all)
 
             // Tier match
             if (filters.tier) {
@@ -4157,9 +4190,8 @@ function performCompactSearch() {
 
     if (!filters.type || filters.type === 'Intervention') {
         const interventions = appState.interventionMenuData.interventions.filter(item => {
-            // Program match
-            const programMatch = item.program === (filters.language === 'English' ? 'English' : 'French Immersion');
-            if (!programMatch) return false;
+            // Program match - show all programs if no language filter
+            // (Language filter hidden, so always show all)
 
             // Tier match
             if (filters.tier) {
@@ -4217,7 +4249,7 @@ function displayCompactResults(results, filters) {
 
     let filterSummary = [];
     if (filters.tier) filterSummary.push(`Tier ${filters.tier}`);
-    if (filters.language) filterSummary.push(filters.language);
+    // Language filter removed from summary
     if (filters.pillar) filterSummary.push(filters.pillar);
     if (filters.type) filterSummary.push(filters.type);
 
