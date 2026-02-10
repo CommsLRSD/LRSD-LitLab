@@ -1093,17 +1093,23 @@ function createIntegratedNodeElement(nodeData, container) {
 
 // Create integrated checklist node
 function createIntegratedChecklistNode(nodeData) {
-    // Sanitize text for use in HTML attributes
-    const sanitizeForAttr = (text) => {
-        const charMap = { '"': '&quot;', '<': '&lt;', '>': '&gt;', '&': '&amp;' };
+    // Sanitize text for use in HTML - prevents XSS
+    const sanitizeForHtml = (text) => {
+        const charMap = { 
+            '"': '&quot;', 
+            '<': '&lt;', 
+            '>': '&gt;', 
+            '&': '&amp;',
+            "'": '&#39;'
+        };
         return String(text).split('').map(c => charMap[c] || c).join('');
     };
     
     const checklistItems = nodeData.items.map((item, index) => `
-        <label class="checklist-item" data-index="${index}" title="${sanitizeForAttr(item)}">
+        <label class="checklist-item" data-index="${index}">
             <input type="checkbox">
-            <span class="checkbox-icon">${index + 1}</span>
-            <span class="checkbox-label">${sanitizeForAttr(item)}</span>
+            <span class="checkbox-check"></span>
+            <span class="checkbox-text">${sanitizeForHtml(item)}</span>
         </label>
     `).join('');
     
@@ -1112,15 +1118,13 @@ function createIntegratedChecklistNode(nodeData) {
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
             </button>
         </div>
         <div class="step-content">
             <h3>${nodeData.subtitle}</h3>
             <p>${nodeData.description}</p>
-            <p class="checklist-hint">Click circles to check off (hover for details):</p>
             <div class="checklist-container">
                 ${checklistItems}
             </div>
@@ -1196,8 +1200,7 @@ function createIntegratedSelectionNode(nodeData) {
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
             </button>
         </div>
@@ -1271,8 +1274,7 @@ function createIntegratedDecisionNode(nodeData) {
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
             </button>
         </div>
@@ -1313,8 +1315,7 @@ function createIntegratedInfoNode(nodeData) {
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
             </button>
         </div>
@@ -1531,9 +1532,11 @@ function undoToStep(nodeId) {
     // If this is the current node, do nothing
     if (appState.visualFlowchart.currentNodeId === nodeId) return;
     
-    // Remove all nodes after this one from the DOM
+    // Remove all nodes and connectors after this one from the DOM
     const allNodes = document.querySelectorAll('.flowchart-step');
+    const allConnectors = document.querySelectorAll('.flowchart-step-connector');
     const nodesToRemove = [];
+    const connectorsToRemove = [];
     
     allNodes.forEach(node => {
         const dataNodeId = node.getAttribute('data-node-id');
@@ -1543,9 +1546,26 @@ function undoToStep(nodeId) {
         }
     });
     
+    // Remove connectors after the target node.
+    // The DOM structure has connectors interleaved with nodes: [node, connector, node, connector, ...]
+    // So connector at index N appears before node at index N+1.
+    // We keep the first (pathIndex + 1) nodes, so we keep the first (pathIndex + 1) connectors.
+    // Any connector at index >= (pathIndex + 1) should be removed.
+    const nodesToKeep = pathIndex + 1;
+    allConnectors.forEach((connector, index) => {
+        if (index >= nodesToKeep) {
+            connectorsToRemove.push(connector);
+        }
+    });
+    
     nodesToRemove.forEach(node => {
         node.classList.add('step-removing');
         setTimeout(() => node.remove(), 300);
+    });
+    
+    connectorsToRemove.forEach(connector => {
+        connector.classList.add('step-removing');
+        setTimeout(() => connector.remove(), 300);
     });
     
     // Update the path - remove steps after this one
@@ -1664,13 +1684,16 @@ function showFlowchartSummary() {
     if (Object.keys(choices).length === 0) {
         summaryItems = '<p class="no-choices">No choices have been made yet. Work through the flowchart to see your decisions summarized here.</p>';
     } else {
-        Object.entries(choices).forEach(([nodeId, choice]) => {
+        Object.entries(choices).forEach(([nodeId, choice], index) => {
             const nodeDef = tierDef?.nodes?.[nodeId];
             const stepTitle = nodeDef?.title || nodeId;
+            // Default to 'selection' as it's the most common step type
+            const stepType = nodeDef?.type || 'selection';
+            
             summaryItems += `
-                <div class="summary-item">
-                    <span class="summary-step">${stepTitle}</span>
-                    <span class="summary-choice">${choice.name}</span>
+                <div class="summary-item summary-item-${stepType}">
+                    <div class="summary-step-label">${stepTitle}</div>
+                    <div class="summary-choice-text">${choice.name}</div>
                 </div>
             `;
         });

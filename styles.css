@@ -33,6 +33,13 @@
     --danger-dark: #b91c1c;
     --success: #10b981;
     
+    /* Step type colors for visual distinction */
+    --step-checklist: #6366f1;       /* Indigo - for review/checklist steps */
+    --step-selection: #8b5cf6;       /* Purple - for choosing options */
+    --step-decision: #ec4899;        /* Pink - for yes/no decisions */
+    --step-info: #14b8a6;            /* Teal - for informational steps */
+    --step-endpoint: #10b981;        /* Green - for completion */
+    
     /* Text colors */
     --text-primary: #1e293b;
     --text-secondary: #64748b;
@@ -6641,13 +6648,13 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--border-dark);
 }
 
-/* Flowchart Step Cards - Glass Style */
+/* Flowchart Step Cards - Glass Style with pronounced color coding */
 .flowchart-step {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
     box-shadow: 
         0 4px 30px rgba(0, 0, 0, 0.05),
         0 1px 3px rgba(0, 0, 0, 0.03);
@@ -6655,8 +6662,8 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0;
     transform: translateX(20px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 380px;
-    min-width: 380px;
+    width: 340px;
+    min-width: 340px;
     flex-shrink: 0;
 }
 
@@ -6670,6 +6677,32 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--success);
 }
 
+/* Pronounced color coding - solid color backgrounds with left border */
+.flowchart-step-checklist {
+    border-left: 5px solid var(--step-checklist);
+    background: rgba(99, 102, 241, 0.12);
+}
+
+.flowchart-step-selection {
+    border-left: 5px solid var(--step-selection);
+    background: rgba(139, 92, 246, 0.12);
+}
+
+.flowchart-step-decision {
+    border-left: 5px solid var(--step-decision);
+    background: rgba(236, 72, 153, 0.12);
+}
+
+.flowchart-step-info {
+    border-left: 5px solid var(--step-info);
+    background: rgba(20, 184, 166, 0.12);
+}
+
+.flowchart-step-endpoint {
+    border-left: 5px solid var(--step-endpoint);
+    background: rgba(16, 185, 129, 0.12);
+}
+
 .flowchart-step.step-removing {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
@@ -6680,7 +6713,7 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 1.5rem;
+    padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.5);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -6688,12 +6721,33 @@ h1, h2, h3, h4, h5, h6 {
 .step-badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.375rem 0.875rem;
+    padding: 0.3rem 0.75rem;
     background: var(--primary);
     color: white;
-    border-radius: 20px;
-    font-size: 0.8125rem;
+    border-radius: 16px;
+    font-size: 0.75rem;
     font-weight: 600;
+}
+
+/* Color coding for different step types */
+.flowchart-step-checklist .step-badge {
+    background: var(--step-checklist);
+}
+
+.flowchart-step-selection .step-badge {
+    background: var(--step-selection);
+}
+
+.flowchart-step-decision .step-badge {
+    background: var(--step-decision);
+}
+
+.flowchart-step-info .step-badge {
+    background: var(--step-info);
+}
+
+.flowchart-step-endpoint .step-badge {
+    background: var(--step-endpoint);
 }
 
 .step-completed .step-badge {
@@ -6704,11 +6758,11 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     background: rgba(255, 255, 255, 0.5);
     border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
+    border-radius: 8px;
     color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
@@ -6717,63 +6771,61 @@ h1, h2, h3, h4, h5, h6 {
 .undo-btn:hover {
     background: white;
     color: var(--primary);
-    transform: rotate(-45deg);
+    transform: translateX(-2px);
 }
 
 .undo-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
 }
 
 /* Step Content */
 .step-content {
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 .step-content h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.125rem;
+    margin: 0 0 0.4rem 0;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
 }
 
 .step-content > p {
-    margin: 0 0 1rem 0;
+    margin: 0 0 0.75rem 0;
     color: var(--text-secondary);
-    line-height: 1.5;
-    font-size: 0.9rem;
+    line-height: 1.4;
+    font-size: 0.875rem;
 }
 
-/* Checklist - Circular style */
+/* Checklist - List style with circular checkboxes */
 .checklist-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.25rem;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 .checklist-item {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.8);
-    border: 2px solid var(--border-dark);
-    border-radius: 50%;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    position: relative;
 }
 
 .checklist-item:hover {
-    background: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.8);
     border-color: var(--primary);
-    transform: scale(1.1);
+    transform: translateX(2px);
 }
 
 .checklist-item.checked {
-    background: var(--success);
+    background: rgba(16, 185, 129, 0.08);
     border-color: var(--success);
 }
 
@@ -6781,60 +6833,44 @@ h1, h2, h3, h4, h5, h6 {
     display: none;
 }
 
-.checkbox-icon {
+.checkbox-check {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    background: white;
+    border: 2px solid var(--border-dark);
     border-radius: 50%;
     transition: all 0.2s ease;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-secondary);
+    margin-top: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.checklist-item.checked .checkbox-icon {
-    color: white;
+/* Checkmark icon when checked */
+.checklist-item.checked .checkbox-check {
+    background: var(--success);
+    border-color: var(--success);
 }
 
-.checklist-item.checked .checkbox-icon::after {
+.checklist-item.checked .checkbox-check::after {
     content: '✓';
     color: white;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
 }
 
-/* Hide checkbox label text - use tooltip instead */
-.checkbox-label {
-    display: none;
+.checkbox-text {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    line-height: 1.5;
 }
 
-/* Tooltip for checklist items on hover */
-.checklist-item[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--bg-dark);
-    color: white;
-    padding: 0.5rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    z-index: 10;
-    max-width: 200px;
-    white-space: normal;
-    text-align: center;
-    margin-bottom: 4px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-/* Checklist hint text */
-.checklist-hint {
-    font-size: 0.8rem;
+.checklist-item.checked .checkbox-text {
     color: var(--text-secondary);
-    margin-bottom: 0.75rem;
+    text-decoration: line-through;
 }
 
 /* Continue Button */
@@ -6883,17 +6919,17 @@ h1, h2, h3, h4, h5, h6 {
 .selection-grid {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.6rem;
 }
 
 .selection-option {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 14px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: left;
@@ -6920,16 +6956,16 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     background: var(--bg-accent);
-    border-radius: 12px;
+    border-radius: 10px;
     flex-shrink: 0;
 }
 
 .option-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     color: var(--primary);
 }
 
@@ -6938,26 +6974,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .option-details h4 {
-    margin: 0 0 0.25rem 0;
-    font-size: 1rem;
+    margin: 0 0 0.2rem 0;
+    font-size: 1.05rem;
     font-weight: 600;
     color: var(--text-primary);
 }
 
 .option-details p {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: var(--text-secondary);
-    line-height: 1.4;
+    line-height: 1.3;
 }
 
 .option-meta {
     display: inline-block;
-    margin-top: 0.375rem;
-    padding: 0.25rem 0.625rem;
+    margin-top: 0.3rem;
+    padding: 0.2rem 0.5rem;
     background: var(--bg-accent);
-    border-radius: 6px;
-    font-size: 0.75rem;
+    border-radius: 5px;
+    font-size: 0.7rem;
     color: var(--text-secondary);
 }
 
@@ -6968,8 +7004,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .option-arrow svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
 .selection-option:hover .option-arrow {
@@ -7444,59 +7480,65 @@ h1, h2, h3, h4, h5, h6 {
     gap: 0;
 }
 
-/* Flowchart-style summary items */
+/* Flowchart-style summary items with color coding */
 .summary-item {
     display: flex;
     flex-direction: column;
+    gap: 0.4rem;
     padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
     position: relative;
 }
 
-/* Connector line between summary items */
-.summary-item::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -16px;
-    width: 2px;
-    height: 16px;
-    background: var(--border-dark);
+/* Color coding for different step types */
+.summary-item-checklist {
+    border-left-color: var(--step-checklist);
 }
 
-.summary-item:last-child::after {
-    display: none;
+.summary-item-selection {
+    border-left-color: var(--step-selection);
 }
 
-/* Arrow at end of connector */
-.summary-item:not(:last-child)::before {
-    content: '▼';
+.summary-item-decision {
+    border-left-color: var(--step-decision);
+}
+
+.summary-item-info {
+    border-left-color: var(--step-info);
+}
+
+.summary-item-endpoint {
+    border-left-color: var(--step-endpoint);
+}
+
+/* Connector arrow between summary items - positioned to center in gap */
+.summary-item:not(:last-child)::after {
+    content: '↓';
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: -20px;
-    color: var(--border-dark);
-    font-size: 8px;
+    bottom: -0.875rem;  /* Adjusted to center in 1.5rem gap (1.5rem / 2 = 0.75rem, accounting for font size) */
+    color: var(--text-secondary);
+    font-size: 1.25rem;
     z-index: 1;
 }
 
 .summary-item + .summary-item {
-    margin-top: 20px;
+    margin-top: 1.5rem;
 }
 
-.summary-step {
+.summary-step-label {
     font-size: 0.7rem;
     font-weight: 600;
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.025em;
-    margin-bottom: 0.125rem;
 }
 
-.summary-choice {
-    font-size: 0.9rem;
+.summary-choice-text {
+    font-size: 0.875rem;
     color: var(--text-primary);
     font-weight: 500;
 }
@@ -7601,8 +7643,8 @@ h1, h2, h3, h4, h5, h6 {
     .flowchart-glass-header {
         flex-wrap: wrap;
         gap: 0.75rem;
-        padding: 1rem;
-        top: 56px;
+        padding: 0.75rem;
+        top: 0;  /* Remove top offset for PWA */
     }
     
     .flowchart-back-btn span {
@@ -7632,54 +7674,71 @@ h1, h2, h3, h4, h5, h6 {
     }
     
     .flowchart-title-bar {
-        padding: 1rem 1.25rem;
+        padding: 1rem;
     }
     
     .flowchart-title-bar h2 {
-        font-size: 1.125rem;
+        font-size: 1rem;
     }
     
+    /* Mobile: vertical scrolling layout */
     .flowchart-content-area {
         padding: 1rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+        flex-direction: column;
+    }
+    
+    .flowchart-steps {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
     }
     
     .flowchart-step {
-        border-radius: 16px;
+        width: 100%;
+        min-width: 100%;
+        border-radius: 14px;
+    }
+    
+    /* Hide horizontal connector arrows on mobile */
+    .flowchart-step-connector {
+        display: none;
     }
     
     .step-content {
-        padding: 1.25rem;
-    }
-    
-    .step-content h3 {
-        font-size: 1.125rem;
-    }
-    
-    .decision-btn {
         padding: 1rem;
     }
     
+    .step-content h3 {
+        font-size: 0.95rem;
+    }
+    
+    .decision-btn {
+        padding: 0.75rem;
+    }
+    
     .decision-icon {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
     }
     
     .endpoint-card {
-        padding: 2rem 1.5rem;
+        padding: 1.5rem 1rem;
     }
     
     .endpoint-icon {
-        width: 64px;
-        height: 64px;
+        width: 56px;
+        height: 56px;
     }
     
     .endpoint-icon svg {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
     }
     
     .endpoint-card h2 {
-        font-size: 1.25rem;
+        font-size: 1.125rem;
     }
     
     .endpoint-actions {
