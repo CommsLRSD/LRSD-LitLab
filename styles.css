@@ -91,6 +91,25 @@
     box-sizing: border-box;
 }
 
+/* Material Icons Support */
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'liga';
+}
+
 /* Modern sans-serif typography */
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
@@ -319,8 +338,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sidebar-icon {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+    color: currentColor;
     flex-shrink: 0;
 }
 
