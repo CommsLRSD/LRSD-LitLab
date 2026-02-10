@@ -1676,13 +1676,15 @@ function showFlowchartSummary() {
     if (Object.keys(choices).length === 0) {
         summaryItems = '<p class="no-choices">No choices have been made yet. Work through the flowchart to see your decisions summarized here.</p>';
     } else {
-        Object.entries(choices).forEach(([nodeId, choice]) => {
+        Object.entries(choices).forEach(([nodeId, choice], index) => {
             const nodeDef = tierDef?.nodes?.[nodeId];
             const stepTitle = nodeDef?.title || nodeId;
+            const stepType = nodeDef?.type || 'selection';
+            
             summaryItems += `
-                <div class="summary-item">
-                    <span class="summary-step">${stepTitle}</span>
-                    <span class="summary-choice">${choice.name}</span>
+                <div class="summary-item summary-item-${stepType}">
+                    <div class="summary-step-label">${stepTitle}</div>
+                    <div class="summary-choice-text">${choice.name}</div>
                 </div>
             `;
         });
