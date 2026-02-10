@@ -6677,30 +6677,30 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--success);
 }
 
-/* Pronounced color coding - colored left border and tinted background */
+/* Pronounced color coding - solid color backgrounds with left border */
 .flowchart-step-checklist {
     border-left: 5px solid var(--step-checklist);
-    background: linear-gradient(to right, rgba(99, 102, 241, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: rgba(99, 102, 241, 0.12);
 }
 
 .flowchart-step-selection {
     border-left: 5px solid var(--step-selection);
-    background: linear-gradient(to right, rgba(139, 92, 246, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: rgba(139, 92, 246, 0.12);
 }
 
 .flowchart-step-decision {
     border-left: 5px solid var(--step-decision);
-    background: linear-gradient(to right, rgba(236, 72, 153, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: rgba(236, 72, 153, 0.12);
 }
 
 .flowchart-step-info {
     border-left: 5px solid var(--step-info);
-    background: linear-gradient(to right, rgba(20, 184, 166, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: rgba(20, 184, 166, 0.12);
 }
 
 .flowchart-step-endpoint {
     border-left: 5px solid var(--step-endpoint);
-    background: linear-gradient(to right, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: rgba(16, 185, 129, 0.12);
 }
 
 .flowchart-step.step-removing {
@@ -6798,7 +6798,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.875rem;
 }
 
-/* Checklist - List style with checkboxes */
+/* Checklist - List style with circular checkboxes */
 .checklist-container {
     display: flex;
     flex-direction: column;
@@ -6837,14 +6837,15 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
     background: white;
     border: 2px solid var(--border-dark);
-    border-radius: 4px;
+    border-radius: 50%;
     transition: all 0.2s ease;
     margin-top: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Checkmark icon when checked */
