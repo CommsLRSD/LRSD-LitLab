@@ -909,82 +909,362 @@ function initIntegratedFlowchart(tierId) {
     const container = document.getElementById('flowchart-container');
     if (!container) return;
     
-    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
-    if (!flowchartDef) return;
-    
-    // Reset visual flowchart state
+    // Initialize progressive flowchart state
     appState.visualFlowchart = {
-        nodes: [],
-        connections: [],
-        currentNodeId: null,
-        selectedPath: [],
         tierId: tierId,
-        choices: {} // Track all choices for summary
+        currentStep: 1,
+        completedSteps: [],
+        decisions: {},
+        path: []
     };
     
     container.classList.remove('flowchart-hidden');
-    container.innerHTML = `
-        <div class="integrated-flowchart">
-            <div class="flowchart-glass-header">
-                <button class="flowchart-back-btn" onclick="closeIntegratedFlowchart()">
+    container.innerHTML = renderGridBasedFlowchart(tierId);
+    
+    // Initialize sidebar checkboxes
+    initializeFlowchartSidebar();
+    
+    // Render initial state (only show first step as active)
+    updateFlowchartDisplay();
+}
+
+function renderGridBasedFlowchart(tierId) {
+    const tierNum = tierId.replace('tier', '');
+    const tierData = getGridFlowchartData(tierId);
+    
+    if (!tierData) {
+        return '<div class="error">Flowchart data not found</div>';
+    }
+    
+    return `
+        <div class="grid-flowchart">
+            <header class="grid-flowchart-header">
+                <button class="grid-back-btn" onclick="closeIntegratedFlowchart()">
                     <span class="material-icons">arrow_back</span>
-                    <span>Back</span>
+                    Back
                 </button>
-                
-                <div class="tier-tabs">
-                    <button class="tier-tab ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')" data-tier="tier1">
-                        <span class="tier-number">1</span>
-                        <span class="tier-label">Tier 1</span>
-                    </button>
-                    <button class="tier-tab ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')" data-tier="tier2">
-                        <span class="tier-number">2</span>
-                        <span class="tier-label">Tier 2</span>
-                    </button>
-                    <button class="tier-tab ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')" data-tier="tier3">
-                        <span class="tier-number">3</span>
-                        <span class="tier-label">Tier 3</span>
-                    </button>
+                <div class="tier-selector">
+                    <button class="tier-btn ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')">Tier 1</button>
+                    <button class="tier-btn ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')">Tier 2</button>
+                    <button class="tier-btn ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')">Tier 3</button>
                 </div>
-                
-                <div class="flowchart-actions">
-                    <button class="flowchart-action-btn" onclick="showFlowchartSummary()" title="View Summary">
-                        <span class="material-icons">assignment</span>
-                        <span>Summary</span>
-                    </button>
-                    <button class="flowchart-action-btn flowchart-done-btn" onclick="finishFlowchart()" title="I'm Done">
-                        <span class="material-icons">check_circle</span>
-                        <span>I'm Done</span>
-                    </button>
+                <div class="header-logo">
+                    <span style="font-weight: bold; font-size: 14px;">Louis Riel</span>
                 </div>
-            </div>
+            </header>
             
-            <div class="flowchart-title-bar">
-                <h2>${flowchartDef.title}</h2>
-                <div class="step-indicator">
-                    <span class="step-text">Step 1</span>
-                </div>
-            </div>
-            
-            <div class="flowchart-content-area" id="flowchart-content">
-                <div class="flowchart-steps" id="flowchart-steps"></div>
+            <div class="grid-flowchart-main">
+                ${renderFlowchartSidebar(tierData)}
+                ${renderFlowchartContent(tierData)}
             </div>
         </div>
     `;
-    
-    // Add horizontal scroll wheel behavior
-    const contentArea = document.getElementById('flowchart-content');
-    if (contentArea) {
-        contentArea.addEventListener('wheel', (e) => {
-            // Convert vertical scroll to horizontal
-            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                e.preventDefault();
-                contentArea.scrollLeft += e.deltaY;
-            }
-        }, { passive: false });
+}
+
+function getGridFlowchartData(tierId) {
+    // Tier 1 data
+    if (tierId === 'tier1') {
+        return {
+            title: 'Tier ONE : UNIVERSAL SCREENING & CORE INSTRUCTION',
+            sidebar: {
+                entry: {
+                    title: 'Entry:',
+                    items: ['Universal - applies to all students'],
+                    checkboxes: []
+                },
+                groupInfo: {
+                    title: 'Group Information:',
+                    items: [
+                        'Whole class instruction',
+                        'Research-supported teaching practices',
+                        'Regular screening and monitoring'
+                    ]
+                },
+                progressMonitoring: {
+                    title: 'Progress Monitoring:',
+                    items: ['Regular literacy screening (DIBELS, CTOPP-2, THaFoL, IDAPEL)']
+                }
+            },
+            steps: [
+                {num: 1, title: 'LITERACY SCREENER', text: 'Administer universal literacy screener to all students.', color: 'beige'},
+                {num: 2, title: 'EVALUATE RESULTS', text: 'Review screening results to determine if core instruction is effective.', color: 'beige'},
+                {num: 3, title: 'CONTINUE MONITORING', text: 'For effective instruction, continue with core curriculum and regular monitoring.', color: 'green'},
+                {num: 4, title: 'MOVE TO TIER 2', text: 'For students not responding to Tier 1, move to Tier 2 small group interventions.', color: 'pink'}
+            ],
+            decisions: [
+                {after: 2, effective: true, ineffective: true}
+            ]
+        };
     }
     
-    // Show the first node
-    showIntegratedNode(flowchartDef.startNode, null);
+    // Tier 2 data matching the screenshot
+    if (tierId === 'tier2') {
+        return {
+            title: 'Tier TWO : SMALL GROUP INTERVENTION',
+            sidebar: {
+                entry: {
+                    title: 'Entry:',
+                    items: [
+                        'Informed by data (See progress monitoring tools).',
+                        'Rule out that challenges are not the result of:'
+                    ],
+                    checkboxes: [
+                        'Vision impairments',
+                        'Hearing impairments',
+                        'Poor attendance',
+                        'MLL',
+                        'Other diagnosis'
+                    ]
+                },
+                groupInfo: {
+                    title: 'Group Information:',
+                    items: [
+                        'Led by classroom teachers.',
+                        'Approx. 3-5 students per group.',
+                        'Students receive intensive, explicit, and systematic intervention in small groups based on specific skill-based literacy goals (not necessarily grade), based on the five pillars of reading instruction as identified by classroom teachers, student services, and administrators.',
+                        'Interventions are implemented for a suggested period of 20-40 minutes, three to five times per week for an 8-week period.'
+                    ]
+                },
+                progressMonitoring: {
+                    title: 'Progress Monitoring:',
+                    items: [
+                        'Weekly progress monitoring (ex. MELL DIBELS Progress Monitoring).'
+                    ]
+                }
+            },
+            steps: [
+                {num: 1, title: 'DRILL DOWN ASSESSMENT', text: 'Use the menu below to find and administer a drill down assessment that aligns with the needs of your students, as determined by the literacy screener.', color: 'beige'},
+                {num: 2, title: '8-WEEK INTERVENTION', text: 'Use the menu below to find an appropriate intervention, monitor student response with progress monitoring tools (as required), and administer for an 8-week period.', color: 'beige'},
+                {num: 3, title: 'PROGRESS MONITORING', text: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFoL, IDAPEL).', color: 'beige'},
+                {num: 4, title: 'DRILL DOWN ASSESSMENT', text: 'Use the menu below to find and administer a drill down assessment that aligns with the needs of your students, as determined by the latest literacy screener.', color: 'pink'},
+                {num: 5, title: '8-WEEK INTERVENTION', text: 'After continuing Tier 2 interventions and regularly monitor student response to intervention with progress monitoring tools (as required).', color: 'beige'},
+                {num: 6, title: 'PROGRESS MONITORING', text: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFoL, IDAPEL).', color: 'beige'},
+                {num: 7, title: 'MOVE TO TIER 3', text: 'If student does not make expected progress in Tier 2 following two 8-week intervention cycles, they move into Tier 3. Fewer than 10% of students should need to be in Tier 3.', color: 'pink'}
+            ],
+            decisions: [
+                {after: 3, effective: true, ineffective: true},
+                {after: 6, effective: true, ineffective: true}
+            ]
+        };
+    }
+    
+    // Tier 3 data
+    if (tierId === 'tier3') {
+        return {
+            title: 'Tier THREE : INTENSIVE INDIVIDUAL INTERVENTION',
+            sidebar: {
+                entry: {
+                    title: 'Entry:',
+                    items: [
+                        'Student has not responded to two 8-week cycles of Tier 2 intervention',
+                        'Less than 10% of students should require Tier 3'
+                    ],
+                    checkboxes: []
+                },
+                groupInfo: {
+                    title: 'Group Information:',
+                    items: [
+                        'Individual or very small group (1-3 students)',
+                        'Intensive daily sessions (45-60 minutes)',
+                        'Highly specialized interventions',
+                        'Collaboration with specialists'
+                    ]
+                },
+                progressMonitoring: {
+                    title: 'Progress Monitoring:',
+                    items: ['Weekly progress monitoring with specialized assessments']
+                }
+            },
+            steps: [
+                {num: 1, title: 'COMPREHENSIVE ASSESSMENT', text: 'Conduct comprehensive diagnostic assessment to identify specific needs.', color: 'beige'},
+                {num: 2, title: 'INTENSIVE INTERVENTION', text: 'Implement intensive, individualized intervention program for 8 weeks.', color: 'beige'},
+                {num: 3, title: 'PROGRESS MONITORING', text: 'Monitor progress weekly and adjust intervention as needed.', color: 'beige'},
+                {num: 4, title: 'CONTINUE OR ADJUST', text: 'Based on progress, continue, adjust, or consider additional support.', color: 'green'}
+            ],
+            decisions: [
+                {after: 3, effective: true, ineffective: true}
+            ]
+        };
+    }
+    
+    // Return null if tier not found
+    return null;
+}
+
+function renderFlowchartSidebar(data) {
+    const {entry, groupInfo, progressMonitoring} = data.sidebar;
+    
+    return `
+        <aside class="flowchart-sidebar">
+            <div class="sidebar-section">
+                <h3>${entry.title}</h3>
+                <ul>
+                    ${entry.items.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+                <ul class="checkbox-list">
+                    ${entry.checkboxes.map(item => `
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                <span>${item}</span>
+                            </label>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>${groupInfo.title}</h3>
+                <ul>
+                    ${groupInfo.items.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>${progressMonitoring.title}</h3>
+                <ul>
+                    ${progressMonitoring.items.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+            </div>
+        </aside>
+    `;
+}
+
+function renderFlowchartContent(data) {
+    return `
+        <main class="flowchart-content">
+            <h1 class="flowchart-title">${data.title}</h1>
+            
+            <div class="flowchart-grid">
+                ${renderStartIndicator()}
+                ${renderStepsGrid(data.steps, data.decisions)}
+            </div>
+        </main>
+    `;
+}
+
+function renderStartIndicator() {
+    return `
+        <div class="start-indicator">
+            <div class="start-badge">
+                <strong>START</strong><br>
+                <strong>HERE</strong>
+            </div>
+            <span class="material-icons start-arrow">arrow_forward</span>
+        </div>
+    `;
+}
+
+function renderStepsGrid(steps, decisions) {
+    let html = '';
+    
+    steps.forEach((step, index) => {
+        // Render step box
+        html += `
+            <div class="flow-step color-${step.color}" data-step="${step.num}">
+                <div class="step-number">${step.num}.</div>
+                <h3 class="step-title">${step.title}</h3>
+                <p class="step-text">${step.text}</p>
+            </div>
+        `;
+        
+        // Check if there's a decision after this step
+        const decision = decisions.find(d => d.after === step.num);
+        if (decision) {
+            html += renderDecisionBoxes(step.num);
+        }
+    });
+    
+    return html;
+}
+
+function renderDecisionBoxes(afterStep) {
+    return `
+        <div class="decision-box decision-effective" onclick="makeFlowchartDecision(${afterStep}, true)">
+            <span class="material-icons decision-icon">check_circle</span>
+            <div class="decision-content">
+                <strong>INSTRUCTION</strong><br>
+                <strong>EFFECTIVE</strong>
+                <p>(Subtest result Blue or Green)</p>
+            </div>
+        </div>
+        
+        <div class="decision-box decision-ineffective" onclick="makeFlowchartDecision(${afterStep}, false)">
+            <span class="material-icons decision-icon">cancel</span>
+            <div class="decision-content">
+                <strong>INSTRUCTION</strong><br>
+                <strong>INEFFECTIVE</strong>
+                <p>(Subtest result Yellow or Red)</p>
+            </div>
+        </div>
+    `;
+}
+
+function initializeFlowchartSidebar() {
+    const checkboxes = document.querySelectorAll('.flowchart-sidebar input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            // Track checkbox state if needed
+        });
+    });
+}
+
+// Update flowchart display to show only relevant steps
+function updateFlowchartDisplay() {
+    const state = appState.visualFlowchart;
+    if (!state) return;
+    
+    // Get all step elements
+    const stepElements = document.querySelectorAll('.flow-step');
+    const decisionElements = document.querySelectorAll('.decision-box');
+    
+    stepElements.forEach((el, index) => {
+        const stepNum = index + 1;
+        
+        if (stepNum < state.currentStep) {
+            // Completed steps - show as completed
+            el.classList.add('step-completed');
+            el.classList.remove('step-active', 'step-hidden');
+        } else if (stepNum === state.currentStep) {
+            // Current active step
+            el.classList.add('step-active');
+            el.classList.remove('step-completed', 'step-hidden');
+        } else {
+            // Future steps - hide or gray out
+            el.classList.add('step-hidden');
+            el.classList.remove('step-active', 'step-completed');
+        }
+    });
+    
+    // Hide all decision boxes initially
+    decisionElements.forEach(el => {
+        el.classList.add('step-hidden');
+    });
+    
+    // Show decision boxes for current decision points
+    // This logic will be enhanced based on the flowchart state
+}
+
+// Handle step progression
+function proceedToNextStep() {
+    const state = appState.visualFlowchart;
+    if (!state) return;
+    
+    state.currentStep++;
+    state.completedSteps.push(state.currentStep - 1);
+    updateFlowchartDisplay();
+}
+
+// Handle decision making
+function makeFlowchartDecision(stepNum, isEffective) {
+    const state = appState.visualFlowchart;
+    if (!state) return;
+    
+    state.decisions[stepNum] = isEffective;
+    state.path.push({step: stepNum, decision: isEffective ? 'effective' : 'ineffective'});
+    
+    // Proceed to next step based on decision
+    proceedToNextStep();
 }
 
 // Show a node in the integrated flowchart
