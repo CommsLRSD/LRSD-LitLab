@@ -6661,17 +6661,12 @@ h1, h2, h3, h4, h5, h6 {
     flex-shrink: 0;
 }
 
-.flowchart-step-connector svg {
-    width: 40px;
-    height: 40px;
+.flowchart-step-connector .material-icons {
+    font-size: 40px;
     color: var(--border-dark);
 }
 
 /* Flowchart Step Cards - Glass Style with pronounced color coding */
-
-.flowchart-step-connector .material-icons {
-    font-size: 40px;
-}
 .flowchart-step {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
@@ -6798,9 +6793,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .undo-btn svg {
-    width: 16px;
-    height: 16px;
-}
 
 .undo-btn .material-icons {
     font-size: 16px;
@@ -6940,10 +6932,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .continue-btn .material-icons {
     font-size: 18px;
-}
-.continue-btn svg {
-    width: 18px;
-    height: 18px;
 }
 
 /* Selection Grid */
