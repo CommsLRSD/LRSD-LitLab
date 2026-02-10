@@ -403,7 +403,9 @@ function renderInterventionStrategies(tier, screener, area) {
             <div class="step-card wide">
                 <div class="step-header">
                     <div class="step-icon success">
-                        <span class="material-icons">check_circle</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
                     <div>
                         <h2>Recommended Interventions</h2>
@@ -909,292 +911,89 @@ function initIntegratedFlowchart(tierId) {
     const container = document.getElementById('flowchart-container');
     if (!container) return;
     
+    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    if (!flowchartDef) return;
+    
+    // Reset visual flowchart state
+    appState.visualFlowchart = {
+        nodes: [],
+        connections: [],
+        currentNodeId: null,
+        selectedPath: [],
+        tierId: tierId,
+        choices: {} // Track all choices for summary
+    };
+    
     container.classList.remove('flowchart-hidden');
-    container.innerHTML = renderGridBasedFlowchart(tierId);
-    
-    // Initialize sidebar checkboxes
-    initializeFlowchartSidebar();
-}
-
-function renderGridBasedFlowchart(tierId) {
-    const tierNum = tierId.replace('tier', '');
-    const tierData = getGridFlowchartData(tierId);
-    
-    if (!tierData) {
-        return '<div class="error">Flowchart data not found</div>';
-    }
-    
-    return `
-        <div class="grid-flowchart">
-            <header class="grid-flowchart-header">
-                <button class="grid-back-btn" onclick="closeIntegratedFlowchart()">
-                    <span class="material-icons">arrow_back</span>
-                    Back
+    container.innerHTML = `
+        <div class="integrated-flowchart">
+            <div class="flowchart-glass-header">
+                <button class="flowchart-back-btn" onclick="closeIntegratedFlowchart()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Back</span>
                 </button>
-                <div class="tier-selector">
-                    <button class="tier-btn ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')">Tier 1</button>
-                    <button class="tier-btn ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')">Tier 2</button>
-                    <button class="tier-btn ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')">Tier 3</button>
+                
+                <div class="tier-tabs">
+                    <button class="tier-tab ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')" data-tier="tier1">
+                        <span class="tier-number">1</span>
+                        <span class="tier-label">Tier 1</span>
+                    </button>
+                    <button class="tier-tab ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')" data-tier="tier2">
+                        <span class="tier-number">2</span>
+                        <span class="tier-label">Tier 2</span>
+                    </button>
+                    <button class="tier-tab ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')" data-tier="tier3">
+                        <span class="tier-number">3</span>
+                        <span class="tier-label">Tier 3</span>
+                    </button>
                 </div>
-                <div class="header-logo">
-                    <span style="font-weight: bold; font-size: 14px;">Louis Riel</span>
+                
+                <div class="flowchart-actions">
+                    <button class="flowchart-action-btn" onclick="showFlowchartSummary()" title="View Summary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            <path d="M12 12h.01M12 16h.01M12 8h.01"/>
+                        </svg>
+                        <span>Summary</span>
+                    </button>
+                    <button class="flowchart-action-btn flowchart-done-btn" onclick="finishFlowchart()" title="I'm Done">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>I'm Done</span>
+                    </button>
                 </div>
-            </header>
+            </div>
             
-            <div class="grid-flowchart-main">
-                ${renderFlowchartSidebar(tierData)}
-                ${renderFlowchartContent(tierData)}
+            <div class="flowchart-title-bar">
+                <h2>${flowchartDef.title}</h2>
+                <div class="step-indicator">
+                    <span class="step-text">Step 1</span>
+                </div>
+            </div>
+            
+            <div class="flowchart-content-area" id="flowchart-content">
+                <div class="flowchart-steps" id="flowchart-steps"></div>
             </div>
         </div>
     `;
-}
-
-function getGridFlowchartData(tierId) {
-    // Tier 1 data
-    if (tierId === 'tier1') {
-        return {
-            title: 'Tier ONE : UNIVERSAL SCREENING & CORE INSTRUCTION',
-            sidebar: {
-                entry: {
-                    title: 'Entry:',
-                    items: ['Universal - applies to all students'],
-                    checkboxes: []
-                },
-                groupInfo: {
-                    title: 'Group Information:',
-                    items: [
-                        'Whole class instruction',
-                        'Research-supported teaching practices',
-                        'Regular screening and monitoring'
-                    ]
-                },
-                progressMonitoring: {
-                    title: 'Progress Monitoring:',
-                    items: ['Regular literacy screening (DIBELS, CTOPP-2, THaFoL, IDAPEL)']
-                }
-            },
-            steps: [
-                {num: 1, title: 'LITERACY SCREENER', text: 'Administer universal literacy screener to all students.', color: 'beige'},
-                {num: 2, title: 'EVALUATE RESULTS', text: 'Review screening results to determine if core instruction is effective.', color: 'beige'},
-                {num: 3, title: 'CONTINUE MONITORING', text: 'For effective instruction, continue with core curriculum and regular monitoring.', color: 'green'},
-                {num: 4, title: 'MOVE TO TIER 2', text: 'For students not responding to Tier 1, move to Tier 2 small group interventions.', color: 'pink'}
-            ],
-            decisions: [
-                {after: 2, effective: true, ineffective: true}
-            ]
-        };
+    
+    // Add horizontal scroll wheel behavior
+    const contentArea = document.getElementById('flowchart-content');
+    if (contentArea) {
+        contentArea.addEventListener('wheel', (e) => {
+            // Convert vertical scroll to horizontal
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                contentArea.scrollLeft += e.deltaY;
+            }
+        }, { passive: false });
     }
     
-    // Tier 2 data matching the screenshot
-    if (tierId === 'tier2') {
-        return {
-            title: 'Tier TWO : SMALL GROUP INTERVENTION',
-            sidebar: {
-                entry: {
-                    title: 'Entry:',
-                    items: [
-                        'Informed by data (See progress monitoring tools).',
-                        'Rule out that challenges are not the result of:'
-                    ],
-                    checkboxes: [
-                        'Vision impairments',
-                        'Hearing impairments',
-                        'Poor attendance',
-                        'MLL',
-                        'Other diagnosis'
-                    ]
-                },
-                groupInfo: {
-                    title: 'Group Information:',
-                    items: [
-                        'Led by classroom teachers.',
-                        'Approx. 3-5 students per group.',
-                        'Students receive intensive, explicit, and systematic intervention in small groups based on specific skill-based literacy goals (not necessarily grade), based on the five pillars of reading instruction as identified by classroom teachers, student services, and administrators.',
-                        'Interventions are implemented for a suggested period of 20-40 minutes, three to five times per week for an 8-week period.'
-                    ]
-                },
-                progressMonitoring: {
-                    title: 'Progress Monitoring:',
-                    items: [
-                        'Weekly progress monitoring (ex. MELL DIBELS Progress Monitoring).'
-                    ]
-                }
-            },
-            steps: [
-                {num: 1, title: 'DRILL DOWN ASSESSMENT', text: 'Use the menu below to find and administer a drill down assessment that aligns with the needs of your students, as determined by the literacy screener.', color: 'beige'},
-                {num: 2, title: '8-WEEK INTERVENTION', text: 'Use the menu below to find an appropriate intervention, monitor student response with progress monitoring tools (as required), and administer for an 8-week period.', color: 'beige'},
-                {num: 3, title: 'PROGRESS MONITORING', text: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFoL, IDAPEL).', color: 'beige'},
-                {num: 4, title: 'DRILL DOWN ASSESSMENT', text: 'Use the menu below to find and administer a drill down assessment that aligns with the needs of your students, as determined by the latest literacy screener.', color: 'pink'},
-                {num: 5, title: '8-WEEK INTERVENTION', text: 'After continuing Tier 2 interventions and regularly monitor student response to intervention with progress monitoring tools (as required).', color: 'beige'},
-                {num: 6, title: 'PROGRESS MONITORING', text: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFoL, IDAPEL).', color: 'beige'},
-                {num: 7, title: 'MOVE TO TIER 3', text: 'If student does not make expected progress in Tier 2 following two 8-week intervention cycles, they move into Tier 3. Fewer than 10% of students should need to be in Tier 3.', color: 'pink'}
-            ],
-            decisions: [
-                {after: 3, effective: true, ineffective: true},
-                {after: 6, effective: true, ineffective: true}
-            ]
-        };
-    }
-    
-    // Tier 3 data
-    if (tierId === 'tier3') {
-        return {
-            title: 'Tier THREE : INTENSIVE INDIVIDUAL INTERVENTION',
-            sidebar: {
-                entry: {
-                    title: 'Entry:',
-                    items: [
-                        'Student has not responded to two 8-week cycles of Tier 2 intervention',
-                        'Less than 10% of students should require Tier 3'
-                    ],
-                    checkboxes: []
-                },
-                groupInfo: {
-                    title: 'Group Information:',
-                    items: [
-                        'Individual or very small group (1-3 students)',
-                        'Intensive daily sessions (45-60 minutes)',
-                        'Highly specialized interventions',
-                        'Collaboration with specialists'
-                    ]
-                },
-                progressMonitoring: {
-                    title: 'Progress Monitoring:',
-                    items: ['Weekly progress monitoring with specialized assessments']
-                }
-            },
-            steps: [
-                {num: 1, title: 'COMPREHENSIVE ASSESSMENT', text: 'Conduct comprehensive diagnostic assessment to identify specific needs.', color: 'beige'},
-                {num: 2, title: 'INTENSIVE INTERVENTION', text: 'Implement intensive, individualized intervention program for 8 weeks.', color: 'beige'},
-                {num: 3, title: 'PROGRESS MONITORING', text: 'Monitor progress weekly and adjust intervention as needed.', color: 'beige'},
-                {num: 4, title: 'CONTINUE OR ADJUST', text: 'Based on progress, continue, adjust, or consider additional support.', color: 'green'}
-            ],
-            decisions: [
-                {after: 3, effective: true, ineffective: true}
-            ]
-        };
-    }
-    
-    // Return null if tier not found
-    return null;
-}
-
-function renderFlowchartSidebar(data) {
-    const {entry, groupInfo, progressMonitoring} = data.sidebar;
-    
-    return `
-        <aside class="flowchart-sidebar">
-            <div class="sidebar-section">
-                <h3>${entry.title}</h3>
-                <ul>
-                    ${entry.items.map(item => `<li>${item}</li>`).join('')}
-                </ul>
-                <ul class="checkbox-list">
-                    ${entry.checkboxes.map(item => `
-                        <li>
-                            <label>
-                                <input type="checkbox">
-                                <span>${item}</span>
-                            </label>
-                        </li>
-                    `).join('')}
-                </ul>
-            </div>
-            
-            <div class="sidebar-section">
-                <h3>${groupInfo.title}</h3>
-                <ul>
-                    ${groupInfo.items.map(item => `<li>${item}</li>`).join('')}
-                </ul>
-            </div>
-            
-            <div class="sidebar-section">
-                <h3>${progressMonitoring.title}</h3>
-                <ul>
-                    ${progressMonitoring.items.map(item => `<li>${item}</li>`).join('')}
-                </ul>
-            </div>
-        </aside>
-    `;
-}
-
-function renderFlowchartContent(data) {
-    return `
-        <main class="flowchart-content">
-            <h1 class="flowchart-title">${data.title}</h1>
-            
-            <div class="flowchart-grid">
-                ${renderStartIndicator()}
-                ${renderStepsGrid(data.steps, data.decisions)}
-            </div>
-        </main>
-    `;
-}
-
-function renderStartIndicator() {
-    return `
-        <div class="start-indicator">
-            <div class="start-badge">
-                <strong>START</strong><br>
-                <strong>HERE</strong>
-            </div>
-            <span class="material-icons start-arrow">arrow_forward</span>
-        </div>
-    `;
-}
-
-function renderStepsGrid(steps, decisions) {
-    let html = '';
-    
-    steps.forEach((step, index) => {
-        // Render step box
-        html += `
-            <div class="flow-step color-${step.color}" data-step="${step.num}">
-                <div class="step-number">${step.num}.</div>
-                <h3 class="step-title">${step.title}</h3>
-                <p class="step-text">${step.text}</p>
-            </div>
-        `;
-        
-        // Check if there's a decision after this step
-        const decision = decisions.find(d => d.after === step.num);
-        if (decision) {
-            html += renderDecisionBoxes(step.num);
-        }
-    });
-    
-    return html;
-}
-
-function renderDecisionBoxes(afterStep) {
-    return `
-        <div class="decision-box decision-effective">
-            <span class="material-icons decision-icon">check_circle</span>
-            <div class="decision-content">
-                <strong>INSTRUCTION</strong><br>
-                <strong>EFFECTIVE</strong>
-                <p>(Subtest result Blue or Green)</p>
-            </div>
-        </div>
-        
-        <div class="decision-box decision-ineffective">
-            <span class="material-icons decision-icon">cancel</span>
-            <div class="decision-content">
-                <strong>INSTRUCTION</strong><br>
-                <strong>INEFFECTIVE</strong>
-                <p>(Subtest result Yellow or Red)</p>
-            </div>
-        </div>
-    `;
-}
-
-function initializeFlowchartSidebar() {
-    const checkboxes = document.querySelectorAll('.flowchart-sidebar input[type="checkbox"]');
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', () => {
-            // Track checkbox state if needed
-        });
-    });
+    // Show the first node
+    showIntegratedNode(flowchartDef.startNode, null);
 }
 
 // Show a node in the integrated flowchart
@@ -1242,7 +1041,9 @@ function createIntegratedNodeElement(nodeData, container) {
         const connector = document.createElement('div');
         connector.className = 'flowchart-step-connector';
         connector.innerHTML = `
-            <span class="material-icons">arrow_forward</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
         `;
         container.appendChild(connector);
     }
@@ -1316,7 +1117,9 @@ function createIntegratedChecklistNode(nodeData) {
         <div class="step-header">
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
-                <span class="material-icons">undo</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                </svg>
             </button>
         </div>
         <div class="step-content">
@@ -1327,7 +1130,9 @@ function createIntegratedChecklistNode(nodeData) {
             </div>
             <button class="continue-btn" disabled onclick="proceedFromIntegratedChecklist('${nodeData.id}', '${nodeData.nextNode}')">
                 ${nodeData.buttonText}
-                <span class="material-icons">arrow_forward</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
             </button>
         </div>
     `;
@@ -1345,7 +1150,10 @@ function createIntegratedSelectionNode(nodeData) {
     const optionsHTML = options.map(option => `
         <button class="selection-option" onclick="selectIntegratedOption('${escapeJsString(nodeData.id)}', '${escapeJsString(option.id)}', '${escapeJsString(option.name)}', '${escapeJsString(nodeData.nextHandler)}')">
             <div class="option-icon">
-                <span class="material-icons">assignment</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
             </div>
             <div class="option-details">
                 <h4>${option.name}</h4>
@@ -1354,14 +1162,19 @@ function createIntegratedSelectionNode(nodeData) {
                 ${option.duration ? `<span class="option-meta">${option.duration} • ${option.frequency}</span>` : ''}
             </div>
             <div class="option-arrow">
-                <span class="material-icons">chevron_right</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
             </div>
         </button>
     `).join('');
     
     const infoBoxHTML = nodeData.infoBox ? `
         <div class="info-callout">
-            <span class="material-icons">info</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4m0-4h.01"/>
+            </svg>
             <div>
                 <h4>${nodeData.infoBox.title}</h4>
                 ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
@@ -1372,7 +1185,9 @@ function createIntegratedSelectionNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="warning-callout">
-            <span class="material-icons">warning</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -1384,7 +1199,9 @@ function createIntegratedSelectionNode(nodeData) {
         <div class="step-header">
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
-                <span class="material-icons">undo</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                </svg>
             </button>
         </div>
         <div class="step-content">
@@ -1405,11 +1222,18 @@ function createIntegratedDecisionNode(nodeData) {
         <button class="decision-btn decision-${choice.type}" onclick="makeIntegratedDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
             <div class="decision-icon">
                 ${choice.type === 'success' ? `
-                    <span class="material-icons">check</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 13l4 4L19 7"/>
+                    </svg>
                 ` : choice.type === 'warning' ? `
-                    <span class="material-icons">warning</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
                 ` : `
-                    <span class="material-icons">info</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4m0-4h.01"/>
+                    </svg>
                 `}
             </div>
             <div class="decision-content">
@@ -1421,7 +1245,10 @@ function createIntegratedDecisionNode(nodeData) {
     
     const infoBoxHTML = nodeData.infoBox ? `
         <div class="info-callout">
-            <span class="material-icons">info</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4m0-4h.01"/>
+            </svg>
             <div>
                 <h4>${nodeData.infoBox.title}</h4>
                 ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
@@ -1432,7 +1259,9 @@ function createIntegratedDecisionNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="warning-callout">
-            <span class="material-icons">warning</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -1444,7 +1273,9 @@ function createIntegratedDecisionNode(nodeData) {
         <div class="step-header">
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
-                <span class="material-icons">undo</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                </svg>
             </button>
         </div>
         <div class="step-content">
@@ -1469,7 +1300,9 @@ function createIntegratedInfoNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="warning-callout">
-            <span class="material-icons">warning</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -1481,7 +1314,9 @@ function createIntegratedInfoNode(nodeData) {
         <div class="step-header">
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
-                <span class="material-icons">undo</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                </svg>
             </button>
         </div>
         <div class="step-content">
@@ -1502,10 +1337,10 @@ function createIntegratedInfoNode(nodeData) {
 // Create integrated endpoint node
 function createIntegratedEndpointNode(nodeData) {
     const statusIcons = {
-        success: `<span class="material-icons">check_circle</span>`,
-        info: `<span class="material-icons">info</span>`,
-        warning: `<span class="material-icons">warning</span>`,
-        danger: `<span class="material-icons">cancel</span>`
+        success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>`,
+        warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
+        danger: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>`
     };
     
     const recommendationsHTML = nodeData.recommendations ? `
@@ -1519,7 +1354,9 @@ function createIntegratedEndpointNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="warning-callout">
-            <span class="material-icons">warning</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -1947,7 +1784,9 @@ function finishFlowchart() {
             <div class="final-summary-container">
                 <div class="final-summary glass-panel">
                     <div class="final-summary-icon">
-                        <span class="material-icons">check_circle</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
                     <h2>Your Intervention Summary</h2>
                     <div class="summary-tier">
@@ -1965,7 +1804,9 @@ function finishFlowchart() {
                             Start Over
                         </button>
                         <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">
-                            <span class="material-icons">check</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 13l4 4L19 7"/>
+                            </svg>
                             Done
                         </button>
                     </div>
@@ -2331,7 +2172,10 @@ function createSelectionNode(nodeData) {
     const optionsHTML = options.map(option => `
         <button class="vf-selection-option" onclick="selectFlowchartOption('${nodeData.id}', '${option.id}', '${option.name}', '${nodeData.nextHandler}')">
             <div class="vf-option-icon">
-                <span class="material-icons">assignment</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
             </div>
             <div class="vf-option-content">
                 <h4>${option.name}</h4>
@@ -2340,14 +2184,19 @@ function createSelectionNode(nodeData) {
                 ${option.duration ? `<span class="vf-option-meta">${option.duration} • ${option.frequency}</span>` : ''}
             </div>
             <div class="vf-option-arrow">
-                <span class="material-icons">chevron_right</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
             </div>
         </button>
     `).join('');
     
     const infoBoxHTML = nodeData.infoBox ? `
         <div class="vf-info-box">
-            <span class="material-icons">info</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4m0-4h.01"/>
+            </svg>
             <div>
                 <h4>${nodeData.infoBox.title}</h4>
                 ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
@@ -2358,7 +2207,9 @@ function createSelectionNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="vf-warning-box">
-            <span class="material-icons">warning</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -2388,11 +2239,18 @@ function createDecisionNode(nodeData) {
         <button class="vf-decision-btn vf-decision-${choice.type}" onclick="makeDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
             <div class="vf-decision-icon">
                 ${choice.type === 'success' ? `
-                    <span class="material-icons">check</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 13l4 4L19 7"/>
+                    </svg>
                 ` : choice.type === 'warning' ? `
-                    <span class="material-icons">warning</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
                 ` : `
-                    <span class="material-icons">info</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4m0-4h.01"/>
+                    </svg>
                 `}
             </div>
             <div class="vf-decision-content">
@@ -2404,7 +2262,10 @@ function createDecisionNode(nodeData) {
     
     const infoBoxHTML = nodeData.infoBox ? `
         <div class="vf-info-box">
-            <span class="material-icons">info</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4m0-4h.01"/>
+            </svg>
             <div>
                 <h4>${nodeData.infoBox.title}</h4>
                 ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
@@ -2415,7 +2276,9 @@ function createDecisionNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="vf-warning-box">
-            <span class="material-icons">warning</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -2449,7 +2312,9 @@ function createInfoNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="vf-warning-box">
-            <span class="material-icons">warning</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -2481,10 +2346,10 @@ function createInfoNode(nodeData) {
 // Create endpoint node HTML
 function createEndpointNode(nodeData) {
     const statusIcons = {
-        success: `<span class="material-icons">check_circle</span>`,
-        info: `<span class="material-icons">info</span>`,
-        warning: `<span class="material-icons">warning</span>`,
-        danger: `<span class="material-icons">cancel</span>`
+        success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>`,
+        warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
+        danger: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>`
     };
     
     const recommendationsHTML = nodeData.recommendations ? `
@@ -2498,7 +2363,9 @@ function createEndpointNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="vf-warning-box">
-            <span class="material-icons">warning</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -2940,7 +2807,10 @@ function proceedToTier1Screener() {
                             ${flowchartData.screeners.map(screener => `
                                 <button class="screener-option" onclick="selectTier1Screener('${screener.id}', '${screener.name}')">
                                     <div class="screener-icon">
-                                        <span class="material-icons">assignment</span>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                            <path d="M9 12l2 2 4-4"/>
+                                        </svg>
                                     </div>
                                     <h4>${screener.name}</h4>
                                     <p>${screener.description}</p>
@@ -2985,7 +2855,10 @@ function selectTier1Screener(screenerId, screenerName) {
                         <p>Based on ${screenerName} results and classroom observations:</p>
                         
                         <div class="info-callout">
-                            <span class="material-icons">info</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4m0-4h.01"/>
+                            </svg>
                             <div>
                                 <h4>Consider These Indicators</h4>
                                 <ul class="indicator-list">
@@ -2999,7 +2872,9 @@ function selectTier1Screener(screenerId, screenerName) {
                         
                         <div class="decision-buttons">
                             <button class="decision-btn success" onclick="tier1InstructionEffective()">
-                                <span class="material-icons">check</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 13l4 4L19 7"/>
+                                </svg>
                                 <div>
                                     <strong>Yes, Instruction is Effective</strong>
                                     <span>80%+ students meeting benchmarks</span>
@@ -3007,7 +2882,9 @@ function selectTier1Screener(screenerId, screenerName) {
                             </button>
                             
                             <button class="decision-btn warning" onclick="tier1InstructionIneffective()">
-                                <span class="material-icons">warning</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
                                 <div>
                                     <strong>No, Needs Improvement</strong>
                                     <span>More than 20% students struggling</span>
@@ -3040,7 +2917,9 @@ function tier1InstructionEffective() {
             <div class="flowchart-content">
                 <div class="success-message">
                     <div class="success-icon">
-                        <span class="material-icons">check_circle</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
                     <h2>Core Instruction is Effective!</h2>
                     <p>Your explicit and systematic instruction is working well for the majority of students.</p>
@@ -3178,7 +3057,9 @@ function tier1MoreThan20Percent() {
             <div class="flowchart-content">
                 <div class="warning-message">
                     <div class="warning-icon">
-                        <span class="material-icons">warning</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
                     </div>
                     <h2>Core Instruction Needs Adjustment</h2>
                     <p>When more than 20% of students are unsuccessful, the core instruction may need to be re-examined and adjusted.</p>
@@ -3196,7 +3077,10 @@ function tier1MoreThan20Percent() {
                     </div>
                     
                     <div class="info-callout">
-                        <span class="material-icons">info</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4m0-4h.01"/>
+                        </svg>
                         <div>
                             <h4>After Re-teaching</h4>
                             <p>Re-assess students and return to this flowchart to determine if Tier 1 instruction is now effective or if students need Tier 2 support.</p>
@@ -3264,7 +3148,10 @@ function proceedToTier2Assessment() {
                         <p>Select an assessment that aligns with the areas of weakness identified by the literacy screener:</p>
                         
                         <div class="info-callout">
-                            <span class="material-icons">info</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4m0-4h.01"/>
+                            </svg>
                             <div>
                                 <h4>Purpose of Drill Down Assessments</h4>
                                 <p>These assessments provide more detailed information about specific skill gaps, helping you select the most appropriate intervention.</p>
@@ -3339,7 +3226,10 @@ function proceedToTier2Intervention() {
                         <p>Select an evidence-based intervention that matches the student's specific needs:</p>
                         
                         <div class="info-callout">
-                            <span class="material-icons">info</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4m0-4h.01"/>
+                            </svg>
                             <div>
                                 <h4>8-Week Intervention Cycle</h4>
                                 <p>Implement the selected intervention for 8 weeks. Monitor student progress regularly during this period using progress monitoring tools.</p>
@@ -3407,7 +3297,10 @@ function proceedToTier2ProgressMonitoring() {
                         <p>Administer a literacy screener to evaluate student progress:</p>
                         
                         <div class="info-callout">
-                            <span class="material-icons">info</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4m0-4h.01"/>
+                            </svg>
                             <div>
                                 <h4>Acceptable Screeners</h4>
                                 <ul class="indicator-list">
@@ -3423,7 +3316,9 @@ function proceedToTier2ProgressMonitoring() {
                         
                         <div class="decision-buttons">
                             <button class="decision-btn success" onclick="tier2StudentImproved()">
-                                <span class="material-icons">check</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 13l4 4L19 7"/>
+                                </svg>
                                 <div>
                                     <strong>Yes, Student Improved</strong>
                                     <span>Blue or Green results - meeting benchmarks</span>
@@ -3431,7 +3326,9 @@ function proceedToTier2ProgressMonitoring() {
                             </button>
                             
                             <button class="decision-btn warning" onclick="tier2StudentDidNotImprove()">
-                                <span class="material-icons">warning</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
                                 <div>
                                     <strong>No Improvement</strong>
                                     <span>Yellow or Red results - below benchmark</span>
@@ -3464,7 +3361,9 @@ function tier2StudentImproved() {
             <div class="flowchart-content">
                 <div class="success-message">
                     <div class="success-icon">
-                        <span class="material-icons">check_circle</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
                     <h2>Student Made Good Progress!</h2>
                     <p>The 8-week Tier 2 intervention was effective. The student is now meeting benchmarks.</p>
@@ -3507,7 +3406,9 @@ function tier2StudentDidNotImprove() {
             <div class="flowchart-content">
                 <div class="warning-message">
                     <div class="warning-icon">
-                        <span class="material-icons">warning</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
                     </div>
                     <h2>Second Intervention Cycle Needed</h2>
                     <p>The student did not make expected progress. Let's try a different intervention approach for another 8-week cycle.</p>
@@ -3740,7 +3641,10 @@ function proceedToTier3ProgressMonitoring() {
                         </div>
                         
                         <div class="info-callout">
-                            <span class="material-icons">info</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4m0-4h.01"/>
+                            </svg>
                             <div>
                                 <h4>Acceptable Screeners</h4>
                                 <ul class="indicator-list">
@@ -3756,7 +3660,9 @@ function proceedToTier3ProgressMonitoring() {
                         
                         <div class="decision-buttons">
                             <button class="decision-btn success" onclick="tier3StudentImproved()">
-                                <span class="material-icons">check</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 13l4 4L19 7"/>
+                                </svg>
                                 <div>
                                     <strong>Yes, Student Improved</strong>
                                     <span>Blue or Green results - showing progress</span>
@@ -3764,7 +3670,9 @@ function proceedToTier3ProgressMonitoring() {
                             </button>
                             
                             <button class="decision-btn warning" onclick="tier3StudentDidNotImprove()">
-                                <span class="material-icons">warning</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
                                 <div>
                                     <strong>No Improvement</strong>
                                     <span>Yellow or Red results - needs specialist support</span>
@@ -3797,7 +3705,9 @@ function tier3StudentImproved() {
             <div class="flowchart-content">
                 <div class="success-message">
                     <div class="success-icon">
-                        <span class="material-icons">check_circle</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
                     <h2>Student Showed Improvement!</h2>
                     <p>The intensive Tier 3 intervention was effective. The student is making progress.</p>
@@ -3846,7 +3756,9 @@ function tier3StudentDidNotImprove() {
             <div class="flowchart-content">
                 <div class="warning-message">
                     <div class="warning-icon">
-                        <span class="material-icons">warning</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
                     </div>
                     <h2>Clinician Consultation Required</h2>
                     <p>The student has not responded to intensive intervention. Specialized assessment and support is needed.</p>
@@ -3942,7 +3854,10 @@ function openInterventionsMenu(tier, mode = 'interventions') {
                 
                 <div class="flowchart-content">
                     <div class="info-callout">
-                        <span class="material-icons">info</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4m0-4h.01"/>
+                        </svg>
                         <div>
                             <h4>No ${mode === 'assessments' ? 'Assessments' : 'Interventions'} Available</h4>
                             <p>No ${mode === 'assessments' ? 'drill-down assessments' : 'intervention resources'} are currently available for Tier ${tier}.</p>

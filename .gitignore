@@ -16,7 +16,6 @@ build/
 *.swp
 *.swo
 *~
-*.backup
 
 # OS files
 .DS_Store
