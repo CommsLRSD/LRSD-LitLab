@@ -6648,13 +6648,13 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--border-dark);
 }
 
-/* Flowchart Step Cards - Glass Style */
+/* Flowchart Step Cards - Glass Style with pronounced color coding */
 .flowchart-step {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 3px solid rgba(255, 255, 255, 0.5);
     box-shadow: 
         0 4px 30px rgba(0, 0, 0, 0.05),
         0 1px 3px rgba(0, 0, 0, 0.03);
@@ -6675,6 +6675,32 @@ h1, h2, h3, h4, h5, h6 {
 .flowchart-step.step-completed {
     background: rgba(255, 255, 255, 0.5);
     border-color: var(--success);
+}
+
+/* Pronounced color coding - colored left border and tinted background */
+.flowchart-step-checklist {
+    border-left: 5px solid var(--step-checklist);
+    background: linear-gradient(to right, rgba(99, 102, 241, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
+}
+
+.flowchart-step-selection {
+    border-left: 5px solid var(--step-selection);
+    background: linear-gradient(to right, rgba(139, 92, 246, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
+}
+
+.flowchart-step-decision {
+    border-left: 5px solid var(--step-decision);
+    background: linear-gradient(to right, rgba(236, 72, 153, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
+}
+
+.flowchart-step-info {
+    border-left: 5px solid var(--step-info);
+    background: linear-gradient(to right, rgba(20, 184, 166, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
+}
+
+.flowchart-step-endpoint {
+    border-left: 5px solid var(--step-endpoint);
+    background: linear-gradient(to right, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
 }
 
 .flowchart-step.step-removing {
@@ -6772,36 +6798,34 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.875rem;
 }
 
-/* Checklist - Circular style */
+/* Checklist - List style with checkboxes */
 .checklist-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+    flex-direction: column;
+    gap: 0.75rem;
     margin-bottom: 1rem;
 }
 
 .checklist-item {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.8);
-    border: 2px solid var(--border-dark);
-    border-radius: 50%;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    position: relative;
 }
 
 .checklist-item:hover {
-    background: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.8);
     border-color: var(--primary);
-    transform: scale(1.1);
+    transform: translateX(2px);
 }
 
 .checklist-item.checked {
-    background: var(--success);
+    background: rgba(16, 185, 129, 0.08);
     border-color: var(--success);
 }
 
@@ -6809,63 +6833,43 @@ h1, h2, h3, h4, h5, h6 {
     display: none;
 }
 
-.checkbox-icon {
+.checkbox-check {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    background: white;
+    border: 2px solid var(--border-dark);
+    border-radius: 4px;
     transition: all 0.2s ease;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-secondary);
+    margin-top: 2px;
 }
 
-/* Show number using data attribute when unchecked */
-.checkbox-icon::before {
-    content: attr(data-number);
-    font-size: 0.75rem;
-    color: var(--text-secondary);
+/* Checkmark icon when checked */
+.checklist-item.checked .checkbox-check {
+    background: var(--success);
+    border-color: var(--success);
 }
 
-/* Hide the number and show checkmark when checked */
-.checklist-item.checked .checkbox-icon::before {
+.checklist-item.checked .checkbox-check::after {
     content: '✓';
     color: white;
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: 700;
 }
 
-/* Hide checkbox label text - use tooltip instead */
-.checkbox-label {
-    display: none;
+.checkbox-text {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    line-height: 1.5;
 }
 
-/* Tooltip for checklist items on hover */
-.checklist-item[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--bg-dark);
-    color: white;
-    padding: 0.5rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    z-index: 10;
-    max-width: 200px;
-    white-space: normal;
-    text-align: center;
-    margin-bottom: 4px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-/* Checklist hint text */
-.checklist-hint {
-    font-size: 0.8rem;
+.checklist-item.checked .checkbox-text {
     color: var(--text-secondary);
-    margin-bottom: 0.75rem;
+    text-decoration: line-through;
 }
 
 /* Continue Button */

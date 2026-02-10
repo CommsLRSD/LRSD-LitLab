@@ -1093,17 +1093,17 @@ function createIntegratedNodeElement(nodeData, container) {
 
 // Create integrated checklist node
 function createIntegratedChecklistNode(nodeData) {
-    // Sanitize text for use in HTML attributes
-    const sanitizeForAttr = (text) => {
+    // Sanitize text for use in HTML
+    const sanitizeForHtml = (text) => {
         const charMap = { '"': '&quot;', '<': '&lt;', '>': '&gt;', '&': '&amp;' };
         return String(text).split('').map(c => charMap[c] || c).join('');
     };
     
     const checklistItems = nodeData.items.map((item, index) => `
-        <label class="checklist-item" data-index="${index}" title="${sanitizeForAttr(item)}">
+        <label class="checklist-item" data-index="${index}">
             <input type="checkbox">
-            <span class="checkbox-icon" data-number="${index + 1}"></span>
-            <span class="checkbox-label">${sanitizeForAttr(item)}</span>
+            <span class="checkbox-check"></span>
+            <span class="checkbox-text">${sanitizeForHtml(item)}</span>
         </label>
     `).join('');
     
@@ -1119,7 +1119,6 @@ function createIntegratedChecklistNode(nodeData) {
         <div class="step-content">
             <h3>${nodeData.subtitle}</h3>
             <p>${nodeData.description}</p>
-            <p class="checklist-hint">Click circles to check off (hover for details):</p>
             <div class="checklist-container">
                 ${checklistItems}
             </div>
