@@ -1102,7 +1102,7 @@ function createIntegratedChecklistNode(nodeData) {
     const checklistItems = nodeData.items.map((item, index) => `
         <label class="checklist-item" data-index="${index}" title="${sanitizeForAttr(item)}">
             <input type="checkbox">
-            <span class="checkbox-icon">${index + 1}</span>
+            <span class="checkbox-icon" data-number="${index + 1}"></span>
             <span class="checkbox-label">${sanitizeForAttr(item)}</span>
         </label>
     `).join('');
@@ -1112,8 +1112,7 @@ function createIntegratedChecklistNode(nodeData) {
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
             </button>
         </div>
@@ -1196,8 +1195,7 @@ function createIntegratedSelectionNode(nodeData) {
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
             </button>
         </div>
@@ -1271,8 +1269,7 @@ function createIntegratedDecisionNode(nodeData) {
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
             </button>
         </div>
@@ -1313,8 +1310,7 @@ function createIntegratedInfoNode(nodeData) {
             <div class="step-badge">${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
+                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
             </button>
         </div>
@@ -1531,9 +1527,11 @@ function undoToStep(nodeId) {
     // If this is the current node, do nothing
     if (appState.visualFlowchart.currentNodeId === nodeId) return;
     
-    // Remove all nodes after this one from the DOM
+    // Remove all nodes and connectors after this one from the DOM
     const allNodes = document.querySelectorAll('.flowchart-step');
+    const allConnectors = document.querySelectorAll('.flowchart-step-connector');
     const nodesToRemove = [];
+    const connectorsToRemove = [];
     
     allNodes.forEach(node => {
         const dataNodeId = node.getAttribute('data-node-id');
@@ -1543,9 +1541,23 @@ function undoToStep(nodeId) {
         }
     });
     
+    // Remove connectors after the target node
+    // Each connector appears before a node, so we need to remove connectors >= the number of nodes to keep
+    const nodesToKeep = pathIndex + 1;
+    allConnectors.forEach((connector, index) => {
+        if (index >= nodesToKeep) {
+            connectorsToRemove.push(connector);
+        }
+    });
+    
     nodesToRemove.forEach(node => {
         node.classList.add('step-removing');
         setTimeout(() => node.remove(), 300);
+    });
+    
+    connectorsToRemove.forEach(connector => {
+        connector.classList.add('step-removing');
+        setTimeout(() => connector.remove(), 300);
     });
     
     // Update the path - remove steps after this one
