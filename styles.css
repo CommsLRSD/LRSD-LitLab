@@ -8151,3 +8151,280 @@ h1, h2, h3, h4, h5, h6 {
 .decision-box.step-active {
     animation: pulse-border 2s ease-in-out infinite;
 }
+
+/* Enhanced Responsive Design for Grid Flowchart */
+
+/* Desktop - maintain 4 column grid */
+@media (min-width: 1400px) {
+    .flowchart-grid {
+        max-width: 1600px;
+    }
+}
+
+/* Large tablets and small desktops - 3 columns */
+@media (max-width: 1199px) {
+    .flowchart-sidebar {
+        width: 250px;
+        font-size: 12px;
+    }
+    
+    .flowchart-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+    
+    .flowchart-title {
+        font-size: 20px;
+    }
+}
+
+/* Tablets - 2 columns */
+@media (max-width: 900px) {
+    .grid-flowchart-header {
+        padding: 0.5rem 1rem;
+    }
+    
+    .tier-btn {
+        padding: 0.4rem 1rem;
+        font-size: 13px;
+    }
+    
+    .flowchart-sidebar {
+        width: 200px;
+        padding: 1rem;
+        font-size: 11px;
+    }
+    
+    .flowchart-sidebar h3 {
+        font-size: 13px;
+    }
+    
+    .flowchart-content {
+        padding: 1.5rem;
+    }
+    
+    .flowchart-title {
+        font-size: 18px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .flowchart-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .flow-step {
+        padding: 1rem;
+    }
+    
+    .step-title {
+        font-size: 12px;
+    }
+    
+    .step-text {
+        font-size: 11px;
+    }
+    
+    .decision-box {
+        padding: 0.75rem;
+    }
+    
+    .decision-icon {
+        font-size: 30px;
+    }
+    
+    .decision-content {
+        font-size: 11px;
+    }
+}
+
+/* Mobile devices - single column, sidebar on top */
+@media (max-width: 768px) {
+    .grid-flowchart-main {
+        flex-direction: column;
+    }
+    
+    .grid-flowchart-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .grid-back-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 13px;
+    }
+    
+    .tier-selector {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .tier-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 12px;
+    }
+    
+    .header-logo {
+        width: 100%;
+        text-align: center;
+        order: 3;
+    }
+    
+    .flowchart-sidebar {
+        width: 100%;
+        max-height: 250px;
+        border-right: none;
+        border-bottom: 2px solid #ccc;
+        padding: 1rem;
+    }
+    
+    .flowchart-sidebar .sidebar-section {
+        margin-bottom: 1rem;
+    }
+    
+    .flowchart-content {
+        padding: 1rem;
+    }
+    
+    .flowchart-title {
+        font-size: 16px;
+        margin-bottom: 1rem;
+    }
+    
+    .flowchart-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .start-indicator {
+        justify-self: center;
+    }
+    
+    .flow-step {
+        padding: 1rem;
+    }
+    
+    .step-number {
+        font-size: 16px;
+    }
+    
+    .step-title {
+        font-size: 13px;
+        padding-top: 1.25rem;
+    }
+    
+    .step-text {
+        font-size: 12px;
+    }
+    
+    .decision-box {
+        padding: 0.75rem;
+    }
+    
+    .decision-icon {
+        font-size: 28px;
+    }
+}
+
+/* Extra small mobile - optimize for narrow screens */
+@media (max-width: 480px) {
+    .grid-flowchart-header {
+        padding: 0.5rem;
+    }
+    
+    .grid-back-btn {
+        font-size: 12px;
+        padding: 0.3rem 0.5rem;
+    }
+    
+    .grid-back-btn .material-icons {
+        font-size: 18px;
+    }
+    
+    .tier-btn {
+        font-size: 11px;
+        padding: 0.3rem 0.5rem;
+    }
+    
+    .flowchart-sidebar {
+        max-height: 200px;
+        font-size: 10px;
+    }
+    
+    .flowchart-sidebar h3 {
+        font-size: 12px;
+    }
+    
+    .flowchart-content {
+        padding: 0.75rem;
+    }
+    
+    .flowchart-title {
+        font-size: 14px;
+    }
+    
+    .flowchart-grid {
+        gap: 0.75rem;
+    }
+    
+    .flow-step {
+        padding: 0.75rem;
+    }
+    
+    .step-title {
+        font-size: 12px;
+    }
+    
+    .step-text {
+        font-size: 11px;
+    }
+    
+    .start-badge {
+        padding: 0.5rem 0.75rem;
+        font-size: 11px;
+    }
+    
+    .start-arrow {
+        font-size: 24px;
+    }
+    
+    .decision-content {
+        font-size: 10px;
+    }
+    
+    .decision-content p {
+        font-size: 9px;
+    }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 900px) and (orientation: landscape) {
+    .flowchart-sidebar {
+        max-height: 150px;
+    }
+    
+    .flowchart-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Print styles */
+@media print {
+    .grid-flowchart-header {
+        position: static;
+        border-bottom: 2px solid #000;
+    }
+    
+    .grid-back-btn,
+    .tier-selector {
+        display: none;
+    }
+    
+    .flowchart-sidebar {
+        page-break-inside: avoid;
+    }
+    
+    .flow-step {
+        page-break-inside: avoid;
+    }
+}

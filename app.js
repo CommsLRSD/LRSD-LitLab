@@ -909,23 +909,11 @@ function initIntegratedFlowchart(tierId) {
     const container = document.getElementById('flowchart-container');
     if (!container) return;
     
-    // Initialize progressive flowchart state
-    appState.visualFlowchart = {
-        tierId: tierId,
-        currentStep: 1,
-        completedSteps: [],
-        decisions: {},
-        path: []
-    };
-    
     container.classList.remove('flowchart-hidden');
     container.innerHTML = renderGridBasedFlowchart(tierId);
     
     // Initialize sidebar checkboxes
     initializeFlowchartSidebar();
-    
-    // Render initial state (only show first step as active)
-    updateFlowchartDisplay();
 }
 
 function renderGridBasedFlowchart(tierId) {
@@ -1180,7 +1168,7 @@ function renderStepsGrid(steps, decisions) {
 
 function renderDecisionBoxes(afterStep) {
     return `
-        <div class="decision-box decision-effective" onclick="makeFlowchartDecision(${afterStep}, true)">
+        <div class="decision-box decision-effective">
             <span class="material-icons decision-icon">check_circle</span>
             <div class="decision-content">
                 <strong>INSTRUCTION</strong><br>
@@ -1189,7 +1177,7 @@ function renderDecisionBoxes(afterStep) {
             </div>
         </div>
         
-        <div class="decision-box decision-ineffective" onclick="makeFlowchartDecision(${afterStep}, false)">
+        <div class="decision-box decision-ineffective">
             <span class="material-icons decision-icon">cancel</span>
             <div class="decision-content">
                 <strong>INSTRUCTION</strong><br>
@@ -1207,64 +1195,6 @@ function initializeFlowchartSidebar() {
             // Track checkbox state if needed
         });
     });
-}
-
-// Update flowchart display to show only relevant steps
-function updateFlowchartDisplay() {
-    const state = appState.visualFlowchart;
-    if (!state) return;
-    
-    // Get all step elements
-    const stepElements = document.querySelectorAll('.flow-step');
-    const decisionElements = document.querySelectorAll('.decision-box');
-    
-    stepElements.forEach((el, index) => {
-        const stepNum = index + 1;
-        
-        if (stepNum < state.currentStep) {
-            // Completed steps - show as completed
-            el.classList.add('step-completed');
-            el.classList.remove('step-active', 'step-hidden');
-        } else if (stepNum === state.currentStep) {
-            // Current active step
-            el.classList.add('step-active');
-            el.classList.remove('step-completed', 'step-hidden');
-        } else {
-            // Future steps - hide or gray out
-            el.classList.add('step-hidden');
-            el.classList.remove('step-active', 'step-completed');
-        }
-    });
-    
-    // Hide all decision boxes initially
-    decisionElements.forEach(el => {
-        el.classList.add('step-hidden');
-    });
-    
-    // Show decision boxes for current decision points
-    // This logic will be enhanced based on the flowchart state
-}
-
-// Handle step progression
-function proceedToNextStep() {
-    const state = appState.visualFlowchart;
-    if (!state) return;
-    
-    state.currentStep++;
-    state.completedSteps.push(state.currentStep - 1);
-    updateFlowchartDisplay();
-}
-
-// Handle decision making
-function makeFlowchartDecision(stepNum, isEffective) {
-    const state = appState.visualFlowchart;
-    if (!state) return;
-    
-    state.decisions[stepNum] = isEffective;
-    state.path.push({step: stepNum, decision: isEffective ? 'effective' : 'ineffective'});
-    
-    // Proceed to next step based on decision
-    proceedToNextStep();
 }
 
 // Show a node in the integrated flowchart
