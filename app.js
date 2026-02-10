@@ -1793,44 +1793,8 @@ function undoToStep(nodeId) {
 
 // Switch to a different tier
 function switchToTier(tierId) {
-    // Update tab states
-    document.querySelectorAll('.tier-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.tier === tierId);
-    });
-    
-    // Clear current flowchart content
-    const stepsContainer = document.getElementById('flowchart-steps');
-    if (stepsContainer) {
-        stepsContainer.innerHTML = '';
-    }
-    
-    // Reset state for new tier
-    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
-    if (!flowchartDef) return;
-    
-    appState.visualFlowchart = {
-        nodes: [],
-        connections: [],
-        currentNodeId: null,
-        selectedPath: [],
-        tierId: tierId,
-        choices: {}
-    };
-    
-    // Update title
-    const titleEl = document.querySelector('.flowchart-title-bar h2');
-    if (titleEl) {
-        titleEl.textContent = flowchartDef.title;
-    }
-    
-    // Reset step indicator
-    const stepText = document.querySelector('.step-text');
-    if (stepText) {
-        stepText.textContent = 'Step 1';
-    }
-    
-    // Show first node of new tier
-    showIntegratedNode(flowchartDef.startNode, null);
+    // Re-initialize the grid flowchart with the new tier
+    initIntegratedFlowchart(tierId);
 }
 
 // Show summary of all choices made
