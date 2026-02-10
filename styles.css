@@ -6825,6 +6825,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Show number using data attribute when unchecked */
 .checkbox-icon::before {
     content: attr(data-number);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
 }
 
 /* Hide the number and show checkmark when checked */
@@ -7506,13 +7508,13 @@ h1, h2, h3, h4, h5, h6 {
     border-left-color: var(--step-endpoint);
 }
 
-/* Connector arrow between summary items */
+/* Connector arrow between summary items - positioned to center in gap */
 .summary-item:not(:last-child)::after {
     content: '↓';
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: -1.25rem;
+    bottom: -0.875rem;  /* Adjusted to center in 1.5rem gap (1.5rem / 2 = 0.75rem, accounting for font size) */
     color: var(--text-secondary);
     font-size: 1.25rem;
     z-index: 1;

@@ -1541,8 +1541,11 @@ function undoToStep(nodeId) {
         }
     });
     
-    // Remove connectors after the target node
-    // Each connector appears before a node, so we need to remove connectors >= the number of nodes to keep
+    // Remove connectors after the target node.
+    // The DOM structure has connectors interleaved with nodes: [node, connector, node, connector, ...]
+    // So connector at index N appears before node at index N+1.
+    // We keep the first (pathIndex + 1) nodes, so we keep the first (pathIndex + 1) connectors.
+    // Any connector at index >= (pathIndex + 1) should be removed.
     const nodesToKeep = pathIndex + 1;
     allConnectors.forEach((connector, index) => {
         if (index >= nodesToKeep) {
@@ -1679,6 +1682,7 @@ function showFlowchartSummary() {
         Object.entries(choices).forEach(([nodeId, choice], index) => {
             const nodeDef = tierDef?.nodes?.[nodeId];
             const stepTitle = nodeDef?.title || nodeId;
+            // Default to 'selection' as it's the most common step type
             const stepType = nodeDef?.type || 'selection';
             
             summaryItems += `
