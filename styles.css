@@ -6511,9 +6511,8 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateX(-2px);
 }
 
-.flowchart-back-btn svg {
-    width: 18px;
-    height: 18px;
+.flowchart-back-btn .material-icons {
+    font-size: 18px;
 }
 
 /* Tier Tabs */
@@ -6595,9 +6594,8 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-primary);
 }
 
-.flowchart-action-btn svg {
-    width: 18px;
-    height: 18px;
+.flowchart-action-btn .material-icons {
+    font-size: 18px;
 }
 
 .flowchart-done-btn {
@@ -6670,6 +6668,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Flowchart Step Cards - Glass Style with pronounced color coding */
+
+.flowchart-step-connector .material-icons {
+    font-size: 40px;
+}
 .flowchart-step {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
@@ -6798,6 +6800,10 @@ h1, h2, h3, h4, h5, h6 {
 .undo-btn svg {
     width: 16px;
     height: 16px;
+}
+
+.undo-btn .material-icons {
+    font-size: 16px;
 }
 
 /* Step Content */
@@ -6931,6 +6937,10 @@ h1, h2, h3, h4, h5, h6 {
     50% { box-shadow: 0 0 0 8px rgba(44, 125, 160, 0); }
 }
 
+
+.continue-btn .material-icons {
+    font-size: 18px;
+}
 .continue-btn svg {
     width: 18px;
     height: 18px;
