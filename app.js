@@ -1093,9 +1093,15 @@ function createIntegratedNodeElement(nodeData, container) {
 
 // Create integrated checklist node
 function createIntegratedChecklistNode(nodeData) {
-    // Sanitize text for use in HTML
+    // Sanitize text for use in HTML - prevents XSS
     const sanitizeForHtml = (text) => {
-        const charMap = { '"': '&quot;', '<': '&lt;', '>': '&gt;', '&': '&amp;' };
+        const charMap = { 
+            '"': '&quot;', 
+            '<': '&lt;', 
+            '>': '&gt;', 
+            '&': '&amp;',
+            "'": '&#39;'
+        };
         return String(text).split('').map(c => charMap[c] || c).join('');
     };
     
