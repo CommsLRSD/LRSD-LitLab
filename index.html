@@ -3,32 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Literacy Interventions - Interactive Teaching Guide</title>
+    <title>LitLab — LRSD Literacy Resource</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Top Navigation -->
-    <nav class="top-nav">
+    <nav class="top-nav" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
             <div class="logo-section">
-                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+                    <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
                 </svg>
-                <h1 class="logo-text">Literacy Interventions</h1>
-            </div>
-            
-            <div class="nav-links">
-                <button class="nav-link active" data-page="home">Home</button>
-                <button class="nav-link" data-page="assessment-schedules">Assessment Schedules</button>
-                <button class="nav-link" data-page="interventions">Interventions</button>
-                <button class="nav-link" data-page="info">Info</button>
-                <button class="nav-link" data-page="resources">Resources</button>
+                <h1 class="logo-text">LitLab</h1>
             </div>
 
-            <button class="mobile-menu-btn" aria-label="Menu">
+            <div class="nav-links" role="tablist" aria-label="Main sections">
+                <button class="nav-link active" data-page="guide" role="tab" aria-selected="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="16" height="16">
+                        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+                    </svg>
+                    Guide
+                </button>
+                <button class="nav-link" data-page="tools" role="tab" aria-selected="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="16" height="16">
+                        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                    Tools
+                </button>
+                <button class="nav-link" data-page="resources" role="tab" aria-selected="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="16" height="16">
+                        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+                    </svg>
+                    Resources
+                </button>
+            </div>
+
+            <button class="mobile-menu-btn" aria-label="Open menu" aria-expanded="false">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -36,145 +52,299 @@
         </div>
     </nav>
 
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-        <nav class="sidebar-nav">
-            <button class="sidebar-item active" data-page="home">
-                <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                    <path d="M9 22V12h6v10"/>
-                </svg>
-                <span class="sidebar-label">Home</span>
-            </button>
-            <button class="sidebar-item" data-page="assessment-schedules">
-                <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <path d="M16 2v4M8 2v4M3 10h18"/>
-                </svg>
-                <span class="sidebar-label">Assessment Schedules</span>
-            </button>
-            <button class="sidebar-item" data-page="interventions">
-                <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
-                    <path d="M22 4L12 14.01l-3-3"/>
-                </svg>
-                <span class="sidebar-label">Interventions</span>
-            </button>
-            <button class="sidebar-item" data-page="info">
-                <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 16v-4M12 8h.01"/>
-                </svg>
-                <span class="sidebar-label">Info</span>
-            </button>
-            <button class="sidebar-item" data-page="resources">
-                <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
-                    <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
-                </svg>
-                <span class="sidebar-label">Resources</span>
-            </button>
-        </nav>
-    </aside>
-
     <!-- Mobile Navigation Overlay -->
-    <div class="mobile-nav-overlay">
+    <div class="mobile-nav-overlay" role="dialog" aria-label="Mobile navigation">
         <div class="mobile-nav-content">
-            <button class="mobile-nav-item active" data-page="home">
-                <span>Home</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6"/>
-                </svg>
+            <button class="mobile-nav-item active" data-page="guide">
+                <span>Guide</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
             </button>
-            <button class="mobile-nav-item" data-page="assessment-schedules">
-                <span>Assessment Schedules</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6"/>
-                </svg>
-            </button>
-            <button class="mobile-nav-item" data-page="interventions">
-                <span>Interventions</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6"/>
-                </svg>
-            </button>
-            <button class="mobile-nav-item" data-page="info">
-                <span>Info</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6"/>
-                </svg>
+            <button class="mobile-nav-item" data-page="tools">
+                <span>Tools</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
             </button>
             <button class="mobile-nav-item" data-page="resources">
                 <span>Resources</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6"/>
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
             </button>
         </div>
     </div>
 
     <!-- Main Content -->
     <main class="main-content">
-        
-        <!-- Home Section -->
-        <section id="home-section" class="content-section active">
-            <div class="home-hero">
+
+        <!-- ===================== TAB 1: GUIDE ===================== -->
+        <section id="guide-section" class="content-section active" data-page="guide">
+
+            <!-- Hero -->
+            <div class="home-hero fade-in">
                 <div class="hero-content">
                     <div class="hero-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" role="presentation">
-                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+                            <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
                         </svg>
                     </div>
-                    <h1 class="hero-title">Welcome to Literacy Interventions</h1>
-                    <p class="hero-subtitle">An interactive teaching guide by the Louis Riel School Division</p>
+                    <h1 class="hero-title">Welcome to LitLab</h1>
+                    <p class="hero-subtitle">An interactive literacy resource by the Louis Riel School Division</p>
                 </div>
             </div>
 
             <div class="home-content">
-                <div class="content-card">
-                    <h2 class="section-heading">Purpose of This Document</h2>
-                    <p>This document is designed to support teachers, clinicians, principals, and vice-principals in interpreting data while collaboratively and effectively planning for instruction and intervention.</p>
-                    <p>It includes a schedule detailing the universal screening and progress monitoring required at each grade level for both English and French Immersion programs. Additionally, it features interactive content to help interpret data and determine next steps.</p>
+
+                <!-- About This Resource -->
+                <div class="content-card fade-in" id="about-card">
+                    <div class="card-header-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="22" height="22">
+                            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+                        </svg>
+                        <h2 class="section-heading">About This Resource</h2>
+                    </div>
+
+                    <details open>
+                        <summary>Purpose of This Document</summary>
+                        <p>This document is designed to support teachers, clinicians, principals, and vice-principals in interpreting data while collaboratively and effectively planning for instruction and intervention.</p>
+                        <p>It includes a schedule detailing the universal screening and progress monitoring required at each grade level for both English and French Immersion programs. Additionally, it features interactive content to help interpret data and determine next steps.</p>
+                    </details>
+
+                    <details>
+                        <summary>Frequency of Screening and Progress Monitoring</summary>
+                        <p>In 2023, the Ontario Human Rights Commission's Two-Year Update Right to Read report recommended conducting at least two screenings per year in K-2. The Saskatchewan Human Rights Commission suggested two to three times annually. The University of Oregon (creators of DIBELS) recommends progress monitoring three times per year.</p>
+                        <p>Reviewing HRC reports, research studies, and consultations with researchers informed the Screening and Progress Monitoring Schedule adopted by LRSD and included in this document. The schedule applies to all students in LRSD in K-8 and will be reviewed annually to ensure alignment with best practices.</p>
+                    </details>
+
+                    <details>
+                        <summary>Access to Data and Its Importance</summary>
+                        <p>Specific reports have been developed for teachers to access student screening and progress monitoring data in Power BI. These reports are available in the Power BI teacher workspace. School leaders and student services teachers also have access to school- and system-level reports through their respective Power BI workspaces.</p>
+                        <p>Using this evidence-based data to inform instructional planning is essential, which is why the screening process is so important.</p>
+                    </details>
                 </div>
 
-                <div class="content-card">
-                    <h2 class="section-heading">Frequency of Screening and Progress Monitoring</h2>
-                    <p>In 2023, the Ontario Human Rights Commission's Two-Year Update Right to Read report recommended conducting at least two screenings per year in K-2. The Saskatchewan Human Rights Commission suggested two to three times annually. The University of Oregon (creators of DIBELS) recommends progress monitoring three times per year.</p>
-                    <p>Reviewing HRC reports, research studies, and consultations with researchers informed the Screening and Progress Monitoring Schedule adopted by LRSD and included in this document. The schedule applies to all students in LRSD in K-8 and will be reviewed annually to ensure alignment with best practices.</p>
-                </div>
-
-                <div class="content-card">
-                    <h2 class="section-heading">Access to Data and Its Importance</h2>
-                    <p>Specific reports have been developed for teachers to access student screening and progress monitoring data in Power BI. These reports are available in the Power BI teacher workspace. School leaders and student services teachers also have access to school- and system-level reports through their respective Power BI workspaces.</p>
-                    <p>Using this evidence-based data to inform instructional planning is essential, which is why the screening process is so important.</p>
-                </div>
-
-                <div class="content-card">
-                    <h2 class="section-heading">Planning for Intervention: RTI and MTSS</h2>
+                <!-- RTI / MTSS Framework -->
+                <div class="content-card fade-in" id="rti-card">
+                    <div class="card-header-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="22" height="22">
+                            <polygon points="12 2 2 22 22 22"/>
+                        </svg>
+                        <h2 class="section-heading">RTI / MTSS Framework</h2>
+                    </div>
                     <p>This document provides a step-by-step tool that allows teachers to input observations and data results, leading to recommendations for next steps. LRSD strongly advocates for Response to Intervention (RTI) and Multi-Tiered System of Supports (MTSS) principles to guide intervention planning.</p>
                     <p><strong>RTI</strong> is a proactive, data-driven framework following a three-tier model:</p>
-                    <ul>
-                        <li><strong>Tier 1:</strong> Research-supported teaching practices in regular classrooms</li>
-                        <li><strong>Tier 2:</strong> Targeted support for students needing additional assistance</li>
-                        <li><strong>Tier 3:</strong> Intensive, individualized interventions for students who continue to struggle</li>
-                    </ul>
+
+                    <div class="tier-pyramid" aria-label="RTI Three-Tier Pyramid">
+                        <div class="tier-level tier-3-level">
+                            <span class="tier-label">Tier 3</span>
+                            <span class="tier-desc">Intensive, individualized interventions for students who continue to struggle</span>
+                        </div>
+                        <div class="tier-level tier-2-level">
+                            <span class="tier-label">Tier 2</span>
+                            <span class="tier-desc">Targeted support for students needing additional assistance</span>
+                        </div>
+                        <div class="tier-level tier-1-level">
+                            <span class="tier-label">Tier 1</span>
+                            <span class="tier-desc">Research-supported teaching practices in regular classrooms</span>
+                        </div>
+                    </div>
+
                     <p><strong>MTSS</strong> builds on RTI by incorporating a tiered approach that addresses not only academic needs but also social, emotional, and behavioral development. All interventions should be evidence-based or aligned with effective classroom instruction methods.</p>
                 </div>
 
-                <div class="content-card">
-                    <h2 class="section-heading">A Living Document</h2>
-                    <p>This resource is a living document that will be updated periodically. Please continue using the provided link to ensure you are accessing the latest version. There is also a link provided to collect feedback. Please use the link to share your feedback to support the improvement of this document over time.</p>
+                <!-- Understanding Scores -->
+                <div class="content-card fade-in" id="scores-card">
+                    <div class="card-header-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="22" height="22">
+                            <path d="M3 3v18h18"/><path d="M18 17V9M14 17v-3M10 17v-5M6 17v-1"/>
+                        </svg>
+                        <h2 class="section-heading">Understanding Scores</h2>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-block">
+                            <h4>Assessment Scores</h4>
+                            <p>Assessment scores represent a student's performance on specific literacy tasks. Scores are compared to grade-level benchmarks to determine if a student is meeting expectations.</p>
+                            <ul class="score-list">
+                                <li><span class="color-badge blue">Blue</span> Strong performance, skill demonstrated</li>
+                                <li><span class="color-badge green">Green</span> Adequate performance, skill present</li>
+                                <li><span class="color-badge yellow">Yellow</span> Below benchmark, skill needs attention</li>
+                                <li><span class="color-badge red">Red</span> Well below benchmark, immediate intervention needed</li>
+                            </ul>
+                        </div>
+                        <div class="info-block">
+                            <h4>Percentiles</h4>
+                            <p>Percentiles indicate how a student's performance compares to other students nationally. A percentile rank of 75 means the student performed better than 75% of students at the same grade level.</p>
+                            <ul class="score-list">
+                                <li><strong>90th percentile or above:</strong> Exceeding expectations</li>
+                                <li><strong>40th-90th percentile:</strong> Meeting grade-level expectations</li>
+                                <li><strong>20th-39th percentile:</strong> Some risk, needs monitoring</li>
+                                <li><strong>Below 20th percentile:</strong> At risk, needs intervention</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info-grid" style="margin-top:1.5rem;">
+                        <div class="info-block">
+                            <h4>Decision Rules</h4>
+                            <p>When to move between tiers</p>
+                            <ul class="score-list">
+                                <li><strong>Move to Tier 2:</strong> Below benchmark for 2+ screenings</li>
+                                <li><strong>Move to Tier 3:</strong> Well below + minimal progress in Tier 2</li>
+                                <li><strong>Fade Support:</strong> At benchmark for 3+ progress checks</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="content-card">
-                    <h2 class="section-heading">Development and Acknowledgements</h2>
-                    <p>This document is the result of a collaborative effort to make the vast resources available on the Teaching and Learning Portal more practical and accessible for educators. It reflects best practices based on widely accepted research, extensive consultations, and numerous discussions with researchers, practitioners, and specialists in evidence-based literacy instruction and intervention.</p>
-                    <p>LRSD would like to acknowledge Rob George, Karla Gutierrez, Nicholas Kelly, Kristen McDowell, Geneviève Shyiak, Lisa Tymchuk, and Dr. Caroline Erdos for their contributions to this resource. Additionally, we must recognize Cody Sellar for his vision and creativity in bringing this project to life in its electronic and interactive format.</p>
+                <!-- FAQ Accordion -->
+                <div class="content-card fade-in" id="faq-card">
+                    <div class="card-header-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="22" height="22">
+                            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>
+                        </svg>
+                        <h2 class="section-heading">Frequently Asked Questions</h2>
+                    </div>
+
+                    <div class="faq-container">
+                        <div class="faq-category">
+                            <h4 class="faq-category-title">Assessments</h4>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>What is DIBELS?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>DIBELS (Dynamic Indicators of Basic Early Literacy Skills) is a set of procedures and measures for assessing the acquisition of literacy skills from kindergarten through sixth grade. It is designed to be short, efficient measures of early literacy development.</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>How long does DIBELS testing take?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>DIBELS assessments are designed to be brief. Individual subtests typically take 1-3 minutes each. A complete screening battery usually takes 10-15 minutes per student.</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>What is THaFoL?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>THaFoL (Test des Habiletés Fondamentales en Lecture) is a French literacy assessment tool designed for French Immersion and Francophone programs. It measures foundational reading skills in French.</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>What is CTOPP-2?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>CTOPP-2 (Comprehensive Test of Phonological Processing, Second Edition) assesses phonological awareness, phonological memory, and rapid naming. It is used to identify individuals who may have reading difficulties related to phonological processing.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-category">
+                            <h4 class="faq-category-title">Data & Portal Access</h4>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>How do I access literacy data in the LRSD Portal?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>Log in to the LRSD Portal with your credentials. Navigate to the Assessment section, select Literacy Assessments, and choose your student or class. Data is organized by assessment period (Fall, Winter, Spring) and subtest.</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>Who can I contact for help with assessment data?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>Contact your school's literacy coordinator or the district literacy support team. They can help you interpret data, troubleshoot portal access issues, and guide intervention planning.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-category">
+                            <h4 class="faq-category-title">Interventions</h4>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>What is RTI/MTSS?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>Response to Intervention (RTI) and Multi-Tiered System of Supports (MTSS) are frameworks for providing academic support to all students through increasingly intensive levels of instruction.</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>How long should interventions last?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>Interventions should be implemented with fidelity for at least 6-8 weeks before making decisions about effectiveness. Tier 2 typically involves 20-30 minutes daily, while Tier 3 requires 45-60 minutes daily.</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>What group sizes are recommended?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>Tier 1: Whole class instruction. Tier 2: Small groups of 3-6 students with similar needs. Tier 3: Groups of 1-3 students or individual instruction for intensive support.</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                    <span>Should interventions replace core instruction?</span>
+                                    <div class="faq-icon"><span class="plus"></span></div>
+                                </button>
+                                <div class="faq-answer" role="region">
+                                    <p>No. Interventions should be provided in addition to, not instead of, high-quality core instruction. All students need access to grade-level content and instruction.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="feedback-section">
+                <!-- Living Document & Acknowledgements (collapsed) -->
+                <div class="content-card fade-in" id="living-doc-card">
+                    <details>
+                        <summary>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="18" height="18" style="vertical-align:middle;margin-right:0.4rem;">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                            </svg>
+                            A Living Document
+                        </summary>
+                        <p>This resource is a living document that will be updated periodically. Please continue using the provided link to ensure you are accessing the latest version. There is also a link provided to collect feedback. Please use the link to share your feedback to support the improvement of this document over time.</p>
+                    </details>
+                    <details>
+                        <summary>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="18" height="18" style="vertical-align:middle;margin-right:0.4rem;">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                            </svg>
+                            Development and Acknowledgements
+                        </summary>
+                        <p>This document is the result of a collaborative effort to make the vast resources available on the Teaching and Learning Portal more practical and accessible for educators. It reflects best practices based on widely accepted research, extensive consultations, and numerous discussions with researchers, practitioners, and specialists in evidence-based literacy instruction and intervention.</p>
+                        <p>LRSD would like to acknowledge Rob George, Karla Gutierrez, Nicholas Kelly, Kristen McDowell, Geneviève Shyiak, Lisa Tymchuk, and Dr. Caroline Erdos for their contributions to this resource. Additionally, we must recognize Cody Sellar for his vision and creativity in bringing this project to life in its electronic and interactive format.</p>
+                    </details>
+                </div>
+
+                <!-- Feedback -->
+                <div class="feedback-section fade-in">
                     <a href="https://forms.gle/your-feedback-form" target="_blank" rel="noopener noreferrer" class="feedback-button">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" role="presentation">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
                         </svg>
                         Provide Feedback
@@ -182,75 +352,128 @@
                 </div>
             </div>
         </section>
-        
-        <!-- Interventions Section with Filterable Menu -->
-        <section id="interventions-section" class="content-section">
-            <!-- Interventions Options Screen -->
-            <div id="interventions-options-screen" class="interventions-options">
-                <div class="interventions-header-compact">
-                    <h2 class="section-title">Interventions & Assessments</h2>
-                    <p class="section-subtitle">Choose how you would like to access interventions and assessments</p>
-                </div>
-                
-                <div class="interventions-options-grid">
-                    <button class="intervention-option-card intervention-option-featured" onclick="openInteractiveFlowchart()" aria-label="Open Interactive Flowchart - Guided decision making through all intervention tiers">
-                        <div class="option-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
-                            </svg>
-                        </div>
-                        <div class="option-content">
-                            <h3>Interactive Flowchart</h3>
-                            <p>Guided decision making through intervention tiers</p>
-                        </div>
-                        <div class="card-arrow">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </div>
-                    </button>
 
-                    <button class="intervention-option-card" onclick="openInterventionsMenuView()" aria-label="Open Interventions Menu - Search and filter interventions and assessments by criteria">
-                        <div class="option-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
+        <!-- ===================== TAB 2: TOOLS ===================== -->
+        <section id="tools-section" class="content-section" data-page="tools">
+
+            <!-- Sub-tab bar -->
+            <div class="subtab-bar" role="tablist" aria-label="Tools navigation">
+                <button class="subtab-btn active" data-subtab="schedules" role="tab" aria-selected="true" aria-controls="subtab-schedules">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="16" height="16">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                    </svg>
+                    Assessment Schedules
+                </button>
+                <button class="subtab-btn" data-subtab="flowchart" role="tab" aria-selected="false" aria-controls="subtab-flowchart">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="16" height="16">
+                        <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+                    </svg>
+                    Intervention Flowchart
+                </button>
+                <button class="subtab-btn" data-subtab="find" role="tab" aria-selected="false" aria-controls="subtab-find">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="16" height="16">
+                        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    Find Interventions
+                </button>
+            </div>
+
+            <!-- Sub-tab: Assessment Schedules -->
+            <div id="subtab-schedules" class="subtab-panel active" role="tabpanel" data-subtab="schedules">
+                <div class="hero-area fade-in">
+                    <h2 class="section-title">Assessment Schedules</h2>
+                    <p class="section-subtitle">Literacy assessment timing and schedules for different programs and grade levels</p>
+
+                    <div class="schedule-toggle" role="tablist" aria-label="Schedule view options">
+                        <button class="toggle-segment active" role="tab" aria-selected="true" aria-controls="schedule-calendar-view" data-view="calendar" id="calendar-tab">Calendar</button>
+                        <button class="toggle-segment" role="tab" aria-selected="false" aria-controls="schedule-table-view" data-view="table" id="table-tab">Table</button>
+                    </div>
+                </div>
+
+                <div class="content-wrapper">
+                    <div id="schedule-calendar-view" class="schedule-view active" role="tabpanel" aria-labelledby="calendar-tab">
+                        <div id="calendar-container"></div>
+                        <div id="calendar-legend" class="calendar-legend"></div>
+                    </div>
+
+                    <div id="schedule-table-view" class="schedule-view" role="tabpanel" aria-labelledby="table-tab" hidden>
+                        <div id="table-container"></div>
+                    </div>
+
+                    <div class="best-practices fade-in">
+                        <h3>Assessment Best Practices</h3>
+                        <div class="practice-grid">
+                            <div class="practice-item">
+                                <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                                </svg>
+                                <span>Quiet testing environment</span>
+                            </div>
+                            <div class="practice-item">
+                                <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                                </svg>
+                                <span>Consistent timing</span>
+                            </div>
+                            <div class="practice-item">
+                                <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M3 3v18h18"/><path d="M18 17V9M14 17v-3M10 17v-5M6 17v-1"/>
+                                </svg>
+                                <span>Multiple data points</span>
+                            </div>
+                            <div class="practice-item">
+                                <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                                </svg>
+                                <span>Trained assessors</span>
+                            </div>
+                            <div class="practice-item">
+                                <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                                </svg>
+                                <span>Clear documentation</span>
+                            </div>
+                            <div class="practice-item">
+                                <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                                </svg>
+                                <span>Team collaboration</span>
+                            </div>
                         </div>
-                        <div class="option-content">
-                            <h3>Interventions Menu</h3>
-                            <p>Search and filter by criteria</p>
-                        </div>
-                        <div class="card-arrow">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </div>
-                    </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Interventions Menu View (hidden by default) -->
-            <div id="interventions-menu-full-view" class="interventions-detail-view" style="display: none;">
-                <div class="dropdown-wizard">
+            <!-- Sub-tab: Intervention Flowchart -->
+            <div id="subtab-flowchart" class="subtab-panel" role="tabpanel" data-subtab="flowchart" hidden>
+                <div class="hero-area fade-in">
+                    <h2 class="section-title">Intervention Flowchart</h2>
+                    <p class="section-subtitle">Guided decision making through intervention tiers</p>
+                </div>
+                <div id="flowchart-container" class="flowchart-view-hidden"></div>
+            </div>
+
+            <!-- Sub-tab: Find Interventions -->
+            <div id="subtab-find" class="subtab-panel" role="tabpanel" data-subtab="find" hidden>
+                <div class="hero-area fade-in">
+                    <h2 class="section-title">Find Interventions</h2>
+                    <p class="section-subtitle">Search and filter interventions and assessments by criteria</p>
+                </div>
+
+                <div class="dropdown-wizard fade-in">
                     <div class="dropdown-wizard-header">
-                        <button class="back-btn-minimal" onclick="returnToInterventionsOptions()" aria-label="Back">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                        </button>
-                        <span class="wizard-title">Find Interventions</span>
-                        <button class="reset-btn-minimal" onclick="restartMenu()" aria-label="Reset">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <span class="wizard-title">Filter Interventions</span>
+                        <button class="reset-btn-minimal" onclick="restartMenu()" aria-label="Reset filters">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
                                 <path d="M21 3v5h-5"/>
                             </svg>
+                            Reset
                         </button>
                     </div>
-                    
-                    <!-- Inline Dropdowns Row -->
+
                     <div class="dropdown-row">
-                        <!-- Language filter hidden per requirements -->
-                        <div class="dropdown-group dropdown-group-small" style="display: none;">
+                        <div class="dropdown-group dropdown-group-small" style="display:none;">
                             <label for="language-filter">Program</label>
                             <select id="language-filter" class="styled-select" onchange="onLanguageFilterChange(this.value)">
                                 <option value="">All</option>
@@ -258,7 +481,7 @@
                                 <option value="French">French Immersion</option>
                             </select>
                         </div>
-                        
+
                         <div class="dropdown-group">
                             <label for="screener-select">Screener</label>
                             <select id="screener-select" class="styled-select" onchange="onScreenerDropdownChange(this.value)">
@@ -273,21 +496,21 @@
                                 </optgroup>
                             </select>
                         </div>
-                        
+
                         <div class="dropdown-group">
                             <label for="subtest-select">Subtest</label>
                             <select id="subtest-select" class="styled-select" disabled onchange="onSubtestDropdownChange(this.value)">
                                 <option value="">Select...</option>
                             </select>
                         </div>
-                        
+
                         <div class="dropdown-group">
                             <label for="pillar-select">Pillar</label>
                             <select id="pillar-select" class="styled-select" disabled onchange="onPillarDropdownChange(this.value)">
                                 <option value="">Select...</option>
                             </select>
                         </div>
-                        
+
                         <div class="dropdown-group">
                             <label for="type-select">Type</label>
                             <select id="type-select" class="styled-select" disabled onchange="onTypeDropdownChange(this.value)">
@@ -297,9 +520,8 @@
                             </select>
                         </div>
                     </div>
-                    
-                    <!-- Compact Results Section -->
-                    <div id="dropdown-results" class="dropdown-results" style="display: none;">
+
+                    <div id="dropdown-results" class="dropdown-results" style="display:none;">
                         <div class="results-header-compact">
                             <span id="results-count-compact">0 results</span>
                         </div>
@@ -307,366 +529,27 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Flowchart View Container -->
-            <div id="flowchart-container" class="flowchart-view-hidden"></div>
+
+            <!-- Hidden elements for app.js backward compatibility -->
+            <div id="interventions-options-screen" class="interventions-options" style="display:none;" aria-hidden="true"></div>
+            <div id="interventions-menu-full-view" class="interventions-detail-view" style="display:none;" aria-hidden="true"></div>
+
         </section>
 
-        <!-- Assessment Schedules Section -->
-        <section id="assessment-schedules-section" class="content-section">
-            <div class="hero-area">
-                <h2 class="section-title">Assessment Schedules</h2>
-                <p class="section-subtitle">Literacy assessment timing and schedules for different programs and grade levels</p>
-                
-                <!-- View Toggle -->
-                <div class="schedule-toggle" role="tablist" aria-label="Schedule view options">
-                    <button 
-                        class="toggle-segment active" 
-                        role="tab" 
-                        aria-selected="true" 
-                        aria-controls="schedule-calendar-view"
-                        data-view="calendar"
-                        id="calendar-tab">
-                        Calendar
-                    </button>
-                    <button 
-                        class="toggle-segment" 
-                        role="tab" 
-                        aria-selected="false" 
-                        aria-controls="schedule-table-view"
-                        data-view="table"
-                        id="table-tab">
-                        Table
-                    </button>
-                </div>
-            </div>
-
-            <div class="content-wrapper">
-                <!-- Calendar View -->
-                <div id="schedule-calendar-view" class="schedule-view active" role="tabpanel" aria-labelledby="calendar-tab">
-                    <div id="calendar-container"></div>
-                    <div id="calendar-legend" class="calendar-legend"></div>
-                </div>
-
-                <!-- Table View -->
-                <div id="schedule-table-view" class="schedule-view" role="tabpanel" aria-labelledby="table-tab" hidden>
-                    <div id="table-container"></div>
-                </div>
-
-                <div class="best-practices">
-                    <h3>Assessment Best Practices</h3>
-                    <div class="practice-grid">
-                        <div class="practice-item">
-                            <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <circle cx="12" cy="12" r="6"/>
-                                <circle cx="12" cy="12" r="2"/>
-                            </svg>
-                            <span>Quiet testing environment</span>
-                        </div>
-                        <div class="practice-item">
-                            <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 6v6l4 2"/>
-                            </svg>
-                            <span>Consistent timing</span>
-                        </div>
-                        <div class="practice-item">
-                            <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 3v18h18"/>
-                                <path d="M18 17V9M14 17v-3M10 17v-5M6 17v-1"/>
-                            </svg>
-                            <span>Multiple data points</span>
-                        </div>
-                        <div class="practice-item">
-                            <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                                <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-                            </svg>
-                            <span>Trained assessors</span>
-                        </div>
-                        <div class="practice-item">
-                            <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
-                            </svg>
-                            <span>Clear documentation</span>
-                        </div>
-                        <div class="practice-item">
-                            <svg class="practice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                            </svg>
-                            <span>Team collaboration</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Info Section -->
-        <section id="info-section" class="content-section">
-            <div class="hero-area">
-                <h2 class="section-title">Information & Support</h2>
-                <p class="section-subtitle">Educational information about assessment and literacy concepts</p>
-            </div>
-
-            <div class="content-wrapper">
-                <!-- Understanding Scores/Percentiles -->
-                <div class="info-subsection">
-                    <div class="subsection-header">
-                        <h3>Understanding Scores & Percentiles</h3>
-                    </div>
-                    
-                    <div class="info-grid">
-                        <div class="info-block">
-                            <h4>Assessment Scores</h4>
-                            <p>Assessment scores represent a student's performance on specific literacy tasks. Scores are compared to grade-level benchmarks to determine if a student is meeting expectations.</p>
-                            <ul class="score-list">
-                                <li><span class="color-badge blue">Blue</span> Strong performance, skill demonstrated</li>
-                                <li><span class="color-badge green">Green</span> Adequate performance, skill present</li>
-                                <li><span class="color-badge yellow">Yellow</span> Below benchmark, skill needs attention</li>
-                                <li><span class="color-badge red">Red</span> Well below benchmark, immediate intervention needed</li>
-                            </ul>
-                        </div>
-
-                        <div class="info-block">
-                            <h4>Percentiles</h4>
-                            <p>Percentiles indicate how a student's performance compares to other students nationally. A percentile rank of 75 means the student performed better than 75% of students at the same grade level.</p>
-                            <ul class="score-list">
-                                <li><strong>90th percentile or above:</strong> Exceeding expectations</li>
-                                <li><strong>40th-90th percentile:</strong> Meeting grade-level expectations</li>
-                                <li><strong>20th-39th percentile:</strong> Some risk, needs monitoring</li>
-                                <li><strong>Below 20th percentile:</strong> At risk, needs intervention</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- FAQs -->
-                <div class="info-subsection">
-                    <div class="subsection-header">
-                        <h3>Frequently Asked Questions</h3>
-                    </div>
-
-                    <div class="faq-container">
-                        <!-- DIBELS FAQs -->
-                        <div class="faq-category">
-                            <h4 class="faq-category-title">DIBELS Assessments</h4>
-                            
-                            <div class="faq-item">
-                                <button class="faq-question" onclick="toggleFAQ(this)">
-                                    <span>What is DIBELS?</span>
-                                    <div class="faq-icon">
-                                        <span class="plus"></span>
-                                    </div>
-                                </button>
-                                <div class="faq-answer">
-                                    <p>DIBELS (Dynamic Indicators of Basic Early Literacy Skills) is a set of procedures and measures for assessing the acquisition of literacy skills from kindergarten through sixth grade. It is designed to be short, efficient measures of early literacy development.</p>
-                                </div>
-                            </div>
-
-                            <div class="faq-item">
-                                <button class="faq-question" onclick="toggleFAQ(this)">
-                                    <span>How long does DIBELS testing take?</span>
-                                    <div class="faq-icon">
-                                        <span class="plus"></span>
-                                    </div>
-                                </button>
-                                <div class="faq-answer">
-                                    <p>DIBELS assessments are designed to be brief. Individual subtests typically take 1-3 minutes each. A complete screening battery usually takes 10-15 minutes per student.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- THaFoL FAQs -->
-                        <div class="faq-category">
-                            <h4 class="faq-category-title">THaFoL Assessments</h4>
-                            
-                            <div class="faq-item">
-                                <button class="faq-question" onclick="toggleFAQ(this)">
-                                    <span>What is THaFoL?</span>
-                                    <div class="faq-icon">
-                                        <span class="plus"></span>
-                                    </div>
-                                </button>
-                                <div class="faq-answer">
-                                    <p>THaFoL (Test des Habiletés Fondamentales en Lecture) is a French literacy assessment tool designed for French Immersion and Francophone programs. It measures foundational reading skills in French.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- CTOPP-2 FAQs -->
-                        <div class="faq-category">
-                            <h4 class="faq-category-title">CTOPP-2 Assessments</h4>
-                            
-                            <div class="faq-item">
-                                <button class="faq-question" onclick="toggleFAQ(this)">
-                                    <span>What is CTOPP-2?</span>
-                                    <div class="faq-icon">
-                                        <span class="plus"></span>
-                                    </div>
-                                </button>
-                                <div class="faq-answer">
-                                    <p>CTOPP-2 (Comprehensive Test of Phonological Processing, Second Edition) assesses phonological awareness, phonological memory, and rapid naming. It is used to identify individuals who may have reading difficulties related to phonological processing.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- LRSD Portal FAQs -->
-                        <div class="faq-category">
-                            <h4 class="faq-category-title">LRSD Portal & Data Access</h4>
-                            
-                            <div class="faq-item">
-                                <button class="faq-question" onclick="toggleFAQ(this)">
-                                    <span>How do I access literacy data in the LRSD Portal?</span>
-                                    <div class="faq-icon">
-                                        <span class="plus"></span>
-                                    </div>
-                                </button>
-                                <div class="faq-answer">
-                                    <p>Log in to the LRSD Portal with your credentials. Navigate to the Assessment section, select Literacy Assessments, and choose your student or class. Data is organized by assessment period (Fall, Winter, Spring) and subtest.</p>
-                                </div>
-                            </div>
-
-                            <div class="faq-item">
-                                <button class="faq-question" onclick="toggleFAQ(this)">
-                                    <span>Who can I contact for help with assessment data?</span>
-                                    <div class="faq-icon">
-                                        <span class="plus"></span>
-                                    </div>
-                                </button>
-                                <div class="faq-answer">
-                                    <p>Contact your school's literacy coordinator or the district literacy support team. They can help you interpret data, troubleshoot portal access issues, and guide intervention planning.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Understanding Scores Section (for backward compatibility) -->
-        <section id="understanding-scores-section" class="content-section">
-            <div class="hero-area">
-                <h2 class="section-title">Understanding Assessment Scores</h2>
-                <p class="section-subtitle">Interpreting results and determining next steps</p>
-            </div>
-
-            <div class="content-wrapper">
-                <div class="info-grid">
-                    <div class="info-block">
-                        <h3>Score Categories</h3>
-                        <p>Understanding benchmark levels</p>
-                        <ul style="list-style: none; padding: 0;">
-                            <li style="padding: 0.5rem 0; color: #3b82f6;">
-                                <strong>Blue (Strong):</strong> Skill demonstrated, exceeding expectations
-                            </li>
-                            <li style="padding: 0.5rem 0; color: #10b981;">
-                                <strong>Green (Adequate):</strong> Meeting grade-level expectations
-                            </li>
-                            <li style="padding: 0.5rem 0; color: #f59e0b;">
-                                <strong>Yellow (Below):</strong> Some risk, needs monitoring
-                            </li>
-                            <li style="padding: 0.5rem 0; color: #ef4444;">
-                                <strong>Red (Well Below):</strong> High risk, needs intervention
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="info-block">
-                        <h3>Decision Rules</h3>
-                        <p>When to move between tiers</p>
-                        <ul style="list-style: none; padding: 0;">
-                            <li style="padding: 0.5rem 0;">
-                                <strong>Move to Tier 2:</strong> Below benchmark for 2+ screenings
-                            </li>
-                            <li style="padding: 0.5rem 0;">
-                                <strong>Move to Tier 3:</strong> Well below + minimal progress in Tier 2
-                            </li>
-                            <li style="padding: 0.5rem 0;">
-                                <strong>Fade Support:</strong> At benchmark for 3+ progress checks
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- FAQs Section -->
-        <section id="faqs-section" class="content-section">
-            <div class="hero-area">
-                <h2 class="section-title">Frequently Asked Questions</h2>
-                <p class="section-subtitle">Common questions about literacy interventions</p>
-            </div>
-
-            <div class="content-wrapper">
-                <div class="faq-container">
-                    <div class="faq-item">
-                        <button class="faq-question" onclick="toggleFAQ(this)">
-                            <span>What is RTI/MTSS?</span>
-                            <div class="faq-icon">
-                                <span class="plus"></span>
-                            </div>
-                        </button>
-                        <div class="faq-answer">
-                            <p>Response to Intervention (RTI) and Multi-Tiered System of Supports (MTSS) are frameworks for providing academic support to all students through increasingly intensive levels of instruction.</p>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <button class="faq-question" onclick="toggleFAQ(this)">
-                            <span>How long should interventions last?</span>
-                            <div class="faq-icon">
-                                <span class="plus"></span>
-                            </div>
-                        </button>
-                        <div class="faq-answer">
-                            <p>Interventions should be implemented with fidelity for at least 6-8 weeks before making decisions about effectiveness. Tier 2 typically involves 20-30 minutes daily, while Tier 3 requires 45-60 minutes daily.</p>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <button class="faq-question" onclick="toggleFAQ(this)">
-                            <span>What group sizes are recommended?</span>
-                            <div class="faq-icon">
-                                <span class="plus"></span>
-                            </div>
-                        </button>
-                        <div class="faq-answer">
-                            <p>Tier 1: Whole class instruction. Tier 2: Small groups of 3-6 students with similar needs. Tier 3: Groups of 1-3 students or individual instruction for intensive support.</p>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <button class="faq-question" onclick="toggleFAQ(this)">
-                            <span>Should interventions replace core instruction?</span>
-                            <div class="faq-icon">
-                                <span class="plus"></span>
-                            </div>
-                        </button>
-                        <div class="faq-answer">
-                            <p>No. Interventions should be provided in addition to, not instead of, high-quality core instruction. All students need access to grade-level content and instruction.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Resources Section -->
-        <section id="resources-section" class="content-section">
-            <div class="hero-area">
+        <!-- ===================== TAB 3: RESOURCES ===================== -->
+        <section id="resources-section" class="content-section" data-page="resources">
+            <div class="hero-area fade-in">
                 <h2 class="section-title">Resources</h2>
-                <p class="section-subtitle">Tools and materials for literacy intervention</p>
+                <p class="section-subtitle">Tools, programs, and materials for literacy intervention</p>
             </div>
 
             <div class="content-wrapper">
-                <div class="resource-grid">
+                <div class="resource-grid fade-in">
+
                     <div class="resource-category">
                         <div class="category-header">
-                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 3v18h18"/>
-                                <path d="M18 17V9M14 17v-3M10 17v-5M6 17v-1"/>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M3 3v18h18"/><path d="M18 17V9M14 17v-3M10 17v-5M6 17v-1"/>
                             </svg>
                             <h3>Assessment Tools</h3>
                         </div>
@@ -680,9 +563,8 @@
 
                     <div class="resource-category">
                         <div class="category-header">
-                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
                             </svg>
                             <h3>Intervention Programs</h3>
                         </div>
@@ -696,9 +578,8 @@
 
                     <div class="resource-category">
                         <div class="category-header">
-                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
                             </svg>
                             <h3>Professional Development</h3>
                         </div>
@@ -712,9 +593,8 @@
 
                     <div class="resource-category">
                         <div class="category-header">
-                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                                <path d="M8 21h8M12 17v4"/>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 21h8M12 17v4"/>
                             </svg>
                             <h3>Digital Tools</h3>
                         </div>
@@ -728,11 +608,10 @@
 
                     <div class="resource-category">
                         <div class="category-header">
-                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"/>
-                                <path d="M21 21l-4.35-4.35"/>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                             </svg>
-                            <h3>Research & Evidence</h3>
+                            <h3>Research &amp; Evidence</h3>
                         </div>
                         <ul class="resource-list">
                             <li><a href="https://ies.ed.gov/ncee/wwc/" target="_blank" rel="noopener noreferrer">What Works Clearinghouse</a></li>
@@ -744,9 +623,8 @@
 
                     <div class="resource-category">
                         <div class="category-header">
-                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                                <path d="M9 22V12h6v10"/>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/>
                             </svg>
                             <h3>Family Resources</h3>
                         </div>
@@ -757,18 +635,82 @@
                             <li><a href="https://www.storylineonline.net/" target="_blank" rel="noopener noreferrer">Storyline Online</a></li>
                         </ul>
                     </div>
+
                 </div>
             </div>
         </section>
+
     </main>
 
     <!-- Footer -->
     <footer class="site-footer">
-        <p>© 2025 Literacy Interventions · Supporting educators in literacy intervention</p>
+        <p>&copy; 2025 LitLab &middot; Louis Riel School Division &middot; Supporting educators in literacy intervention</p>
     </footer>
 
-    <!-- Flowchart Review Modal -->
-
     <script src="app.js"></script>
+
+    <!-- Sub-tab navigation & fade-in animations -->
+    <script>
+    (function() {
+        // Sub-tab switching within Tools
+        document.querySelectorAll('.subtab-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var target = btn.getAttribute('data-subtab');
+
+                // Update button states
+                document.querySelectorAll('.subtab-btn').forEach(function(b) {
+                    var isActive = b.getAttribute('data-subtab') === target;
+                    b.classList.toggle('active', isActive);
+                    b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+
+                // Show/hide panels
+                document.querySelectorAll('.subtab-panel').forEach(function(panel) {
+                    var isTarget = panel.getAttribute('data-subtab') === target;
+                    panel.classList.toggle('active', isTarget);
+                    panel.hidden = !isTarget;
+                });
+
+                // Initialize flowchart on first view
+                if (target === 'flowchart' && typeof openInteractiveFlowchart === 'function') {
+                    var fc = document.getElementById('flowchart-container');
+                    if (fc && !fc.hasChildNodes()) {
+                        openInteractiveFlowchart();
+                    }
+                }
+
+                // Initialize menu on first view
+                if (target === 'find' && typeof initializeInterventionMenu === 'function') {
+                    var sr = document.getElementById('screener-select');
+                    if (sr && sr.options.length <= 1) {
+                        initializeInterventionMenu();
+                    }
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.08 });
+
+            document.querySelectorAll('.fade-in').forEach(function(el) {
+                observer.observe(el);
+            });
+        } else {
+            document.querySelectorAll('.fade-in').forEach(function(el) {
+                el.classList.add('visible');
+            });
+        }
+    })();
+    </script>
 </body>
 </html>
