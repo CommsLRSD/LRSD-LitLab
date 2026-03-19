@@ -1986,7 +1986,7 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     path.setAttribute('d', d);
     path.setAttribute('class', `vf-connection-path ${choiceId ? `choice-${choiceId}` : ''}`);
     path.setAttribute('fill', 'none');
-    path.setAttribute('stroke-width', '3');
+    path.setAttribute('stroke-width', '2');
     
     // Set up animation
     const pathLength = path.getTotalLength ? path.getTotalLength() : VF_CONSTANTS.PATH_LENGTH_FALLBACK;
@@ -2003,7 +2003,7 @@ function drawConnectionLine(fromNodeId, toNodeId, choiceId, onComplete) {
     
     // Add a moving dot animation
     const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    dot.setAttribute('r', '6');
+    dot.setAttribute('r', '4');
     dot.setAttribute('class', 'vf-connection-dot');
     connectionsContainer.appendChild(dot);
     
