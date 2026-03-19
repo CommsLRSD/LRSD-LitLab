@@ -4453,6 +4453,41 @@ function returnToInterventionsOptions() {
     console.log('returnToInterventionsOptions called (no-op in new design)');
 }
 
+// Activate a sub-tab by name (shared helper)
+function activateSubTab(target) {
+    document.querySelectorAll('.subtab-btn').forEach(function(btn) {
+        var isActive = btn.getAttribute('data-subtab') === target;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    document.querySelectorAll('.subtab-panel').forEach(function(panel) {
+        var isTarget = panel.getAttribute('data-subtab') === target;
+        panel.classList.toggle('active', isTarget);
+        panel.hidden = !isTarget;
+    });
+}
+
+// Navigate to Tools → Intervention Flowchart sub-tab from the Guide page
+function navigateToFlowchart() {
+    navigateToPage('tools');
+    activateSubTab('flowchart');
+    var fc = document.getElementById('flowchart-container');
+    if (fc && !fc.dataset.initialized) {
+        fc.dataset.initialized = 'true';
+        openInteractiveFlowchart();
+    }
+}
+
+// Navigate to Tools → Find Interventions sub-tab from the Guide page
+function navigateToFindInterventions() {
+    navigateToPage('tools');
+    activateSubTab('find');
+    var sr = document.getElementById('screener-select');
+    if (sr && sr.options.length <= 1 && typeof initializeInterventionMenu === 'function') {
+        initializeInterventionMenu();
+    }
+}
+
 // ============================================
 // NEW STEP-BASED INTERVENTION MENU
 // ============================================
@@ -5325,6 +5360,9 @@ window.restartTier2Visual = restartTier2Visual;
 window.showInterventionView = showInterventionView;
 window.openTierFlowchart = openTierFlowchart;
 window.returnToInterventionsOptions = returnToInterventionsOptions;
+window.activateSubTab = activateSubTab;
+window.navigateToFlowchart = navigateToFlowchart;
+window.navigateToFindInterventions = navigateToFindInterventions;
 
 // Integrated flowchart exports
 window.openInteractiveFlowchart = openInteractiveFlowchart;

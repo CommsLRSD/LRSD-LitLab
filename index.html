@@ -92,6 +92,48 @@
 
             <div class="home-content">
 
+                <!-- Quick Access CTA Cards -->
+                <div class="guide-cta-section fade-in">
+                    <div class="cta-grid">
+
+                        <!-- Featured: Interactive Flowchart -->
+                        <div class="cta-card cta-card-featured">
+                            <span class="cta-badge">Featured</span>
+                            <div class="cta-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" width="28" height="28">
+                                    <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+                                </svg>
+                            </div>
+                            <h3 class="cta-title">Interactive Flowchart</h3>
+                            <p class="cta-desc">Step-by-step guided decision support for intervention planning based on student assessment data.</p>
+                            <button class="cta-btn cta-btn-featured" onclick="navigateToFlowchart()">
+                                Start Flowchart
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="16" height="16">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Secondary: Find Interventions -->
+                        <div class="cta-card">
+                            <div class="cta-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" width="28" height="28">
+                                    <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                                </svg>
+                            </div>
+                            <h3 class="cta-title">Find Interventions</h3>
+                            <p class="cta-desc">Search and filter interventions and assessments by screener, subtest, pillar, and type.</p>
+                            <button class="cta-btn" onclick="navigateToFindInterventions()">
+                                Browse Interventions
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="16" height="16">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
                 <!-- About This Resource -->
                 <div class="content-card fade-in" id="about-card">
                     <div class="card-header-row">
@@ -101,7 +143,7 @@
                         <h2 class="section-heading">About This Resource</h2>
                     </div>
 
-                    <details open>
+                    <details>
                         <summary>Purpose of This Document</summary>
                         <p>This document is designed to support teachers, clinicians, principals, and vice-principals in interpreting data while collaboratively and effectively planning for instruction and intervention.</p>
                         <p>It includes a schedule detailing the universal screening and progress monitoring required at each grade level for both English and French Immersion programs. Additionally, it features interactive content to help interpret data and determine next steps.</p>
@@ -128,7 +170,6 @@
                         </svg>
                         <h2 class="section-heading">RTI / MTSS Framework</h2>
                     </div>
-                    <p>This document provides a step-by-step tool that allows teachers to input observations and data results, leading to recommendations for next steps. LRSD strongly advocates for Response to Intervention (RTI) and Multi-Tiered System of Supports (MTSS) principles to guide intervention planning.</p>
                     <p><strong>RTI</strong> is a proactive, data-driven framework following a three-tier model:</p>
 
                     <div class="tier-pyramid" aria-label="RTI Three-Tier Pyramid">
@@ -146,17 +187,23 @@
                         </div>
                     </div>
 
-                    <p><strong>MTSS</strong> builds on RTI by incorporating a tiered approach that addresses not only academic needs but also social, emotional, and behavioral development. All interventions should be evidence-based or aligned with effective classroom instruction methods.</p>
+                    <details>
+                        <summary>About MTSS</summary>
+                        <p><strong>MTSS</strong> builds on RTI by incorporating a tiered approach that addresses not only academic needs but also social, emotional, and behavioral development. All interventions should be evidence-based or aligned with effective classroom instruction methods.</p>
+                    </details>
                 </div>
 
                 <!-- Understanding Scores -->
                 <div class="content-card fade-in" id="scores-card">
-                    <div class="card-header-row">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="22" height="22">
-                            <path d="M3 3v18h18"/><path d="M18 17V9M14 17v-3M10 17v-5M6 17v-1"/>
-                        </svg>
-                        <h2 class="section-heading">Understanding Scores</h2>
-                    </div>
+                    <details>
+                        <summary>
+                            <span class="details-card-header">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="20" height="20">
+                                    <path d="M3 3v18h18"/><path d="M18 17V9M14 17v-3M10 17v-5M6 17v-1"/>
+                                </svg>
+                                Understanding Scores
+                            </span>
+                        </summary>
 
                     <div class="info-grid">
                         <div class="info-block">
@@ -192,16 +239,20 @@
                             </ul>
                         </div>
                     </div>
+                    </details>
                 </div>
 
                 <!-- FAQ Accordion -->
                 <div class="content-card fade-in" id="faq-card">
-                    <div class="card-header-row">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="22" height="22">
-                            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>
-                        </svg>
-                        <h2 class="section-heading">Frequently Asked Questions</h2>
-                    </div>
+                    <details>
+                        <summary>
+                            <span class="details-card-header">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" width="20" height="20">
+                                    <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>
+                                </svg>
+                                Frequently Asked Questions
+                            </span>
+                        </summary>
 
                     <div class="faq-container">
                         <div class="faq-category">
@@ -249,7 +300,7 @@
                         </div>
 
                         <div class="faq-category">
-                            <h4 class="faq-category-title">Data & Portal Access</h4>
+                            <h4 class="faq-category-title">Data &amp; Portal Access</h4>
 
                             <div class="faq-item">
                                 <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
@@ -316,6 +367,7 @@
                             </div>
                         </div>
                     </div>
+                    </details>
                 </div>
 
                 <!-- Living Document & Acknowledgements (collapsed) -->
