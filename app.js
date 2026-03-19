@@ -140,7 +140,9 @@ function navigateToPage(pageName) {
     
     // Update active states in desktop nav
     document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.toggle('active', link.dataset.page === pageName);
+        const isActive = link.dataset.page === pageName;
+        link.classList.toggle('active', isActive);
+        link.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
     
     // Update active states in mobile nav
