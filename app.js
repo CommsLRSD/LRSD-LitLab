@@ -5,7 +5,7 @@
 // State Management
 // ============================================
 const appState = {
-    currentPage: 'home',
+    currentPage: 'guide',
     mobileMenuOpen: false,
     flowchartData: null,
     tierFlowchartData: null,
@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup mobile menu
     setupMobileMenu();
     
-    // Setup home menu cards
-    setupHomeMenuCards();
+    // Setup sub-tab navigation
+    setupSubTabs();
     
     // Initialize intervention menu
     initializeInterventionMenu();
@@ -124,14 +124,6 @@ function setupNavigation() {
         });
     });
     
-    // Sidebar navigation
-    document.querySelectorAll('.sidebar-item').forEach(link => {
-        link.addEventListener('click', (e) => {
-            const page = e.currentTarget.dataset.page;
-            navigateToPage(page);
-        });
-    });
-    
     // Mobile navigation
     document.querySelectorAll('.mobile-nav-item').forEach(link => {
         link.addEventListener('click', (e) => {
@@ -151,17 +143,12 @@ function navigateToPage(pageName) {
         link.classList.toggle('active', link.dataset.page === pageName);
     });
     
-    // Update active states in sidebar
-    document.querySelectorAll('.sidebar-item').forEach(link => {
-        link.classList.toggle('active', link.dataset.page === pageName);
-    });
-    
     // Update active states in mobile nav
     document.querySelectorAll('.mobile-nav-item').forEach(link => {
         link.classList.toggle('active', link.dataset.page === pageName);
     });
     
-    // Show/hide sections
+    // Show/hide the 3 main sections: guide, tools, resources
     document.querySelectorAll('.content-section').forEach(section => {
         const sectionId = section.id.replace('-section', '');
         section.classList.toggle('active', sectionId === pageName);
@@ -169,6 +156,23 @@ function navigateToPage(pageName) {
     
     // Smooth scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setupSubTabs() {
+    document.querySelectorAll('.subtab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const group = btn.closest('.subtab-nav')?.dataset.tabGroup;
+            if (!group) return;
+            // Deactivate all buttons and panels in this group
+            document.querySelectorAll(`.subtab-nav[data-tab-group="${group}"] .subtab-btn`).forEach(b => b.classList.remove('active'));
+            document.querySelectorAll(`.subtab-panel[data-tab-group="${group}"]`).forEach(p => p.classList.remove('active'));
+            // Activate clicked button and target panel
+            btn.classList.add('active');
+            const target = btn.dataset.subtab;
+            const panel = document.getElementById(`subtab-${target}`);
+            if (panel) panel.classList.add('active');
+        });
+    });
 }
 
 // ============================================
@@ -197,17 +201,10 @@ function closeMobileMenu() {
 }
 
 // ============================================
-// Home Menu Cards
+// Home Menu Cards (removed - no longer in design)
 // ============================================
 function setupHomeMenuCards() {
-    document.querySelectorAll('.menu-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            const page = e.currentTarget.dataset.page;
-            if (page) {
-                navigateToPage(page);
-            }
-        });
-    });
+    // No-op: home menu cards removed in new design
 }
 
 // ============================================
@@ -4397,18 +4394,6 @@ function resetInterventionMenu() {
 function openInteractiveFlowchart() {
     console.log('Opening Interactive Flowchart');
     
-    // Hide the options screen
-    const optionsScreen = document.getElementById('interventions-options-screen');
-    if (optionsScreen) {
-        optionsScreen.style.display = 'none';
-    }
-    
-    // Hide the menu view
-    const menuView = document.getElementById('interventions-menu-full-view');
-    if (menuView) {
-        menuView.style.display = 'none';
-    }
-    
     // Show and initialize the flowchart container
     const flowchartContainer = document.getElementById('flowchart-container');
     if (flowchartContainer) {
@@ -4434,18 +4419,6 @@ function openTierFlowchart(tierName) {
         return;
     }
     
-    // Hide the options screen
-    const optionsScreen = document.getElementById('interventions-options-screen');
-    if (optionsScreen) {
-        optionsScreen.style.display = 'none';
-    }
-    
-    // Hide the menu view
-    const menuView = document.getElementById('interventions-menu-full-view');
-    if (menuView) {
-        menuView.style.display = 'none';
-    }
-    
     // Show and initialize the flowchart container
     const flowchartContainer = document.getElementById('flowchart-container');
     if (flowchartContainer) {
@@ -4469,59 +4442,13 @@ function openTierFlowchart(tierName) {
 }
 
 function openInterventionsMenuView() {
-    console.log('Opening Interventions Menu View');
-    
-    // Hide the options screen
-    const optionsScreen = document.getElementById('interventions-options-screen');
-    if (optionsScreen) {
-        optionsScreen.style.display = 'none';
-    }
-    
-    // Show the menu view
-    const menuView = document.getElementById('interventions-menu-full-view');
-    if (menuView) {
-        menuView.style.display = 'block';
-    }
-    
-    // Hide the flowchart
-    const flowchartContainer = document.getElementById('flowchart-container');
-    if (flowchartContainer) {
-        flowchartContainer.classList.add('flowchart-view-hidden');
-        flowchartContainer.style.display = 'none';
-    }
-    
-    // Scroll to the menu view
-    if (menuView) {
-        menuView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // No-op: sub-tabs handle navigation in new design
+    console.log('openInterventionsMenuView called (no-op in new design)');
 }
 
 function returnToInterventionsOptions() {
-    console.log('Returning to Interventions Options');
-    
-    // Show the options screen
-    const optionsScreen = document.getElementById('interventions-options-screen');
-    if (optionsScreen) {
-        optionsScreen.style.display = 'block';
-    }
-    
-    // Hide the menu view
-    const menuView = document.getElementById('interventions-menu-full-view');
-    if (menuView) {
-        menuView.style.display = 'none';
-    }
-    
-    // Hide the flowchart
-    const flowchartContainer = document.getElementById('flowchart-container');
-    if (flowchartContainer) {
-        flowchartContainer.classList.add('flowchart-view-hidden');
-        flowchartContainer.style.display = 'none';
-    }
-    
-    // Scroll to the options screen
-    if (optionsScreen) {
-        optionsScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // No-op: sub-tabs handle navigation in new design
+    console.log('returnToInterventionsOptions called (no-op in new design)');
 }
 
 // ============================================
@@ -4628,7 +4555,7 @@ function goToStep(stepNumber) {
     updateProgressIndicator(stepNumber);
     
     // Scroll to top of menu
-    const menuView = document.getElementById('interventions-menu-full-view');
+    const menuView = document.getElementById('subtab-find') || document.getElementById('subtab-flowchart');
     if (menuView) {
         menuView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -5330,10 +5257,8 @@ function restartMenu() {
 }
 
 // Update openInterventionsMenuView to initialize the new menu
-const originalOpenInterventionsMenuView = openInterventionsMenuView;
 window.openInterventionsMenuView = function() {
-    originalOpenInterventionsMenuView();
-    initializeStepBasedMenu();
+    // No-op for navigation in new design
 };
 
 // ============================================
@@ -5719,25 +5644,11 @@ function restartMenu() {
 
 // Override openInterventionsMenuView to initialize dropdown wizard
 window.openInterventionsMenuView = function() {
-    // Hide the options screen (correct ID)
-    const optionsScreen = document.getElementById('interventions-options-screen');
-    const menuView = document.getElementById('interventions-menu-full-view');
-    
-    if (optionsScreen) optionsScreen.style.display = 'none';
-    if (menuView) menuView.style.display = 'block';
-    
-    // Hide the flowchart container if visible
-    const flowchartContainer = document.getElementById('flowchart-container');
-    if (flowchartContainer) {
-        flowchartContainer.classList.add('flowchart-view-hidden');
-        flowchartContainer.style.display = 'none';
-    }
-    
+    // No-op for navigation (sub-tabs handle it in new design)
+    // Just initialize the dropdown wizard if present
     const dropdownWizard = document.querySelector('.dropdown-wizard');
     if (dropdownWizard) {
         initializeDropdownWizard();
-    } else {
-        initializeStepBasedMenu();
     }
 };
 
