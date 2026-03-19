@@ -674,7 +674,8 @@
                 // Initialize flowchart on first view
                 if (target === 'flowchart' && typeof openInteractiveFlowchart === 'function') {
                     var fc = document.getElementById('flowchart-container');
-                    if (fc && !fc.hasChildNodes()) {
+                    if (fc && !fc.dataset.initialized) {
+                        fc.dataset.initialized = 'true';
                         openInteractiveFlowchart();
                     }
                 }
@@ -693,6 +694,7 @@
 
         // Intersection Observer for fade-in animations
         if ('IntersectionObserver' in window) {
+            // Trigger fade-in when 8% of element is visible
             var observer = new IntersectionObserver(function(entries) {
                 entries.forEach(function(entry) {
                     if (entry.isIntersecting) {
