@@ -487,7 +487,7 @@ summary::-webkit-details-marker { display: none; }
 summary::marker { display: none; content: ""; }
 
 summary::before {
-  content: "b6";
+  content: "\25B6";
   display: inline-block;
   font-size: 0.6rem;
   margin-right: var(--space-sm);
@@ -2190,7 +2190,7 @@ details > p {
 }
 
 .feature-list li::before {
-  content: "¹3";
+  content: "\2713";
   position: absolute;
   left: 0;
   color: var(--success);
@@ -3027,7 +3027,7 @@ details > p {
 }
 
 .vf-feature-list li::before {
-  content: "¹3";
+  content: "\2713";
   position: absolute;
   left: 0;
   color: var(--success);
