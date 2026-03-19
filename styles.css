@@ -446,6 +446,191 @@ strong { font-weight: 600; }
   box-shadow: var(--shadow-md);
 }
 
+/* Details summary used as a card heading (replaces card-header-row) */
+.content-card details > summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.content-card details > summary::-webkit-details-marker { display: none; }
+
+.details-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 0.15rem 0;
+}
+
+.details-card-header svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.content-card details > summary .details-card-header::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  margin-left: auto;
+  transition: transform var(--duration) var(--ease);
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.content-card details[open] > summary .details-card-header::after {
+  transform: rotate(-135deg);
+}
+
+.content-card details[open] > summary {
+  margin-bottom: var(--space-md);
+}
+
+/* --------------------------------------------------------
+   Guide CTA Section
+   -------------------------------------------------------- */
+
+.guide-cta-section {
+  margin-bottom: var(--space-lg);
+}
+
+.cta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+.cta-card {
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-xl);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-sm);
+  transition: transform var(--duration) var(--ease),
+              box-shadow var(--duration) var(--ease);
+}
+
+.cta-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.cta-card.cta-card-featured {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  border: none;
+  box-shadow: var(--shadow-md);
+}
+
+.cta-badge {
+  background: var(--accent);
+  color: var(--text-on-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.65rem;
+  border-radius: 100px;
+  align-self: flex-start;
+}
+
+.cta-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--primary-faint);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.cta-card.cta-card-featured .cta-icon {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.cta-icon svg {
+  stroke: var(--primary);
+}
+
+.cta-card.cta-card-featured .cta-icon svg {
+  stroke: var(--text-on-primary);
+}
+
+.cta-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cta-card.cta-card-featured .cta-title {
+  color: var(--text-on-primary);
+}
+
+.cta-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  flex: 1;
+  margin: 0;
+}
+
+.cta-card.cta-card-featured .cta-desc {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.cta-btn {
+  margin-top: var(--space-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration) var(--ease),
+              color var(--duration) var(--ease),
+              border-color var(--duration) var(--ease);
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+}
+
+.cta-btn:hover {
+  background: var(--primary);
+  color: var(--text-on-primary);
+}
+
+.cta-card.cta-card-featured .cta-btn {
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-on-primary);
+}
+
+.cta-card.cta-card-featured .cta-btn:hover {
+  background: var(--bg);
+  color: var(--primary);
+}
+
+@media (max-width: 640px) {
+  .cta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .card-header-row {
   display: flex;
   align-items: center;
