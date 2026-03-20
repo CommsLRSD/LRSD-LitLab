@@ -2034,7 +2034,7 @@ details > p {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: 1px 0.3rem;
+  padding: 0.1rem 0.3rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background var(--duration) var(--ease);
@@ -2055,7 +2055,7 @@ details > p {
   width: 13px;
   height: 13px;
   border-radius: 2px;
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
