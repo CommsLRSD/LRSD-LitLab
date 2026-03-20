@@ -1823,24 +1823,8 @@ function restartCurrentTier() {
 
 // Close integrated flowchart
 function closeIntegratedFlowchart() {
-    const container = document.getElementById('flowchart-container');
-    if (container) {
-        container.classList.add('flowchart-hidden');
-        container.innerHTML = '';
-    }
-    
-    // Reset state
-    appState.visualFlowchart = {
-        nodes: [],
-        connections: [],
-        currentNodeId: null,
-        selectedPath: [],
-        choices: {}
-    };
-    appState.currentTierFlow = null;
-    
-    // Return to interventions options screen
-    returnToInterventionsOptions();
+    // Restart the flowchart from Tier 1
+    initIntegratedFlowchart('tier1');
 }
 
 // Integrated tier transition handlers
@@ -3803,15 +3787,8 @@ function tier3StudentDidNotImprove() {
 }
 
 function closeTierFlowchart() {
-    const container = document.getElementById('flowchart-container');
-    if (container) {
-        container.classList.add('flowchart-hidden');
-        container.style.display = 'none';
-        container.innerHTML = '';
-    }
-    
-    // Return to interventions options screen
-    returnToInterventionsOptions();
+    // Restart the flowchart from Tier 1
+    openInteractiveFlowchart();
 }
 
 function openInterventionsMenu(tier, mode = 'interventions') {
