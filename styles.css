@@ -26,12 +26,15 @@
   /* Functional – softened pastels */
   --success: #7cc5a8;
   --success-light: #eef7f2;
+  --success-text: #5b9e7a;
   --warning: #d4b87a;
   --warning-light: #faf5ec;
+  --warning-text: #a39060;
   --danger: #c98a8a;
   --danger-light: #faf0f0;
   --info: #8ab4d6;
   --info-light: #eef5fb;
+  --info-text: #5b7fa3;
 
   /* Step type colours (flowchart) – soft pastels */
   --step-checklist: #a0a4d6;
@@ -1200,10 +1203,10 @@ details > p {
   letter-spacing: 0.02em;
 }
 
-.badge-dibels  { background: #eef5fb; color: #5b7fa3; }
+.badge-dibels  { background: var(--info-light); color: var(--info-text); }
 .badge-ctopp   { background: #faf0f5; color: #a37590; }
-.badge-thafol  { background: #eef7f2; color: #5b9e7a; }
-.badge-idapel  { background: #faf5ec; color: #a39060; }
+.badge-thafol  { background: var(--success-light); color: var(--success-text); }
+.badge-idapel  { background: var(--warning-light); color: var(--warning-text); }
 
 /* Table View */
 .table-container {
@@ -2242,7 +2245,7 @@ details > p {
   background: var(--info-light);
   border-radius: var(--radius);
   font-size: 0.78rem;
-  color: #5b7fa3;
+  color: var(--info-text);
   margin-bottom: var(--space-sm);
 }
 
@@ -2255,7 +2258,7 @@ details > p {
   background: var(--warning-light);
   border-radius: var(--radius);
   font-size: 0.78rem;
-  color: #a39060;
+  color: var(--warning-text);
   margin-bottom: var(--space-sm);
 }
 
@@ -2848,7 +2851,7 @@ details > p {
   padding: var(--space-sm);
   background: var(--success-light);
   border-radius: var(--radius);
-  color: #5b9e7a;
+  color: var(--success-text);
   margin-bottom: var(--space-sm);
 }
 
@@ -2861,7 +2864,7 @@ details > p {
   padding: var(--space-sm);
   background: var(--info-light);
   border-radius: var(--radius);
-  color: #5b7fa3;
+  color: var(--info-text);
   margin-bottom: var(--space-sm);
 }
 
@@ -2872,7 +2875,7 @@ details > p {
   padding: var(--space-sm);
   background: var(--warning-light);
   border-radius: var(--radius);
-  color: #a39060;
+  color: var(--warning-text);
   margin-bottom: var(--space-sm);
 }
 
@@ -3151,7 +3154,7 @@ details > p {
   padding: var(--space-sm);
   background: var(--info-light);
   border-radius: var(--radius);
-  color: #5b7fa3;
+  color: var(--info-text);
   font-size: 0.78rem;
   margin-bottom: var(--space-sm);
 }
@@ -3160,7 +3163,7 @@ details > p {
   padding: var(--space-sm);
   background: var(--warning-light);
   border-radius: var(--radius);
-  color: #a39060;
+  color: var(--warning-text);
   font-size: 0.78rem;
   margin-bottom: var(--space-sm);
 }
