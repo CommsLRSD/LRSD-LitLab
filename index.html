@@ -43,18 +43,6 @@
 
     <script>
     (function() {
-        // Auto-initialize the flowchart on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Wait a brief moment for app.js data loading to complete
-            setTimeout(function() {
-                var fc = document.getElementById('flowchart-container');
-                if (fc && typeof openInteractiveFlowchart === 'function') {
-                    fc.dataset.initialized = 'true';
-                    openInteractiveFlowchart();
-                }
-            }, 500);
-        });
-
         // Intersection Observer for fade-in animations
         if ('IntersectionObserver' in window) {
             var observer = new IntersectionObserver(function(entries) {

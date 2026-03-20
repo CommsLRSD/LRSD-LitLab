@@ -3493,6 +3493,8 @@ details > p {
     width: auto;
     min-width: auto;
     height: 20px;
+  }
+  .flowchart-step-connector svg {
     transform: rotate(90deg);
   }
 }

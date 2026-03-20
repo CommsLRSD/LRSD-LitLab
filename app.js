@@ -70,6 +70,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 150); // Debounce resize events
     });
     
+    // Auto-initialize the flowchart now that all data is loaded
+    const fc = document.getElementById('flowchart-container');
+    if (fc && !fc.dataset.initialized) {
+        fc.dataset.initialized = 'true';
+        openInteractiveFlowchart();
+    }
+    
     console.log('Literacy Interventions - Ready!');
 });
 
