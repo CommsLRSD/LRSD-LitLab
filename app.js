@@ -5,7 +5,7 @@
 // State Management
 // ============================================
 const appState = {
-    currentPage: 'guide',
+    currentPage: 'home',
     mobileMenuOpen: false,
     flowchartData: null,
     tierFlowchartData: null,
@@ -69,13 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateTierTitleOnResize();
         }, 150); // Debounce resize events
     });
-    
-    // Auto-initialize the flowchart now that all data is loaded
-    const fc = document.getElementById('flowchart-container');
-    if (fc && !fc.dataset.initialized) {
-        fc.dataset.initialized = 'true';
-        openInteractiveFlowchart();
-    }
     
     console.log('Literacy Interventions - Ready!');
 });
@@ -157,11 +150,25 @@ function navigateToPage(pageName) {
         link.classList.toggle('active', link.dataset.page === pageName);
     });
     
-    // Show/hide the 3 main sections: guide, tools, resources
+    // Show/hide the main sections
     document.querySelectorAll('.content-section').forEach(section => {
         const sectionId = section.id.replace('-section', '');
         section.classList.toggle('active', sectionId === pageName);
     });
+    
+    // Lazy-initialize sections on first visit
+    if (pageName === 'flowchart') {
+        const fc = document.getElementById('flowchart-container');
+        if (fc && !fc.dataset.initialized) {
+            fc.dataset.initialized = 'true';
+            openInteractiveFlowchart();
+        }
+    } else if (pageName === 'interventions') {
+        if (!appState.menuInitialized) {
+            appState.menuInitialized = true;
+            initializeStepBasedMenu();
+        }
+    }
     
     // Smooth scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4451,25 +4458,14 @@ function activateSubTab(target) {
     });
 }
 
-// Navigate to Tools → Intervention Flowchart sub-tab from the Guide page
+// Navigate to Flowchart page
 function navigateToFlowchart() {
-    navigateToPage('tools');
-    activateSubTab('flowchart');
-    var fc = document.getElementById('flowchart-container');
-    if (fc && !fc.dataset.initialized) {
-        fc.dataset.initialized = 'true';
-        openInteractiveFlowchart();
-    }
+    navigateToPage('flowchart');
 }
 
-// Navigate to Tools → Find Interventions sub-tab from the Guide page
+// Navigate to Interventions Menu page
 function navigateToFindInterventions() {
-    navigateToPage('tools');
-    activateSubTab('find');
-    var sr = document.getElementById('screener-select');
-    if (sr && sr.options.length <= 1 && typeof initializeInterventionMenu === 'function') {
-        initializeInterventionMenu();
-    }
+    navigateToPage('interventions');
 }
 
 // ============================================
