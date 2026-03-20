@@ -1606,7 +1606,9 @@ details > p {
 }
 
 .result-expand-icon {
-  font-size: 0.8rem;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
   color: var(--text-light);
   transition: transform var(--duration) var(--ease);
 }
@@ -3600,4 +3602,101 @@ details > p {
 
   a { color: #6b7b8d; text-decoration: underline; }
   a[href]::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #666; }
+}
+
+/* ------------------------------------------------------------
+   HOMEPAGE & INTERVENTIONS LAYOUT (added for clear homepage)
+   ------------------------------------------------------------ */
+
+/* Interventions page layout */
+.interventions-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-height));
+}
+
+.interventions-page-body {
+  flex: 1;
+  max-width: 840px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+/* Step panel helpers */
+.step-panel-prompt {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.step-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+/* Subtest options wrapper */
+.subtest-options-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+/* Pillar layout helpers */
+.pillar-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: var(--space-sm);
+}
+
+.pillar-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* Item type stacked list */
+.item-type-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Results breadcrumb & summary */
+.results-breadcrumb {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.step5-summary {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: var(--space-md);
+}
+
+/* Screener icon sizing within screener-option */
+.screener-option .screener-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
+}
+
+/* Make screener-option a bit more substantial */
+.screener-option {
+  padding: var(--space-sm) var(--space-md);
+  gap: var(--space-xs);
+  font-size: 0.8rem;
+}
+
+/* Mobile tweaks for interventions page */
+@media (max-width: 600px) {
+  .interventions-page-body {
+    padding: var(--space-md);
+  }
 }

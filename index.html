@@ -13,25 +13,285 @@
     <!-- Top Navigation -->
     <nav class="top-nav" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
-            <div class="logo-section">
+            <button class="logo-section" onclick="navigateToPage('home')" aria-label="Go to homepage" style="background:none;border:none;cursor:pointer;padding:0;">
                 <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
                     <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
                 </svg>
                 <h1 class="logo-text">LitLab</h1>
-            </div>
+            </button>
+
+            <nav class="nav-links" role="menubar" aria-label="Site sections">
+                <button class="nav-link active" data-page="home" role="menuitem" aria-selected="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    Home
+                </button>
+                <button class="nav-link" data-page="flowchart" role="menuitem" aria-selected="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <path d="M6.5 10v4M6.5 14h11M17.5 14v-4"/>
+                    </svg>
+                    Flowchart
+                </button>
+                <button class="nav-link" data-page="interventions" role="menuitem" aria-selected="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    Interventions
+                </button>
+            </nav>
+
+            <!-- Mobile menu button -->
+            <button class="mobile-menu-btn" aria-label="Open navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
+    <!-- Mobile nav overlay -->
+    <div class="mobile-nav-overlay" role="dialog" aria-label="Navigation menu" aria-hidden="true">
+        <div class="mobile-nav-content">
+            <button class="mobile-nav-item active" data-page="home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Home
+            </button>
+            <button class="mobile-nav-item" data-page="flowchart">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <path d="M6.5 10v4M6.5 14h11M17.5 14v-4"/>
+                </svg>
+                Flowchart
+            </button>
+            <button class="mobile-nav-item" data-page="interventions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                Interventions Menu
+            </button>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="main-content">
-        <section id="tools-section" class="content-section active" data-page="tools">
-            <div id="flowchart-container" class="flowchart-view-hidden"></div>
+
+        <!-- ── HOME ─────────────────────────────────────────── -->
+        <section id="home-section" class="content-section active" data-page="home">
+            <div class="home-hero">
+                <div class="hero-content">
+                    <div class="hero-icon" aria-hidden="true">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+                            <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+                        </svg>
+                    </div>
+                    <h2 class="hero-title">LRSD Literacy Lab</h2>
+                    <p class="hero-subtitle">Supporting educators in identifying and implementing effective literacy interventions for every learner.</p>
+                </div>
+            </div>
+
+            <div class="home-content">
+                <div class="cta-grid">
+                    <button class="cta-card cta-card-featured" onclick="navigateToPage('flowchart')" aria-label="Open Intervention Flowchart">
+                        <div class="cta-icon" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                                <path d="M6.5 10v4M6.5 14h11M17.5 14v-4"/>
+                            </svg>
+                        </div>
+                        <h3 class="cta-title">Intervention Flowchart</h3>
+                        <p class="cta-desc">Step-by-step decision guide to navigate tiers of support based on student screening results.</p>
+                        <span class="cta-btn">Start Flowchart
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </button>
+
+                    <button class="cta-card" onclick="navigateToPage('interventions')" aria-label="Open Interventions Menu">
+                        <div class="cta-icon" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                        </div>
+                        <h3 class="cta-title">Interventions Menu</h3>
+                        <p class="cta-desc">Browse interventions and assessments filtered by screener, subtest, and literacy pillar.</p>
+                        <span class="cta-btn">Find Interventions
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── FLOWCHART ─────────────────────────────────────── -->
+        <section id="flowchart-section" class="content-section" data-page="flowchart">
+            <div id="flowchart-container"></div>
 
             <!-- Hidden elements for app.js backward compatibility -->
             <div id="interventions-options-screen" class="interventions-options" style="display:none;" aria-hidden="true"></div>
             <div id="interventions-menu-full-view" class="interventions-detail-view" style="display:none;" aria-hidden="true"></div>
         </section>
+
+        <!-- ── INTERVENTIONS MENU ───────────────────────────── -->
+        <section id="interventions-section" class="content-section" data-page="interventions">
+            <div class="interventions-page-wrapper">
+                <div class="hero-area">
+                    <h2 class="section-title">Interventions &amp; Assessments Menu</h2>
+                    <p class="section-subtitle">Follow the steps below to find resources matched to your screening results</p>
+                </div>
+
+                <div class="interventions-page-body">
+                    <div class="step-wizard">
+                        <!-- Step progress bar -->
+                        <div class="step-bar" role="list" aria-label="Progress">
+                            <span class="step-pill active" role="listitem">1 · Screener</span>
+                            <span class="step-connector" aria-hidden="true"></span>
+                            <span class="step-pill disabled" role="listitem">2 · Subtest</span>
+                            <span class="step-connector" aria-hidden="true"></span>
+                            <span class="step-pill disabled" role="listitem">3 · Pillars</span>
+                            <span class="step-connector" aria-hidden="true"></span>
+                            <span class="step-pill disabled" role="listitem">4 · Type</span>
+                            <span class="step-connector" aria-hidden="true"></span>
+                            <span class="step-pill disabled" role="listitem">5 · Results</span>
+                        </div>
+
+                        <!-- Step panels -->
+                        <div class="step-panels">
+
+                            <!-- Panel 1: Screener selection -->
+                            <div id="panel-1" class="step-panel active">
+                                <p class="step-panel-prompt">Which screener was used?</p>
+                                <div class="screener-grid">
+                                    <button class="screener-option" onclick="selectScreener('DIBELS')">
+                                        <svg class="screener-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        </svg>
+                                        <strong>DIBELS</strong>
+                                        <span class="card-badge">English · K–6</span>
+                                    </button>
+                                    <button class="screener-option" onclick="selectScreener('CTOPP-2')">
+                                        <svg class="screener-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        </svg>
+                                        <strong>CTOPP-2</strong>
+                                        <span class="card-badge">English · K–3</span>
+                                    </button>
+                                    <button class="screener-option" onclick="selectScreener('THaFoL')">
+                                        <svg class="screener-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        </svg>
+                                        <strong>THaFoL</strong>
+                                        <span class="card-badge">French · K–3</span>
+                                    </button>
+                                    <button class="screener-option" onclick="selectScreener('IDAPEL')">
+                                        <svg class="screener-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        </svg>
+                                        <strong>IDAPEL</strong>
+                                        <span class="card-badge">French · K–3</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Panel 2: Subtest selection -->
+                            <div id="panel-2" class="step-panel">
+                                <p class="step-panel-prompt">Which subtest from <strong id="selected-screener-name"></strong>?</p>
+                                <div id="subtest-options" class="subtest-options-wrap"></div>
+                                <div class="step-panel-actions">
+                                    <button class="back-btn-minimal" onclick="goToStep(1)">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Panel 3: Pillar selection -->
+                            <div id="panel-3" class="step-panel">
+                                <p class="step-panel-prompt">Literacy pillars assessed by this subtest:</p>
+                                <div id="pillar-info" class="pillar-chips-row"></div>
+                                <div id="pillar-options" class="pillar-options-list"></div>
+                                <div class="step-panel-actions">
+                                    <button class="back-btn-minimal" onclick="goToStep(2)">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                        Back
+                                    </button>
+                                    <button class="cta-btn" onclick="proceedFromStep3()">
+                                        Next
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Panel 4: Item type -->
+                            <div id="panel-4" class="step-panel">
+                                <p class="step-panel-prompt">What are you looking for?</p>
+                                <div class="item-type-options">
+                                    <button class="option-item" onclick="selectItemType('Intervention')">
+                                        <div class="option-item-content">
+                                            <div class="option-item-title">Intervention</div>
+                                            <div class="option-item-subtitle">Programs and strategies to address identified skill gaps</div>
+                                        </div>
+                                        <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M9 18l6-6-6-6"/>
+                                        </svg>
+                                    </button>
+                                    <button class="option-item" onclick="selectItemType('Assessment')">
+                                        <div class="option-item-content">
+                                            <div class="option-item-title">Assessment</div>
+                                            <div class="option-item-subtitle">Tools to further assess and monitor student progress</div>
+                                        </div>
+                                        <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M9 18l6-6-6-6"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="step-panel-actions">
+                                    <button class="back-btn-minimal" onclick="goToStep(3)">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Panel 5: Results -->
+                            <div id="panel-5" class="step-panel">
+                                <div id="results-breadcrumb" class="results-breadcrumb"></div>
+                                <div id="step5-results-summary" class="step5-summary"></div>
+                                <div id="step5-results-container" class="results-grid-compact"></div>
+                                <div class="step-panel-actions">
+                                    <button class="back-btn-minimal" onclick="goToStep(4)">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                        Back
+                                    </button>
+                                    <button class="reset-btn-minimal" onclick="restartMenu()">Start Over</button>
+                                </div>
+                            </div>
+
+                        </div><!-- /.step-panels -->
+                    </div><!-- /.step-wizard -->
+                </div><!-- /.interventions-page-body -->
+            </div><!-- /.interventions-page-wrapper -->
+        </section>
+
     </main>
 
     <!-- Footer -->
