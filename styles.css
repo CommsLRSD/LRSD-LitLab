@@ -1907,8 +1907,14 @@ details > p {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
+  height: 24px;
   color: var(--text-light);
+}
+
+.flowchart-step-connector svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .flowchart-step-connector::after {
@@ -2084,6 +2090,12 @@ details > p {
   font-size: 0.9rem;
   cursor: not-allowed;
   transition: all var(--duration) var(--ease);
+}
+
+.continue-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .continue-btn.btn-ready {
@@ -2409,7 +2421,12 @@ details > p {
 .endpoint-card.endpoint-warning { background: var(--warning-light); border-color: var(--warning); }
 .endpoint-card.endpoint-danger  { background: var(--danger-light); border-color: var(--danger); }
 
-.endpoint-icon { font-size: 2.5rem; margin-bottom: var(--space-sm); }
+.endpoint-icon { margin-bottom: var(--space-sm); }
+
+.endpoint-icon svg {
+  width: 32px;
+  height: 32px;
+}
 
 .endpoint-actions {
   display: flex;
@@ -3100,6 +3117,12 @@ details > p {
   transition: all var(--duration) var(--ease);
 }
 
+.vf-continue-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 .vf-continue-btn.vf-btn-ready {
   background: var(--primary);
   color: var(--text-on-primary);
@@ -3232,7 +3255,12 @@ details > p {
 .vf-endpoint.vf-endpoint-warning { background: var(--warning-light); border-color: var(--warning); }
 .vf-endpoint.vf-endpoint-danger  { background: var(--danger-light); border-color: var(--danger); }
 
-.vf-endpoint-icon { font-size: 2.5rem; margin-bottom: var(--space-sm); }
+.vf-endpoint-icon { margin-bottom: var(--space-sm); }
+
+.vf-endpoint-icon svg {
+  width: 32px;
+  height: 32px;
+}
 
 .vf-endpoint-actions {
   display: flex;
@@ -3277,12 +3305,12 @@ details > p {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
+  height: 24px;
 }
 
 .vf-connection-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--border);
 }
