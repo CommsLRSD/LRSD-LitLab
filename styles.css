@@ -338,9 +338,9 @@ strong { font-weight: 600; }
   align-items: center;
   gap: var(--space-md);
   padding: 0 var(--space-lg);
-  height: 56px;
+  height: 60px;
   border-radius: var(--radius-lg);
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: background var(--duration) var(--ease),
@@ -348,8 +348,8 @@ strong { font-weight: 600; }
 }
 
 .mobile-nav-item svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
 }
 
@@ -440,9 +440,9 @@ strong { font-weight: 600; }
 
 .content-card {
   background: var(--bg);
-  border-radius: var(--radius);
-  padding: var(--space-md);
-  margin-bottom: var(--space-md);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
   border: 1px solid var(--border);
 }
 
@@ -662,9 +662,9 @@ summary {
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
   font-weight: 400;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   color: var(--text);
   list-style: none;
   user-select: none;
@@ -688,10 +688,10 @@ details[open] > summary::before {
 
 details > div,
 details > p {
-  padding: 0 0 0.5rem 1rem;
+  padding: 0 0 0.6rem 1.1rem;
   color: var(--text-secondary);
-  font-size: 0.8rem;
-  line-height: 1.55;
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
 /* ------------------------------------------------------------
@@ -1830,10 +1830,10 @@ details > p {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: 0.3rem 0.75rem;
+  padding: 0.4rem 0.9rem;
   border-radius: var(--radius-pill);
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.82rem;
+  font-weight: 500;
   cursor: pointer;
   border: 1px solid var(--border);
   background: var(--bg);
@@ -1842,11 +1842,11 @@ details > p {
 }
 
 .tier-tab:hover { background: var(--bg-alt); }
-.tier-tab.active { background: var(--primary); color: var(--text-on-primary); border-color: var(--primary); }
+.tier-tab.active { background: var(--primary); color: var(--text-on-primary); border-color: var(--primary); box-shadow: var(--shadow-sm); }
 
 .tier-number {
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
 }
 
 /* Flowchart actions */
@@ -2061,27 +2061,27 @@ details > p {
 .checklist-actions {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .check-all-btn {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 2px 8px;
-  font-size: 0.65rem;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--primary);
   background: var(--primary-faint);
   border: 1px solid var(--primary-light);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   cursor: pointer;
   transition: all var(--duration) var(--ease);
 }
 
 .check-all-btn svg {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 .check-all-btn:hover {
@@ -2562,18 +2562,18 @@ details > p {
 /* Action buttons */
 .action-buttons {
   display: flex;
-  gap: var(--space-sm);
-  margin-top: var(--space-md);
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
   flex-wrap: wrap;
 }
 
 .action-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.7rem;
+  gap: var(--space-sm);
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius);
+  font-size: 0.82rem;
   font-weight: 500;
   border: 1px solid var(--border);
   background: var(--bg);
@@ -2828,7 +2828,7 @@ details > p {
 }
 
 .summary-step-label {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -2836,7 +2836,7 @@ details > p {
   margin-bottom: var(--space-xs);
 }
 
-.summary-choice-text { font-size: 0.95rem; color: var(--text); }
+.summary-choice-text { font-size: 1rem; color: var(--text); }
 
 .summary-actions {
   display: flex;
@@ -3783,10 +3783,10 @@ details > p {
 
 .interventions-page-body {
   flex: 1;
-  max-width: 840px;
+  max-width: 860px;
   width: 100%;
   margin: 0 auto;
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-2xl) var(--space-lg);
 }
 
 /* Step panel helpers */
@@ -3808,42 +3808,42 @@ details > p {
 .subtest-options-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 /* Pillar layout helpers */
 .pillar-chips-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: var(--space-sm);
+  gap: 6px;
+  margin-bottom: var(--space-md);
 }
 
 .pillar-options-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 /* Item type stacked list */
 .item-type-options {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-md);
 }
 
 /* Results breadcrumb & summary */
 .results-breadcrumb {
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-sm);
 }
 
 .step5-summary {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--text);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 /* Screener icon sizing within screener-option */
