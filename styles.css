@@ -1742,7 +1742,7 @@ details > p {
 .integrated-flowchart {
   max-width: 100%;
   margin: 0 auto;
-  padding: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
 }
 
 .integrated-flowchart-header,
@@ -1898,7 +1898,7 @@ details > p {
 .flowchart-steps {
   display: flex;
   flex-direction: row;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   align-items: flex-start;
 }
 
@@ -1990,7 +1990,7 @@ details > p {
 .node-number { font-size: 0.7rem; font-weight: 600; color: var(--text-light); }
 .node-title { font-weight: 500; font-size: 0.85rem; color: var(--text); }
 
-.step-content, .node-content { padding: var(--space-sm); }
+.step-content, .node-content { padding: var(--space-md); }
 
 .step-content h3 { font-size: 0.78rem; margin-bottom: 2px; }
 .step-content p { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: var(--space-xs); line-height: 1.4; }
@@ -2088,6 +2088,15 @@ details > p {
   border: 1px solid var(--border);
   font-size: 0.72rem;
   line-height: 1.35;
+}
+
+.checklist-item input[type="checkbox"],
+.vf-checklist-item input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 .checklist-item:hover { background: var(--bg-alt); }
@@ -2357,7 +2366,7 @@ details > p {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: 0.2rem 0.4rem;
+  padding: 0.4rem 0.6rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -3598,8 +3607,6 @@ details > p {
   .decision-buttons,
   .vf-decision-grid { flex-direction: column; }
 
-  .decision-btn, .vf-decision-btn { min-width: auto; }
-
   .grade-cards { grid-template-columns: 1fr; }
   .assessment-grid { grid-template-columns: 1fr; }
   .interventions-grid { grid-template-columns: 1fr; }
@@ -3612,11 +3619,17 @@ details > p {
   /* Stack flowchart vertically on mobile */
   .flowchart-steps {
     flex-direction: column;
+    padding: 0 var(--space-sm);
   }
   .flowchart-step,
   .integrated-flow-node {
     min-width: unset;
     max-width: 100%;
+    width: 100%;
+  }
+  .decision-btn, .vf-decision-btn {
+    min-width: auto;
+    padding: 0.5rem 0.75rem;
   }
   .flowchart-step-connector {
     width: auto;
