@@ -1138,6 +1138,15 @@ function createIntegratedChecklistNode(nodeData) {
         <div class="step-content">
             <h3>${nodeData.subtitle}</h3>
             <p>${nodeData.description}</p>
+            <div class="checklist-actions">
+                <button class="check-all-btn" onclick="toggleCheckAll('${nodeData.id}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                    </svg>
+                    Check All
+                </button>
+            </div>
             <div class="checklist-container">
                 ${checklistItems}
             </div>
@@ -1211,7 +1220,7 @@ function createIntegratedSelectionNode(nodeData) {
     return `
         <div class="step-header">
             <div class="step-badge">${nodeData.title}</div>
-            <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
+            <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
@@ -1285,7 +1294,7 @@ function createIntegratedDecisionNode(nodeData) {
     return `
         <div class="step-header">
             <div class="step-badge">${nodeData.title}</div>
-            <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
+            <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
@@ -1326,7 +1335,7 @@ function createIntegratedInfoNode(nodeData) {
     return `
         <div class="step-header">
             <div class="step-badge">${nodeData.title}</div>
-            <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step" style="display: none;">
+            <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
@@ -1443,12 +1452,60 @@ function updateIntegratedChecklistProgress(nodeId) {
 
 // Proceed from checklist node
 function proceedFromIntegratedChecklist(fromNodeId, toNodeId) {
+    // Store checklist completion in choices for summary
+    const tierId = appState.visualFlowchart.tierId;
+    const tierDef = FLOWCHART_DEFINITIONS[tierId];
+    const nodeDef = tierDef?.nodes?.[fromNodeId];
+    const itemCount = nodeDef?.items?.length || 0;
+    appState.visualFlowchart.choices[fromNodeId] = { 
+        id: 'completed', 
+        name: `All ${itemCount} principles reviewed ✓`
+    };
     markStepCompleted(fromNodeId);
     showIntegratedNode(toNodeId, fromNodeId, 'continue');
 }
 
+// Toggle check all / uncheck all for a checklist node
+function toggleCheckAll(nodeId) {
+    const node = document.querySelector(`[data-node-id="${nodeId}"]`);
+    if (!node) return;
+    
+    const checkboxes = node.querySelectorAll('.checklist-item input[type="checkbox"]');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    const newState = !allChecked;
+    
+    checkboxes.forEach(cb => {
+        cb.checked = newState;
+    });
+    
+    // Update button label
+    const btn = node.querySelector('.check-all-btn');
+    if (btn) {
+        const label = btn.querySelector('.check-all-label');
+        if (label) {
+            label.textContent = newState ? 'Uncheck All' : 'Check All';
+        } else {
+            // Fallback: update text content after the SVG
+            const svgEl = btn.querySelector('svg');
+            if (svgEl && svgEl.nextSibling) {
+                svgEl.nextSibling.textContent = newState ? ' Uncheck All' : ' Check All';
+            }
+        }
+    }
+    
+    updateIntegratedChecklistProgress(nodeId);
+}
+
 // Proceed from info node
 function proceedFromIntegratedInfo(fromNodeId, toNodeId) {
+    // Store info acknowledgment in choices for summary
+    const tierId = appState.visualFlowchart.tierId;
+    const tierDef = FLOWCHART_DEFINITIONS[tierId];
+    const nodeDef = tierDef?.nodes?.[fromNodeId];
+    appState.visualFlowchart.choices[fromNodeId] = { 
+        id: 'acknowledged', 
+        name: nodeDef?.subtitle || 'Reviewed'
+    };
     markStepCompleted(fromNodeId);
     showIntegratedNode(toNodeId, fromNodeId, 'continue');
 }
@@ -1689,24 +1746,38 @@ function showFlowchartSummary() {
     if (!container) return;
     
     const choices = appState.visualFlowchart.choices || {};
+    const selectedPath = appState.visualFlowchart.selectedPath || [];
     const tierId = appState.visualFlowchart.tierId;
     const tierDef = FLOWCHART_DEFINITIONS[tierId];
     
     let summaryItems = '';
     
-    if (Object.keys(choices).length === 0) {
+    if (selectedPath.length === 0 && Object.keys(choices).length === 0) {
         summaryItems = '<p class="no-choices">No choices have been made yet. Work through the flowchart to see your decisions summarized here.</p>';
     } else {
-        Object.entries(choices).forEach(([nodeId, choice], index) => {
+        // Build summary in path order for a comprehensive view
+        const orderedNodeIds = selectedPath.map(step => step.nodeId);
+        // Include any choices not in the path as well
+        Object.keys(choices).forEach(nodeId => {
+            if (!orderedNodeIds.includes(nodeId)) {
+                orderedNodeIds.push(nodeId);
+            }
+        });
+        
+        orderedNodeIds.forEach((nodeId, index) => {
+            const choice = choices[nodeId];
             const nodeDef = tierDef?.nodes?.[nodeId];
             const stepTitle = nodeDef?.title || nodeId;
-            // Default to 'selection' as it's the most common step type
             const stepType = nodeDef?.type || 'selection';
+            const choiceText = choice ? choice.name : (stepType === 'checklist' ? 'Completed' : 'Visited');
             
             summaryItems += `
                 <div class="summary-item summary-item-${stepType}">
-                    <div class="summary-step-label">${stepTitle}</div>
-                    <div class="summary-choice-text">${choice.name}</div>
+                    <div class="summary-step-number">${index + 1}</div>
+                    <div class="summary-step-details">
+                        <div class="summary-step-label">${stepTitle}</div>
+                        <div class="summary-choice-text">${choiceText}</div>
+                    </div>
                 </div>
             `;
         });
@@ -1760,23 +1831,39 @@ function finishFlowchart() {
     if (!container) return;
     
     const choices = appState.visualFlowchart.choices || {};
+    const selectedPath = appState.visualFlowchart.selectedPath || [];
     const tierId = appState.visualFlowchart.tierId;
     const tierDef = FLOWCHART_DEFINITIONS[tierId];
     
     let summaryItems = '';
     
-    if (Object.keys(choices).length === 0) {
+    if (selectedPath.length === 0 && Object.keys(choices).length === 0) {
         summaryItems = '<p class="no-choices">No choices were recorded during this session.</p>';
     } else {
-        Object.entries(choices).forEach(([nodeId, choice]) => {
+        // Build summary in path order for comprehensive view
+        const orderedNodeIds = selectedPath.map(step => step.nodeId);
+        Object.keys(choices).forEach(nodeId => {
+            if (!orderedNodeIds.includes(nodeId)) {
+                orderedNodeIds.push(nodeId);
+            }
+        });
+        
+        orderedNodeIds.forEach((nodeId, index) => {
+            const choice = choices[nodeId];
             const nodeDef = tierDef?.nodes?.[nodeId];
             const stepTitle = nodeDef?.title || nodeId;
+            const stepType = nodeDef?.type || 'selection';
+            const choiceText = choice ? choice.name : (stepType === 'checklist' ? 'Completed' : 'Visited');
             summaryItems += `
-                <div class="summary-item">
-                    <span class="summary-step">${stepTitle}</span>
-                    <span class="summary-choice">${choice.name}</span>
+                <div class="summary-item summary-item-${stepType}">
+                    <div class="summary-step-number">${index + 1}</div>
+                    <div class="summary-step-details">
+                        <span class="summary-step">${stepTitle}</span>
+                        <span class="summary-choice">${choiceText}</span>
+                    </div>
                 </div>
             `;
+        });
         });
     }
     
@@ -5359,6 +5446,7 @@ window.proceedFromIntegratedInfo = proceedFromIntegratedInfo;
 window.selectIntegratedOption = selectIntegratedOption;
 window.makeIntegratedDecision = makeIntegratedDecision;
 window.updateIntegratedChecklistProgress = updateIntegratedChecklistProgress;
+window.toggleCheckAll = toggleCheckAll;
 window.selectTier1ScreenerVisualIntegrated = selectTier1ScreenerVisualIntegrated;
 window.selectTier2AssessmentVisualIntegrated = selectTier2AssessmentVisualIntegrated;
 window.selectTier2InterventionVisualIntegrated = selectTier2InterventionVisualIntegrated;
