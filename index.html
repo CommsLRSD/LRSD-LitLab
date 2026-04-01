@@ -45,6 +45,13 @@
                     </svg>
                     Interventions
                 </button>
+                <button class="nav-link" data-page="original" role="menuitem" aria-selected="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                    </svg>
+                    Original Guide
+                </button>
             </nav>
 
             <!-- Mobile menu button -->
@@ -81,6 +88,13 @@
                     <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
                 Interventions Menu
+            </button>
+            <button class="mobile-nav-item" data-page="original">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                </svg>
+                Original Guide
             </button>
         </div>
     </div>
@@ -133,6 +147,22 @@
                         <h3 class="cta-title">Interventions Menu</h3>
                         <p class="cta-desc">Browse interventions and assessments filtered by screener, subtest, and literacy pillar.</p>
                         <span class="cta-btn">Find Interventions
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </button>
+
+                    <button class="cta-card" onclick="navigateToPage('original')" aria-label="View Original Literacy Interventions Guide">
+                        <div class="cta-icon" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="cta-title">Original Literacy Interventions</h3>
+                        <p class="cta-desc">View the original LRSD Literacy Interventions guide document in its published format.</p>
+                        <span class="cta-btn">View Guide
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
@@ -290,6 +320,25 @@
                     </div><!-- /.step-wizard -->
                 </div><!-- /.interventions-page-body -->
             </div><!-- /.interventions-page-wrapper -->
+        </section>
+
+        <!-- ── ORIGINAL GUIDE ─────────────────────────────── -->
+        <section id="original-section" class="content-section" data-page="original">
+            <div class="original-guide-wrapper">
+                <div class="hero-area">
+                    <h2 class="section-title">Original Literacy Interventions</h2>
+                    <p class="section-subtitle">View the original LRSD Literacy Interventions guide document</p>
+                </div>
+                <div class="original-guide-body">
+                    <iframe
+                        src="https://indd.adobe.com/view/f95e967b-1f8c-436e-bf79-a22fb4b1df74"
+                        class="original-guide-iframe"
+                        title="Original Literacy Interventions Guide"
+                        allowfullscreen
+                        loading="lazy"
+                    ></iframe>
+                </div>
+            </div>
         </section>
 
     </main>
