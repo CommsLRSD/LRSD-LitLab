@@ -2442,11 +2442,11 @@ details > p {
 
 .decision-btn-no,
 .decision-btn.decision-warning,
-.decision-btn.warning { border-color: var(--warning); }
+.decision-btn.warning { border-color: #c27070; }
 
 .decision-btn-no:hover,
 .decision-btn.decision-warning:hover,
-.decision-btn.warning:hover { background: var(--warning-light); }
+.decision-btn.warning:hover { background: #fdf0f0; }
 
 .decision-btn.decision-info,
 .decision-btn.info { border-color: var(--info); }
@@ -2873,6 +2873,7 @@ details > p {
   width: 100%;
   max-width: 420px;
   margin-top: var(--space-xs);
+  align-items: flex-start;
 }
 
 .journey-branch {
@@ -2888,9 +2889,32 @@ details > p {
   border-color: var(--primary);
 }
 
+/* Colour-coded branches based on choice type */
+.journey-branch-taken.journey-branch-success {
+  background: var(--success-light);
+  border-color: var(--success);
+}
+.journey-branch-taken.journey-branch-warning {
+  background: #fdf0f0;
+  border-color: #c27070;
+}
+
 .journey-branch-other {
   opacity: 0.4;
   background: var(--bg-muted);
+  cursor: pointer;
+  transition: opacity var(--duration) var(--ease);
+}
+.journey-branch-other:hover {
+  opacity: 0.55;
+}
+
+/* Colour tint for non-chosen branches */
+.journey-branch-other.journey-branch-success {
+  background: var(--success-light);
+}
+.journey-branch-other.journey-branch-warning {
+  background: #fdf0f0;
 }
 
 .journey-branch-indicator {
@@ -2898,6 +2922,14 @@ details > p {
   font-weight: 600;
   color: var(--primary);
   margin-bottom: 2px;
+}
+
+/* Colour-coded indicators */
+.journey-branch-success .journey-branch-indicator {
+  color: var(--success-text);
+}
+.journey-branch-warning .journey-branch-indicator {
+  color: #a05050;
 }
 
 .journey-branch-label {
@@ -2915,6 +2947,110 @@ details > p {
   font-size: 0.68rem;
   color: var(--text-light);
   margin-top: 4px;
+  font-style: italic;
+}
+
+/* Expand prompt on greyed-out branches */
+.journey-branch-expand-hint {
+  font-size: 0.65rem;
+  color: var(--text-light);
+  margin-top: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.journey-branch-expand-hint svg {
+  transition: transform var(--duration) var(--ease);
+}
+.journey-branch-other.journey-branch-expanded .journey-branch-expand-hint svg {
+  transform: rotate(90deg);
+}
+
+/* Expanded alternative path container */
+.journey-alt-path {
+  display: none;
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px dashed var(--border);
+}
+.journey-branch-expanded .journey-alt-path {
+  display: block;
+}
+
+.journey-alt-step {
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-muted);
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
+.journey-alt-step-title {
+  font-weight: 600;
+  font-size: 0.72rem;
+  margin-bottom: 2px;
+}
+.journey-alt-step-desc {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+}
+.journey-alt-connector {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.65rem;
+  padding: 2px 0;
+}
+.journey-alt-endpoint {
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
+.journey-alt-endpoint.alt-endpoint-success {
+  background: var(--success-light);
+  border: 1px solid var(--success);
+}
+.journey-alt-endpoint.alt-endpoint-warning {
+  background: #fdf0f0;
+  border: 1px solid #c27070;
+}
+.journey-alt-endpoint.alt-endpoint-info {
+  background: var(--info-light);
+  border: 1px solid var(--info);
+}
+.journey-alt-endpoint.alt-endpoint-danger {
+  background: var(--danger-light);
+  border: 1px solid var(--danger);
+}
+.journey-alt-endpoint-title {
+  font-weight: 600;
+  font-size: 0.72rem;
+  margin-bottom: 2px;
+}
+.journey-alt-endpoint-desc {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+}
+
+.journey-alt-branches {
+  padding-left: 8px;
+}
+.journey-alt-branch-success {
+  border-left: 2px solid var(--success);
+  margin-left: 4px;
+}
+.journey-alt-branch-warning {
+  border-left: 2px solid #c27070;
+  margin-left: 4px;
+}
+.journey-alt-branch-primary,
+.journey-alt-branch-default {
+  border-left: 2px solid var(--border);
+  margin-left: 4px;
+}
+
+.journey-alt-continues {
   font-style: italic;
 }
 
@@ -3604,8 +3740,8 @@ details > p {
 
 .vf-decision-success { border-color: var(--success); }
 .vf-decision-success:hover { background: var(--success-light); }
-.vf-decision-warning { border-color: var(--warning); }
-.vf-decision-warning:hover { background: var(--warning-light); }
+.vf-decision-warning { border-color: #c27070; }
+.vf-decision-warning:hover { background: #fdf0f0; }
 .vf-decision-info { border-color: var(--info); }
 .vf-decision-info:hover { background: var(--info-light); }
 
