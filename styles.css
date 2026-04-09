@@ -3033,6 +3033,27 @@ details > p {
   color: var(--text-secondary);
 }
 
+.journey-alt-branches {
+  padding-left: 8px;
+}
+.journey-alt-branch-success {
+  border-left: 2px solid var(--success);
+  margin-left: 4px;
+}
+.journey-alt-branch-warning {
+  border-left: 2px solid #c27070;
+  margin-left: 4px;
+}
+.journey-alt-branch-primary,
+.journey-alt-branch-default {
+  border-left: 2px solid var(--border);
+  margin-left: 4px;
+}
+
+.journey-alt-continues {
+  font-style: italic;
+}
+
 /* Journey selection chips */
 .journey-selections {
   display: flex;

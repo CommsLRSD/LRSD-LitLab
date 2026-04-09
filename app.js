@@ -1634,6 +1634,7 @@ function buildAlternativePathHTML(tierDef, startNodeId) {
     let nodeId = startNodeId;
     let safety = 0;
     
+    // Max depth to prevent infinite loops in case of circular references
     while (nodeId && safety < 20) {
         safety++;
         const node = tierDef.nodes[nodeId];
@@ -1662,12 +1663,12 @@ function buildAlternativePathHTML(tierDef, startNodeId) {
         // Determine the next node in this alternative path
         if (node.type === 'decision' && node.choices && node.choices.length > 0) {
             // Show all possible branches from this decision, then stop
-            html += '<div style="padding-left: 8px;">';
+            html += '<div class="journey-alt-branches">';
             node.choices.forEach(c => {
                 const targetNode = tierDef.nodes[c.nextNode];
-                const typeClass = c.type === 'success' ? 'alt-endpoint-success' : c.type === 'warning' ? 'alt-endpoint-warning' : 'alt-endpoint-info';
+                const branchType = c.type || 'default';
                 html += `
-                    <div class="journey-alt-step" style="border-left: 2px solid ${c.type === 'success' ? 'var(--success)' : c.type === 'warning' ? '#c27070' : 'var(--border)'}; margin-left: 4px;">
+                    <div class="journey-alt-step journey-alt-branch-${branchType}">
                         <div class="journey-alt-step-title">${c.label}</div>
                         ${targetNode ? `<div class="journey-alt-step-desc">→ ${targetNode.title}</div>` : ''}
                     </div>
@@ -1682,7 +1683,7 @@ function buildAlternativePathHTML(tierDef, startNodeId) {
             // Selection/handler nodes - we can't determine the specific next node without user input
             html += `
                 <div class="journey-alt-step">
-                    <div class="journey-alt-step-desc" style="font-style: italic;">Continues based on selection...</div>
+                    <div class="journey-alt-step-desc journey-alt-continues">Continues based on selection...</div>
                 </div>
             `;
             break;
