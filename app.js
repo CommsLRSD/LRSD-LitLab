@@ -1762,19 +1762,26 @@ function showTierJourneyReview(endpointNodeData) {
     });
     
     // Build action buttons based on endpoint
-    const allowedActions = ['startTier2Visual', 'startTier3Visual', 'restartTier1Visual', 'restartTier2Visual'];
+    const actionFnMap = {
+        startTier2Visual: 'startTier2VisualIntegrated',
+        startTier3Visual: 'startTier3VisualIntegrated',
+        restartTier1Visual: 'restartTier1VisualIntegrated',
+        restartTier2Visual: 'restartTier2VisualIntegrated'
+    };
     
     let actionsHTML = '';
-    if (endpointNodeData.actionButton && allowedActions.includes(endpointNodeData.actionButton.action)) {
+    if (endpointNodeData.actionButton && actionFnMap[endpointNodeData.actionButton.action]) {
+        const fnName = actionFnMap[endpointNodeData.actionButton.action];
         actionsHTML += `
-            <button class="action-btn action-primary" onclick="${endpointNodeData.actionButton.action}Integrated()">
+            <button class="action-btn action-primary" onclick="${fnName}()">
                 ${endpointNodeData.actionButton.text}
             </button>
         `;
     }
-    if (endpointNodeData.secondaryAction && allowedActions.includes(endpointNodeData.secondaryAction.action)) {
+    if (endpointNodeData.secondaryAction && actionFnMap[endpointNodeData.secondaryAction.action]) {
+        const fnName = actionFnMap[endpointNodeData.secondaryAction.action];
         actionsHTML += `
-            <button class="action-btn action-secondary" onclick="${endpointNodeData.secondaryAction.action}Integrated()">
+            <button class="action-btn action-secondary" onclick="${fnName}()">
                 ${endpointNodeData.secondaryAction.text}
             </button>
         `;
@@ -1799,7 +1806,7 @@ function showTierJourneyReview(endpointNodeData) {
     stepsContainer.innerHTML = `
         <div class="journey-review">
             <div class="journey-review-header">
-                <h2>Your ${tierDef.title.split(':')[0].trim()} Journey</h2>
+                <h2>Your ${tierDef.title.includes(':') ? tierDef.title.split(':')[0].trim() : tierDef.title} Journey</h2>
                 <p>Review your path through the flowchart</p>
             </div>
             <div class="journey-flow">
