@@ -1628,6 +1628,77 @@ function goToPreviousStep() {
     showIntegratedNode(targetStep.nodeId, targetStep.fromNodeId, null, 'back');
 }
 
+// Build HTML showing the alternative path from a given node (greyed out)
+function buildAlternativePathHTML(tierDef, startNodeId) {
+    let html = '';
+    let nodeId = startNodeId;
+    let safety = 0;
+    
+    while (nodeId && safety < 20) {
+        safety++;
+        const node = tierDef.nodes[nodeId];
+        if (!node) break;
+        
+        if (node.type === 'endpoint') {
+            // Render endpoint
+            const statusClass = node.status ? `alt-endpoint-${node.status}` : 'alt-endpoint-info';
+            html += `
+                <div class="journey-alt-endpoint ${statusClass}">
+                    <div class="journey-alt-endpoint-title">${node.title}</div>
+                    <div class="journey-alt-endpoint-desc">${node.description || ''}</div>
+                </div>
+            `;
+            break;
+        }
+        
+        // Render regular step
+        html += `
+            <div class="journey-alt-step">
+                <div class="journey-alt-step-title">${node.title}</div>
+                ${node.subtitle ? `<div class="journey-alt-step-desc">${node.subtitle}</div>` : ''}
+            </div>
+        `;
+        
+        // Determine the next node in this alternative path
+        if (node.type === 'decision' && node.choices && node.choices.length > 0) {
+            // Show all possible branches from this decision, then stop
+            html += '<div style="padding-left: 8px;">';
+            node.choices.forEach(c => {
+                const targetNode = tierDef.nodes[c.nextNode];
+                const typeClass = c.type === 'success' ? 'alt-endpoint-success' : c.type === 'warning' ? 'alt-endpoint-warning' : 'alt-endpoint-info';
+                html += `
+                    <div class="journey-alt-step" style="border-left: 2px solid ${c.type === 'success' ? 'var(--success)' : c.type === 'warning' ? '#c27070' : 'var(--border)'}; margin-left: 4px;">
+                        <div class="journey-alt-step-title">${c.label}</div>
+                        ${targetNode ? `<div class="journey-alt-step-desc">→ ${targetNode.title}</div>` : ''}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            break;
+        } else if (node.nextNode) {
+            html += '<div class="journey-alt-connector">↓</div>';
+            nodeId = node.nextNode;
+        } else if (node.nextHandler) {
+            // Selection/handler nodes - we can't determine the specific next node without user input
+            html += `
+                <div class="journey-alt-step">
+                    <div class="journey-alt-step-desc" style="font-style: italic;">Continues based on selection...</div>
+                </div>
+            `;
+            break;
+        } else {
+            break;
+        }
+    }
+    
+    return html;
+}
+
+// Toggle alternative path expansion on greyed-out branch
+function toggleAltPath(element) {
+    element.classList.toggle('journey-branch-expanded');
+}
+
 // Show tier journey review at end of tier (when endpoint is reached)
 function showTierJourneyReview(endpointNodeData) {
     const stepsContainer = document.getElementById('flowchart-steps');
@@ -1729,12 +1800,27 @@ function showTierJourneyReview(endpointNodeData) {
                 nodeDef.choices.forEach(c => {
                     const isSelected = c.id === choice.id;
                     const targetNodeDef = tierDef.nodes[c.nextNode];
+                    const typeClass = c.type ? `journey-branch-${c.type}` : '';
+                    
+                    // Build alternative path HTML for non-selected branches
+                    let altPathHTML = '';
+                    if (!isSelected && c.nextNode) {
+                        altPathHTML = buildAlternativePathHTML(tierDef, c.nextNode);
+                    }
+                    
                     journeyStepsHTML += `
-                        <div class="journey-branch ${isSelected ? 'journey-branch-taken' : 'journey-branch-other'}">
+                        <div class="journey-branch ${isSelected ? 'journey-branch-taken' : 'journey-branch-other'} ${typeClass}" ${!isSelected ? `onclick="toggleAltPath(this)"` : ''}>
                             ${isSelected ? '<div class="journey-branch-indicator">✓ Your choice</div>' : ''}
                             <div class="journey-branch-label">${c.label}</div>
                             <div class="journey-branch-sublabel">${c.sublabel}</div>
                             ${!isSelected && targetNodeDef ? `<div class="journey-branch-leads-to">→ ${targetNodeDef.title}</div>` : ''}
+                            ${!isSelected && altPathHTML ? `
+                                <div class="journey-branch-expand-hint">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
+                                    See what would happen
+                                </div>
+                                <div class="journey-alt-path">${altPathHTML}</div>
+                            ` : ''}
                         </div>
                     `;
                 });
@@ -5607,6 +5693,7 @@ window.finishFlowchart = finishFlowchart;
 window.restartCurrentTier = restartCurrentTier;
 window.undoToStep = undoToStep;
 window.goToPreviousStep = goToPreviousStep;
+window.toggleAltPath = toggleAltPath;
 window.proceedFromIntegratedChecklist = proceedFromIntegratedChecklist;
 window.proceedFromIntegratedInfo = proceedFromIntegratedInfo;
 window.selectIntegratedOption = selectIntegratedOption;
