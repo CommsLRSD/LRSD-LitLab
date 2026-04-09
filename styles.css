@@ -1915,9 +1915,9 @@ details > p {
 
 .flowchart-steps {
   display: flex;
-  flex-direction: row;
-  gap: var(--space-md);
+  justify-content: center;
   align-items: flex-start;
+  min-height: 200px;
 }
 
 /* Connector */
@@ -1949,14 +1949,32 @@ details > p {
   border-radius: var(--radius-lg);
   overflow: hidden;
   opacity: 0;
-  transform: translateX(-10px);
-  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease),
-              border-color var(--duration) var(--ease),
+  transition: border-color var(--duration) var(--ease),
               box-shadow var(--duration) var(--ease);
   min-width: 280px;
-  max-width: 360px;
+  max-width: 520px;
+  width: 100%;
   flex-shrink: 0;
   box-shadow: var(--shadow-xs);
+}
+
+/* Carousel slide-in animations */
+.flowchart-step.carousel-enter-forward {
+  animation: carouselSlideInRight 0.35s var(--ease) forwards;
+}
+
+.flowchart-step.carousel-enter-back {
+  animation: carouselSlideInLeft 0.35s var(--ease) forwards;
+}
+
+@keyframes carouselSlideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes carouselSlideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .flowchart-step.step-visible,
@@ -2729,6 +2747,238 @@ details > p {
   font-weight: 600;
   background: var(--secondary);
   color: var(--text-on-primary);
+}
+
+/* Carousel navigation button */
+.carousel-prev-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-muted);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--duration) var(--ease);
+}
+
+.carousel-prev-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.carousel-prev-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Journey Review (end-of-tier visual flowchart) */
+.journey-review {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--space-lg) 0;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+
+.journey-review.journey-review-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.journey-review-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.journey-review-header h2 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.journey-review-header p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.journey-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.journey-connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  color: var(--text-light);
+}
+
+.journey-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-md);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.journey-step-checklist { border-left: 3px solid var(--step-checklist); }
+.journey-step-selection { border-left: 3px solid var(--step-selection); }
+.journey-step-decision  { border-left: 3px solid var(--step-decision); }
+.journey-step-info      { border-left: 3px solid var(--step-info); }
+
+.journey-step-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.journey-step-details {
+  flex: 1;
+}
+
+.journey-step-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.journey-step-choice {
+  font-size: 0.78rem;
+  color: var(--primary);
+  margin-top: 2px;
+}
+
+/* Journey branches (decision alternatives) */
+.journey-branches {
+  display: flex;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 420px;
+  margin-top: var(--space-xs);
+}
+
+.journey-branch {
+  flex: 1;
+  padding: var(--space-sm);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  font-size: 0.78rem;
+}
+
+.journey-branch-taken {
+  background: var(--primary-faint);
+  border-color: var(--primary);
+}
+
+.journey-branch-other {
+  opacity: 0.4;
+  background: var(--bg-muted);
+}
+
+.journey-branch-indicator {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.journey-branch-label {
+  font-weight: 600;
+  font-size: 0.8rem;
+  margin-bottom: 2px;
+}
+
+.journey-branch-sublabel {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.journey-branch-leads-to {
+  font-size: 0.68rem;
+  color: var(--text-light);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Journey selection chips */
+.journey-selections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  max-width: 420px;
+  margin-top: var(--space-xs);
+  justify-content: center;
+}
+
+.journey-selection-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.journey-selection-chosen {
+  background: var(--primary-faint);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.journey-selection-other {
+  background: var(--bg-muted);
+  color: var(--text-light);
+  opacity: 0.45;
+  border: 1px solid var(--border);
+}
+
+/* Journey endpoint */
+.journey-endpoint {
+  text-align: center;
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.journey-endpoint-icon { margin-bottom: 4px; }
+.journey-endpoint-icon svg { width: 24px; height: 24px; }
+.journey-endpoint h3 { font-size: 0.95rem; margin-bottom: 4px; }
+.journey-endpoint p { font-size: 0.8rem; color: var(--text-secondary); }
+
+.journey-endpoint-success { background: var(--success-light); border-color: var(--success); }
+.journey-endpoint-info    { background: var(--info-light); border-color: var(--info); }
+.journey-endpoint-warning { background: var(--warning-light); border-color: var(--warning); }
+.journey-endpoint-danger  { background: var(--danger-light); border-color: var(--danger); }
+
+/* Journey actions */
+.journey-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
 }
 
 /* Summary / Review modal */
@@ -3640,7 +3890,6 @@ details > p {
 
   /* Stack flowchart vertically on mobile */
   .flowchart-steps {
-    flex-direction: column;
     padding: 0 var(--space-sm);
   }
   .flowchart-step,
@@ -3660,6 +3909,20 @@ details > p {
   }
   .flowchart-step-connector svg {
     transform: rotate(90deg);
+  }
+  /* Journey review mobile */
+  .journey-review {
+    padding: var(--space-md);
+  }
+  .journey-branches {
+    flex-direction: column;
+  }
+  .journey-step,
+  .journey-endpoint {
+    max-width: 100%;
+  }
+  .journey-selections {
+    max-width: 100%;
   }
 }
 

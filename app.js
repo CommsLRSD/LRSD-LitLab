@@ -1000,6 +1000,12 @@ function initIntegratedFlowchart(tierId) {
             </div>
             
             <div class="flowchart-title-bar">
+                <button class="carousel-prev-btn" id="carousel-prev-btn" onclick="goToPreviousStep()" style="visibility: hidden;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Previous
+                </button>
                 <h2>${flowchartDef.title}</h2>
                 <div class="step-indicator">
                     <span class="step-text">Step 1</span>
@@ -1012,24 +1018,12 @@ function initIntegratedFlowchart(tierId) {
         </div>
     `;
     
-    // Add horizontal scroll wheel behavior
-    const contentArea = document.getElementById('flowchart-content');
-    if (contentArea) {
-        contentArea.addEventListener('wheel', (e) => {
-            // Convert vertical scroll to horizontal
-            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                e.preventDefault();
-                contentArea.scrollLeft += e.deltaY;
-            }
-        }, { passive: false });
-    }
-    
     // Show the first node
     showIntegratedNode(flowchartDef.startNode, null);
 }
 
 // Show a node in the integrated flowchart
-function showIntegratedNode(nodeId, fromNodeId, choiceId = null) {
+function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'forward') {
     const tierId = appState.visualFlowchart.tierId;
     const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
     const nodeData = flowchartDef.nodes[nodeId];
@@ -1046,40 +1040,30 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null) {
     appState.visualFlowchart.selectedPath.push({ nodeId, fromNodeId, choiceId });
     appState.visualFlowchart.currentNodeId = nodeId;
     
-    // Update step indicator
-    const stepText = document.querySelector('.step-text');
-    if (stepText) {
-        stepText.textContent = `Step ${appState.visualFlowchart.selectedPath.length}`;
+    // Update carousel navigation (prev button, step indicator)
+    updateCarouselNav();
+    
+    // If this is an endpoint, show the tier journey review instead
+    if (nodeData.type === 'endpoint') {
+        showTierJourneyReview(nodeData);
+        return;
     }
     
-    // Create the node element
-    createIntegratedNodeElement(nodeData, stepsContainer);
+    // Carousel mode: clear container and show only this step
+    stepsContainer.innerHTML = '';
+    createIntegratedNodeElement(nodeData, stepsContainer, direction);
     
-    // Scroll to new node (horizontal scroll)
+    // Scroll to top of content area
     setTimeout(() => {
-        const newNode = document.querySelector(`[data-node-id="${nodeId}"]`);
         const contentArea = document.getElementById('flowchart-content');
-        if (newNode && contentArea) {
-            newNode.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        if (contentArea) {
+            contentArea.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }, 100);
 }
 
-// Create integrated node element
-function createIntegratedNodeElement(nodeData, container) {
-    // Add connector arrow if not the first node
-    const existingNodes = container.querySelectorAll('.flowchart-step');
-    if (existingNodes.length > 0) {
-        const connector = document.createElement('div');
-        connector.className = 'flowchart-step-connector';
-        connector.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-        `;
-        container.appendChild(connector);
-    }
-    
+// Create integrated node element (carousel mode - single step)
+function createIntegratedNodeElement(nodeData, container, direction = 'forward') {
     const nodeElement = document.createElement('div');
     nodeElement.className = `flowchart-step flowchart-step-${nodeData.type}`;
     nodeElement.setAttribute('data-node-id', nodeData.id);
@@ -1109,9 +1093,10 @@ function createIntegratedNodeElement(nodeData, container) {
     nodeElement.innerHTML = content;
     container.appendChild(nodeElement);
     
-    // Animate in
+    // Animate in based on direction
+    const animClass = direction === 'back' ? 'carousel-enter-back' : 'carousel-enter-forward';
     requestAnimationFrame(() => {
-        nodeElement.classList.add('step-visible');
+        nodeElement.classList.add(animClass);
     });
     
     // Initialize checklist if needed
@@ -1606,7 +1591,241 @@ function markStepCompleted(nodeId) {
     }
 }
 
-// Undo to a specific step
+// Update carousel navigation (prev button, step indicator)
+function updateCarouselNav() {
+    const path = appState.visualFlowchart.selectedPath;
+    const prevBtn = document.getElementById('carousel-prev-btn');
+    if (prevBtn) {
+        prevBtn.style.visibility = path.length > 1 ? 'visible' : 'hidden';
+    }
+    
+    const stepText = document.querySelector('.step-text');
+    if (stepText) {
+        stepText.textContent = `Step ${path.length}`;
+    }
+}
+
+// Navigate to previous step in carousel
+function goToPreviousStep() {
+    const path = appState.visualFlowchart.selectedPath;
+    if (path.length <= 1) return;
+    
+    // Remove current step from path
+    path.pop();
+    
+    // Get the step we're going back to
+    const targetStep = path[path.length - 1];
+    
+    // Delete the choice for this step (so they can re-make it)
+    delete appState.visualFlowchart.choices[targetStep.nodeId];
+    
+    // Remove the target from path (showIntegratedNode will re-add it)
+    path.pop();
+    
+    appState.visualFlowchart.currentNodeId = null;
+    
+    // Show the target node with back animation
+    showIntegratedNode(targetStep.nodeId, targetStep.fromNodeId, null, 'back');
+}
+
+// Show tier journey review at end of tier (when endpoint is reached)
+function showTierJourneyReview(endpointNodeData) {
+    const stepsContainer = document.getElementById('flowchart-steps');
+    if (!stepsContainer) return;
+    
+    const tierId = appState.visualFlowchart.tierId;
+    const tierDef = FLOWCHART_DEFINITIONS[tierId];
+    const selectedPath = appState.visualFlowchart.selectedPath;
+    const choices = appState.visualFlowchart.choices;
+    
+    // Build the journey flow HTML
+    let journeyStepsHTML = '';
+    
+    selectedPath.forEach((step, index) => {
+        const nodeDef = tierDef.nodes[step.nodeId];
+        if (!nodeDef) return;
+        
+        const choice = choices[step.nodeId];
+        const isEndpoint = nodeDef.type === 'endpoint';
+        
+        // Add connector arrow (except before first node)
+        if (index > 0) {
+            journeyStepsHTML += `
+                <div class="journey-connector">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <path d="M12 5v14M5 12l7 7 7-7"/>
+                    </svg>
+                </div>
+            `;
+        }
+        
+        if (isEndpoint) {
+            // Render the endpoint as a special card
+            const statusClasses = {
+                success: 'journey-endpoint-success',
+                info: 'journey-endpoint-info',
+                warning: 'journey-endpoint-warning',
+                danger: 'journey-endpoint-danger'
+            };
+            const statusClass = statusClasses[nodeDef.status] || 'journey-endpoint-info';
+            
+            const statusIcons = {
+                success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>',
+                warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
+                danger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>'
+            };
+            
+            const recommendationsHTML = nodeDef.recommendations ? `
+                <div class="recommendations-box">
+                    <h4>Recommendations</h4>
+                    <ul>${nodeDef.recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
+                </div>
+            ` : '';
+            
+            const warningBoxHTML = nodeDef.warningBox ? `
+                <div class="warning-callout">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div>
+                        <h4>${nodeDef.warningBox.title}</h4>
+                        <p>${nodeDef.warningBox.text}</p>
+                    </div>
+                </div>
+            ` : '';
+            
+            journeyStepsHTML += `
+                <div class="journey-endpoint ${statusClass}">
+                    <div class="journey-endpoint-icon">${statusIcons[nodeDef.status] || statusIcons.info}</div>
+                    <h3>${nodeDef.title}</h3>
+                    <p>${nodeDef.description}</p>
+                    ${warningBoxHTML}
+                    ${recommendationsHTML}
+                </div>
+            `;
+        } else {
+            // Regular visited step
+            let choiceText = '';
+            if (choice) {
+                choiceText = choice.name;
+            } else if (nodeDef.type === 'checklist') {
+                choiceText = 'Completed';
+            }
+            
+            journeyStepsHTML += `
+                <div class="journey-step journey-step-${nodeDef.type}">
+                    <div class="journey-step-marker">${index + 1}</div>
+                    <div class="journey-step-details">
+                        <div class="journey-step-title">${nodeDef.title}</div>
+                        ${choiceText ? `<div class="journey-step-choice">${choiceText}</div>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // For decision nodes, show all options with selected highlighted
+            if (nodeDef.type === 'decision' && nodeDef.choices && choice) {
+                journeyStepsHTML += '<div class="journey-branches">';
+                nodeDef.choices.forEach(c => {
+                    const isSelected = c.id === choice.id;
+                    const targetNodeDef = tierDef.nodes[c.nextNode];
+                    journeyStepsHTML += `
+                        <div class="journey-branch ${isSelected ? 'journey-branch-taken' : 'journey-branch-other'}">
+                            ${isSelected ? '<div class="journey-branch-indicator">✓ Your choice</div>' : ''}
+                            <div class="journey-branch-label">${c.label}</div>
+                            <div class="journey-branch-sublabel">${c.sublabel}</div>
+                            ${!isSelected && targetNodeDef ? `<div class="journey-branch-leads-to">→ ${targetNodeDef.title}</div>` : ''}
+                        </div>
+                    `;
+                });
+                journeyStepsHTML += '</div>';
+            }
+            
+            // For selection nodes, show all options with selected highlighted
+            if (nodeDef.type === 'selection' && choice) {
+                const tierData = appState.tierFlowchartData?.[tierId];
+                const options = tierData?.[nodeDef.options] || [];
+                if (options.length > 1) {
+                    journeyStepsHTML += '<div class="journey-selections">';
+                    options.forEach(opt => {
+                        const isSelected = opt.id === choice.id;
+                        journeyStepsHTML += `
+                            <span class="journey-selection-chip ${isSelected ? 'journey-selection-chosen' : 'journey-selection-other'}">
+                                ${opt.name}
+                            </span>
+                        `;
+                    });
+                    journeyStepsHTML += '</div>';
+                }
+            }
+        }
+    });
+    
+    // Build action buttons based on endpoint
+    const allowedActions = ['startTier2Visual', 'startTier3Visual', 'restartTier1Visual', 'restartTier2Visual'];
+    
+    let actionsHTML = '';
+    if (endpointNodeData.actionButton && allowedActions.includes(endpointNodeData.actionButton.action)) {
+        actionsHTML += `
+            <button class="action-btn action-primary" onclick="${endpointNodeData.actionButton.action}Integrated()">
+                ${endpointNodeData.actionButton.text}
+            </button>
+        `;
+    }
+    if (endpointNodeData.secondaryAction && allowedActions.includes(endpointNodeData.secondaryAction.action)) {
+        actionsHTML += `
+            <button class="action-btn action-secondary" onclick="${endpointNodeData.secondaryAction.action}Integrated()">
+                ${endpointNodeData.secondaryAction.text}
+            </button>
+        `;
+    }
+    actionsHTML += `
+        <button class="action-btn action-secondary" onclick="goToPreviousStep()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Go Back
+        </button>
+        <button class="action-btn action-secondary" onclick="restartCurrentTier()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+            </svg>
+            Start Over
+        </button>
+    `;
+    
+    // Render journey review into the steps container
+    stepsContainer.innerHTML = `
+        <div class="journey-review">
+            <div class="journey-review-header">
+                <h2>Your ${tierDef.title.split(':')[0].trim()} Journey</h2>
+                <p>Review your path through the flowchart</p>
+            </div>
+            <div class="journey-flow">
+                ${journeyStepsHTML}
+            </div>
+            <div class="journey-actions">
+                ${actionsHTML}
+            </div>
+        </div>
+    `;
+    
+    // Update navigation
+    const prevBtn = document.getElementById('carousel-prev-btn');
+    if (prevBtn) prevBtn.style.visibility = 'hidden';
+    
+    const stepText = document.querySelector('.step-text');
+    if (stepText) stepText.textContent = 'Journey Complete';
+    
+    // Animate in
+    requestAnimationFrame(() => {
+        const review = stepsContainer.querySelector('.journey-review');
+        if (review) review.classList.add('journey-review-visible');
+    });
+}
+
+// Undo to a specific step (carousel mode)
 function undoToStep(nodeId) {
     const pathIndex = appState.visualFlowchart.selectedPath.findIndex(step => step.nodeId === nodeId);
     
@@ -1615,100 +1834,24 @@ function undoToStep(nodeId) {
     // If this is the current node, do nothing
     if (appState.visualFlowchart.currentNodeId === nodeId) return;
     
-    // Remove all nodes and connectors after this one from the DOM
-    const allNodes = document.querySelectorAll('.flowchart-step');
-    const allConnectors = document.querySelectorAll('.flowchart-step-connector');
-    const nodesToRemove = [];
-    const connectorsToRemove = [];
+    // Truncate path to before the target step
+    appState.visualFlowchart.selectedPath = appState.visualFlowchart.selectedPath.slice(0, pathIndex);
     
-    allNodes.forEach(node => {
-        const dataNodeId = node.getAttribute('data-node-id');
-        const nodePathIndex = appState.visualFlowchart.selectedPath.findIndex(step => step.nodeId === dataNodeId);
-        if (nodePathIndex > pathIndex) {
-            nodesToRemove.push(node);
-        }
-    });
-    
-    // Remove connectors after the target node.
-    // The DOM structure has connectors interleaved with nodes: [node, connector, node, connector, ...]
-    // So connector at index N appears before node at index N+1.
-    // We keep the first (pathIndex + 1) nodes, so we keep the first (pathIndex + 1) connectors.
-    // Any connector at index >= (pathIndex + 1) should be removed.
-    const nodesToKeep = pathIndex + 1;
-    allConnectors.forEach((connector, index) => {
-        if (index >= nodesToKeep) {
-            connectorsToRemove.push(connector);
-        }
-    });
-    
-    nodesToRemove.forEach(node => {
-        node.classList.add('step-removing');
-        setTimeout(() => node.remove(), 300);
-    });
-    
-    connectorsToRemove.forEach(connector => {
-        connector.classList.add('step-removing');
-        setTimeout(() => connector.remove(), 300);
-    });
-    
-    // Update the path - remove steps after this one
-    appState.visualFlowchart.selectedPath = appState.visualFlowchart.selectedPath.slice(0, pathIndex + 1);
-    appState.visualFlowchart.currentNodeId = nodeId;
-    
-    // Remove choices after this step
-    const choiceKeys = Object.keys(appState.visualFlowchart.choices);
-    choiceKeys.forEach(key => {
-        const keyIndex = appState.visualFlowchart.selectedPath.findIndex(step => step.nodeId === key);
-        if (keyIndex > pathIndex || keyIndex === -1) {
+    // Remove choices from the target step onwards
+    const remainingNodeIds = new Set(appState.visualFlowchart.selectedPath.map(s => s.nodeId));
+    Object.keys(appState.visualFlowchart.choices).forEach(key => {
+        if (!remainingNodeIds.has(key)) {
             delete appState.visualFlowchart.choices[key];
         }
     });
     
-    // Reset the node
-    const targetNode = document.querySelector(`[data-node-id="${nodeId}"]`);
-    if (targetNode) {
-        targetNode.classList.remove('step-completed');
-        
-        // Hide undo button
-        const undoBtn = targetNode.querySelector('.undo-btn');
-        if (undoBtn) {
-            undoBtn.style.display = 'none';
-        }
-        
-        // Re-enable buttons and options
-        const btn = targetNode.querySelector('.continue-btn');
-        if (btn) btn.disabled = false;
-        
-        const options = targetNode.querySelectorAll('.selection-option');
-        options.forEach(opt => {
-            opt.classList.remove('option-disabled', 'option-selected');
-        });
-        
-        const choices = targetNode.querySelectorAll('.decision-btn');
-        choices.forEach(ch => {
-            ch.classList.remove('decision-disabled', 'decision-selected');
-        });
-        
-        const checkboxes = targetNode.querySelectorAll('.checklist-item input[type="checkbox"]');
-        checkboxes.forEach(cb => {
-            cb.checked = false;
-            cb.closest('.checklist-item')?.classList.remove('checked');
-        });
-        if (btn) {
-            btn.disabled = true;
-        }
-    }
+    appState.visualFlowchart.currentNodeId = null;
     
-    // Update step indicator
-    const stepText = document.querySelector('.step-text');
-    if (stepText) {
-        stepText.textContent = `Step ${appState.visualFlowchart.selectedPath.length}`;
-    }
+    // Get the from-node info for proper path tracking
+    const prevStep = pathIndex > 0 ? appState.visualFlowchart.selectedPath[pathIndex - 1] : null;
     
-    // Scroll to the node
-    setTimeout(() => {
-        targetNode?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
+    // Show the target node with back animation (this re-adds it to the path)
+    showIntegratedNode(nodeId, prevStep?.nodeId || null, null, 'back');
 }
 
 // Switch to a different tier
@@ -1743,7 +1886,10 @@ function switchToTier(tierId) {
         titleEl.textContent = flowchartDef.title;
     }
     
-    // Reset step indicator
+    // Reset carousel navigation
+    const prevBtn = document.getElementById('carousel-prev-btn');
+    if (prevBtn) prevBtn.style.visibility = 'hidden';
+    
     const stepText = document.querySelector('.step-text');
     if (stepText) {
         stepText.textContent = 'Step 1';
@@ -5453,6 +5599,7 @@ window.closeSummary = closeSummary;
 window.finishFlowchart = finishFlowchart;
 window.restartCurrentTier = restartCurrentTier;
 window.undoToStep = undoToStep;
+window.goToPreviousStep = goToPreviousStep;
 window.proceedFromIntegratedChecklist = proceedFromIntegratedChecklist;
 window.proceedFromIntegratedInfo = proceedFromIntegratedInfo;
 window.selectIntegratedOption = selectIntegratedOption;
