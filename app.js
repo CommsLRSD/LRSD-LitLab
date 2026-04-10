@@ -435,9 +435,7 @@ function renderInterventionStrategies(tier, screener, area) {
             <div class="step-card wide">
                 <div class="step-header">
                     <div class="step-icon success">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
                     </div>
                     <div>
                         <h2>Recommended Interventions</h2>
@@ -598,6 +596,38 @@ const VF_CONSTANTS = {
     PATH_LENGTH_FALLBACK: 100,        // Fallback for SVG path length
     MOBILE_BREAKPOINT: 768            // Breakpoint for mobile layout (matches CSS media query)
 };
+
+// ── Shared icon SVG strings ──
+// Used across flowchart nodes, endpoints, decisions, and journey review.
+// All icons include stroke-linecap="round" stroke-linejoin="round" for proper
+// rendering at small sizes (dots, line-caps stay visible even at 12-20 px).
+const ICONS = {
+    // Status icons (endpoints + decision buttons)
+    success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>`,
+    warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+    info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+    danger: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+
+    // Decision-button–specific (larger, bolder feel)
+    checkmark: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`,
+
+    // Step-type icons (appear inside step badges / journey markers)
+    checklist: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>`,
+    selection: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+    decision: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+    infoStep: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>`,
+};
+
+// Return the step-type icon for a given node type string
+function getStepTypeIcon(nodeType) {
+    const map = {
+        checklist: ICONS.checklist,
+        selection: ICONS.selection,
+        decision:  ICONS.decision,
+        info:      ICONS.infoStep,
+    };
+    return map[nodeType] || '';
+}
 
 // Helper function to get shortened tier title for mobile
 function getTierTitle(fullTitle, isMobile = window.innerWidth <= 768) {
@@ -991,9 +1021,7 @@ function initIntegratedFlowchart(tierId) {
                         <span>Summary</span>
                     </button>
                     <button class="flowchart-action-btn flowchart-done-btn" onclick="finishFlowchart()" title="I'm Done">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
                         <span>I'm Done</span>
                     </button>
                 </div>
@@ -1132,7 +1160,7 @@ function createIntegratedChecklistNode(nodeData) {
     
     return `
         <div class="step-header">
-            <div class="step-badge">${nodeData.title}</div>
+            <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
@@ -1197,10 +1225,7 @@ function createIntegratedSelectionNode(nodeData) {
     
     const infoBoxHTML = nodeData.infoBox ? `
         <div class="info-callout">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4m0-4h.01"/>
-            </svg>
+            ${ICONS.info}
             <div>
                 <h4>${nodeData.infoBox.title}</h4>
                 ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
@@ -1211,9 +1236,7 @@ function createIntegratedSelectionNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="warning-callout">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
+            ${ICONS.warning}
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -1223,7 +1246,7 @@ function createIntegratedSelectionNode(nodeData) {
     
     return `
         <div class="step-header">
-            <div class="step-badge">${nodeData.title}</div>
+            <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
@@ -1247,20 +1270,7 @@ function createIntegratedDecisionNode(nodeData) {
     const choicesHTML = nodeData.choices.map(choice => `
         <button class="decision-btn decision-${choice.type}" onclick="makeIntegratedDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
             <div class="decision-icon">
-                ${choice.type === 'success' ? `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 13l4 4L19 7"/>
-                    </svg>
-                ` : choice.type === 'warning' ? `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                ` : `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 16v-4m0-4h.01"/>
-                    </svg>
-                `}
+                ${choice.type === 'success' ? ICONS.checkmark : choice.type === 'warning' ? ICONS.warning : ICONS.info}
             </div>
             <div class="decision-content">
                 <strong>${choice.label}</strong>
@@ -1271,10 +1281,7 @@ function createIntegratedDecisionNode(nodeData) {
     
     const infoBoxHTML = nodeData.infoBox ? `
         <div class="info-callout">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4m0-4h.01"/>
-            </svg>
+            ${ICONS.info}
             <div>
                 <h4>${nodeData.infoBox.title}</h4>
                 ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
@@ -1285,9 +1292,7 @@ function createIntegratedDecisionNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="warning-callout">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
+            ${ICONS.warning}
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -1297,7 +1302,7 @@ function createIntegratedDecisionNode(nodeData) {
     
     return `
         <div class="step-header">
-            <div class="step-badge">${nodeData.title}</div>
+            <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
@@ -1326,9 +1331,7 @@ function createIntegratedInfoNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="warning-callout">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
+            ${ICONS.warning}
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -1338,7 +1341,7 @@ function createIntegratedInfoNode(nodeData) {
     
     return `
         <div class="step-header">
-            <div class="step-badge">${nodeData.title}</div>
+            <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
@@ -1362,13 +1365,6 @@ function createIntegratedInfoNode(nodeData) {
 
 // Create integrated endpoint node
 function createIntegratedEndpointNode(nodeData) {
-    const statusIcons = {
-        success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
-        info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>`,
-        warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
-        danger: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>`
-    };
-    
     const recommendationsHTML = nodeData.recommendations ? `
         <div class="recommendations-box">
             <h4>Recommendations</h4>
@@ -1380,9 +1376,7 @@ function createIntegratedEndpointNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="warning-callout">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
+            ${ICONS.warning}
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -1408,7 +1402,7 @@ function createIntegratedEndpointNode(nodeData) {
     return `
         <div class="endpoint-card endpoint-${nodeData.status}">
             <div class="endpoint-icon">
-                ${statusIcons[nodeData.status] || statusIcons.info}
+                ${ICONS[nodeData.status] || ICONS.info}
             </div>
             <h2>${nodeData.title}</h2>
             <p>${nodeData.description}</p>
@@ -1741,13 +1735,6 @@ function showTierJourneyReview(endpointNodeData) {
             };
             const statusClass = statusClasses[nodeDef.status] || 'journey-endpoint-info';
             
-            const statusIcons = {
-                success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
-                info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>',
-                warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
-                danger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>'
-            };
-            
             const recommendationsHTML = nodeDef.recommendations ? `
                 <div class="recommendations-box">
                     <h4>Recommendations</h4>
@@ -1757,9 +1744,7 @@ function showTierJourneyReview(endpointNodeData) {
             
             const warningBoxHTML = nodeDef.warningBox ? `
                 <div class="warning-callout">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
+                    ${ICONS.warning}
                     <div>
                         <h4>${nodeDef.warningBox.title}</h4>
                         <p>${nodeDef.warningBox.text}</p>
@@ -1769,7 +1754,7 @@ function showTierJourneyReview(endpointNodeData) {
             
             journeyStepsHTML += `
                 <div class="journey-endpoint ${statusClass}">
-                    <div class="journey-endpoint-icon">${statusIcons[nodeDef.status] || statusIcons.info}</div>
+                    <div class="journey-endpoint-icon">${ICONS[nodeDef.status] || ICONS.info}</div>
                     <h3>${nodeDef.title}</h3>
                     <p>${nodeDef.description}</p>
                     ${warningBoxHTML}
@@ -1787,7 +1772,7 @@ function showTierJourneyReview(endpointNodeData) {
             
             journeyStepsHTML += `
                 <div class="journey-step journey-step-${nodeDef.type}">
-                    <div class="journey-step-marker">${index + 1}</div>
+                    <div class="journey-step-marker"><span class="journey-marker-icon">${getStepTypeIcon(nodeDef.type)}</span></div>
                     <div class="journey-step-details">
                         <div class="journey-step-title">${nodeDef.title}</div>
                         ${choiceText ? `<div class="journey-step-choice">${choiceText}</div>` : ''}
@@ -2026,7 +2011,7 @@ function showFlowchartSummary() {
             
             summaryItems += `
                 <div class="summary-item summary-item-${stepType}">
-                    <div class="summary-step-number">${index + 1}</div>
+                    <div class="summary-step-number"><span class="step-badge-icon">${getStepTypeIcon(stepType)}</span></div>
                     <div class="summary-step-details">
                         <div class="summary-step-label">${stepTitle}</div>
                         <div class="summary-choice-text">${choiceText}</div>
@@ -2109,7 +2094,7 @@ function finishFlowchart() {
             const choiceText = choice ? choice.name : (stepType === 'checklist' ? 'Completed' : 'Visited');
             summaryItems += `
                 <div class="summary-item summary-item-${stepType}">
-                    <div class="summary-step-number">${index + 1}</div>
+                    <div class="summary-step-number"><span class="step-badge-icon">${getStepTypeIcon(stepType)}</span></div>
                     <div class="summary-step-details">
                         <span class="summary-step">${stepTitle}</span>
                         <span class="summary-choice">${choiceText}</span>
@@ -2136,9 +2121,7 @@ function finishFlowchart() {
             <div class="final-summary-container">
                 <div class="final-summary glass-panel">
                     <div class="final-summary-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
                     </div>
                     <h2>Your Intervention Summary</h2>
                     <div class="summary-tier">
@@ -2156,9 +2139,7 @@ function finishFlowchart() {
                             Start Over
                         </button>
                         <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 13l4 4L19 7"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                             Done
                         </button>
                     </div>
@@ -2481,7 +2462,7 @@ function createChecklistNode(nodeData) {
     
     return `
         <div class="vf-node-header">
-            <div class="vf-node-step-badge">${nodeData.title}</div>
+            <div class="vf-node-step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
         </div>
         <div class="vf-node-content">
             <h3>${nodeData.subtitle}</h3>
@@ -2529,10 +2510,7 @@ function createSelectionNode(nodeData) {
     
     const infoBoxHTML = nodeData.infoBox ? `
         <div class="vf-info-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4m0-4h.01"/>
-            </svg>
+            ${ICONS.info}
             <div>
                 <h4>${nodeData.infoBox.title}</h4>
                 ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
@@ -2543,9 +2521,7 @@ function createSelectionNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="vf-warning-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
+            ${ICONS.warning}
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -2555,7 +2531,7 @@ function createSelectionNode(nodeData) {
     
     return `
         <div class="vf-node-header">
-            <div class="vf-node-step-badge">${nodeData.title}</div>
+            <div class="vf-node-step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
         </div>
         <div class="vf-node-content">
             <h3>${nodeData.subtitle}</h3>
@@ -2574,20 +2550,7 @@ function createDecisionNode(nodeData) {
     const choicesHTML = nodeData.choices.map(choice => `
         <button class="vf-decision-btn vf-decision-${choice.type}" onclick="makeDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
             <div class="vf-decision-icon">
-                ${choice.type === 'success' ? `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 13l4 4L19 7"/>
-                    </svg>
-                ` : choice.type === 'warning' ? `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                ` : `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 16v-4m0-4h.01"/>
-                    </svg>
-                `}
+                ${choice.type === 'success' ? ICONS.checkmark : choice.type === 'warning' ? ICONS.warning : ICONS.info}
             </div>
             <div class="vf-decision-content">
                 <strong>${choice.label}</strong>
@@ -2598,10 +2561,7 @@ function createDecisionNode(nodeData) {
     
     const infoBoxHTML = nodeData.infoBox ? `
         <div class="vf-info-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4m0-4h.01"/>
-            </svg>
+            ${ICONS.info}
             <div>
                 <h4>${nodeData.infoBox.title}</h4>
                 ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
@@ -2612,9 +2572,7 @@ function createDecisionNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="vf-warning-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
+            ${ICONS.warning}
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -2624,7 +2582,7 @@ function createDecisionNode(nodeData) {
     
     return `
         <div class="vf-node-header">
-            <div class="vf-node-step-badge">${nodeData.title}</div>
+            <div class="vf-node-step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
         </div>
         <div class="vf-node-content">
             <h3>${nodeData.subtitle}</h3>
@@ -2648,9 +2606,7 @@ function createInfoNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="vf-warning-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
+            ${ICONS.warning}
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -2662,7 +2618,7 @@ function createInfoNode(nodeData) {
     
     return `
         <div class="vf-node-header">
-            <div class="vf-node-step-badge">${nodeData.title}</div>
+            <div class="vf-node-step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
         </div>
         <div class="vf-node-content">
             <h3>${nodeData.subtitle}</h3>
@@ -2681,13 +2637,6 @@ function createInfoNode(nodeData) {
 
 // Create endpoint node HTML
 function createEndpointNode(nodeData) {
-    const statusIcons = {
-        success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
-        info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>`,
-        warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
-        danger: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>`
-    };
-    
     const recommendationsHTML = nodeData.recommendations ? `
         <div class="vf-recommendations">
             <h4>Next Steps:</h4>
@@ -2699,9 +2648,7 @@ function createEndpointNode(nodeData) {
     
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="vf-warning-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
+            ${ICONS.warning}
             <div>
                 <h4>${nodeData.warningBox.title}</h4>
                 <p>${nodeData.warningBox.text}</p>
@@ -2724,7 +2671,7 @@ function createEndpointNode(nodeData) {
     return `
         <div class="vf-endpoint vf-endpoint-${nodeData.status}">
             <div class="vf-endpoint-icon">
-                ${statusIcons[nodeData.status]}
+                ${ICONS[nodeData.status] || ICONS.info}
             </div>
             <h2>${nodeData.title}</h2>
             <p>${nodeData.description}</p>
@@ -3191,10 +3138,7 @@ function selectTier1Screener(screenerId, screenerName) {
                         <p>Based on ${screenerName} results and classroom observations:</p>
                         
                         <div class="info-callout">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 16v-4m0-4h.01"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                             <div>
                                 <h4>Consider These Indicators</h4>
                                 <ul class="indicator-list">
@@ -3208,9 +3152,7 @@ function selectTier1Screener(screenerId, screenerName) {
                         
                         <div class="decision-buttons">
                             <button class="decision-btn success" onclick="tier1InstructionEffective()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M5 13l4 4L19 7"/>
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                                 <div>
                                     <strong>Yes, Instruction is Effective</strong>
                                     <span>80%+ students meeting benchmarks</span>
@@ -3218,9 +3160,7 @@ function selectTier1Screener(screenerId, screenerName) {
                             </button>
                             
                             <button class="decision-btn warning" onclick="tier1InstructionIneffective()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                 <div>
                                     <strong>No, Needs Improvement</strong>
                                     <span>More than 20% students struggling</span>
@@ -3253,9 +3193,7 @@ function tier1InstructionEffective() {
             <div class="flowchart-content">
                 <div class="success-message">
                     <div class="success-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
                     </div>
                     <h2>Core Instruction is Effective!</h2>
                     <p>Your explicit and systematic instruction is working well for the majority of students.</p>
@@ -3393,9 +3331,7 @@ function tier1MoreThan20Percent() {
             <div class="flowchart-content">
                 <div class="warning-message">
                     <div class="warning-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
                     <h2>Core Instruction Needs Adjustment</h2>
                     <p>When more than 20% of students are unsuccessful, the core instruction may need to be re-examined and adjusted.</p>
@@ -3413,10 +3349,7 @@ function tier1MoreThan20Percent() {
                     </div>
                     
                     <div class="info-callout">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 16v-4m0-4h.01"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                         <div>
                             <h4>After Re-teaching</h4>
                             <p>Re-assess students and return to this flowchart to determine if Tier 1 instruction is now effective or if students need Tier 2 support.</p>
@@ -3484,10 +3417,7 @@ function proceedToTier2Assessment() {
                         <p>Select an assessment that aligns with the areas of weakness identified by the literacy screener:</p>
                         
                         <div class="info-callout">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 16v-4m0-4h.01"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                             <div>
                                 <h4>Purpose of Drill Down Assessments</h4>
                                 <p>These assessments provide more detailed information about specific skill gaps, helping you select the most appropriate intervention.</p>
@@ -3562,10 +3492,7 @@ function proceedToTier2Intervention() {
                         <p>Select an evidence-based intervention that matches the student's specific needs:</p>
                         
                         <div class="info-callout">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 16v-4m0-4h.01"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                             <div>
                                 <h4>8-Week Intervention Cycle</h4>
                                 <p>Implement the selected intervention for 8 weeks. Monitor student progress regularly during this period using progress monitoring tools.</p>
@@ -3633,10 +3560,7 @@ function proceedToTier2ProgressMonitoring() {
                         <p>Administer a literacy screener to evaluate student progress:</p>
                         
                         <div class="info-callout">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 16v-4m0-4h.01"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                             <div>
                                 <h4>Acceptable Screeners</h4>
                                 <ul class="indicator-list">
@@ -3652,9 +3576,7 @@ function proceedToTier2ProgressMonitoring() {
                         
                         <div class="decision-buttons">
                             <button class="decision-btn success" onclick="tier2StudentImproved()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M5 13l4 4L19 7"/>
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                                 <div>
                                     <strong>Yes, Student Improved</strong>
                                     <span>Blue or Green results - meeting benchmarks</span>
@@ -3662,9 +3584,7 @@ function proceedToTier2ProgressMonitoring() {
                             </button>
                             
                             <button class="decision-btn warning" onclick="tier2StudentDidNotImprove()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                 <div>
                                     <strong>No Improvement</strong>
                                     <span>Yellow or Red results - below benchmark</span>
@@ -3697,9 +3617,7 @@ function tier2StudentImproved() {
             <div class="flowchart-content">
                 <div class="success-message">
                     <div class="success-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
                     </div>
                     <h2>Student Made Good Progress!</h2>
                     <p>The 8-week Tier 2 intervention was effective. The student is now meeting benchmarks.</p>
@@ -3742,9 +3660,7 @@ function tier2StudentDidNotImprove() {
             <div class="flowchart-content">
                 <div class="warning-message">
                     <div class="warning-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
                     <h2>Second Intervention Cycle Needed</h2>
                     <p>The student did not make expected progress. Let's try a different intervention approach for another 8-week cycle.</p>
@@ -3977,10 +3893,7 @@ function proceedToTier3ProgressMonitoring() {
                         </div>
                         
                         <div class="info-callout">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 16v-4m0-4h.01"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                             <div>
                                 <h4>Acceptable Screeners</h4>
                                 <ul class="indicator-list">
@@ -3996,9 +3909,7 @@ function proceedToTier3ProgressMonitoring() {
                         
                         <div class="decision-buttons">
                             <button class="decision-btn success" onclick="tier3StudentImproved()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M5 13l4 4L19 7"/>
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                                 <div>
                                     <strong>Yes, Student Improved</strong>
                                     <span>Blue or Green results - showing progress</span>
@@ -4006,9 +3917,7 @@ function proceedToTier3ProgressMonitoring() {
                             </button>
                             
                             <button class="decision-btn warning" onclick="tier3StudentDidNotImprove()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                 <div>
                                     <strong>No Improvement</strong>
                                     <span>Yellow or Red results - needs specialist support</span>
@@ -4041,9 +3950,7 @@ function tier3StudentImproved() {
             <div class="flowchart-content">
                 <div class="success-message">
                     <div class="success-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
                     </div>
                     <h2>Student Showed Improvement!</h2>
                     <p>The intensive Tier 3 intervention was effective. The student is making progress.</p>
@@ -4092,9 +3999,7 @@ function tier3StudentDidNotImprove() {
             <div class="flowchart-content">
                 <div class="warning-message">
                     <div class="warning-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
                     <h2>Clinician Consultation Required</h2>
                     <p>The student has not responded to intensive intervention. Specialized assessment and support is needed.</p>
@@ -4183,10 +4088,7 @@ function openInterventionsMenu(tier, mode = 'interventions') {
                 
                 <div class="flowchart-content">
                     <div class="info-callout">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 16v-4m0-4h.01"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                         <div>
                             <h4>No ${mode === 'assessments' ? 'Assessments' : 'Interventions'} Available</h4>
                             <p>No ${mode === 'assessments' ? 'drill-down assessments' : 'intervention resources'} are currently available for Tier ${tier}.</p>

@@ -2008,11 +2008,24 @@ details > p {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   padding: 0 2px;
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--text-secondary);
   letter-spacing: 0.01em;
+}
+
+.step-badge-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.step-badge-icon svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
 }
 
 .step-text {
@@ -2463,7 +2476,7 @@ details > p {
 }
 
 .decision-icon { flex-shrink: 0; }
-.decision-icon svg { width: 12px; height: 12px; }
+.decision-icon svg { width: 20px; height: 20px; }
 .decision-content { flex: 1; min-width: 0; }
 
 .decision-content strong,
@@ -2545,8 +2558,8 @@ details > p {
 .endpoint-icon { margin-bottom: 2px; }
 
 .endpoint-icon svg {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
 }
 
 .endpoint-actions {
@@ -2842,6 +2855,16 @@ details > p {
   font-weight: 700;
   color: var(--primary);
   flex-shrink: 0;
+}
+
+.journey-marker-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.journey-marker-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .journey-step-details {
@@ -3559,6 +3582,7 @@ details > p {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   padding: 0 2px;
   font-size: 0.72rem;
   font-weight: 600;
@@ -3734,6 +3758,7 @@ details > p {
 .vf-decision-info:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
 
 .vf-decision-icon { font-size: 1.25rem; flex-shrink: 0; }
+.vf-decision-icon svg { width: 22px; height: 22px; }
 .vf-decision-content { flex: 1; }
 
 .vf-feature-list { list-style: none; padding: 0; margin-top: var(--space-sm); }
