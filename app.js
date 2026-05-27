@@ -5743,8 +5743,10 @@ function onPillarDropdownChange(pillarValue) {
     // Enable type dropdown
     const typeSelect = document.getElementById('type-select');
     if (typeSelect) {
+        typeSelect.value = '';
         typeSelect.disabled = false;
     }
+    menuState.selectedItemType = null;
     
     // Hide results
     const resultsSection = document.getElementById('dropdown-results');
