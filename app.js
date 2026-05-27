@@ -169,7 +169,11 @@ function navigateToPage(pageName) {
     } else if (pageName === 'interventions') {
         if (!appState.menuInitialized) {
             appState.menuInitialized = true;
-            initializeStepBasedMenu();
+            if (document.querySelector('.dropdown-wizard')) {
+                initializeDropdownWizard();
+            } else {
+                initializeStepBasedMenu();
+            }
         }
     }
     

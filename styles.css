@@ -1401,6 +1401,14 @@ details > p {
   box-shadow: 0 0 0 3px var(--primary-faint);
 }
 
+.styled-select:disabled {
+  cursor: not-allowed;
+  color: var(--text-light);
+  background-color: var(--bg-muted);
+  border-color: var(--border);
+  opacity: 0.75;
+}
+
 .back-btn-minimal,
 .reset-btn-minimal {
   display: inline-flex;
@@ -1581,6 +1589,35 @@ details > p {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.result-badges {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.result-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: 0.2rem 0.45rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-muted);
 }
 
 .results-empty {
