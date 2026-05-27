@@ -193,134 +193,54 @@
                 </div>
 
                 <div class="interventions-page-body">
-                    <div class="step-wizard">
-                        <!-- Step progress bar -->
-                        <div class="step-bar" role="list" aria-label="Progress">
-                            <span class="step-pill active" role="listitem">1 · Screener</span>
-                            <span class="step-connector" aria-hidden="true"></span>
-                            <span class="step-pill disabled" role="listitem">2 · Subtest</span>
-                            <span class="step-connector" aria-hidden="true"></span>
-                            <span class="step-pill disabled" role="listitem">3 · Pillars</span>
-                            <span class="step-connector" aria-hidden="true"></span>
-                            <span class="step-pill disabled" role="listitem">4 · Type</span>
-                            <span class="step-connector" aria-hidden="true"></span>
-                            <span class="step-pill disabled" role="listitem">5 · Results</span>
+                    <div class="dropdown-wizard" aria-label="Intervention menu dropdown workflow">
+                        <div class="dropdown-wizard-header">
+                            <h3 class="wizard-title">Choose each step in order</h3>
                         </div>
 
-                        <!-- Step panels -->
-                        <div class="step-panels">
-
-                            <!-- Panel 1: Screener selection -->
-                            <div id="panel-1" class="step-panel active">
-                                <p class="step-panel-prompt">Which screener was used?</p>
-                                <div class="screener-grid">
-                                    <button class="screener-option" onclick="selectScreener('DIBELS')">
-                                        <svg class="screener-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                        </svg>
-                                        <strong>DIBELS</strong>
-                                        <span class="card-badge">English · K–6</span>
-                                    </button>
-                                    <button class="screener-option" onclick="selectScreener('CTOPP-2')">
-                                        <svg class="screener-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                        </svg>
-                                        <strong>CTOPP-2</strong>
-                                        <span class="card-badge">English · K–3</span>
-                                    </button>
-                                    <button class="screener-option" onclick="selectScreener('THaFoL')">
-                                        <svg class="screener-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                        </svg>
-                                        <strong>THaFoL</strong>
-                                        <span class="card-badge">French · K–3</span>
-                                    </button>
-                                    <button class="screener-option" onclick="selectScreener('IDAPEL')">
-                                        <svg class="screener-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                        </svg>
-                                        <strong>IDAPEL</strong>
-                                        <span class="card-badge">French · K–3</span>
-                                    </button>
-                                </div>
+                        <div class="dropdown-row">
+                            <div class="dropdown-group">
+                                <label for="screener-select">Step 1 · Screener</label>
+                                <select id="screener-select" class="styled-select" onchange="onScreenerDropdownChange(this.value)">
+                                    <option value="">Select...</option>
+                                </select>
                             </div>
-
-                            <!-- Panel 2: Subtest selection -->
-                            <div id="panel-2" class="step-panel">
-                                <p class="step-panel-prompt">Which subtest from <strong id="selected-screener-name"></strong>?</p>
-                                <div id="subtest-options" class="subtest-options-wrap"></div>
-                                <div class="step-panel-actions">
-                                    <button class="back-btn-minimal" onclick="goToStep(1)">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                                        Back
-                                    </button>
-                                </div>
+                            <div class="dropdown-group">
+                                <label for="subtest-select">Step 2 · Subtest</label>
+                                <select id="subtest-select" class="styled-select" onchange="onSubtestDropdownChange(this.value)" disabled>
+                                    <option value="">Select...</option>
+                                </select>
                             </div>
+                        </div>
 
-                            <!-- Panel 3: Pillar selection -->
-                            <div id="panel-3" class="step-panel">
-                                <p class="step-panel-prompt">Literacy pillars assessed by this subtest:</p>
-                                <div id="pillar-info" class="pillar-chips-row"></div>
-                                <div id="pillar-options" class="pillar-options-list"></div>
-                                <div class="step-panel-actions">
-                                    <button class="back-btn-minimal" onclick="goToStep(2)">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                                        Back
-                                    </button>
-                                    <button class="cta-btn" onclick="proceedFromStep3()">
-                                        Next
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                    </button>
-                                </div>
+                        <div class="dropdown-row">
+                            <div class="dropdown-group">
+                                <label for="pillar-select">Step 3 · Pillar</label>
+                                <select id="pillar-select" class="styled-select" onchange="onPillarDropdownChange(this.value)" disabled>
+                                    <option value="">Select...</option>
+                                </select>
                             </div>
-
-                            <!-- Panel 4: Item type -->
-                            <div id="panel-4" class="step-panel">
-                                <p class="step-panel-prompt">What are you looking for?</p>
-                                <div class="item-type-options">
-                                    <button class="option-item" onclick="selectItemType('Intervention')">
-                                        <div class="option-item-content">
-                                            <div class="option-item-title">Intervention</div>
-                                            <div class="option-item-subtitle">Programs and strategies to address identified skill gaps</div>
-                                        </div>
-                                        <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                            <path d="M9 18l6-6-6-6"/>
-                                        </svg>
-                                    </button>
-                                    <button class="option-item" onclick="selectItemType('Assessment')">
-                                        <div class="option-item-content">
-                                            <div class="option-item-title">Assessment</div>
-                                            <div class="option-item-subtitle">Tools to further assess and monitor student progress</div>
-                                        </div>
-                                        <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                            <path d="M9 18l6-6-6-6"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="step-panel-actions">
-                                    <button class="back-btn-minimal" onclick="goToStep(3)">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                                        Back
-                                    </button>
-                                </div>
+                            <div class="dropdown-group">
+                                <label for="type-select">Step 4 · Resource Type</label>
+                                <select id="type-select" class="styled-select" onchange="onTypeDropdownChange(this.value)" disabled>
+                                    <option value="">Select...</option>
+                                    <option value="Intervention">Intervention</option>
+                                    <option value="Assessment">Assessment</option>
+                                </select>
                             </div>
+                        </div>
 
-                            <!-- Panel 5: Results -->
-                            <div id="panel-5" class="step-panel">
-                                <div id="results-breadcrumb" class="results-breadcrumb"></div>
-                                <div id="step5-results-summary" class="step5-summary"></div>
-                                <div id="step5-results-container" class="results-grid-compact"></div>
-                                <div class="step-panel-actions">
-                                    <button class="back-btn-minimal" onclick="goToStep(4)">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                                        Back
-                                    </button>
-                                    <button class="reset-btn-minimal" onclick="restartMenu()">Start Over</button>
-                                </div>
+                        <div id="dropdown-results" class="dropdown-results" style="display:none;">
+                            <div class="results-header-compact">
+                                <div id="results-count-compact" class="results-count-compact">0 results</div>
                             </div>
+                            <div id="results-list-compact" class="results-list-compact"></div>
+                        </div>
 
-                        </div><!-- /.step-panels -->
-                    </div><!-- /.step-wizard -->
+                        <div class="step-panel-actions">
+                            <button class="reset-btn-minimal" onclick="restartMenu()">Start Over</button>
+                        </div>
+                    </div><!-- /.dropdown-wizard -->
                 </div><!-- /.interventions-page-body -->
             </div><!-- /.interventions-page-wrapper -->
         </section>

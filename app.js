@@ -169,7 +169,11 @@ function navigateToPage(pageName) {
     } else if (pageName === 'interventions') {
         if (!appState.menuInitialized) {
             appState.menuInitialized = true;
-            initializeStepBasedMenu();
+            if (document.querySelector('.dropdown-wizard')) {
+                initializeDropdownWizard();
+            } else {
+                initializeStepBasedMenu();
+            }
         }
     }
     
@@ -5739,8 +5743,10 @@ function onPillarDropdownChange(pillarValue) {
     // Enable type dropdown
     const typeSelect = document.getElementById('type-select');
     if (typeSelect) {
+        typeSelect.value = '';
         typeSelect.disabled = false;
     }
+    menuState.selectedItemType = null;
     
     // Hide results
     const resultsSection = document.getElementById('dropdown-results');
