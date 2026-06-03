@@ -36,29 +36,50 @@
   --info-light: #edf5fc;
   --info-text: #2f6a92;
 
-  /* Step type colours (flowchart) – soft pastels */
-  --step-checklist: #8a8ed6;
-  --step-selection: #a48fd6;
-  --step-decision: #d68aaf;
-  --step-info: #6ab8ad;
-  --step-endpoint: #5eb892;
+  /* ── Unified flowchart colour code ──
+     Only THREE colours are used across the flowchart:
+       1. STEP        – every step (checklist, selection, decision, info)
+       2. EFFECTIVE   – effective / positive routes & outcomes
+       3. INEFFECTIVE – ineffective / needs-improvement routes & outcomes */
+  --step: #4c63a6;
+  --step-bg: #eef1fa;
+  --step-header: #e1e7f7;
+  --step-text: #2c3c72;
+  --step-soft: rgba(76, 99, 166, 0.18);
 
-  /* Step type background tints & text colours */
-  --step-checklist-bg: #eeeffa;
-  --step-checklist-header: #e2e4f6;
-  --step-checklist-text: #3c40a0;
-  --step-selection-bg: #f2eefa;
-  --step-selection-header: #e9e3f7;
-  --step-selection-text: #5a40a8;
-  --step-decision-bg: #fce9f3;
-  --step-decision-header: #f8d9eb;
-  --step-decision-text: #a02868;
-  --step-info-bg: #e9f6f4;
-  --step-info-header: #d5ede9;
-  --step-info-text: #1d6b63;
-  --step-endpoint-bg: #e9f7ef;
-  --step-endpoint-header: #d4eedf;
-  --step-endpoint-text: #1a6e45;
+  --effective: #2fa56f;
+  --effective-bg: #e7f6ee;
+  --effective-text: #156844;
+  --effective-soft: rgba(47, 165, 111, 0.18);
+
+  --ineffective: #d06464;
+  --ineffective-bg: #fbeced;
+  --ineffective-text: #97333b;
+  --ineffective-soft: rgba(208, 100, 100, 0.18);
+
+  /* Legacy step-type variables now all map to the single STEP colour so the
+     whole flowchart shares one colour for steps. Endpoint maps to EFFECTIVE. */
+  --step-checklist: var(--step);
+  --step-selection: var(--step);
+  --step-decision: var(--step);
+  --step-info: var(--step);
+  --step-endpoint: var(--effective);
+
+  --step-checklist-bg: var(--step-bg);
+  --step-checklist-header: var(--step-header);
+  --step-checklist-text: var(--step-text);
+  --step-selection-bg: var(--step-bg);
+  --step-selection-header: var(--step-header);
+  --step-selection-text: var(--step-text);
+  --step-decision-bg: var(--step-bg);
+  --step-decision-header: var(--step-header);
+  --step-decision-text: var(--step-text);
+  --step-info-bg: var(--step-bg);
+  --step-info-header: var(--step-header);
+  --step-info-text: var(--step-text);
+  --step-endpoint-bg: var(--effective-bg);
+  --step-endpoint-header: var(--effective-bg);
+  --step-endpoint-text: var(--effective-text);
 
   /* Tier colours – gentle pastels */
   --tier-1: #5eb892;
@@ -1943,7 +1964,7 @@ details > p {
   margin-bottom: var(--space-xs);
 }
 
-.flowchart-title-bar h2 { font-size: 0.85rem; }
+.flowchart-title-bar h2 { font-size: 1.05rem; font-weight: 700; }
 
 .header-title {
   font-size: 0.9rem;
@@ -2140,12 +2161,13 @@ details > p {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
   padding: 0 2px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: 0.01em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--step-text);
+  letter-spacing: 0.06em;
 }
 
 .step-badge-icon {
@@ -2155,8 +2177,8 @@ details > p {
 }
 
 .step-badge-icon svg {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   opacity: 0.7;
 }
 
@@ -2172,8 +2194,21 @@ details > p {
 
 .step-content, .node-content { padding: var(--space-xl); }
 
-.step-content h3 { font-size: 0.9rem; margin-bottom: 4px; }
-.step-content p { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: var(--space-sm); line-height: 1.5; }
+/* Stronger typographic hierarchy: bold title, lighter supporting copy */
+.step-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: var(--space-xs);
+}
+.step-content p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  line-height: 1.55;
+}
 
 .node-instruction, .node-description {
   font-size: 0.68rem;
@@ -2212,35 +2247,35 @@ details > p {
 /* Themed step headers per type */
 .flowchart-step-checklist .step-header {
   background: var(--step-checklist-header);
-  border-bottom-color: rgba(138, 142, 214, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .flowchart-step-checklist .step-badge { color: var(--step-checklist-text); }
 .flowchart-step-checklist .step-badge-icon svg { opacity: 1; color: var(--step-checklist); }
 
 .flowchart-step-selection .step-header {
   background: var(--step-selection-header);
-  border-bottom-color: rgba(164, 143, 214, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .flowchart-step-selection .step-badge { color: var(--step-selection-text); }
 .flowchart-step-selection .step-badge-icon svg { opacity: 1; color: var(--step-selection); }
 
 .flowchart-step-decision .step-header {
   background: var(--step-decision-header);
-  border-bottom-color: rgba(214, 138, 175, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .flowchart-step-decision .step-badge { color: var(--step-decision-text); }
 .flowchart-step-decision .step-badge-icon svg { opacity: 1; color: var(--step-decision); }
 
 .flowchart-step-info .step-header {
   background: var(--step-info-header);
-  border-bottom-color: rgba(106, 184, 173, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .flowchart-step-info .step-badge { color: var(--step-info-text); }
 .flowchart-step-info .step-badge-icon svg { opacity: 1; color: var(--step-info); }
 
 .flowchart-step-endpoint .step-header {
   background: var(--step-endpoint-header);
-  border-bottom-color: rgba(94, 184, 146, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .flowchart-step-endpoint .step-badge { color: var(--step-endpoint-text); }
 .flowchart-step-endpoint .step-badge-icon svg { opacity: 1; color: var(--step-endpoint); }
@@ -2248,12 +2283,12 @@ details > p {
 /* Checklist items tinted to match step type */
 .flowchart-step-checklist .checklist-item {
   background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(138, 142, 214, 0.35);
+  border-color: var(--step-soft);
 }
 .flowchart-step-checklist .checklist-item:hover { background: rgba(255, 255, 255, 0.9); }
 .flowchart-step-checklist .checklist-item.checked,
 .flowchart-step-checklist .checklist-item.item-checked {
-  background: rgba(138, 142, 214, 0.15);
+  background: var(--step-soft);
   border-color: var(--step-checklist);
 }
 .flowchart-step-checklist .checklist-item.checked .checkbox-check,
@@ -2265,7 +2300,7 @@ details > p {
 /* Selection options tinted to match step type */
 .flowchart-step-selection .selection-option {
   background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(164, 143, 214, 0.35);
+  border-color: var(--step-soft);
 }
 .flowchart-step-selection .selection-option:hover {
   background: rgba(255, 255, 255, 0.95);
@@ -2273,7 +2308,7 @@ details > p {
 }
 .flowchart-step-selection .selection-option.selected,
 .flowchart-step-selection .selection-option.option-selected {
-  background: rgba(164, 143, 214, 0.15);
+  background: var(--step-soft);
   border-color: var(--step-selection);
   box-shadow: 0 0 0 1px var(--step-selection);
 }
@@ -2427,12 +2462,224 @@ details > p {
 }
 
 .continue-btn.btn-ready {
-  background: var(--primary);
-  color: var(--text-on-primary);
+  background: var(--step);
+  color: #fff;
   cursor: pointer;
 }
 
-.continue-btn.btn-ready:hover { background: var(--primary-light); }
+.continue-btn.btn-ready:hover { background: var(--step-text); }
+
+/* ============================================================
+   ONE-AT-A-TIME CHECKLIST SUB-STEPS
+   Each principle is shown alone so the user engages with every
+   sub-step explicitly. Blocky, app-like, with motion.
+   ============================================================ */
+.checklist-substep {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.substep-context {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--step-text);
+  opacity: 0.75;
+  margin-bottom: var(--space-md);
+}
+
+.substep-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.substep-dots {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.substep-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--step-soft);
+  transition: transform var(--duration) var(--ease), background var(--duration) var(--ease);
+}
+
+.substep-dot-done {
+  background: var(--step);
+}
+
+.substep-dot-active {
+  background: var(--step);
+  transform: scale(1.45);
+  box-shadow: 0 0 0 4px var(--step-soft);
+}
+
+.substep-count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--step-text);
+  white-space: nowrap;
+}
+
+/* The single large checklist block */
+.checklist-item-big {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 2px solid var(--step-soft);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  cursor: pointer;
+  min-height: 96px;
+  transition: border-color var(--duration) var(--ease),
+              background var(--duration) var(--ease),
+              transform var(--duration) var(--ease),
+              box-shadow var(--duration) var(--ease);
+}
+
+.checklist-item-big:hover {
+  border-color: var(--step);
+  box-shadow: var(--shadow-md);
+}
+
+.checklist-item-big.checked {
+  border-color: var(--step);
+  background: var(--step-bg);
+  animation: substepPop 0.3s var(--ease);
+}
+
+.checklist-item-big input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.checkbox-check-big {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: var(--radius);
+  border: 2px solid var(--step-soft);
+  background: var(--bg-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: all var(--duration) var(--ease);
+}
+
+.checkbox-check-big svg {
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease);
+}
+
+.checklist-item-big.checked .checkbox-check-big {
+  background: var(--step);
+  border-color: var(--step);
+}
+
+.checklist-item-big.checked .checkbox-check-big svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.checkbox-text-big {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.substep-hint {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  margin-top: var(--space-sm);
+  text-align: center;
+}
+
+.substep-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.substep-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-muted);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--duration) var(--ease);
+}
+
+.substep-back-btn svg { width: 16px; height: 16px; }
+.substep-back-btn:hover { background: var(--border); color: var(--text); }
+
+.substep-confirm {
+  margin-top: 0;
+  flex: 1;
+  justify-content: center;
+  padding: 0.7rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: var(--radius);
+}
+
+.substep-confirm svg { width: 18px; height: 18px; }
+
+/* Sub-step slide-in animations */
+.checklist-substep.subitem-enter-forward {
+  animation: subitemSlideInRight 0.3s var(--ease);
+}
+.checklist-substep.subitem-enter-back {
+  animation: subitemSlideInLeft 0.3s var(--ease);
+}
+
+@keyframes subitemSlideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes subitemSlideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes substepPop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.025); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checklist-substep.subitem-enter-forward,
+  .checklist-substep.subitem-enter-back,
+  .checklist-item-big.checked,
+  .flowchart-step.carousel-enter-forward,
+  .flowchart-step.carousel-enter-back {
+    animation: none;
+  }
+}
 
 /* Selection grid */
 .selection-grid {
@@ -2444,10 +2691,10 @@ details > p {
 .selection-option {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: 0.5rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  gap: var(--space-md);
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--step-soft);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all var(--duration) var(--ease);
   background: var(--bg);
@@ -2477,16 +2724,16 @@ details > p {
 .option-details strong,
 .option-details h4 {
   display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text);
-  margin-bottom: 0;
+  margin-bottom: 1px;
   line-height: 1.3;
 }
 
 .option-details p,
 .option-details span {
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   color: var(--text-secondary);
   line-height: 1.4;
 }
@@ -2588,21 +2835,22 @@ details > p {
 .area-icon { font-size: 1rem; }
 .area-icon svg { width: 16px; height: 16px; }
 
-/* Callouts */
+/* Callouts – informational boxes share the STEP colour */
 .info-callout {
   display: flex;
   align-items: flex-start;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  background: var(--info-light);
+  background: var(--step-bg);
+  border: 1px solid var(--step-soft);
   border-radius: var(--radius);
   font-size: 0.78rem;
-  color: var(--info-text);
+  color: var(--step-text);
   margin-bottom: var(--space-sm);
   line-height: 1.45;
 }
 
-.info-callout svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; }
+.info-callout svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: var(--step); }
 
 .info-callout h4 { font-size: 0.8rem; margin-bottom: 2px; }
 .info-callout ul { margin: 0; padding-left: 1.1rem; }
@@ -2614,16 +2862,17 @@ details > p {
   align-items: flex-start;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  background: var(--warning-light);
+  background: var(--ineffective-bg);
+  border: 1px solid var(--ineffective-soft);
   border-radius: var(--radius);
   font-size: 0.78rem;
-  color: var(--warning-text);
+  color: var(--ineffective-text);
   margin-bottom: var(--space-sm);
   line-height: 1.45;
 }
 
 .warning-callout svg,
-.warning-box svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; }
+.warning-box svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: var(--ineffective); }
 
 /* Decision grid */
 .decision-grid,
@@ -2637,9 +2886,9 @@ details > p {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: 0.6rem 0.8rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  padding: 0.95rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all var(--duration) var(--ease);
   background: var(--bg);
@@ -2663,45 +2912,43 @@ details > p {
   pointer-events: none;
 }
 
+/* Effective routes: success / info / primary all share ONE colour */
 .decision-btn-yes,
 .decision-btn.decision-success,
-.decision-btn.success {
-  border-color: var(--success);
-  background: var(--success-light);
-  color: var(--success-text);
+.decision-btn.success,
+.decision-btn.decision-info,
+.decision-btn.info,
+.decision-btn.decision-primary,
+.decision-btn.primary {
+  border-color: var(--effective);
+  background: var(--effective-bg);
+  color: var(--effective-text);
 }
 
 .decision-btn-yes:hover,
 .decision-btn.decision-success:hover,
-.decision-btn.success:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.decision-btn.success:hover,
+.decision-btn.decision-info:hover,
+.decision-btn.info:hover,
+.decision-btn.decision-primary:hover,
+.decision-btn.primary:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
 
+/* Ineffective routes: warning / danger share ONE colour */
 .decision-btn-no,
 .decision-btn.decision-warning,
-.decision-btn.warning {
-  border-color: var(--danger);
-  background: var(--danger-light);
-  color: #8b3535;
+.decision-btn.warning,
+.decision-btn.decision-danger,
+.decision-btn.danger {
+  border-color: var(--ineffective);
+  background: var(--ineffective-bg);
+  color: var(--ineffective-text);
 }
 
 .decision-btn-no:hover,
 .decision-btn.decision-warning:hover,
-.decision-btn.warning:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
-
-.decision-btn.decision-info,
-.decision-btn.info {
-  border-color: var(--info);
-  background: var(--info-light);
-  color: var(--info-text);
-}
-
-.decision-btn.decision-info:hover,
-.decision-btn.info:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
-
-.decision-btn.primary {
-  background: var(--primary);
-  color: var(--text-on-primary);
-  border-color: var(--primary);
-}
+.decision-btn.warning:hover,
+.decision-btn.decision-danger:hover,
+.decision-btn.danger:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
 
 .decision-btn.secondary {
   background: var(--bg-muted);
@@ -2715,9 +2962,9 @@ details > p {
 .decision-content strong,
 .decision-content h4 {
   display: block;
-  font-size: 0.82rem;
-  font-weight: 600;
-  margin-bottom: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 1px;
   line-height: 1.3;
 }
 
@@ -2729,11 +2976,15 @@ details > p {
 }
 
 .decision-btn.decision-success .decision-content p,
-.decision-btn.decision-success .decision-content span { color: var(--success-text); }
-.decision-btn.decision-warning .decision-content p,
-.decision-btn.decision-warning .decision-content span { color: #8b3535; }
+.decision-btn.decision-success .decision-content span,
 .decision-btn.decision-info .decision-content p,
-.decision-btn.decision-info .decision-content span { color: var(--info-text); }
+.decision-btn.decision-info .decision-content span,
+.decision-btn.decision-primary .decision-content p,
+.decision-btn.decision-primary .decision-content span { color: var(--effective-text); }
+.decision-btn.decision-warning .decision-content p,
+.decision-btn.decision-warning .decision-content span,
+.decision-btn.decision-danger .decision-content p,
+.decision-btn.decision-danger .decision-content span { color: var(--ineffective-text); }
 
 .decision-options {
   display: flex;
@@ -2761,7 +3012,7 @@ details > p {
   content: "\2713";
   position: absolute;
   left: 0;
-  color: var(--success);
+  color: var(--effective);
   font-weight: 600;
 }
 
@@ -2787,13 +3038,13 @@ details > p {
   border: 1px solid var(--border);
 }
 
-.endpoint-card h2 { font-size: 0.95rem; margin-bottom: 4px; }
-.endpoint-card p { font-size: 0.8rem; }
+.endpoint-card h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: var(--space-xs); }
+.endpoint-card p { font-size: 0.9rem; }
 
-.endpoint-card.endpoint-success { background: var(--success-light); border-color: var(--success); }
-.endpoint-card.endpoint-info    { background: var(--info-light); border-color: var(--info); }
-.endpoint-card.endpoint-warning { background: var(--warning-light); border-color: var(--warning); }
-.endpoint-card.endpoint-danger  { background: var(--danger-light); border-color: var(--danger); }
+.endpoint-card.endpoint-success { background: var(--effective-bg); border-color: var(--effective); }
+.endpoint-card.endpoint-info    { background: var(--effective-bg); border-color: var(--effective); }
+.endpoint-card.endpoint-warning { background: var(--ineffective-bg); border-color: var(--ineffective); }
+.endpoint-card.endpoint-danger  { background: var(--ineffective-bg); border-color: var(--ineffective); }
 
 .endpoint-icon { margin-bottom: 2px; }
 
@@ -3105,7 +3356,7 @@ details > p {
   min-width: 20px;
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--step);
   flex-shrink: 0;
 }
 
@@ -3131,7 +3382,7 @@ details > p {
 
 .journey-step-choice {
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--step-text);
   margin-top: 2px;
 }
 
@@ -3159,13 +3410,16 @@ details > p {
 }
 
 /* Colour-coded branches based on choice type */
-.journey-branch-taken.journey-branch-success {
-  background: var(--success-light);
-  border-color: var(--success);
+.journey-branch-taken.journey-branch-success,
+.journey-branch-taken.journey-branch-info,
+.journey-branch-taken.journey-branch-primary {
+  background: var(--effective-bg);
+  border-color: var(--effective);
 }
-.journey-branch-taken.journey-branch-warning {
-  background: #fdf0f0;
-  border-color: #c27070;
+.journey-branch-taken.journey-branch-warning,
+.journey-branch-taken.journey-branch-danger {
+  background: var(--ineffective-bg);
+  border-color: var(--ineffective);
 }
 
 .journey-branch-other {
@@ -3179,26 +3433,32 @@ details > p {
 }
 
 /* Colour tint for non-chosen branches */
-.journey-branch-other.journey-branch-success {
-  background: var(--success-light);
+.journey-branch-other.journey-branch-success,
+.journey-branch-other.journey-branch-info,
+.journey-branch-other.journey-branch-primary {
+  background: var(--effective-bg);
 }
-.journey-branch-other.journey-branch-warning {
-  background: #fdf0f0;
+.journey-branch-other.journey-branch-warning,
+.journey-branch-other.journey-branch-danger {
+  background: var(--ineffective-bg);
 }
 
 .journey-branch-indicator {
   font-size: 0.68rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--step-text);
   margin-bottom: 2px;
 }
 
 /* Colour-coded indicators */
-.journey-branch-success .journey-branch-indicator {
-  color: var(--success-text);
+.journey-branch-success .journey-branch-indicator,
+.journey-branch-info .journey-branch-indicator,
+.journey-branch-primary .journey-branch-indicator {
+  color: var(--effective-text);
 }
-.journey-branch-warning .journey-branch-indicator {
-  color: #a05050;
+.journey-branch-warning .journey-branch-indicator,
+.journey-branch-danger .journey-branch-indicator {
+  color: var(--ineffective-text);
 }
 
 .journey-branch-label {
@@ -3276,21 +3536,15 @@ details > p {
   font-size: 0.7rem;
   opacity: 0.75;
 }
-.journey-alt-endpoint.alt-endpoint-success {
-  background: var(--success-light);
-  border: 1px solid var(--success);
-}
-.journey-alt-endpoint.alt-endpoint-warning {
-  background: #fdf0f0;
-  border: 1px solid #c27070;
-}
+.journey-alt-endpoint.alt-endpoint-success,
 .journey-alt-endpoint.alt-endpoint-info {
-  background: var(--info-light);
-  border: 1px solid var(--info);
+  background: var(--effective-bg);
+  border: 1px solid var(--effective);
 }
+.journey-alt-endpoint.alt-endpoint-warning,
 .journey-alt-endpoint.alt-endpoint-danger {
-  background: var(--danger-light);
-  border: 1px solid var(--danger);
+  background: var(--ineffective-bg);
+  border: 1px solid var(--ineffective);
 }
 .journey-alt-endpoint-title {
   font-weight: 600;
@@ -3305,12 +3559,14 @@ details > p {
 .journey-alt-branches {
   padding-left: 8px;
 }
-.journey-alt-branch-success {
-  border-left: 2px solid var(--success);
+.journey-alt-branch-success,
+.journey-alt-branch-info {
+  border-left: 2px solid var(--effective);
   margin-left: 4px;
 }
-.journey-alt-branch-warning {
-  border-left: 2px solid #c27070;
+.journey-alt-branch-warning,
+.journey-alt-branch-danger {
+  border-left: 2px solid var(--ineffective);
   margin-left: 4px;
 }
 .journey-alt-branch-primary,
@@ -3343,9 +3599,9 @@ details > p {
 }
 
 .journey-selection-chosen {
-  background: var(--primary-faint);
-  color: var(--primary);
-  border: 1px solid var(--primary);
+  background: var(--step-soft);
+  color: var(--step-text);
+  border: 1px solid var(--step);
 }
 
 .journey-selection-other {
@@ -3367,13 +3623,13 @@ details > p {
 
 .journey-endpoint-icon { margin-bottom: 4px; }
 .journey-endpoint-icon svg { width: 24px; height: 24px; }
-.journey-endpoint h3 { font-size: 0.95rem; margin-bottom: 4px; }
-.journey-endpoint p { font-size: 0.8rem; color: var(--text-secondary); }
+.journey-endpoint h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: var(--space-xs); }
+.journey-endpoint p { font-size: 0.9rem; color: var(--text-secondary); }
 
-.journey-endpoint-success { background: var(--success-light); border-color: var(--success); }
-.journey-endpoint-info    { background: var(--info-light); border-color: var(--info); }
-.journey-endpoint-warning { background: var(--warning-light); border-color: var(--warning); }
-.journey-endpoint-danger  { background: var(--danger-light); border-color: var(--danger); }
+.journey-endpoint-success { background: var(--effective-bg); border-color: var(--effective); }
+.journey-endpoint-info    { background: var(--effective-bg); border-color: var(--effective); }
+.journey-endpoint-warning { background: var(--ineffective-bg); border-color: var(--ineffective); }
+.journey-endpoint-danger  { background: var(--ineffective-bg); border-color: var(--ineffective); }
 
 /* Journey actions */
 .journey-actions {
@@ -3492,7 +3748,7 @@ details > p {
   min-width: 20px;
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--step);
   flex-shrink: 0;
 }
 
@@ -3864,42 +4120,42 @@ details > p {
 /* Themed vf-node headers per type */
 .vf-node-checklist .vf-node-header {
   background: var(--step-checklist-header);
-  border-bottom-color: rgba(138, 142, 214, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .vf-node-checklist .vf-node-step-badge { color: var(--step-checklist-text); }
 
 .vf-node-selection .vf-node-header {
   background: var(--step-selection-header);
-  border-bottom-color: rgba(164, 143, 214, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .vf-node-selection .vf-node-step-badge { color: var(--step-selection-text); }
 
 .vf-node-decision .vf-node-header {
   background: var(--step-decision-header);
-  border-bottom-color: rgba(214, 138, 175, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .vf-node-decision .vf-node-step-badge { color: var(--step-decision-text); }
 
 .vf-node-info .vf-node-header {
   background: var(--step-info-header);
-  border-bottom-color: rgba(106, 184, 173, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .vf-node-info .vf-node-step-badge { color: var(--step-info-text); }
 
 .vf-node-endpoint .vf-node-header {
   background: var(--step-endpoint-header);
-  border-bottom-color: rgba(94, 184, 146, 0.3);
+  border-bottom-color: var(--step-soft);
 }
 .vf-node-endpoint .vf-node-step-badge { color: var(--step-endpoint-text); }
 
 /* Checklist items tinted within vf-node */
 .vf-node-checklist .vf-checklist-item {
   background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(138, 142, 214, 0.35);
+  border-color: var(--step-soft);
 }
 .vf-node-checklist .vf-checklist-item:hover { background: rgba(255, 255, 255, 0.9); }
 .vf-node-checklist .vf-checklist-item.checked {
-  background: rgba(138, 142, 214, 0.15);
+  background: var(--step-soft);
   border-color: var(--step-checklist);
 }
 .vf-node-checklist .vf-checklist-item.checked .vf-checkbox-custom {
@@ -3910,14 +4166,14 @@ details > p {
 /* Selection options tinted within vf-node */
 .vf-node-selection .vf-selection-option {
   background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(164, 143, 214, 0.35);
+  border-color: var(--step-soft);
 }
 .vf-node-selection .vf-selection-option:hover {
   background: rgba(255, 255, 255, 0.95);
   border-color: var(--step-selection);
 }
 .vf-node-selection .vf-selection-option.vf-option-selected {
-  background: rgba(164, 143, 214, 0.15);
+  background: var(--step-soft);
   border-color: var(--step-selection);
   box-shadow: 0 0 0 1px var(--step-selection);
 }

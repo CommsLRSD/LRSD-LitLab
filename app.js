@@ -987,7 +987,8 @@ function initIntegratedFlowchart(tierId) {
         currentNodeId: null,
         selectedPath: [],
         tierId: tierId,
-        choices: {} // Track all choices for summary
+        choices: {}, // Track all choices for summary
+        checklistProgress: {} // Track per-checklist sub-step index (one item at a time)
     };
     
     container.classList.remove('flowchart-hidden');
@@ -1104,7 +1105,12 @@ function createIntegratedNodeElement(nodeData, container, direction = 'forward')
     
     switch (nodeData.type) {
         case 'checklist':
-            content = createIntegratedChecklistNode(nodeData);
+            // Checklists are walked one item at a time. Reset progress so the
+            // user must engage with every sub-step explicitly on each visit.
+            appState.visualFlowchart.checklistProgress[nodeData.id] = 0;
+            appState.visualFlowchart.checklistChecked = appState.visualFlowchart.checklistChecked || {};
+            appState.visualFlowchart.checklistChecked[nodeData.id] = [];
+            content = createChecklistSubStepHTML(nodeData, 0);
             break;
         case 'selection':
             content = createIntegratedSelectionNode(nodeData);
@@ -1131,37 +1137,49 @@ function createIntegratedNodeElement(nodeData, container, direction = 'forward')
         nodeElement.classList.add(animClass);
     });
     
-    // Initialize checklist if needed
+    // Wire up the single checklist sub-step if needed
     if (nodeData.type === 'checklist') {
-        const checkboxes = nodeElement.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', () => updateIntegratedChecklistProgress(nodeData.id));
-        });
+        wireChecklistSubStep(nodeElement, nodeData);
     }
 }
 
-// Create integrated checklist node
-function createIntegratedChecklistNode(nodeData) {
+// Create integrated checklist node – ONE item at a time (sub-step carousel).
+// Each principle is the only thing on screen so the user must engage with
+// every single sub-step explicitly before moving on.
+function createChecklistSubStepHTML(nodeData, index) {
     // Sanitize text for use in HTML - prevents XSS
     const sanitizeForHtml = (text) => {
-        const charMap = { 
-            '"': '&quot;', 
-            '<': '&lt;', 
-            '>': '&gt;', 
+        const charMap = {
+            '"': '&quot;',
+            '<': '&lt;',
+            '>': '&gt;',
             '&': '&amp;',
             "'": '&#39;'
         };
         return String(text).split('').map(c => charMap[c] || c).join('');
     };
-    
-    const checklistItems = nodeData.items.map((item, index) => `
-        <label class="checklist-item" data-index="${index}">
-            <input type="checkbox">
-            <span class="checkbox-check"></span>
-            <span class="checkbox-text">${sanitizeForHtml(item)}</span>
-        </label>
-    `).join('');
-    
+
+    const items = nodeData.items || [];
+    const total = items.length;
+    const safeIndex = Math.max(0, Math.min(index, total - 1));
+    const isLast = safeIndex === total - 1;
+    const checkedState = (appState.visualFlowchart.checklistChecked &&
+        appState.visualFlowchart.checklistChecked[nodeData.id]) || [];
+    const isChecked = !!checkedState[safeIndex];
+
+    // Progress dots – one per sub-step
+    const dots = items.map((_, i) => {
+        let cls = 'substep-dot';
+        if (i < safeIndex) cls += ' substep-dot-done';
+        else if (i === safeIndex) cls += ' substep-dot-active';
+        return `<span class="${cls}"></span>`;
+    }).join('');
+
+    const confirmLabel = isLast ? (nodeData.buttonText || 'Finish') : 'Confirm & Continue';
+    const confirmArrow = isLast
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+
     return `
         <div class="step-header">
             <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
@@ -1171,29 +1189,104 @@ function createIntegratedChecklistNode(nodeData) {
                 </svg>
             </button>
         </div>
-        <div class="step-content">
-            <h3>${nodeData.subtitle}</h3>
-            <p>${nodeData.description}</p>
-            <div class="checklist-actions">
-                <button class="check-all-btn" onclick="toggleCheckAll('${nodeData.id}')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 11l3 3L22 4"/>
-                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-                    </svg>
-                    <span class="check-all-label">Check All</span>
+        <div class="step-content checklist-substep">
+            <p class="substep-context">${sanitizeForHtml(nodeData.subtitle || '')}</p>
+            <div class="substep-progress">
+                <div class="substep-dots">${dots}</div>
+                <div class="substep-count">Point ${safeIndex + 1} of ${total}</div>
+            </div>
+            <label class="checklist-item-big ${isChecked ? 'checked' : ''}">
+                <input type="checkbox" ${isChecked ? 'checked' : ''}>
+                <span class="checkbox-check-big">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                </span>
+                <span class="checkbox-text-big">${sanitizeForHtml(items[safeIndex])}</span>
+            </label>
+            <p class="substep-hint">Tick the box to confirm you have considered this point.</p>
+            <div class="substep-nav">
+                <button class="substep-back-btn" onclick="checklistSubBack('${nodeData.id}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Back
+                </button>
+                <button class="continue-btn substep-confirm" ${isChecked ? '' : 'disabled'} onclick="confirmChecklistSubStep('${nodeData.id}')">
+                    <span class="substep-confirm-label">${confirmLabel}</span>
+                    ${confirmArrow}
                 </button>
             </div>
-            <div class="checklist-container">
-                ${checklistItems}
-            </div>
-            <button class="continue-btn" disabled onclick="proceedFromIntegratedChecklist('${nodeData.id}', '${nodeData.nextNode}')">
-                ${nodeData.buttonText}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-            </button>
         </div>
     `;
+}
+
+// Wire the single checklist sub-step's checkbox to its confirm button
+function wireChecklistSubStep(nodeElement, nodeData) {
+    const checkbox = nodeElement.querySelector('.checklist-item-big input[type="checkbox"]');
+    const confirmBtn = nodeElement.querySelector('.substep-confirm');
+    const item = nodeElement.querySelector('.checklist-item-big');
+    if (!checkbox || !confirmBtn) return;
+
+    // Initialise ready-state if pre-checked
+    if (checkbox.checked) confirmBtn.classList.add('btn-ready');
+
+    checkbox.addEventListener('change', () => {
+        const index = appState.visualFlowchart.checklistProgress[nodeData.id] || 0;
+        appState.visualFlowchart.checklistChecked = appState.visualFlowchart.checklistChecked || {};
+        appState.visualFlowchart.checklistChecked[nodeData.id] =
+            appState.visualFlowchart.checklistChecked[nodeData.id] || [];
+        appState.visualFlowchart.checklistChecked[nodeData.id][index] = checkbox.checked;
+
+        confirmBtn.disabled = !checkbox.checked;
+        confirmBtn.classList.toggle('btn-ready', checkbox.checked);
+        if (item) item.classList.toggle('checked', checkbox.checked);
+    });
+}
+
+// Re-render the current checklist sub-step in place with a slide animation
+function rerenderChecklistSubStep(nodeData, direction = 'forward') {
+    const nodeElement = document.querySelector(`.flowchart-step[data-node-id="${CSS.escape(nodeData.id)}"]`);
+    if (!nodeElement) return;
+    const index = appState.visualFlowchart.checklistProgress[nodeData.id] || 0;
+    nodeElement.innerHTML = createChecklistSubStepHTML(nodeData, index);
+    wireChecklistSubStep(nodeElement, nodeData);
+
+    const content = nodeElement.querySelector('.checklist-substep');
+    if (content) {
+        const animClass = direction === 'back' ? 'subitem-enter-back' : 'subitem-enter-forward';
+        requestAnimationFrame(() => content.classList.add(animClass));
+    }
+}
+
+// Advance to the next checklist sub-step, or finish the checklist
+function confirmChecklistSubStep(nodeId) {
+    const vf = appState.visualFlowchart;
+    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const nodeData = tierDef?.nodes?.[nodeId];
+    if (!nodeData) return;
+
+    const total = (nodeData.items || []).length;
+    const current = vf.checklistProgress[nodeId] || 0;
+
+    if (current < total - 1) {
+        vf.checklistProgress[nodeId] = current + 1;
+        rerenderChecklistSubStep(nodeData, 'forward');
+    } else {
+        proceedFromIntegratedChecklist(nodeId, nodeData.nextNode);
+    }
+}
+
+// Go back one checklist sub-step, or to the previous flow step if at the first
+function checklistSubBack(nodeId) {
+    const vf = appState.visualFlowchart;
+    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const nodeData = tierDef?.nodes?.[nodeId];
+    if (!nodeData) return;
+
+    const current = vf.checklistProgress[nodeId] || 0;
+    if (current > 0) {
+        vf.checklistProgress[nodeId] = current - 1;
+        rerenderChecklistSubStep(nodeData, 'back');
+    } else {
+        goToPreviousStep();
+    }
 }
 
 // Create integrated selection node
@@ -1960,7 +2053,8 @@ function switchToTier(tierId) {
         currentNodeId: null,
         selectedPath: [],
         tierId: tierId,
-        choices: {}
+        choices: {},
+        checklistProgress: {}
     };
     
     // Update title
@@ -5605,8 +5699,8 @@ window.proceedFromIntegratedChecklist = proceedFromIntegratedChecklist;
 window.proceedFromIntegratedInfo = proceedFromIntegratedInfo;
 window.selectIntegratedOption = selectIntegratedOption;
 window.makeIntegratedDecision = makeIntegratedDecision;
-window.updateIntegratedChecklistProgress = updateIntegratedChecklistProgress;
-window.toggleCheckAll = toggleCheckAll;
+window.confirmChecklistSubStep = confirmChecklistSubStep;
+window.checklistSubBack = checklistSubBack;
 window.selectTier1ScreenerVisualIntegrated = selectTier1ScreenerVisualIntegrated;
 window.selectTier2AssessmentVisualIntegrated = selectTier2AssessmentVisualIntegrated;
 window.selectTier2InterventionVisualIntegrated = selectTier2InterventionVisualIntegrated;
