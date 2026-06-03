@@ -990,6 +990,7 @@ function initIntegratedFlowchart(tierId) {
         choices: {}, // Track all choices for summary
         checklistProgress: {} // Track per-checklist sub-step index (one item at a time)
     };
+    appState.fullJourney = [];
     
     container.classList.remove('flowchart-hidden');
     container.innerHTML = `
@@ -1017,19 +1018,6 @@ function initIntegratedFlowchart(tierId) {
                     </button>
                 </div>
                 
-                <div class="flowchart-actions">
-                    <button class="flowchart-action-btn" onclick="showFlowchartSummary()" title="View Summary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            <path d="M12 12h.01M12 16h.01M12 8h.01"/>
-                        </svg>
-                        <span>Summary</span>
-                    </button>
-                    <button class="flowchart-action-btn flowchart-done-btn" onclick="finishFlowchart()" title="I'm Done">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
-                        <span>I'm Done</span>
-                    </button>
-                </div>
             </div>
             
             <div class="flowchart-title-bar">
@@ -1076,9 +1064,30 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
     // Update carousel navigation (prev button, step indicator)
     updateCarouselNav();
     
-    // If this is an endpoint, show the tier journey review instead
+    // If this is an endpoint, route based on whether it's a tier transition or terminal
     if (nodeData.type === 'endpoint') {
-        showTierJourneyReview(nodeData);
+        saveCurrentTierToFullJourney();
+        const tierTransitionActions = new Set(['startTier2Visual', 'startTier3Visual', 'restartTier2Visual']);
+        const primaryAction = nodeData.actionButton?.action;
+        const secondaryAction = nodeData.secondaryAction?.action;
+        const hasPrimaryTransition = tierTransitionActions.has(primaryAction);
+        const hasSecondaryTransition = tierTransitionActions.has(secondaryAction);
+
+        if (hasPrimaryTransition && !hasSecondaryTransition) {
+            // Single tier-transition action → go directly to next tier
+            const fnMap = {
+                startTier2Visual: 'startTier2VisualIntegrated',
+                startTier3Visual: 'startTier3VisualIntegrated',
+                restartTier2Visual: 'restartTier2VisualIntegrated'
+            };
+            if (window[fnMap[primaryAction]]) window[fnMap[primaryAction]]();
+        } else if (hasPrimaryTransition || hasSecondaryTransition) {
+            // Multiple tier-transition options → show choice card (no journey review)
+            showTierTransitionChoice(nodeData);
+        } else {
+            // True terminal endpoint → show full cross-tier summary
+            showFinalSummary(nodeData);
+        }
         return;
     }
     
@@ -1162,7 +1171,6 @@ function createChecklistSubStepHTML(nodeData, index) {
     const items = nodeData.items || [];
     const total = items.length;
     const safeIndex = Math.max(0, Math.min(index, total - 1));
-    const isLast = safeIndex === total - 1;
     const checkedState = (appState.visualFlowchart.checklistChecked &&
         appState.visualFlowchart.checklistChecked[nodeData.id]) || [];
     const isChecked = !!checkedState[safeIndex];
@@ -1174,11 +1182,6 @@ function createChecklistSubStepHTML(nodeData, index) {
         else if (i === safeIndex) cls += ' substep-dot-active';
         return `<span class="${cls}"></span>`;
     }).join('');
-
-    const confirmLabel = isLast ? (nodeData.buttonText || 'Finish') : 'Confirm & Continue';
-    const confirmArrow = isLast
-        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`
-        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
 
     return `
         <div class="step-header">
@@ -1202,30 +1205,24 @@ function createChecklistSubStepHTML(nodeData, index) {
                 </span>
                 <span class="checkbox-text-big">${sanitizeForHtml(items[safeIndex])}</span>
             </label>
-            <p class="substep-hint">Tick the box to confirm you have considered this point.</p>
+            <p class="substep-hint">Tick the box to move to the next point.</p>
             <div class="substep-nav">
                 <button class="substep-back-btn" onclick="checklistSubBack('${nodeData.id}')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                     Back
-                </button>
-                <button class="continue-btn substep-confirm" ${isChecked ? '' : 'disabled'} onclick="confirmChecklistSubStep('${nodeData.id}')">
-                    <span class="substep-confirm-label">${confirmLabel}</span>
-                    ${confirmArrow}
                 </button>
             </div>
         </div>
     `;
 }
 
-// Wire the single checklist sub-step's checkbox to its confirm button
+// Wire the single checklist sub-step's checkbox to auto-advance
 function wireChecklistSubStep(nodeElement, nodeData) {
     const checkbox = nodeElement.querySelector('.checklist-item-big input[type="checkbox"]');
-    const confirmBtn = nodeElement.querySelector('.substep-confirm');
     const item = nodeElement.querySelector('.checklist-item-big');
-    if (!checkbox || !confirmBtn) return;
+    if (!checkbox) return;
 
-    // Initialise ready-state if pre-checked
-    if (checkbox.checked) confirmBtn.classList.add('btn-ready');
+    let advancing = false;
 
     checkbox.addEventListener('change', () => {
         const index = appState.visualFlowchart.checklistProgress[nodeData.id] || 0;
@@ -1234,9 +1231,17 @@ function wireChecklistSubStep(nodeElement, nodeData) {
             appState.visualFlowchart.checklistChecked[nodeData.id] || [];
         appState.visualFlowchart.checklistChecked[nodeData.id][index] = checkbox.checked;
 
-        confirmBtn.disabled = !checkbox.checked;
-        confirmBtn.classList.toggle('btn-ready', checkbox.checked);
         if (item) item.classList.toggle('checked', checkbox.checked);
+        if (!checkbox.checked || advancing) return;
+
+        advancing = true;
+        const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300;
+        setTimeout(() => {
+            advancing = false;
+            if (checkbox.checked) {
+                confirmChecklistSubStep(nodeData.id);
+            }
+        }, delay);
     });
 }
 
@@ -1293,11 +1298,94 @@ function checklistSubBack(nodeId) {
 function createIntegratedSelectionNode(nodeData) {
     const tierId = appState.visualFlowchart.tierId;
     const tierData = appState.tierFlowchartData?.[tierId];
-    const options = tierData?.[nodeData.options] || [];
-    
+
     // Helper function to escape strings for use in JS string literals
     const escapeJsString = (str) => String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    
+
+    const infoBoxHTML = nodeData.infoBox ? `
+        <div class="info-callout">
+            ${ICONS.info}
+            <div>
+                <h4>${nodeData.infoBox.title}</h4>
+                ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
+                ${nodeData.infoBox.items ? `<ul>${nodeData.infoBox.items.map(i => `<li>${i}</li>`).join('')}</ul>` : ''}
+            </div>
+        </div>
+    ` : '';
+
+    const warningBoxHTML = nodeData.warningBox ? `
+        <div class="warning-callout">
+            ${ICONS.warning}
+            <div>
+                <h4>${nodeData.warningBox.title}</h4>
+                <p>${nodeData.warningBox.text}</p>
+            </div>
+        </div>
+    ` : '';
+
+    // For drill-down assessments and interventions, use the embedded interventions menu wizard
+    const wizardItemTypes = { drillDownAssessments: 'Assessment', interventions: 'Intervention' };
+    const itemType = wizardItemTypes[nodeData.options];
+
+    if (itemType) {
+        // Initialize wizard state for this node
+        appState.fwState = {
+            screener: null,
+            screenerData: null,
+            subtest: null,
+            subtestData: null,
+            pillars: [],
+            nodeId: nodeData.id,
+            handlerName: nodeData.nextHandler,
+            itemType: itemType
+        };
+
+        const screenerOptionsHtml = buildScreenerDropdownHtml('');
+
+        return `
+            <div class="step-header">
+                <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
+                <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="step-content">
+                <h3>${nodeData.subtitle}</h3>
+                <p>${nodeData.description}</p>
+                ${infoBoxHTML}
+                ${warningBoxHTML}
+                <div class="fw-wizard">
+                    <div class="fw-wizard-selects">
+                        <div class="fw-select-group">
+                            <label for="fw-screener-select">Screener</label>
+                            <select id="fw-screener-select" class="fw-select" onchange="fwOnScreenerChange(this.value)">
+                                ${screenerOptionsHtml}
+                            </select>
+                        </div>
+                        <div class="fw-select-group">
+                            <label for="fw-subtest-select">Subtest</label>
+                            <select id="fw-subtest-select" class="fw-select" onchange="fwOnSubtestChange(this.value)" disabled>
+                                <option value="">Select screener first…</option>
+                            </select>
+                        </div>
+                        <div class="fw-select-group">
+                            <label for="fw-pillar-select">Literacy Pillar</label>
+                            <select id="fw-pillar-select" class="fw-select" onchange="fwOnPillarChange(this.value)" disabled>
+                                <option value="">Select subtest first…</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="fw-results" class="fw-results"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Default: flat list of options (used for screener selection in Tier 1)
+    const options = tierData?.[nodeData.options] || [];
+
     const optionsHTML = options.map(option => `
         <button class="selection-option" onclick="selectIntegratedOption('${escapeJsString(nodeData.id)}', '${escapeJsString(option.id)}', '${escapeJsString(option.name)}', '${escapeJsString(nodeData.nextHandler)}')">
             <div class="option-icon">
@@ -1319,28 +1407,7 @@ function createIntegratedSelectionNode(nodeData) {
             </div>
         </button>
     `).join('');
-    
-    const infoBoxHTML = nodeData.infoBox ? `
-        <div class="info-callout">
-            ${ICONS.info}
-            <div>
-                <h4>${nodeData.infoBox.title}</h4>
-                ${nodeData.infoBox.text ? `<p>${nodeData.infoBox.text}</p>` : ''}
-                ${nodeData.infoBox.items ? `<ul>${nodeData.infoBox.items.map(i => `<li>${i}</li>`).join('')}</ul>` : ''}
-            </div>
-        </div>
-    ` : '';
-    
-    const warningBoxHTML = nodeData.warningBox ? `
-        <div class="warning-callout">
-            ${ICONS.warning}
-            <div>
-                <h4>${nodeData.warningBox.title}</h4>
-                <p>${nodeData.warningBox.text}</p>
-            </div>
-        </div>
-    ` : '';
-    
+
     return `
         <div class="step-header">
             <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
@@ -1360,6 +1427,165 @@ function createIntegratedSelectionNode(nodeData) {
             </div>
         </div>
     `;
+}
+
+// Flowchart embedded intervention wizard: screener change handler
+function fwOnScreenerChange(value) {
+    if (!appState.fwState) return;
+    const subtestSel = document.getElementById('fw-subtest-select');
+    const pillarSel = document.getElementById('fw-pillar-select');
+    const resultsEl = document.getElementById('fw-results');
+
+    appState.fwState.screener = value || null;
+    appState.fwState.screenerData = null;
+    appState.fwState.subtest = null;
+    appState.fwState.subtestData = null;
+    appState.fwState.pillars = [];
+
+    if (pillarSel) { pillarSel.innerHTML = '<option value="">Select subtest first…</option>'; pillarSel.disabled = true; }
+    if (resultsEl) resultsEl.innerHTML = '';
+
+    if (!value) {
+        if (subtestSel) { subtestSel.innerHTML = '<option value="">Select screener first…</option>'; subtestSel.disabled = true; }
+        return;
+    }
+
+    const screenerData = (appState.interventionMenuData?.screeners || []).find(s => s.screener_id === value);
+    if (!screenerData) return;
+    appState.fwState.screenerData = screenerData;
+
+    if (subtestSel) {
+        subtestSel.innerHTML = '<option value="">Select…</option>';
+        (screenerData.subtests || []).forEach(st => {
+            const opt = document.createElement('option');
+            opt.value = st.subtest_code;
+            opt.textContent = `${st.subtest_code} – ${st.subtest_name}`;
+            subtestSel.appendChild(opt);
+        });
+        subtestSel.disabled = false;
+    }
+}
+
+// Flowchart embedded intervention wizard: subtest change handler
+function fwOnSubtestChange(value) {
+    if (!appState.fwState || !appState.fwState.screenerData) return;
+    const pillarSel = document.getElementById('fw-pillar-select');
+    const resultsEl = document.getElementById('fw-results');
+
+    appState.fwState.subtest = value || null;
+    appState.fwState.subtestData = null;
+    appState.fwState.pillars = [];
+    if (resultsEl) resultsEl.innerHTML = '';
+
+    if (!value) {
+        if (pillarSel) { pillarSel.innerHTML = '<option value="">Select subtest first…</option>'; pillarSel.disabled = true; }
+        return;
+    }
+
+    const subtestData = (appState.fwState.screenerData.subtests || []).find(s => s.subtest_code === value);
+    if (!subtestData) return;
+    appState.fwState.subtestData = subtestData;
+
+    const pillars = subtestData.literacy_pillars || [];
+    if (pillarSel) {
+        pillarSel.innerHTML = '<option value="">Select…</option>';
+        if (pillars.length > 1) {
+            const allOpt = document.createElement('option');
+            allOpt.value = 'ALL';
+            allOpt.textContent = 'All Pillars';
+            pillarSel.appendChild(allOpt);
+        }
+        pillars.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.textContent = p;
+            pillarSel.appendChild(opt);
+        });
+        pillarSel.disabled = false;
+
+        // Auto-select if only one pillar
+        if (pillars.length === 1) {
+            pillarSel.value = pillars[0];
+            fwOnPillarChange(pillars[0]);
+        }
+    }
+}
+
+// Flowchart embedded intervention wizard: pillar change handler
+function fwOnPillarChange(value) {
+    if (!appState.fwState) return;
+    const resultsEl = document.getElementById('fw-results');
+
+    if (!value) {
+        appState.fwState.pillars = [];
+        if (resultsEl) resultsEl.innerHTML = '';
+        return;
+    }
+
+    const allPillars = appState.fwState.subtestData?.literacy_pillars || [];
+    appState.fwState.pillars = value === 'ALL' ? [...allPillars] : [value];
+    fwLoadResults();
+}
+
+// Flowchart embedded intervention wizard: load and display filtered results
+function fwLoadResults() {
+    if (!appState.fwState || !appState.fwState.subtestData) return;
+    const resultsEl = document.getElementById('fw-results');
+    if (!resultsEl) return;
+
+    const { itemType, screenerData, subtestData, pillars } = appState.fwState;
+    const program = screenerData?.language === 'English' ? 'English' : 'French Immersion';
+    const subtestStart = subtestData.grade_range?.start;
+    const subtestEnd = subtestData.grade_range?.end;
+
+    let items = itemType === 'Assessment'
+        ? (appState.interventionMenuData?.assessments || [])
+        : (appState.interventionMenuData?.interventions || []);
+
+    let filtered = items.filter(item => item.program === program);
+    filtered = filtered.filter(item =>
+        gradeRangeOverlaps(subtestStart, subtestEnd, item.grade_range?.start, item.grade_range?.end)
+    );
+    if (pillars && pillars.length > 0) {
+        filtered = filtered.filter(item => {
+            const itemPillars = item.literacy_pillars || [item.literacy_pillar];
+            return pillars.some(p => itemPillars.includes(p));
+        });
+    }
+
+    if (filtered.length === 0) {
+        resultsEl.innerHTML = '<p class="fw-no-results">No matching items found for the selected criteria.</p>';
+        return;
+    }
+
+    const escapeJs = (s) => String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    resultsEl.innerHTML = `
+        <div class="fw-results-header">${filtered.length} result${filtered.length !== 1 ? 's' : ''}</div>
+        <div class="fw-results-list">
+            ${filtered.map(item => {
+                const gradeText = `${item.grade_range?.start || 'K'}–${item.grade_range?.end || '12'}`;
+                const detailText = item.duration
+                    ? `${item.duration} • ${item.frequency}`
+                    : item.administrationTime ? `Time: ${item.administrationTime}` : '';
+                return `<button class="fw-result-item" onclick="fwSelectItem('${escapeJs(item.item_id)}', '${escapeJs(item.name)}')">
+                    <div class="fw-result-info">
+                        <div class="fw-result-name">${escapeHtml(item.name)}</div>
+                        <div class="fw-result-meta">${detailText ? escapeHtml(detailText) + ' • ' : ''}Gr. ${gradeText}</div>
+                    </div>
+                    <svg class="fw-result-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M9 18l6-6-6-6"/></svg>
+                </button>`;
+            }).join('')}
+        </div>
+    `;
+}
+
+// Flowchart embedded intervention wizard: select an item and advance the flowchart
+function fwSelectItem(itemId, itemName) {
+    if (!appState.fwState) return;
+    const { nodeId, handlerName } = appState.fwState;
+    if (nodeId && handlerName) {
+        selectIntegratedOption(nodeId, itemId, itemName, handlerName);
+    }
 }
 
 // Create integrated decision node
@@ -1508,9 +1734,6 @@ function createIntegratedEndpointNode(nodeData) {
             <div class="endpoint-actions">
                 ${actionButtonHTML}
                 ${secondaryActionHTML}
-                <button class="action-btn action-summary" onclick="showFlowchartSummary()">
-                    View Summary
-                </button>
             </div>
         </div>
     `;
@@ -1719,289 +1942,8 @@ function goToPreviousStep() {
     showIntegratedNode(targetStep.nodeId, targetStep.fromNodeId, null, 'back');
 }
 
-// Build HTML showing the alternative path from a given node (greyed out)
-function buildAlternativePathHTML(tierDef, startNodeId) {
-    let html = '';
-    let nodeId = startNodeId;
-    let safety = 0;
-    
-    // Max depth to prevent infinite loops in case of circular references
-    while (nodeId && safety < 20) {
-        safety++;
-        const node = tierDef.nodes[nodeId];
-        if (!node) break;
-        
-        if (node.type === 'endpoint') {
-            // Render endpoint
-            const statusClass = node.status ? `alt-endpoint-${node.status}` : 'alt-endpoint-info';
-            html += `
-                <div class="journey-alt-endpoint ${statusClass}">
-                    <div class="journey-alt-endpoint-title">${node.title}</div>
-                    <div class="journey-alt-endpoint-desc">${node.description || ''}</div>
-                </div>
-            `;
-            break;
-        }
-        
-        // Render regular step
-        html += `
-            <div class="journey-alt-step">
-                <div class="journey-alt-step-title">${node.title}</div>
-                ${node.subtitle ? `<div class="journey-alt-step-desc">${node.subtitle}</div>` : ''}
-            </div>
-        `;
-        
-        // Determine the next node in this alternative path
-        if (node.type === 'decision' && node.choices && node.choices.length > 0) {
-            // Show all possible branches from this decision, then stop
-            html += '<div class="journey-alt-branches">';
-            node.choices.forEach(c => {
-                const targetNode = tierDef.nodes[c.nextNode];
-                const branchType = c.type || 'default';
-                html += `
-                    <div class="journey-alt-step journey-alt-branch-${branchType}">
-                        <div class="journey-alt-step-title">${c.label}</div>
-                        ${targetNode ? `<div class="journey-alt-step-desc">→ ${targetNode.title}</div>` : ''}
-                    </div>
-                `;
-            });
-            html += '</div>';
-            break;
-        } else if (node.nextNode) {
-            html += '<div class="journey-alt-connector">↓</div>';
-            nodeId = node.nextNode;
-        } else if (node.nextHandler) {
-            // Selection/handler nodes - we can't determine the specific next node without user input
-            html += `
-                <div class="journey-alt-step">
-                    <div class="journey-alt-step-desc journey-alt-continues">Continues based on selection...</div>
-                </div>
-            `;
-            break;
-        } else {
-            break;
-        }
-    }
-    
-    return html;
-}
-
-// Toggle alternative path expansion on greyed-out branch
-function toggleAltPath(element) {
-    element.classList.toggle('journey-branch-expanded');
-}
-
-// Show tier journey review at end of tier (when endpoint is reached)
-function showTierJourneyReview(endpointNodeData) {
-    const stepsContainer = document.getElementById('flowchart-steps');
-    if (!stepsContainer) return;
-    
-    const tierId = appState.visualFlowchart.tierId;
-    const tierDef = FLOWCHART_DEFINITIONS[tierId];
-    const selectedPath = appState.visualFlowchart.selectedPath;
-    const choices = appState.visualFlowchart.choices;
-    
-    // Build the journey flow HTML
-    let journeyStepsHTML = '';
-    
-    selectedPath.forEach((step, index) => {
-        const nodeDef = tierDef.nodes[step.nodeId];
-        if (!nodeDef) return;
-        
-        const choice = choices[step.nodeId];
-        const isEndpoint = nodeDef.type === 'endpoint';
-        
-        // Add connector arrow (except before first node)
-        if (index > 0) {
-            journeyStepsHTML += `
-                <div class="journey-connector">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-                        <path d="M12 5v14M5 12l7 7 7-7"/>
-                    </svg>
-                </div>
-            `;
-        }
-        
-        if (isEndpoint) {
-            // Render the endpoint as a special card
-            const statusClasses = {
-                success: 'journey-endpoint-success',
-                info: 'journey-endpoint-info',
-                warning: 'journey-endpoint-warning',
-                danger: 'journey-endpoint-danger'
-            };
-            const statusClass = statusClasses[nodeDef.status] || 'journey-endpoint-info';
-            
-            const recommendationsHTML = nodeDef.recommendations ? `
-                <div class="recommendations-box">
-                    <h4>Recommendations</h4>
-                    <ul>${nodeDef.recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
-                </div>
-            ` : '';
-            
-            const warningBoxHTML = nodeDef.warningBox ? `
-                <div class="warning-callout">
-                    ${ICONS.warning}
-                    <div>
-                        <h4>${nodeDef.warningBox.title}</h4>
-                        <p>${nodeDef.warningBox.text}</p>
-                    </div>
-                </div>
-            ` : '';
-            
-            journeyStepsHTML += `
-                <div class="journey-endpoint ${statusClass}">
-                    <div class="journey-endpoint-icon">${ICONS[nodeDef.status] || ICONS.info}</div>
-                    <h3>${nodeDef.title}</h3>
-                    <p>${nodeDef.description}</p>
-                    ${warningBoxHTML}
-                    ${recommendationsHTML}
-                </div>
-            `;
-        } else {
-            // Regular visited step
-            let choiceText = '';
-            if (choice) {
-                choiceText = choice.name;
-            } else if (nodeDef.type === 'checklist') {
-                choiceText = 'Completed';
-            }
-            
-            journeyStepsHTML += `
-                <div class="journey-step journey-step-${nodeDef.type}">
-                    <div class="journey-step-marker"><span class="journey-marker-icon">${getStepTypeIcon(nodeDef.type)}</span></div>
-                    <div class="journey-step-details">
-                        <div class="journey-step-title">${nodeDef.title}</div>
-                        ${choiceText ? `<div class="journey-step-choice">${choiceText}</div>` : ''}
-                    </div>
-                </div>
-            `;
-            
-            // For decision nodes, show all options with selected highlighted
-            if (nodeDef.type === 'decision' && nodeDef.choices && choice) {
-                journeyStepsHTML += '<div class="journey-branches">';
-                nodeDef.choices.forEach(c => {
-                    const isSelected = c.id === choice.id;
-                    const targetNodeDef = tierDef.nodes[c.nextNode];
-                    const typeClass = c.type ? `journey-branch-${c.type}` : '';
-                    
-                    // Build alternative path HTML for non-selected branches
-                    let altPathHTML = '';
-                    if (!isSelected && c.nextNode) {
-                        altPathHTML = buildAlternativePathHTML(tierDef, c.nextNode);
-                    }
-                    
-                    journeyStepsHTML += `
-                        <div class="journey-branch ${isSelected ? 'journey-branch-taken' : 'journey-branch-other'} ${typeClass}" ${!isSelected ? `onclick="toggleAltPath(this)"` : ''}>
-                            ${isSelected ? '<div class="journey-branch-indicator">✓ Your choice</div>' : ''}
-                            <div class="journey-branch-label">${c.label}</div>
-                            <div class="journey-branch-sublabel">${c.sublabel}</div>
-                            ${!isSelected && targetNodeDef ? `<div class="journey-branch-leads-to">→ ${targetNodeDef.title}</div>` : ''}
-                            ${!isSelected && altPathHTML ? `
-                                <div class="journey-branch-expand-hint">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
-                                    See what would happen
-                                </div>
-                                <div class="journey-alt-path">${altPathHTML}</div>
-                            ` : ''}
-                        </div>
-                    `;
-                });
-                journeyStepsHTML += '</div>';
-            }
-            
-            // For selection nodes, show all options with selected highlighted
-            if (nodeDef.type === 'selection' && choice) {
-                const tierData = appState.tierFlowchartData?.[tierId];
-                const options = tierData?.[nodeDef.options] || [];
-                if (options.length > 1) {
-                    journeyStepsHTML += '<div class="journey-selections">';
-                    options.forEach(opt => {
-                        const isSelected = opt.id === choice.id;
-                        journeyStepsHTML += `
-                            <span class="journey-selection-chip ${isSelected ? 'journey-selection-chosen' : 'journey-selection-other'}">
-                                ${opt.name}
-                            </span>
-                        `;
-                    });
-                    journeyStepsHTML += '</div>';
-                }
-            }
-        }
-    });
-    
-    // Build action buttons based on endpoint
-    const actionFnMap = {
-        startTier2Visual: 'startTier2VisualIntegrated',
-        startTier3Visual: 'startTier3VisualIntegrated',
-        restartTier1Visual: 'restartTier1VisualIntegrated',
-        restartTier2Visual: 'restartTier2VisualIntegrated'
-    };
-    
-    let actionsHTML = '';
-    if (endpointNodeData.actionButton && actionFnMap[endpointNodeData.actionButton.action]) {
-        const fnName = actionFnMap[endpointNodeData.actionButton.action];
-        actionsHTML += `
-            <button class="action-btn action-primary" onclick="${fnName}()">
-                ${endpointNodeData.actionButton.text}
-            </button>
-        `;
-    }
-    if (endpointNodeData.secondaryAction && actionFnMap[endpointNodeData.secondaryAction.action]) {
-        const fnName = actionFnMap[endpointNodeData.secondaryAction.action];
-        actionsHTML += `
-            <button class="action-btn action-secondary" onclick="${fnName}()">
-                ${endpointNodeData.secondaryAction.text}
-            </button>
-        `;
-    }
-    actionsHTML += `
-        <button class="action-btn action-secondary" onclick="goToPreviousStep()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-            Go Back
-        </button>
-        <button class="action-btn action-secondary" onclick="restartCurrentTier()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-            </svg>
-            Start Over
-        </button>
-    `;
-    
-    // Render journey review into the steps container
-    stepsContainer.innerHTML = `
-        <div class="journey-review">
-            <div class="journey-review-header">
-                <h2>Your ${tierDef.title.includes(':') ? tierDef.title.split(':')[0].trim() : tierDef.title} Journey</h2>
-                <p>Review your path through the flowchart</p>
-            </div>
-            <div class="journey-flow">
-                ${journeyStepsHTML}
-            </div>
-            <div class="journey-actions">
-                ${actionsHTML}
-            </div>
-        </div>
-    `;
-    
-    // Update navigation
-    const prevBtn = document.getElementById('carousel-prev-btn');
-    if (prevBtn) prevBtn.style.visibility = 'hidden';
-    
-    const stepText = document.querySelector('.step-text');
-    if (stepText) stepText.textContent = 'Journey Complete';
-    
-    // Animate in
-    requestAnimationFrame(() => {
-        const review = stepsContainer.querySelector('.journey-review');
-        if (review) review.classList.add('journey-review-visible');
-    });
-}
-
 // Undo to a specific step (carousel mode)
+
 function undoToStep(nodeId) {
     const pathIndex = appState.visualFlowchart.selectedPath.findIndex(step => step.nodeId === nodeId);
     
@@ -2076,181 +2018,199 @@ function switchToTier(tierId) {
     showIntegratedNode(flowchartDef.startNode, null);
 }
 
-// Show summary of all choices made
-function showFlowchartSummary() {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    const choices = appState.visualFlowchart.choices || {};
-    const selectedPath = appState.visualFlowchart.selectedPath || [];
-    const tierId = appState.visualFlowchart.tierId;
-    const tierDef = FLOWCHART_DEFINITIONS[tierId];
-    
-    let summaryItems = '';
-    
-    if (selectedPath.length === 0 && Object.keys(choices).length === 0) {
-        summaryItems = '<p class="no-choices">No choices have been made yet. Work through the flowchart to see your decisions summarized here.</p>';
-    } else {
-        // Build summary in path order for a comprehensive view
-        const orderedNodeIds = selectedPath.map(step => step.nodeId);
-        // Include any choices not in the path as well
-        Object.keys(choices).forEach(nodeId => {
-            if (!orderedNodeIds.includes(nodeId)) {
-                orderedNodeIds.push(nodeId);
-            }
-        });
-        
-        orderedNodeIds.forEach((nodeId, index) => {
-            const choice = choices[nodeId];
-            const nodeDef = tierDef?.nodes?.[nodeId];
-            const stepTitle = nodeDef?.title || nodeId;
-            const stepType = nodeDef?.type || 'selection';
-            const choiceText = choice ? choice.name : (stepType === 'checklist' ? 'Completed' : 'Visited');
-            
-            summaryItems += `
-                <div class="summary-item summary-item-${stepType}">
-                    <div class="summary-step-number"><span class="step-badge-icon">${getStepTypeIcon(stepType)}</span></div>
-                    <div class="summary-step-details">
-                        <div class="summary-step-label">${stepTitle}</div>
-                        <div class="summary-choice-text">${choiceText}</div>
-                    </div>
-                </div>
-            `;
-        });
+// Save current tier state to the cross-tier full journey history
+function saveCurrentTierToFullJourney() {
+    const vf = appState.visualFlowchart;
+    if (!appState.fullJourney) appState.fullJourney = [];
+    appState.fullJourney.push({
+        tierId: vf.tierId,
+        selectedPath: vf.selectedPath.slice(),
+        choices: Object.assign({}, vf.choices)
+    });
+}
+
+// Show a simple endpoint card for tier-transition endpoints (no journey history)
+function showTierTransitionChoice(nodeData) {
+    const stepsContainer = document.getElementById('flowchart-steps');
+    if (!stepsContainer) return;
+
+    const actionFnMap = {
+        startTier2Visual: 'startTier2VisualIntegrated',
+        startTier3Visual: 'startTier3VisualIntegrated',
+        restartTier2Visual: 'restartTier2VisualIntegrated'
+    };
+
+    let actionsHTML = '';
+    if (nodeData.actionButton && actionFnMap[nodeData.actionButton.action]) {
+        const fnName = actionFnMap[nodeData.actionButton.action];
+        actionsHTML += `<button class="action-btn action-primary" onclick="${fnName}()">${nodeData.actionButton.text}</button>`;
     }
-    
-    const summaryHTML = `
-        <div class="summary-overlay">
-            <div class="summary-modal glass-panel">
-                <div class="summary-header">
-                    <h2>Your Choices Summary</h2>
-                    <button class="close-summary-btn" onclick="closeSummary()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 6L6 18M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="summary-tier">
-                    <span class="tier-badge">${tierDef?.title || tierId}</span>
-                </div>
-                <div class="summary-content">
-                    ${summaryItems}
-                </div>
-                <div class="summary-actions">
-                    <button class="action-btn action-secondary" onclick="closeSummary()">Continue Working</button>
-                    <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">I'm Done</button>
+    if (nodeData.secondaryAction && actionFnMap[nodeData.secondaryAction.action]) {
+        const fnName = actionFnMap[nodeData.secondaryAction.action];
+        actionsHTML += `<button class="action-btn action-secondary" onclick="${fnName}()">${nodeData.secondaryAction.text}</button>`;
+    }
+    actionsHTML += `<button class="action-btn action-secondary" onclick="goToPreviousStep()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Go Back
+    </button>`;
+
+    const recommendationsHTML = nodeData.recommendations ? `
+        <div class="recommendations-box">
+            <h4>Recommendations</h4>
+            <ul>${nodeData.recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
+        </div>
+    ` : '';
+
+    const warningBoxHTML = nodeData.warningBox ? `
+        <div class="warning-callout">
+            ${ICONS.warning}
+            <div><h4>${nodeData.warningBox.title}</h4><p>${nodeData.warningBox.text}</p></div>
+        </div>
+    ` : '';
+
+    const statusClasses = { success: 'journey-endpoint-success', info: 'journey-endpoint-info', warning: 'journey-endpoint-warning', danger: 'journey-endpoint-danger' };
+    const statusClass = statusClasses[nodeData.status] || 'journey-endpoint-info';
+
+    stepsContainer.innerHTML = `
+        <div class="journey-review">
+            <div class="journey-flow">
+                <div class="journey-endpoint ${statusClass}">
+                    <div class="journey-endpoint-icon">${ICONS[nodeData.status] || ICONS.info}</div>
+                    <h3>${nodeData.title}</h3>
+                    <p>${nodeData.description || ''}</p>
+                    ${warningBoxHTML}
+                    ${recommendationsHTML}
                 </div>
             </div>
+            <div class="journey-actions">${actionsHTML}</div>
         </div>
     `;
-    
-    // Add summary overlay to container
-    const summaryEl = document.createElement('div');
-    summaryEl.id = 'summary-overlay-container';
-    summaryEl.innerHTML = summaryHTML;
-    container.appendChild(summaryEl);
+
+    const prevBtn = document.getElementById('carousel-prev-btn');
+    if (prevBtn) prevBtn.style.visibility = 'hidden';
+    const stepText = document.querySelector('.step-text');
+    if (stepText) stepText.textContent = 'Next Step';
+    requestAnimationFrame(() => {
+        const review = stepsContainer.querySelector('.journey-review');
+        if (review) review.classList.add('journey-review-visible');
+    });
 }
 
-// Close summary modal
-function closeSummary() {
-    const summaryContainer = document.getElementById('summary-overlay-container');
-    if (summaryContainer) {
-        summaryContainer.remove();
-    }
-}
+// Show the complete cross-tier journey summary at a true terminal endpoint
+function showFinalSummary(endpointNodeData) {
+    const stepsContainer = document.getElementById('flowchart-steps');
+    if (!stepsContainer) return;
 
-// Finish the flowchart and show final summary
-function finishFlowchart() {
-    closeSummary(); // Close any existing summary
-    
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-    
-    const choices = appState.visualFlowchart.choices || {};
-    const selectedPath = appState.visualFlowchart.selectedPath || [];
-    const tierId = appState.visualFlowchart.tierId;
-    const tierDef = FLOWCHART_DEFINITIONS[tierId];
-    
-    let summaryItems = '';
-    
-    if (selectedPath.length === 0 && Object.keys(choices).length === 0) {
-        summaryItems = '<p class="no-choices">No choices were recorded during this session.</p>';
-    } else {
-        // Build summary in path order for comprehensive view
-        const orderedNodeIds = selectedPath.map(step => step.nodeId);
-        Object.keys(choices).forEach(nodeId => {
-            if (!orderedNodeIds.includes(nodeId)) {
-                orderedNodeIds.push(nodeId);
-            }
-        });
-        
-        orderedNodeIds.forEach((nodeId, index) => {
-            const choice = choices[nodeId];
-            const nodeDef = tierDef?.nodes?.[nodeId];
-            const stepTitle = nodeDef?.title || nodeId;
-            const stepType = nodeDef?.type || 'selection';
-            const choiceText = choice ? choice.name : (stepType === 'checklist' ? 'Completed' : 'Visited');
-            summaryItems += `
-                <div class="summary-item summary-item-${stepType}">
-                    <div class="summary-step-number"><span class="step-badge-icon">${getStepTypeIcon(stepType)}</span></div>
-                    <div class="summary-step-details">
-                        <span class="summary-step">${stepTitle}</span>
-                        <span class="summary-choice">${choiceText}</span>
-                    </div>
-                </div>
-            `;
-        });
-    }
-    
-    container.innerHTML = `
-        <div class="integrated-flowchart">
-            <div class="flowchart-glass-header">
-                <button class="flowchart-back-btn" onclick="closeIntegratedFlowchart()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+    const fullJourney = appState.fullJourney || [];
+    const statusClasses = { success: 'journey-endpoint-success', info: 'journey-endpoint-info', warning: 'journey-endpoint-warning', danger: 'journey-endpoint-danger' };
+
+    let journeyHTML = '';
+    fullJourney.forEach((tierSnapshot, tierIndex) => {
+        const tierDef = FLOWCHART_DEFINITIONS[tierSnapshot.tierId];
+        if (!tierDef) return;
+
+        journeyHTML += `<div class="journey-tier-section">
+            <div class="journey-tier-header">
+                <span class="journey-tier-badge">${tierDef.title.split(':')[0].trim()}</span>
+            </div>`;
+
+        tierSnapshot.selectedPath.forEach((step, stepIndex) => {
+            const nodeDef = tierDef.nodes[step.nodeId];
+            if (!nodeDef) return;
+
+            const choice = tierSnapshot.choices[step.nodeId];
+            const isEndpoint = nodeDef.type === 'endpoint';
+
+            if (stepIndex > 0) {
+                journeyHTML += `<div class="journey-connector">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <path d="M12 5v14M5 12l7 7 7-7"/>
                     </svg>
-                    <span>Back</span>
-                </button>
-                <div class="header-title">
-                    <h2>Session Complete</h2>
-                </div>
+                </div>`;
+            }
+
+            if (isEndpoint) {
+                const statusClass = statusClasses[nodeDef.status] || 'journey-endpoint-info';
+                const recommendationsHTML = nodeDef.recommendations ? `
+                    <div class="recommendations-box">
+                        <h4>Recommendations</h4>
+                        <ul>${nodeDef.recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
+                    </div>` : '';
+                const warningBoxHTML = nodeDef.warningBox ? `
+                    <div class="warning-callout">
+                        ${ICONS.warning}
+                        <div><h4>${nodeDef.warningBox.title}</h4><p>${nodeDef.warningBox.text}</p></div>
+                    </div>` : '';
+                journeyHTML += `<div class="journey-endpoint ${statusClass}">
+                    <div class="journey-endpoint-icon">${ICONS[nodeDef.status] || ICONS.info}</div>
+                    <h3>${nodeDef.title}</h3>
+                    <p>${nodeDef.description || ''}</p>
+                    ${warningBoxHTML}
+                    ${recommendationsHTML}
+                </div>`;
+            } else {
+                let choiceText = '';
+                if (choice) {
+                    choiceText = choice.name;
+                } else if (nodeDef.type === 'checklist') {
+                    choiceText = 'Completed';
+                }
+                journeyHTML += `<div class="journey-step journey-step-${nodeDef.type}">
+                    <div class="journey-step-marker"><span class="journey-marker-icon">${getStepTypeIcon(nodeDef.type)}</span></div>
+                    <div class="journey-step-details">
+                        <div class="journey-step-title">${nodeDef.title}</div>
+                        ${choiceText ? `<div class="journey-step-choice">${choiceText}</div>` : ''}
+                    </div>
+                </div>`;
+            }
+        });
+
+        journeyHTML += '</div>';
+    });
+
+    // Build action buttons
+    let actionsHTML = '';
+    const actionFnMap = { restartTier1Visual: 'restartTier1VisualIntegrated' };
+    if (endpointNodeData?.actionButton && actionFnMap[endpointNodeData.actionButton.action]) {
+        const fnName = actionFnMap[endpointNodeData.actionButton.action];
+        actionsHTML += `<button class="action-btn action-primary" onclick="${fnName}()">${endpointNodeData.actionButton.text}</button>`;
+    }
+    actionsHTML += `<button class="action-btn action-secondary" onclick="restartCurrentTier()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+            <path d="M21 3v5h-5"/>
+        </svg>
+        Start Over
+    </button>
+    <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        Done
+    </button>`;
+
+    stepsContainer.innerHTML = `
+        <div class="journey-review">
+            <div class="journey-review-header">
+                <h2>Your Complete Journey</h2>
+                <p>A summary of your full intervention pathway</p>
             </div>
-            
-            <div class="final-summary-container">
-                <div class="final-summary glass-panel">
-                    <div class="final-summary-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
-                    </div>
-                    <h2>Your Intervention Summary</h2>
-                    <div class="summary-tier">
-                        <span class="tier-badge">${tierDef?.title || tierId}</span>
-                    </div>
-                    <div class="summary-content">
-                        ${summaryItems}
-                    </div>
-                    <div class="final-summary-actions">
-                        <button class="action-btn action-secondary" onclick="restartCurrentTier()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                                <path d="M21 3v5h-5"/>
-                            </svg>
-                            Start Over
-                        </button>
-                        <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                            Done
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <div class="journey-flow">${journeyHTML}</div>
+            <div class="journey-actions">${actionsHTML}</div>
         </div>
     `;
+
+    const prevBtn = document.getElementById('carousel-prev-btn');
+    if (prevBtn) prevBtn.style.visibility = 'hidden';
+    const stepText = document.querySelector('.step-text');
+    if (stepText) stepText.textContent = 'Journey Complete';
+    requestAnimationFrame(() => {
+        const review = stepsContainer.querySelector('.journey-review');
+        if (review) review.classList.add('journey-review-visible');
+    });
 }
 
 // Restart current tier
 function restartCurrentTier() {
-    const tierId = appState.visualFlowchart.tierId || 'tier1';
-    initIntegratedFlowchart(tierId);
+    initIntegratedFlowchart('tier1');
 }
 
 // Close integrated flowchart
@@ -2269,6 +2229,7 @@ function startTier3VisualIntegrated() {
 }
 
 function restartTier1VisualIntegrated() {
+    appState.fullJourney = [];
     switchToTier('tier1');
 }
 
@@ -5688,19 +5649,20 @@ window.openInteractiveFlowchart = openInteractiveFlowchart;
 window.initIntegratedFlowchart = initIntegratedFlowchart;
 window.closeIntegratedFlowchart = closeIntegratedFlowchart;
 window.switchToTier = switchToTier;
-window.showFlowchartSummary = showFlowchartSummary;
-window.closeSummary = closeSummary;
-window.finishFlowchart = finishFlowchart;
 window.restartCurrentTier = restartCurrentTier;
 window.undoToStep = undoToStep;
 window.goToPreviousStep = goToPreviousStep;
-window.toggleAltPath = toggleAltPath;
 window.proceedFromIntegratedChecklist = proceedFromIntegratedChecklist;
 window.proceedFromIntegratedInfo = proceedFromIntegratedInfo;
 window.selectIntegratedOption = selectIntegratedOption;
 window.makeIntegratedDecision = makeIntegratedDecision;
 window.confirmChecklistSubStep = confirmChecklistSubStep;
 window.checklistSubBack = checklistSubBack;
+window.fwOnScreenerChange = fwOnScreenerChange;
+window.fwOnSubtestChange = fwOnSubtestChange;
+window.fwOnPillarChange = fwOnPillarChange;
+window.fwSelectItem = fwSelectItem;
+window.showFinalSummary = showFinalSummary;
 window.selectTier1ScreenerVisualIntegrated = selectTier1ScreenerVisualIntegrated;
 window.selectTier2AssessmentVisualIntegrated = selectTier2AssessmentVisualIntegrated;
 window.selectTier2InterventionVisualIntegrated = selectTier2InterventionVisualIntegrated;
