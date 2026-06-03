@@ -775,7 +775,7 @@ summary::before {
   font-size: 0.6rem;
   margin-right: var(--space-sm);
   transition: transform var(--duration-slow) var(--ease);
-  color: var(--text-light);
+  color: var(--text-secondary);
 }
 
 details[open] > summary::before {
@@ -2461,14 +2461,6 @@ details > p {
   flex-shrink: 0;
 }
 
-.continue-btn.btn-ready {
-  background: var(--step);
-  color: #fff;
-  cursor: pointer;
-}
-
-.continue-btn.btn-ready:hover { background: var(--step-text); }
-
 /* ============================================================
    ONE-AT-A-TIME CHECKLIST SUB-STEPS
    Each principle is shown alone so the user engages with every
@@ -2606,7 +2598,7 @@ details > p {
 
 .substep-hint {
   font-size: 0.78rem;
-  color: var(--text-light);
+  color: var(--text-secondary);
   margin-top: var(--space-sm);
   text-align: center;
 }
@@ -2636,18 +2628,6 @@ details > p {
 
 .substep-back-btn svg { width: 16px; height: 16px; }
 .substep-back-btn:hover { background: var(--border); color: var(--text); }
-
-.substep-confirm {
-  margin-top: 0;
-  flex: 1;
-  justify-content: center;
-  padding: 0.7rem 1.1rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  border-radius: var(--radius);
-}
-
-.substep-confirm svg { width: 18px; height: 18px; }
 
 /* Sub-step slide-in animations */
 .checklist-substep.subitem-enter-forward {
@@ -2759,6 +2739,113 @@ details > p {
 }
 
 .option-arrow svg { width: 10px; height: 10px; }
+
+/* ── Embedded Flowchart Intervention Wizard ─────────────────────────── */
+.fw-wizard {
+  margin-top: var(--space-md);
+}
+
+.fw-wizard-selects {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.fw-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fw-select-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.fw-select {
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color var(--duration) var(--ease);
+}
+
+.fw-select:focus {
+  outline: none;
+  border-color: var(--step);
+}
+
+.fw-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fw-results {
+  margin-top: var(--space-sm);
+}
+
+.fw-results-header {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.fw-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fw-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: 0.65rem var(--space-md);
+  background: var(--bg-muted);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--duration) var(--ease);
+}
+
+.fw-result-item:hover {
+  background: var(--step-soft);
+  border-color: var(--step);
+}
+
+.fw-result-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.fw-result-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.fw-result-arrow {
+  flex-shrink: 0;
+  color: var(--step);
+}
+
+.fw-no-results {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: var(--space-md);
+}
 
 /* Screener grid */
 .screener-grid,
@@ -3312,6 +3399,30 @@ details > p {
   color: var(--text-secondary);
 }
 
+/* ── Journey Tier Sections (cross-tier final summary) ──────────────── */
+.journey-tier-section {
+  width: 100%;
+  max-width: 420px;
+}
+
+.journey-tier-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-sm);
+}
+
+.journey-tier-badge {
+  display: inline-block;
+  padding: 4px 16px;
+  background: var(--step-soft);
+  color: var(--step-text);
+  border: 1px solid var(--step);
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
 .journey-flow {
   display: flex;
   flex-direction: column;
@@ -3428,27 +3539,6 @@ details > p {
   border-color: var(--ineffective);
 }
 
-.journey-branch-other {
-  opacity: 0.4;
-  background: var(--bg-muted);
-  cursor: pointer;
-  transition: opacity var(--duration) var(--ease);
-}
-.journey-branch-other:hover {
-  opacity: 0.55;
-}
-
-/* Colour tint for non-chosen branches */
-.journey-branch-other.journey-branch-success,
-.journey-branch-other.journey-branch-info,
-.journey-branch-other.journey-branch-primary {
-  background: var(--effective-bg);
-}
-.journey-branch-other.journey-branch-warning,
-.journey-branch-other.journey-branch-danger {
-  background: var(--ineffective-bg);
-}
-
 .journey-branch-indicator {
   font-size: 0.68rem;
   font-weight: 600;
@@ -3485,106 +3575,6 @@ details > p {
   font-style: italic;
 }
 
-/* Expand prompt on greyed-out branches */
-.journey-branch-expand-hint {
-  font-size: 0.65rem;
-  color: var(--text-light);
-  margin-top: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-.journey-branch-expand-hint svg {
-  transition: transform var(--duration) var(--ease);
-}
-.journey-branch-other.journey-branch-expanded .journey-branch-expand-hint svg {
-  transform: rotate(90deg);
-}
-
-/* Expanded alternative path container */
-.journey-alt-path {
-  display: none;
-  margin-top: var(--space-sm);
-  padding-top: var(--space-sm);
-  border-top: 1px dashed var(--border);
-}
-.journey-branch-expanded .journey-alt-path {
-  display: block;
-}
-
-.journey-alt-step {
-  padding: 6px 8px;
-  margin-bottom: 4px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-muted);
-  font-size: 0.7rem;
-  opacity: 0.75;
-}
-.journey-alt-step-title {
-  font-weight: 600;
-  font-size: 0.72rem;
-  margin-bottom: 2px;
-}
-.journey-alt-step-desc {
-  font-size: 0.65rem;
-  color: var(--text-secondary);
-}
-.journey-alt-connector {
-  text-align: center;
-  color: var(--text-light);
-  font-size: 0.65rem;
-  padding: 2px 0;
-}
-.journey-alt-endpoint {
-  padding: 8px;
-  border-radius: var(--radius-sm);
-  font-size: 0.7rem;
-  opacity: 0.75;
-}
-.journey-alt-endpoint.alt-endpoint-success,
-.journey-alt-endpoint.alt-endpoint-info {
-  background: var(--effective-bg);
-  border: 1px solid var(--effective);
-}
-.journey-alt-endpoint.alt-endpoint-warning,
-.journey-alt-endpoint.alt-endpoint-danger {
-  background: var(--ineffective-bg);
-  border: 1px solid var(--ineffective);
-}
-.journey-alt-endpoint-title {
-  font-weight: 600;
-  font-size: 0.72rem;
-  margin-bottom: 2px;
-}
-.journey-alt-endpoint-desc {
-  font-size: 0.65rem;
-  color: var(--text-secondary);
-}
-
-.journey-alt-branches {
-  padding-left: 8px;
-}
-.journey-alt-branch-success,
-.journey-alt-branch-info {
-  border-left: 2px solid var(--effective);
-  margin-left: 4px;
-}
-.journey-alt-branch-warning,
-.journey-alt-branch-danger {
-  border-left: 2px solid var(--ineffective);
-  margin-left: 4px;
-}
-.journey-alt-branch-primary,
-.journey-alt-branch-default {
-  border-left: 2px solid var(--border);
-  margin-left: 4px;
-}
-
-.journey-alt-continues {
-  font-style: italic;
-}
-
 /* Journey selection chips */
 .journey-selections {
   display: flex;
@@ -3608,13 +3598,6 @@ details > p {
   background: var(--step-soft);
   color: var(--step-text);
   border: 1px solid var(--step);
-}
-
-.journey-selection-other {
-  background: var(--bg-muted);
-  color: var(--text-light);
-  opacity: 0.45;
-  border: 1px solid var(--border);
 }
 
 /* Journey endpoint */
