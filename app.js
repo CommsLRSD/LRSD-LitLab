@@ -13,6 +13,10 @@ const appState = {
     currentPath: [],
     interventionHistory: [],
     currentTierFlow: null,
+    // Screener the user selected (remembered across tiers and the menu so they
+    // are never forced to re-choose it). Stored as the intervention-menu
+    // screener_id, e.g. "DIBELS".
+    selectedScreener: null,
     // Visual flowchart state
     visualFlowchart: {
         nodes: [],
@@ -174,6 +178,10 @@ function navigateToPage(pageName) {
             } else {
                 initializeStepBasedMenu();
             }
+        } else if (document.querySelector('.dropdown-wizard')) {
+            // Already initialized: pre-select the remembered screener if the user
+            // picked one elsewhere (e.g. in the flowchart) since the last visit.
+            applyRememberedScreenerToMenu();
         }
     }
     
@@ -1205,6 +1213,21 @@ function createIntegratedNodeElement(nodeData, container, direction = 'forward')
     if (nodeData.type === 'checklist') {
         wireChecklistSubStep(nodeElement, nodeData);
     }
+
+    // For drill-down / intervention wizard nodes, if a screener has already been
+    // chosen earlier in the journey, populate the dependent dropdowns so the user
+    // doesn't have to re-select it.
+    if (nodeData.type === 'selection') {
+        const wizardItemTypes = { drillDownAssessments: 'Assessment', interventions: 'Intervention' };
+        if (wizardItemTypes[nodeData.options]) {
+            const remembered = getRememberedScreenerId();
+            const screenerSel = nodeElement.querySelector('#fw-screener-select');
+            if (remembered && screenerSel) {
+                screenerSel.value = remembered;
+                fwOnScreenerChange(remembered);
+            }
+        }
+    }
 }
 
 // Create integrated checklist node – ONE item at a time (sub-step carousel).
@@ -1384,6 +1407,7 @@ function createIntegratedSelectionNode(nodeData) {
 
     if (itemType) {
         // Initialize wizard state for this node
+        const rememberedScreener = getRememberedScreenerId();
         appState.fwState = {
             screener: null,
             screenerData: null,
@@ -1395,7 +1419,7 @@ function createIntegratedSelectionNode(nodeData) {
             itemType: itemType
         };
 
-        const screenerOptionsHtml = buildScreenerDropdownHtml('');
+        const screenerOptionsHtml = buildScreenerDropdownHtml('', rememberedScreener);
 
         return `
             <div class="step-header">
@@ -1508,6 +1532,9 @@ function fwOnScreenerChange(value) {
     const screenerData = (appState.interventionMenuData?.screeners || []).find(s => s.screener_id === value);
     if (!screenerData) return;
     appState.fwState.screenerData = screenerData;
+
+    // Keep the remembered screener in sync so later steps stay pre-selected.
+    setRememberedScreener(value);
 
     if (subtestSel) {
         subtestSel.innerHTML = '<option value="">Select…</option>';
@@ -2303,7 +2330,11 @@ function selectTier1ScreenerVisualIntegrated(nodeId, screenerId, screenerName) {
     appState.currentTierFlow = appState.currentTierFlow || {};
     appState.currentTierFlow.screener = screenerId;
     appState.currentTierFlow.screenerName = screenerName;
-    
+
+    // Remember the chosen screener so the user is never forced to re-select it
+    // in later tiers, drill-downs, interventions, or the interventions menu.
+    setRememberedScreener(screenerName || screenerId);
+
     showIntegratedNode('tier1-effectiveness', nodeId, screenerId);
 }
 
@@ -3088,7 +3119,9 @@ function selectTier1ScreenerVisual(nodeId, screenerId, screenerName) {
     appState.currentTierFlow = appState.currentTierFlow || {};
     appState.currentTierFlow.screener = screenerId;
     appState.currentTierFlow.screenerName = screenerName;
-    
+
+    setRememberedScreener(screenerName || screenerId);
+
     showFlowchartNode('tier1-effectiveness', nodeId, screenerId);
 }
 
@@ -4419,7 +4452,7 @@ function updateScreenerOptions() {
 }
 
 // Shared helper function to build screener dropdown HTML
-function buildScreenerDropdownHtml(languageFilter) {
+function buildScreenerDropdownHtml(languageFilter, selectedId) {
     if (!appState.interventionMenuData) return '<option value="">Select...</option>';
     
     let englishScreeners = [];
@@ -4435,21 +4468,57 @@ function buildScreenerDropdownHtml(languageFilter) {
         frenchScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'French');
     }
     
+    const optionHtml = (s) => {
+        const isSelected = selectedId && s.screener_id === selectedId ? ' selected' : '';
+        return `<option value="${s.screener_id}"${isSelected}>${s.screener_name}</option>`;
+    };
+
     let html = '<option value="">Select...</option>';
     
     if (englishScreeners.length > 0) {
         html += '<optgroup label="English">';
-        html += englishScreeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
+        html += englishScreeners.map(optionHtml).join('');
         html += '</optgroup>';
     }
     
     if (frenchScreeners.length > 0) {
         html += '<optgroup label="French Immersion">';
-        html += frenchScreeners.map(s => `<option value="${s.screener_id}">${s.screener_name}</option>`).join('');
+        html += frenchScreeners.map(optionHtml).join('');
         html += '</optgroup>';
     }
     
     return html;
+}
+
+// ============================================
+// Remembered screener (shared across tiers + menu)
+// ============================================
+
+// Resolve any screener identifier (id or display name, any casing) to the
+// canonical intervention-menu screener_id. Returns null if it cannot be matched.
+function resolveScreenerId(idOrName) {
+    if (!idOrName) return null;
+    const screeners = appState.interventionMenuData?.screeners || [];
+    const needle = String(idOrName).trim().toLowerCase();
+    const match = screeners.find(s =>
+        String(s.screener_id).toLowerCase() === needle ||
+        String(s.screener_name).toLowerCase() === needle
+    );
+    return match ? match.screener_id : null;
+}
+
+// Remember the screener the user selected so it can be pre-selected elsewhere.
+function setRememberedScreener(idOrName) {
+    const resolved = resolveScreenerId(idOrName);
+    if (resolved) {
+        appState.selectedScreener = resolved;
+    }
+    return resolved;
+}
+
+// Get the remembered screener_id (or null if none chosen yet).
+function getRememberedScreenerId() {
+    return appState.selectedScreener || null;
 }
 
 function updateSubtestOptions() {
@@ -5014,6 +5083,7 @@ function selectScreener(screenerId) {
     
     menuState.selectedScreener = screenerId;
     menuState.selectedScreenerData = screenerData;
+    setRememberedScreener(screenerId);
     
     // Load subtests for step 2
     loadSubtests();
@@ -5770,6 +5840,9 @@ function onScreenerDropdownChange(screenerId) {
     
     menuState.selectedScreener = screenerId;
     menuState.selectedScreenerData = screenerData;
+
+    // Keep the remembered screener in sync across the app.
+    setRememberedScreener(screenerId);
     
     // Populate subtest dropdown
     const subtestSelect = document.getElementById('subtest-select');
@@ -6017,6 +6090,26 @@ function initializeDropdownWizard() {
     }
     
     resetDropdownsFrom('subtest');
+
+    // If the user already chose a screener (e.g. in the flowchart), pre-select it
+    // here for convenience so they don't have to choose it again.
+    applyRememberedScreenerToMenu();
+}
+
+// Pre-select the remembered screener in the interventions menu dropdown wizard
+// and populate its dependent dropdowns, mirroring a manual selection.
+function applyRememberedScreenerToMenu() {
+    const remembered = getRememberedScreenerId();
+    if (!remembered) return;
+    const screenerSelect = document.getElementById('screener-select');
+    if (!screenerSelect) return;
+    // Don't clobber a selection the user is already working with.
+    if (screenerSelect.value) return;
+    // Only apply if the screener exists as an option in the current list.
+    const hasOption = Array.from(screenerSelect.options).some(o => o.value === remembered);
+    if (!hasOption) return;
+    screenerSelect.value = remembered;
+    onScreenerDropdownChange(remembered);
 }
 
 // Override restartMenu to work with dropdown wizard
@@ -6421,6 +6514,9 @@ function recordSelection(type, itemId, itemName, tierId) {
     saveSelectionHistory(history);
     renderHistoryPanel();
     flashHistoryToggle();
+    // Briefly slide the history panel open so the user sees the new entry land,
+    // then auto-collapse it again.
+    peekHistoryPanel();
 }
 
 // Format an ISO date string for display.
@@ -6563,6 +6659,50 @@ function flashHistoryToggle() {
     void toggle.offsetWidth;
     toggle.classList.add('just-updated');
     setTimeout(() => toggle.classList.remove('just-updated'), 1200);
+}
+
+// Momentarily slide the history panel open to confirm a new selection was added,
+// then auto-collapse it. If the panel was already open (or the user opens/hovers
+// it during the peek), it is left open and not auto-closed.
+let historyPeekTimer = null;
+function peekHistoryPanel() {
+    const tracker = document.getElementById('selection-tracker');
+    if (!tracker) return;
+
+    // If the user already has the panel open, don't interfere with it.
+    if (tracker.classList.contains('open') && !tracker.dataset.peeking) return;
+
+    if (historyPeekTimer) {
+        clearTimeout(historyPeekTimer);
+        historyPeekTimer = null;
+    }
+
+    tracker.dataset.peeking = 'true';
+    toggleHistoryPanel(true);
+
+    // Cancel the auto-collapse if the user interacts with the panel.
+    const cancelPeek = () => {
+        if (tracker.dataset.peeking) {
+            delete tracker.dataset.peeking;
+            if (historyPeekTimer) {
+                clearTimeout(historyPeekTimer);
+                historyPeekTimer = null;
+            }
+        }
+    };
+    tracker.addEventListener('mouseenter', cancelPeek, { once: true });
+    tracker.addEventListener('focusin', cancelPeek, { once: true });
+
+    historyPeekTimer = setTimeout(() => {
+        historyPeekTimer = null;
+        // Only auto-collapse if this was still an un-interrupted peek.
+        if (tracker.dataset.peeking) {
+            delete tracker.dataset.peeking;
+            tracker.removeEventListener('mouseenter', cancelPeek);
+            tracker.removeEventListener('focusin', cancelPeek);
+            toggleHistoryPanel(false);
+        }
+    }, 2600);
 }
 
 // Initialize the panel on load.
