@@ -1918,16 +1918,45 @@ details > p {
 
 .integrated-flowchart-header,
 .flowchart-glass-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: var(--space-xs) var(--space-sm);
   background: var(--bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   margin-bottom: var(--space-sm);
-  flex-wrap: wrap;
   gap: var(--space-xs);
+}
+
+/* Back button stays left, tier tabs centred, screener indicator right */
+.flowchart-glass-header .flowchart-back-btn { justify-self: start; }
+.flowchart-glass-header .tier-tabs { justify-self: center; margin-bottom: 0; }
+.flowchart-glass-header .flowchart-screener-indicator { justify-self: end; }
+
+/* Currently-selected screener indicator */
+.flowchart-screener-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--step-bg);
+  border: 1px solid var(--step-soft);
+  color: var(--step-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.flowchart-screener-indicator[hidden] { display: none; }
+.flowchart-screener-indicator svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--step); }
+.flowchart-screener-indicator-label { color: var(--text-secondary); font-weight: 600; }
+.flowchart-screener-indicator-value {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .flowchart-back-btn {
@@ -2194,20 +2223,30 @@ details > p {
 
 .step-content, .node-content { padding: var(--space-xl); }
 
-/* Stronger typographic hierarchy: bold title, lighter supporting copy */
+/* Stronger typographic hierarchy: bold title, lighter supporting copy.
+   Font sizes are kept on a tight, consistent scale (1.2 / 0.9 / 0.85rem)
+   and section blocks use shades of the step colour to stand apart. */
 .step-content h3 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
   line-height: 1.3;
   letter-spacing: -0.01em;
   color: var(--text);
   margin-bottom: var(--space-xs);
 }
-.step-content p {
+.step-content > p {
   font-size: 0.9rem;
   color: var(--text-secondary);
   margin-bottom: var(--space-md);
-  line-height: 1.55;
+  line-height: 1.6;
+}
+/* Section sub-headings (e.g. "Key Characteristics") share one consistent size */
+.step-content > h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--step-text);
+  margin: var(--space-sm) 0 4px;
+  letter-spacing: 0.01em;
 }
 
 .node-instruction, .node-description {
@@ -2474,11 +2513,11 @@ details > p {
 
 .substep-context {
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--step-text);
-  opacity: 0.75;
+  opacity: 0.9;
   margin-bottom: var(--space-md);
 }
 
@@ -2928,7 +2967,8 @@ details > p {
 .area-icon { font-size: 1rem; }
 .area-icon svg { width: 16px; height: 16px; }
 
-/* Callouts – informational boxes share the STEP colour */
+/* Callouts – informational boxes share the STEP colour.
+   A left accent + tinted panel marks them as a distinct semantic block. */
 .info-callout {
   display: flex;
   align-items: flex-start;
@@ -2936,18 +2976,25 @@ details > p {
   padding: var(--space-sm) var(--space-md);
   background: var(--step-bg);
   border: 1px solid var(--step-soft);
+  border-left: 4px solid var(--step);
   border-radius: var(--radius);
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--step-text);
-  margin-bottom: var(--space-sm);
-  line-height: 1.45;
+  margin-bottom: var(--space-md);
+  line-height: 1.55;
 }
 
-.info-callout svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: var(--step); }
+.info-callout svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; color: var(--step); }
 
-.info-callout h4 { font-size: 0.8rem; margin-bottom: 2px; }
-.info-callout ul { margin: 0; padding-left: 1.1rem; }
-.info-callout li { font-size: 0.75rem; line-height: 1.45; }
+.info-callout h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--step-text);
+  margin-bottom: 4px;
+}
+.info-callout p { font-size: 0.85rem; line-height: 1.55; margin: 0; }
+.info-callout ul { margin: 4px 0 0; padding-left: 1.1rem; }
+.info-callout li { font-size: 0.85rem; line-height: 1.5; }
 
 .warning-callout,
 .warning-box {
@@ -2957,15 +3004,26 @@ details > p {
   padding: var(--space-sm) var(--space-md);
   background: var(--ineffective-bg);
   border: 1px solid var(--ineffective-soft);
+  border-left: 4px solid var(--ineffective);
   border-radius: var(--radius);
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--ineffective-text);
-  margin-bottom: var(--space-sm);
-  line-height: 1.45;
+  margin-bottom: var(--space-md);
+  line-height: 1.55;
 }
 
 .warning-callout svg,
-.warning-box svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: var(--ineffective); }
+.warning-box svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; color: var(--ineffective); }
+
+.warning-callout h4,
+.warning-box h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ineffective-text);
+  margin-bottom: 4px;
+}
+.warning-callout p,
+.warning-box p { font-size: 0.85rem; line-height: 1.55; margin: 0; }
 
 /* Decision grid */
 .decision-grid,
@@ -3094,11 +3152,11 @@ details > p {
 
 .feature-list li {
   position: relative;
-  padding-left: 1.1rem;
-  font-size: 0.78rem;
+  padding-left: 1.3rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
-  margin-bottom: 3px;
-  line-height: 1.45;
+  margin-bottom: 5px;
+  line-height: 1.5;
 }
 
 .feature-list li::before {
@@ -3162,15 +3220,17 @@ details > p {
   margin-top: var(--space-sm);
   text-align: left;
   border: 1px solid var(--border);
-  font-size: 0.78rem;
+  border-left: 4px solid var(--primary-light);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
 }
 
 .recommendations-box h4,
-.recommendation-box h4 { font-size: 0.82rem; margin-bottom: 4px; }
+.recommendation-box h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; color: var(--text); }
 .recommendations-box ul,
 .recommendation-box ul { padding-left: 1.1rem; margin: 0; }
 .recommendations-box li,
-.recommendation-box li { font-size: 0.75rem; line-height: 1.45; }
+.recommendation-box li { font-size: 0.85rem; line-height: 1.5; }
 
 /* Action buttons */
 .action-buttons {
@@ -4655,6 +4715,10 @@ details > p {
   .tier-tabs { flex-wrap: wrap; }
 
   /* Stack flowchart vertically on mobile */
+  .integrated-flowchart,
+  .integrated-flowchart-container {
+    padding: var(--space-md) var(--space-sm);
+  }
   .flowchart-steps {
     padding: 0 var(--space-sm);
   }
@@ -4724,7 +4788,17 @@ details > p {
   .endpoint-card, .vf-endpoint { padding: var(--space-lg); }
 
   .flowchart-glass-header,
-  .integrated-flowchart-header { flex-direction: column; align-items: flex-start; }
+  .integrated-flowchart-header {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    row-gap: var(--space-xs);
+  }
+  .flowchart-glass-header .flowchart-back-btn { justify-self: center; }
+  .flowchart-glass-header .tier-tabs { justify-self: center; justify-content: center; }
+  .flowchart-glass-header .flowchart-screener-indicator {
+    justify-self: center;
+    justify-content: center;
+  }
 
   .tier-selection { gap: var(--space-sm); }
   .tier-option { padding: var(--space-md); }
@@ -5057,12 +5131,25 @@ details > p {
 }
 .selection-tracker-count.is-empty { opacity: 0.6; }
 
-.selection-tracker-toggle.just-updated {
-  animation: tracker-pulse 0.6s ease 2;
+.selection-tracker-toggle.has-unseen {
+  background: var(--primary-light);
+  animation: tracker-glow 1.6s ease-in-out infinite;
 }
-@keyframes tracker-pulse {
-  0%, 100% { transform: translateY(-50%) scale(1); }
-  50% { transform: translateY(-50%) scale(1.08); }
+@keyframes tracker-glow {
+  0%, 100% {
+    box-shadow: var(--shadow-md, var(--shadow-sm)),
+                0 0 0 0 rgba(106, 139, 168, 0.55),
+                -4px 0 16px 2px rgba(106, 139, 168, 0.35);
+  }
+  50% {
+    box-shadow: var(--shadow-md, var(--shadow-sm)),
+                0 0 0 4px rgba(106, 139, 168, 0),
+                -6px 0 26px 6px rgba(106, 139, 168, 0.65);
+  }
+}
+.selection-tracker-toggle.has-unseen .selection-tracker-count {
+  background: var(--warning, #d1a44e);
+  color: #fff;
 }
 
 .selection-tracker-panel {
@@ -5163,6 +5250,52 @@ details > p {
   padding: var(--space-xl) var(--space-sm);
 }
 .history-empty-hint { font-size: 0.8rem; opacity: 0.8; }
+
+/* Grouped history sections, one per screener */
+.history-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.history-section + .history-section { margin-top: var(--space-md); }
+
+.history-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.4rem 0;
+  background: var(--bg);
+  border-bottom: 2px solid var(--primary-faint);
+}
+
+.history-section-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+}
+
+.history-section-count {
+  margin-left: auto;
+  min-width: 18px;
+  text-align: center;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--primary-faint);
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.history-section-entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
 
 .history-entry {
   border: 1px solid var(--border);

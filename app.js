@@ -1025,7 +1025,12 @@ function initIntegratedFlowchart(tierId) {
                         <span class="tier-label">Tier 3</span>
                     </button>
                 </div>
-                
+
+                <div class="flowchart-screener-indicator" id="flowchart-screener-indicator" hidden>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <span class="flowchart-screener-indicator-label">Screener:</span>
+                    <span class="flowchart-screener-indicator-value" id="flowchart-screener-indicator-value"></span>
+                </div>
             </div>
             
             <div class="flowchart-title-bar">
@@ -1049,6 +1054,9 @@ function initIntegratedFlowchart(tierId) {
     
     // Apply the tier colour theme so the user always knows which tier they are on
     applyTierTheme(tierId);
+
+    // Reflect any previously chosen screener in the visible header indicator.
+    updateScreenerIndicator();
 
     // Show the first node
     showIntegratedNode(flowchartDef.startNode, null);
@@ -4513,12 +4521,41 @@ function setRememberedScreener(idOrName) {
     if (resolved) {
         appState.selectedScreener = resolved;
     }
+    updateScreenerIndicator();
     return resolved;
 }
 
 // Get the remembered screener_id (or null if none chosen yet).
 function getRememberedScreenerId() {
     return appState.selectedScreener || null;
+}
+
+// Resolve a screener_id to its human-friendly display name.
+function getScreenerName(idOrName) {
+    if (!idOrName) return '';
+    const screeners = appState.interventionMenuData?.screeners || [];
+    const needle = String(idOrName).trim().toLowerCase();
+    const match = screeners.find(s =>
+        String(s.screener_id).toLowerCase() === needle ||
+        String(s.screener_name).toLowerCase() === needle
+    );
+    return match ? (match.screener_name || match.screener_id) : String(idOrName);
+}
+
+// Reflect the currently selected screener in the visible flowchart indicator so
+// the user can always see which screener they chose.
+function updateScreenerIndicator() {
+    const indicator = document.getElementById('flowchart-screener-indicator');
+    if (!indicator) return;
+    const valueEl = document.getElementById('flowchart-screener-indicator-value');
+    const id = getRememberedScreenerId();
+    if (id) {
+        if (valueEl) valueEl.textContent = getScreenerName(id);
+        indicator.hidden = false;
+    } else {
+        if (valueEl) valueEl.textContent = '';
+        indicator.hidden = true;
+    }
 }
 
 function updateSubtestOptions() {
@@ -6501,22 +6538,26 @@ function tierLabelFromId(tierId) {
 function recordSelection(type, itemId, itemName, tierId) {
     if (!itemName) return;
     const history = loadSelectionHistory();
+    // Capture the screener that was active for this selection so entries can be
+    // grouped by screener in the history panel.
+    const screenerId = appState.fwState?.screener || getRememberedScreenerId() || '';
+    const screenerName = appState.fwState?.screenerData?.screener_name || getScreenerName(screenerId) || '';
     const entry = {
         id: `sel-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         type: type || 'Selection',
         itemId: itemId || '',
         name: itemName,
         tier: tierLabelFromId(tierId),
+        screener: screenerName,
         date: new Date().toISOString(),
         notes: ''
     };
     history.push(entry);
     saveSelectionHistory(history);
     renderHistoryPanel();
-    flashHistoryToggle();
-    // Briefly slide the history panel open so the user sees the new entry land,
-    // then auto-collapse it again.
-    peekHistoryPanel();
+    // Glow the history tab to signal a new entry, leaving it until the user opens
+    // the panel, rather than popping the whole panel open.
+    markHistoryUnseen();
 }
 
 // Format an ISO date string for display.
@@ -6552,9 +6593,10 @@ function renderHistoryPanel() {
         return;
     }
 
-    // Newest first
+    // Newest first, grouped into sections by the screener that was active.
     const ordered = history.slice().reverse();
-    list.innerHTML = ordered.map(entry => {
+
+    const renderEntry = (entry) => {
         const tierNum = String(entry.tier || '').replace(/\D/g, '');
         const tierClass = tierNum ? `history-tier-${tierNum}` : '';
         const typeLabel = entry.type === 'Assessment' ? 'Drill-Down Assessment' : (entry.type || 'Selection');
@@ -6571,7 +6613,30 @@ function renderHistoryPanel() {
                 <div class="history-entry-date">Selected: ${escapeHtml(formatHistoryDate(entry.date))}</div>
                 <textarea class="history-entry-notes" rows="2" placeholder="Add notes about this selection…" oninput="updateHistoryNote('${escapeHtml(entry.id)}', this.value)">${escapeHtml(entry.notes || '')}</textarea>
             </div>`;
-    }).join('');
+    };
+
+    // Preserve the order in which each screener group first appears (newest first).
+    const groups = [];
+    const groupIndex = {};
+    ordered.forEach(entry => {
+        const key = entry.screener && String(entry.screener).trim() ? entry.screener : '';
+        if (!(key in groupIndex)) {
+            groupIndex[key] = groups.length;
+            groups.push({ key, label: key || 'No screener selected', entries: [] });
+        }
+        groups[groupIndex[key]].entries.push(entry);
+    });
+
+    list.innerHTML = groups.map(group => `
+        <div class="history-section">
+            <div class="history-section-header">
+                <span class="history-section-title">${escapeHtml(group.label)}</span>
+                <span class="history-section-count">${group.entries.length}</span>
+            </div>
+            <div class="history-section-entries">
+                ${group.entries.map(renderEntry).join('')}
+            </div>
+        </div>`).join('');
 }
 
 // Update the note for a specific entry.
@@ -6648,61 +6713,24 @@ function toggleHistoryPanel(forceOpen) {
     tracker.classList.toggle('open', willOpen);
     const toggle = tracker.querySelector('.selection-tracker-toggle');
     if (toggle) toggle.setAttribute('aria-expanded', String(willOpen));
+    // Opening the panel counts as "checking" the new entries, so clear the glow.
+    if (willOpen) clearHistoryUnseen();
 }
 
-// Briefly highlight the peek toggle when a new selection is recorded.
-function flashHistoryToggle() {
+// Add a persistent glow to the history tab to signal unchecked new entries.
+function markHistoryUnseen() {
+    const tracker = document.getElementById('selection-tracker');
     const toggle = document.querySelector('.selection-tracker-toggle');
     if (!toggle) return;
-    toggle.classList.remove('just-updated');
-    // Force reflow so the animation restarts on rapid consecutive saves
-    void toggle.offsetWidth;
-    toggle.classList.add('just-updated');
-    setTimeout(() => toggle.classList.remove('just-updated'), 1200);
+    // If the panel is already open, the user is already looking at it.
+    if (tracker && tracker.classList.contains('open')) return;
+    toggle.classList.add('has-unseen');
 }
 
-// Momentarily slide the history panel open to confirm a new selection was added,
-// then auto-collapse it. If the panel was already open (or the user opens/hovers
-// it during the peek), it is left open and not auto-closed.
-let historyPeekTimer = null;
-function peekHistoryPanel() {
-    const tracker = document.getElementById('selection-tracker');
-    if (!tracker) return;
-
-    // If the user already has the panel open, don't interfere with it.
-    if (tracker.classList.contains('open') && !tracker.dataset.peeking) return;
-
-    if (historyPeekTimer) {
-        clearTimeout(historyPeekTimer);
-        historyPeekTimer = null;
-    }
-
-    tracker.dataset.peeking = 'true';
-    toggleHistoryPanel(true);
-
-    // Cancel the auto-collapse if the user interacts with the panel.
-    const cancelPeek = () => {
-        if (tracker.dataset.peeking) {
-            delete tracker.dataset.peeking;
-            if (historyPeekTimer) {
-                clearTimeout(historyPeekTimer);
-                historyPeekTimer = null;
-            }
-        }
-    };
-    tracker.addEventListener('mouseenter', cancelPeek, { once: true });
-    tracker.addEventListener('focusin', cancelPeek, { once: true });
-
-    historyPeekTimer = setTimeout(() => {
-        historyPeekTimer = null;
-        // Only auto-collapse if this was still an un-interrupted peek.
-        if (tracker.dataset.peeking) {
-            delete tracker.dataset.peeking;
-            tracker.removeEventListener('mouseenter', cancelPeek);
-            tracker.removeEventListener('focusin', cancelPeek);
-            toggleHistoryPanel(false);
-        }
-    }, 2600);
+// Remove the glow once the user has opened (checked) the history panel.
+function clearHistoryUnseen() {
+    const toggle = document.querySelector('.selection-tracker-toggle');
+    if (toggle) toggle.classList.remove('has-unseen');
 }
 
 // Initialize the panel on load.
