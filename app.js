@@ -1039,8 +1039,63 @@ function initIntegratedFlowchart(tierId) {
         </div>
     `;
     
+    // Apply the tier colour theme so the user always knows which tier they are on
+    applyTierTheme(tierId);
+
     // Show the first node
     showIntegratedNode(flowchartDef.startNode, null);
+}
+
+// Apply a tier-specific colour theme to the active flowchart so the user can
+// always tell, at a glance, which tier they are currently working in.
+function applyTierTheme(tierId) {
+    const fc = document.querySelector('.integrated-flowchart');
+    if (!fc) return;
+    fc.classList.remove('flowchart-tier-1', 'flowchart-tier-2', 'flowchart-tier-3');
+    const num = String(tierId).replace('tier', '');
+    if (num === '1' || num === '2' || num === '3') {
+        fc.classList.add(`flowchart-tier-${num}`);
+    }
+}
+
+// Show an explicit "Go to Tier #" transition step so the user is clearly aware
+// they are moving from one tier to another before the next tier's flow begins.
+function showGoToTierStep(tierId) {
+    const stepsContainer = document.getElementById('flowchart-steps');
+    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    if (!stepsContainer || !flowchartDef) {
+        switchToTier(tierId);
+        return;
+    }
+
+    const num = String(tierId).replace('tier', '');
+    const subtitle = flowchartDef.title.split(':').slice(1).join(':').trim();
+
+    // Switch the colour theme now for an immediate visual cue of the new tier
+    applyTierTheme(tierId);
+
+    stepsContainer.innerHTML = `
+        <div class="go-to-tier-step go-to-tier-${num}">
+            <div class="go-to-tier-badge">Tier ${num}</div>
+            <h2 class="go-to-tier-heading">Go to Tier ${num}</h2>
+            ${subtitle ? `<p class="go-to-tier-sub">${escapeHtml(subtitle)}</p>` : ''}
+            <p class="go-to-tier-note">You are moving on to the next tier of support.</p>
+            <button class="continue-btn go-to-tier-btn" onclick="switchToTier('${tierId}')">
+                Continue to Tier ${num}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    `;
+
+    const stepText = document.querySelector('.step-text');
+    if (stepText) stepText.textContent = `Go to Tier ${num}`;
+    const prevBtn = document.getElementById('carousel-prev-btn');
+    if (prevBtn) prevBtn.style.visibility = 'hidden';
+
+    requestAnimationFrame(() => {
+        const step = stepsContainer.querySelector('.go-to-tier-step');
+        if (step) step.classList.add('go-to-tier-visible');
+    });
 }
 
 // Show a node in the integrated flowchart
@@ -1582,8 +1637,11 @@ function fwLoadResults() {
 // Flowchart embedded intervention wizard: select an item and advance the flowchart
 function fwSelectItem(itemId, itemName) {
     if (!appState.fwState) return;
-    const { nodeId, handlerName } = appState.fwState;
+    const { nodeId, handlerName, itemType } = appState.fwState;
     if (nodeId && handlerName) {
+        // Record the drill-down assessment / intervention selection so the teacher
+        // can always keep track of what has been chosen (persisted to localStorage).
+        recordSelection(itemType, itemId, itemName, appState.visualFlowchart?.tierId);
         selectIntegratedOption(nodeId, itemId, itemName, handlerName);
     }
 }
@@ -2014,6 +2072,9 @@ function switchToTier(tierId) {
         stepText.textContent = 'Step 1';
     }
     
+    // Apply the tier colour theme for the newly active tier
+    applyTierTheme(tierId);
+
     // Show first node of new tier
     showIntegratedNode(flowchartDef.startNode, null);
 }
@@ -2221,11 +2282,11 @@ function closeIntegratedFlowchart() {
 
 // Integrated tier transition handlers
 function startTier2VisualIntegrated() {
-    switchToTier('tier2');
+    showGoToTierStep('tier2');
 }
 
 function startTier3VisualIntegrated() {
-    switchToTier('tier3');
+    showGoToTierStep('tier3');
 }
 
 function restartTier1VisualIntegrated() {
@@ -6304,3 +6365,218 @@ async function initializeAssessmentSchedules() {
 
 // Export functions
 window.initializeAssessmentSchedules = initializeAssessmentSchedules;
+
+// ============================================
+// SELECTION HISTORY TRACKER
+// ============================================
+// Records every drill-down assessment and intervention the teacher selects in
+// the flowchart, persists it to localStorage (so it survives navigation and
+// reloads), and surfaces it in an always-accessible side panel. Teachers can
+// add notes to each entry and export the whole history as a CSV file.
+
+const SELECTION_HISTORY_KEY = 'litlab_selection_history';
+
+// Load the saved selection history from localStorage (returns an array).
+function loadSelectionHistory() {
+    try {
+        const raw = localStorage.getItem(SELECTION_HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+        console.error('Could not read selection history:', err);
+        return [];
+    }
+}
+
+// Persist the selection history array to localStorage.
+function saveSelectionHistory(history) {
+    try {
+        localStorage.setItem(SELECTION_HISTORY_KEY, JSON.stringify(history));
+    } catch (err) {
+        console.error('Could not save selection history:', err);
+    }
+}
+
+// Turn a tierId such as "tier2" into a friendly label such as "Tier 2".
+function tierLabelFromId(tierId) {
+    const num = String(tierId || '').replace('tier', '');
+    return num ? `Tier ${num}` : '';
+}
+
+// Record a drill-down assessment or intervention selection.
+function recordSelection(type, itemId, itemName, tierId) {
+    if (!itemName) return;
+    const history = loadSelectionHistory();
+    const entry = {
+        id: `sel-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        type: type || 'Selection',
+        itemId: itemId || '',
+        name: itemName,
+        tier: tierLabelFromId(tierId),
+        date: new Date().toISOString(),
+        notes: ''
+    };
+    history.push(entry);
+    saveSelectionHistory(history);
+    renderHistoryPanel();
+    flashHistoryToggle();
+}
+
+// Format an ISO date string for display.
+function formatHistoryDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+    });
+}
+
+// Render the history list and count badge inside the static panel shell.
+function renderHistoryPanel() {
+    const list = document.getElementById('selection-tracker-list');
+    const countEl = document.getElementById('selection-tracker-count');
+    const history = loadSelectionHistory();
+
+    if (countEl) {
+        countEl.textContent = String(history.length);
+        countEl.classList.toggle('is-empty', history.length === 0);
+    }
+
+    if (!list) return;
+
+    if (history.length === 0) {
+        list.innerHTML = `
+            <div class="history-empty">
+                <p>No drill-downs or interventions selected yet.</p>
+                <p class="history-empty-hint">Your selections from the flowchart will appear here.</p>
+            </div>`;
+        return;
+    }
+
+    // Newest first
+    const ordered = history.slice().reverse();
+    list.innerHTML = ordered.map(entry => {
+        const tierNum = String(entry.tier || '').replace(/\D/g, '');
+        const tierClass = tierNum ? `history-tier-${tierNum}` : '';
+        const typeLabel = entry.type === 'Assessment' ? 'Drill-Down Assessment' : (entry.type || 'Selection');
+        return `
+            <div class="history-entry ${tierClass}" data-entry-id="${escapeHtml(entry.id)}">
+                <div class="history-entry-top">
+                    <span class="history-entry-type">${escapeHtml(typeLabel)}</span>
+                    ${entry.tier ? `<span class="history-entry-tier">${escapeHtml(entry.tier)}</span>` : ''}
+                    <button class="history-entry-delete" title="Remove this entry" aria-label="Remove this entry" onclick="deleteHistoryEntry('${escapeHtml(entry.id)}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="history-entry-name">${escapeHtml(entry.name)}</div>
+                <div class="history-entry-date">Selected: ${escapeHtml(formatHistoryDate(entry.date))}</div>
+                <textarea class="history-entry-notes" rows="2" placeholder="Add notes about this selection…" oninput="updateHistoryNote('${escapeHtml(entry.id)}', this.value)">${escapeHtml(entry.notes || '')}</textarea>
+            </div>`;
+    }).join('');
+}
+
+// Update the note for a specific entry.
+function updateHistoryNote(entryId, value) {
+    const history = loadSelectionHistory();
+    const entry = history.find(e => e.id === entryId);
+    if (!entry) return;
+    entry.notes = value;
+    saveSelectionHistory(history);
+}
+
+// Delete a single entry.
+function deleteHistoryEntry(entryId) {
+    let history = loadSelectionHistory();
+    history = history.filter(e => e.id !== entryId);
+    saveSelectionHistory(history);
+    renderHistoryPanel();
+}
+
+// Clear the entire history (with confirmation).
+function clearSelectionHistory() {
+    const history = loadSelectionHistory();
+    if (history.length === 0) return;
+    const ok = window.confirm('Clear ALL saved selections and notes? This cannot be undone.');
+    if (!ok) return;
+    saveSelectionHistory([]);
+    renderHistoryPanel();
+}
+
+// Escape a single CSV field.
+function csvEscape(value) {
+    const str = String(value == null ? '' : value);
+    if (/[",\r\n]/.test(str)) {
+        return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+}
+
+// Export the history as a downloadable CSV file.
+function exportHistoryCsv() {
+    const history = loadSelectionHistory();
+    if (history.length === 0) {
+        window.alert('There are no selections to export yet.');
+        return;
+    }
+
+    const headers = ['Type', 'Name', 'Tier', 'Date Selected', 'Notes'];
+    const rows = history.map(e => [
+        e.type === 'Assessment' ? 'Drill-Down Assessment' : (e.type || 'Selection'),
+        e.name,
+        e.tier,
+        formatHistoryDate(e.date),
+        e.notes || ''
+    ].map(csvEscape).join(','));
+
+    const csv = [headers.map(csvEscape).join(','), ...rows].join('\r\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `litlab-selection-history-${stamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// Open/close the side panel.
+function toggleHistoryPanel(forceOpen) {
+    const tracker = document.getElementById('selection-tracker');
+    if (!tracker) return;
+    const willOpen = typeof forceOpen === 'boolean' ? forceOpen : !tracker.classList.contains('open');
+    tracker.classList.toggle('open', willOpen);
+    const toggle = tracker.querySelector('.selection-tracker-toggle');
+    if (toggle) toggle.setAttribute('aria-expanded', String(willOpen));
+}
+
+// Briefly highlight the peek toggle when a new selection is recorded.
+function flashHistoryToggle() {
+    const toggle = document.querySelector('.selection-tracker-toggle');
+    if (!toggle) return;
+    toggle.classList.remove('just-updated');
+    // Force reflow so the animation restarts on rapid consecutive saves
+    void toggle.offsetWidth;
+    toggle.classList.add('just-updated');
+    setTimeout(() => toggle.classList.remove('just-updated'), 1200);
+}
+
+// Initialize the panel on load.
+document.addEventListener('DOMContentLoaded', () => {
+    renderHistoryPanel();
+});
+
+// Selection history exports
+window.recordSelection = recordSelection;
+window.renderHistoryPanel = renderHistoryPanel;
+window.updateHistoryNote = updateHistoryNote;
+window.deleteHistoryEntry = deleteHistoryEntry;
+window.clearSelectionHistory = clearSelectionHistory;
+window.exportHistoryCsv = exportHistoryCsv;
+window.toggleHistoryPanel = toggleHistoryPanel;
+window.showGoToTierStep = showGoToTierStep;
+window.applyTierTheme = applyTierTheme;
