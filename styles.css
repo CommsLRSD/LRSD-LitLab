@@ -2679,6 +2679,12 @@ details > p {
   .flowchart-step.carousel-enter-back {
     animation: none;
   }
+
+  .flowchart-step,
+  .integrated-flow-node {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Selection grid */
