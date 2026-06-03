@@ -43,6 +43,23 @@
   --step-info: #6ab8ad;
   --step-endpoint: #5eb892;
 
+  /* Step type background tints & text colours */
+  --step-checklist-bg: #eeeffa;
+  --step-checklist-header: #e2e4f6;
+  --step-checklist-text: #3c40a0;
+  --step-selection-bg: #f2eefa;
+  --step-selection-header: #e9e3f7;
+  --step-selection-text: #5a40a8;
+  --step-decision-bg: #fce9f3;
+  --step-decision-header: #f8d9eb;
+  --step-decision-text: #a02868;
+  --step-info-bg: #e9f6f4;
+  --step-info-header: #d5ede9;
+  --step-info-text: #1d6b63;
+  --step-endpoint-bg: #e9f7ef;
+  --step-endpoint-header: #d4eedf;
+  --step-endpoint-text: #1a6e45;
+
   /* Tier colours – gentle pastels */
   --tier-1: #5eb892;
   --tier-1-bg: #ecf8f2;
@@ -2165,12 +2182,101 @@ details > p {
   line-height: 1.35;
 }
 
-/* Step type themes */
-.flowchart-step-checklist { border-left: 3px solid var(--step-checklist); }
-.flowchart-step-selection { border-left: 3px solid var(--step-selection); }
-.flowchart-step-decision  { border-left: 3px solid var(--step-decision); }
-.flowchart-step-info      { border-left: 3px solid var(--step-info); }
-.flowchart-step-endpoint  { border-left: 3px solid var(--step-endpoint); }
+/* Step type themes – coloured background tint + strong accent border */
+.flowchart-step-checklist {
+  background: var(--step-checklist-bg);
+  border-left: 5px solid var(--step-checklist);
+  border-color: var(--step-checklist);
+}
+.flowchart-step-selection {
+  background: var(--step-selection-bg);
+  border-left: 5px solid var(--step-selection);
+  border-color: var(--step-selection);
+}
+.flowchart-step-decision {
+  background: var(--step-decision-bg);
+  border-left: 5px solid var(--step-decision);
+  border-color: var(--step-decision);
+}
+.flowchart-step-info {
+  background: var(--step-info-bg);
+  border-left: 5px solid var(--step-info);
+  border-color: var(--step-info);
+}
+.flowchart-step-endpoint {
+  background: var(--step-endpoint-bg);
+  border-left: 5px solid var(--step-endpoint);
+  border-color: var(--step-endpoint);
+}
+
+/* Themed step headers per type */
+.flowchart-step-checklist .step-header {
+  background: var(--step-checklist-header);
+  border-bottom-color: rgba(138, 142, 214, 0.3);
+}
+.flowchart-step-checklist .step-badge { color: var(--step-checklist-text); }
+.flowchart-step-checklist .step-badge-icon svg { opacity: 1; color: var(--step-checklist); }
+
+.flowchart-step-selection .step-header {
+  background: var(--step-selection-header);
+  border-bottom-color: rgba(164, 143, 214, 0.3);
+}
+.flowchart-step-selection .step-badge { color: var(--step-selection-text); }
+.flowchart-step-selection .step-badge-icon svg { opacity: 1; color: var(--step-selection); }
+
+.flowchart-step-decision .step-header {
+  background: var(--step-decision-header);
+  border-bottom-color: rgba(214, 138, 175, 0.3);
+}
+.flowchart-step-decision .step-badge { color: var(--step-decision-text); }
+.flowchart-step-decision .step-badge-icon svg { opacity: 1; color: var(--step-decision); }
+
+.flowchart-step-info .step-header {
+  background: var(--step-info-header);
+  border-bottom-color: rgba(106, 184, 173, 0.3);
+}
+.flowchart-step-info .step-badge { color: var(--step-info-text); }
+.flowchart-step-info .step-badge-icon svg { opacity: 1; color: var(--step-info); }
+
+.flowchart-step-endpoint .step-header {
+  background: var(--step-endpoint-header);
+  border-bottom-color: rgba(94, 184, 146, 0.3);
+}
+.flowchart-step-endpoint .step-badge { color: var(--step-endpoint-text); }
+.flowchart-step-endpoint .step-badge-icon svg { opacity: 1; color: var(--step-endpoint); }
+
+/* Checklist items tinted to match step type */
+.flowchart-step-checklist .checklist-item {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(138, 142, 214, 0.35);
+}
+.flowchart-step-checklist .checklist-item:hover { background: rgba(255, 255, 255, 0.9); }
+.flowchart-step-checklist .checklist-item.checked,
+.flowchart-step-checklist .checklist-item.item-checked {
+  background: rgba(138, 142, 214, 0.15);
+  border-color: var(--step-checklist);
+}
+.flowchart-step-checklist .checklist-item.checked .checkbox-check,
+.flowchart-step-checklist .checklist-item.item-checked .checkbox-check {
+  background: var(--step-checklist);
+  border-color: var(--step-checklist);
+}
+
+/* Selection options tinted to match step type */
+.flowchart-step-selection .selection-option {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(164, 143, 214, 0.35);
+}
+.flowchart-step-selection .selection-option:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--step-selection);
+}
+.flowchart-step-selection .selection-option.selected,
+.flowchart-step-selection .selection-option.option-selected {
+  background: rgba(164, 143, 214, 0.15);
+  border-color: var(--step-selection);
+  box-shadow: 0 0 0 1px var(--step-selection);
+}
 
 /* Undo button */
 .undo-btn {
@@ -2559,7 +2665,11 @@ details > p {
 
 .decision-btn-yes,
 .decision-btn.decision-success,
-.decision-btn.success { border-color: var(--success); background: var(--success-light); }
+.decision-btn.success {
+  border-color: var(--success);
+  background: var(--success-light);
+  color: var(--success-text);
+}
 
 .decision-btn-yes:hover,
 .decision-btn.decision-success:hover,
@@ -2567,14 +2677,22 @@ details > p {
 
 .decision-btn-no,
 .decision-btn.decision-warning,
-.decision-btn.warning { border-color: #c27070; background: #fdf0f0; }
+.decision-btn.warning {
+  border-color: var(--danger);
+  background: var(--danger-light);
+  color: #8b3535;
+}
 
 .decision-btn-no:hover,
 .decision-btn.decision-warning:hover,
 .decision-btn.warning:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
 
 .decision-btn.decision-info,
-.decision-btn.info { border-color: var(--info); background: var(--info-light); }
+.decision-btn.info {
+  border-color: var(--info);
+  background: var(--info-light);
+  color: var(--info-text);
+}
 
 .decision-btn.decision-info:hover,
 .decision-btn.info:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
@@ -2609,6 +2727,13 @@ details > p {
   color: var(--text-secondary);
   line-height: 1.4;
 }
+
+.decision-btn.decision-success .decision-content p,
+.decision-btn.decision-success .decision-content span { color: var(--success-text); }
+.decision-btn.decision-warning .decision-content p,
+.decision-btn.decision-warning .decision-content span { color: #8b3535; }
+.decision-btn.decision-info .decision-content p,
+.decision-btn.decision-info .decision-content span { color: var(--info-text); }
 
 .decision-options {
   display: flex;
@@ -2956,10 +3081,22 @@ details > p {
   border-radius: var(--radius);
 }
 
-.journey-step-checklist { border-left: 3px solid var(--step-checklist); }
-.journey-step-selection { border-left: 3px solid var(--step-selection); }
-.journey-step-decision  { border-left: 3px solid var(--step-decision); }
-.journey-step-info      { border-left: 3px solid var(--step-info); }
+.journey-step-checklist {
+  background: var(--step-checklist-bg);
+  border-left: 4px solid var(--step-checklist);
+}
+.journey-step-selection {
+  background: var(--step-selection-bg);
+  border-left: 4px solid var(--step-selection);
+}
+.journey-step-decision  {
+  background: var(--step-decision-bg);
+  border-left: 4px solid var(--step-decision);
+}
+.journey-step-info      {
+  background: var(--step-info-bg);
+  border-left: 4px solid var(--step-info);
+}
 
 .journey-step-marker {
   display: flex;
@@ -3322,11 +3459,31 @@ details > p {
 
 .summary-item:last-child { border-bottom: none; }
 
-.summary-item-checklist  { border-left: 3px solid var(--step-checklist); padding-left: var(--space-md); }
-.summary-item-selection  { border-left: 3px solid var(--step-selection); padding-left: var(--space-md); }
-.summary-item-decision   { border-left: 3px solid var(--step-decision); padding-left: var(--space-md); }
-.summary-item-info       { border-left: 3px solid var(--step-info); padding-left: var(--space-md); }
-.summary-item-endpoint   { border-left: 3px solid var(--step-endpoint); padding-left: var(--space-md); }
+.summary-item-checklist  {
+  background: var(--step-checklist-bg);
+  border-left: 4px solid var(--step-checklist);
+  padding-left: var(--space-md);
+}
+.summary-item-selection  {
+  background: var(--step-selection-bg);
+  border-left: 4px solid var(--step-selection);
+  padding-left: var(--space-md);
+}
+.summary-item-decision   {
+  background: var(--step-decision-bg);
+  border-left: 4px solid var(--step-decision);
+  padding-left: var(--space-md);
+}
+.summary-item-info       {
+  background: var(--step-info-bg);
+  border-left: 4px solid var(--step-info);
+  padding-left: var(--space-md);
+}
+.summary-item-endpoint   {
+  background: var(--step-endpoint-bg);
+  border-left: 4px solid var(--step-endpoint);
+  padding-left: var(--space-md);
+}
 
 .summary-step-number {
   display: flex;
@@ -3678,11 +3835,92 @@ details > p {
 .vf-node.vf-node-visible { opacity: 1; transform: translateY(0); }
 .vf-node.vf-node-completed { opacity: 0.5; pointer-events: none; }
 
-.vf-node-checklist  { border-left: 3px solid var(--step-checklist); }
-.vf-node-selection  { border-left: 3px solid var(--step-selection); }
-.vf-node-decision   { border-left: 3px solid var(--step-decision); }
-.vf-node-info       { border-left: 3px solid var(--step-info); }
-.vf-node-endpoint   { border-left: 3px solid var(--step-endpoint); }
+.vf-node-checklist  {
+  background: var(--step-checklist-bg);
+  border-left: 5px solid var(--step-checklist);
+  border-color: var(--step-checklist);
+}
+.vf-node-selection  {
+  background: var(--step-selection-bg);
+  border-left: 5px solid var(--step-selection);
+  border-color: var(--step-selection);
+}
+.vf-node-decision   {
+  background: var(--step-decision-bg);
+  border-left: 5px solid var(--step-decision);
+  border-color: var(--step-decision);
+}
+.vf-node-info       {
+  background: var(--step-info-bg);
+  border-left: 5px solid var(--step-info);
+  border-color: var(--step-info);
+}
+.vf-node-endpoint   {
+  background: var(--step-endpoint-bg);
+  border-left: 5px solid var(--step-endpoint);
+  border-color: var(--step-endpoint);
+}
+
+/* Themed vf-node headers per type */
+.vf-node-checklist .vf-node-header {
+  background: var(--step-checklist-header);
+  border-bottom-color: rgba(138, 142, 214, 0.3);
+}
+.vf-node-checklist .vf-node-step-badge { color: var(--step-checklist-text); }
+
+.vf-node-selection .vf-node-header {
+  background: var(--step-selection-header);
+  border-bottom-color: rgba(164, 143, 214, 0.3);
+}
+.vf-node-selection .vf-node-step-badge { color: var(--step-selection-text); }
+
+.vf-node-decision .vf-node-header {
+  background: var(--step-decision-header);
+  border-bottom-color: rgba(214, 138, 175, 0.3);
+}
+.vf-node-decision .vf-node-step-badge { color: var(--step-decision-text); }
+
+.vf-node-info .vf-node-header {
+  background: var(--step-info-header);
+  border-bottom-color: rgba(106, 184, 173, 0.3);
+}
+.vf-node-info .vf-node-step-badge { color: var(--step-info-text); }
+
+.vf-node-endpoint .vf-node-header {
+  background: var(--step-endpoint-header);
+  border-bottom-color: rgba(94, 184, 146, 0.3);
+}
+.vf-node-endpoint .vf-node-step-badge { color: var(--step-endpoint-text); }
+
+/* Checklist items tinted within vf-node */
+.vf-node-checklist .vf-checklist-item {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(138, 142, 214, 0.35);
+}
+.vf-node-checklist .vf-checklist-item:hover { background: rgba(255, 255, 255, 0.9); }
+.vf-node-checklist .vf-checklist-item.checked {
+  background: rgba(138, 142, 214, 0.15);
+  border-color: var(--step-checklist);
+}
+.vf-node-checklist .vf-checklist-item.checked .vf-checkbox-custom {
+  background: var(--step-checklist);
+  border-color: var(--step-checklist);
+}
+
+/* Selection options tinted within vf-node */
+.vf-node-selection .vf-selection-option {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(164, 143, 214, 0.35);
+}
+.vf-node-selection .vf-selection-option:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--step-selection);
+}
+.vf-node-selection .vf-selection-option.vf-option-selected {
+  background: rgba(164, 143, 214, 0.15);
+  border-color: var(--step-selection);
+  box-shadow: 0 0 0 1px var(--step-selection);
+}
 
 .vf-node-header {
   display: flex;
@@ -3865,16 +4103,34 @@ details > p {
 
 .vf-decision-btn.vf-decision-disabled { opacity: 0.5; pointer-events: none; }
 
-.vf-decision-success { border-color: var(--success); background: var(--success-light); }
+.vf-decision-success {
+  border-color: var(--success);
+  background: var(--success-light);
+  color: var(--success-text);
+}
 .vf-decision-success:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
-.vf-decision-warning { border-color: #c27070; background: #fdf0f0; }
+.vf-decision-warning {
+  border-color: var(--danger);
+  background: var(--danger-light);
+  color: #8b3535;
+}
 .vf-decision-warning:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
-.vf-decision-info { border-color: var(--info); background: var(--info-light); }
+.vf-decision-info {
+  border-color: var(--info);
+  background: var(--info-light);
+  color: var(--info-text);
+}
 .vf-decision-info:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
 
 .vf-decision-icon { font-size: 1.25rem; flex-shrink: 0; }
 .vf-decision-icon svg { width: 22px; height: 22px; }
 .vf-decision-content { flex: 1; }
+
+.vf-decision-content strong { display: block; font-size: 0.85rem; font-weight: 600; line-height: 1.3; }
+.vf-decision-content span { font-size: 0.75rem; color: var(--text-secondary); }
+.vf-decision-success .vf-decision-content span { color: var(--success-text); }
+.vf-decision-warning .vf-decision-content span { color: #8b3535; }
+.vf-decision-info .vf-decision-content span { color: var(--info-text); }
 
 .vf-feature-list { list-style: none; padding: 0; margin-top: var(--space-sm); }
 
