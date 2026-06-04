@@ -1913,7 +1913,9 @@ details > p {
 .integrated-flowchart {
   max-width: 100%;
   margin: 0 auto;
-  padding: var(--space-sm) var(--space-xl) calc(48px + var(--space-xl));
+  /* No top padding so the sticky tier tab bar sits flush against the navbar
+     (avoids a gap when scrolled to the very top). */
+  padding: 0 var(--space-xl) calc(48px + var(--space-xl));
 }
 
 .integrated-flowchart-header,
@@ -4746,16 +4748,35 @@ details > p {
   .summary-modal, .review-modal-content { max-width: 95%; max-height: 90vh; }
 
   .practice-grid { grid-template-columns: 1fr; }
-  .tier-tabs { flex-wrap: wrap; }
+  .tier-tabs { flex-wrap: nowrap; }
 
   /* Stack flowchart vertically on mobile */
   .integrated-flowchart,
   .integrated-flowchart-container {
-    padding: var(--space-md) var(--space-sm);
+    /* Keep top padding at 0 so the tier tab bar stays flush with the navbar. */
+    padding: 0 var(--space-sm) calc(48px + var(--space-md));
   }
   .flowchart-steps {
     padding: 0 var(--space-sm);
   }
+  /* Trim the generous desktop padding so step text has more room per line. */
+  .step-content, .node-content { padding: var(--space-md); }
+  .step-header { padding: var(--space-sm) var(--space-md); }
+  /* Make the single-point checklist card more compact and readable: smaller
+     checkbox, tighter gap/padding and a slightly smaller font so more than two
+     words fit per line. */
+  .checklist-item-big {
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    min-height: 0;
+  }
+  .checkbox-check-big {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+  }
+  .checkbox-check-big svg { width: 20px; height: 20px; }
+  .checkbox-text-big { font-size: 1rem; }
   .flowchart-step,
   .integrated-flow-node {
     min-width: unset;
@@ -4821,16 +4842,35 @@ details > p {
   .schedule-toggle { width: 100%; justify-content: center; }
   .endpoint-card, .vf-endpoint { padding: var(--space-lg); }
 
+  /* Keep the back button and all three tier tabs on a single row, even on the
+     narrowest screens. The screener indicator (if shown) wraps below them. */
   .flowchart-glass-header,
   .integrated-flowchart-header {
-    grid-template-columns: 1fr;
-    justify-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    column-gap: var(--space-xs);
     row-gap: var(--space-xs);
   }
-  .flowchart-glass-header .flowchart-back-btn { justify-self: center; }
-  .flowchart-glass-header .tier-tabs { justify-self: center; justify-content: center; }
+  .flowchart-glass-header .flowchart-back-btn {
+    justify-self: auto;
+    flex: 0 0 auto;
+    padding: 0.4rem 0.5rem;
+  }
+  /* Collapse the back button to an icon only so the tier tabs fit alongside. */
+  .flowchart-back-btn span { display: none; }
+  .flowchart-glass-header .tier-tabs {
+    justify-self: auto;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+  .tier-tab { padding: 0.4rem 0.6rem; }
   .flowchart-glass-header .flowchart-screener-indicator {
-    justify-self: center;
+    justify-self: auto;
+    flex: 1 0 100%;
     justify-content: center;
   }
 
@@ -4864,7 +4904,7 @@ details > p {
 /* Smooth section transitions */
 .content-section {
   display: none;
-  animation: sectionFadeIn 0.35s var(--ease) both;
+  animation: sectionFadeIn 0.35s var(--ease);
 }
 
 .content-section.active {
@@ -4872,8 +4912,8 @@ details > p {
 }
 
 @keyframes sectionFadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ------------------------------------------------------------
@@ -5087,7 +5127,6 @@ details > p {
 .integrated-flowchart.flowchart-tier-1,
 .integrated-flowchart.flowchart-tier-2,
 .integrated-flowchart.flowchart-tier-3 {
-  border-top: 4px solid var(--tier-color);
   border-radius: var(--radius);
   background: linear-gradient(180deg, var(--tier-bg) 0%, transparent 140px);
   transition: background 0.4s var(--ease), border-color 0.4s var(--ease);
@@ -5122,6 +5161,9 @@ details > p {
 
 .selection-tracker-toggle {
   pointer-events: auto;
+  /* Claim touch gestures on the tab so dragging it vertically repositions the
+     tab instead of scrolling the page underneath (critical on mobile). */
+  touch-action: none;
   position: absolute;
   top: 50%;
   right: 0;
