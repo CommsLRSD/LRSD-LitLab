@@ -641,6 +641,14 @@ function getStepTypeIcon(nodeType) {
     return map[nodeType] || '';
 }
 
+// Helper that returns just the descriptive tier name, stripping the leading
+// "Tier N:" prefix (e.g. "Universal Screening & Core Instruction").
+function getTierName(fullTitle) {
+    if (!fullTitle) return '';
+    const idx = fullTitle.indexOf(':');
+    return idx === -1 ? fullTitle.trim() : fullTitle.slice(idx + 1).trim();
+}
+
 // Helper function to get shortened tier title for mobile
 function getTierTitle(fullTitle, isMobile = window.innerWidth <= 768) {
     if (!isMobile) return fullTitle;
@@ -1040,14 +1048,14 @@ function initIntegratedFlowchart(tierId) {
                     </svg>
                     Previous
                 </button>
-                <h2>${flowchartDef.title}</h2>
-                <div class="step-indicator">
-                    <span class="step-text">Step 1</span>
-                </div>
             </div>
             
             <div class="flowchart-content-area" id="flowchart-content">
                 <div class="flowchart-steps" id="flowchart-steps"></div>
+            </div>
+
+            <div class="flowchart-tier-name-bar" id="flowchart-tier-name-bar" role="status" aria-label="Current tier">
+                <span class="flowchart-tier-name-value" id="flowchart-tier-name-value">${escapeHtml(getTierName(flowchartDef.title))}</span>
             </div>
         </div>
     `;
@@ -1107,6 +1115,13 @@ function showGoToTierStep(tierId) {
     if (stepText) stepText.textContent = `Go to Tier ${num}`;
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.visibility = 'hidden';
+
+    // Reflect the upcoming tier in the sticky top tabs and bottom name bar
+    document.querySelectorAll('.tier-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tier === tierId);
+    });
+    const tierNameEl = document.getElementById('flowchart-tier-name-value');
+    if (tierNameEl) tierNameEl.textContent = getTierName(flowchartDef.title);
 
     requestAnimationFrame(() => {
         const step = stepsContainer.querySelector('.go-to-tier-step');
@@ -2092,10 +2107,10 @@ function switchToTier(tierId) {
         checklistProgress: {}
     };
     
-    // Update title
-    const titleEl = document.querySelector('.flowchart-title-bar h2');
-    if (titleEl) {
-        titleEl.textContent = flowchartDef.title;
+    // Update the sticky bottom tier-name bar
+    const tierNameEl = document.getElementById('flowchart-tier-name-value');
+    if (tierNameEl) {
+        tierNameEl.textContent = getTierName(flowchartDef.title);
     }
     
     // Reset carousel navigation
@@ -6736,7 +6751,90 @@ function clearHistoryUnseen() {
 // Initialize the panel on load.
 document.addEventListener('DOMContentLoaded', () => {
     renderHistoryPanel();
+    initHistoryTrackerDrag();
 });
+
+// Make the floating History tab draggable along the vertical axis so users can
+// reposition it out of the way. The chosen position is remembered per browser.
+function initHistoryTrackerDrag() {
+    const tracker = document.getElementById('selection-tracker');
+    if (!tracker) return;
+    const toggle = tracker.querySelector('.selection-tracker-toggle');
+    if (!toggle) return;
+
+    const STORAGE_KEY = 'litlab-history-tab-top';
+    const EDGE_MARGIN = 8;
+    const DRAG_THRESHOLD = 4;
+
+    function clampTop(top) {
+        const h = toggle.offsetHeight || 80;
+        const max = Math.max(EDGE_MARGIN, window.innerHeight - h - EDGE_MARGIN);
+        return Math.min(Math.max(top, EDGE_MARGIN), max);
+    }
+
+    function applyTop(top) {
+        toggle.classList.add('is-positioned');
+        toggle.style.top = clampTop(top) + 'px';
+    }
+
+    // Restore any previously saved position.
+    const saved = parseFloat(localStorage.getItem(STORAGE_KEY));
+    if (!Number.isNaN(saved)) applyTop(saved);
+
+    let dragging = false;
+    let moved = false;
+    let startY = 0;
+    let startTop = 0;
+
+    function onPointerMove(e) {
+        if (!dragging) return;
+        const dy = e.clientY - startY;
+        if (!moved && Math.abs(dy) > DRAG_THRESHOLD) {
+            moved = true;
+            toggle.classList.add('is-dragging');
+        }
+        if (moved) {
+            e.preventDefault();
+            applyTop(startTop + dy);
+        }
+    }
+
+    function onPointerUp() {
+        if (!dragging) return;
+        dragging = false;
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+        toggle.classList.remove('is-dragging');
+        if (moved) {
+            localStorage.setItem(STORAGE_KEY, String(parseFloat(toggle.style.top)));
+        }
+    }
+
+    toggle.addEventListener('pointerdown', (e) => {
+        if (e.button != null && e.button !== 0) return;
+        dragging = true;
+        moved = false;
+        startY = e.clientY;
+        startTop = toggle.getBoundingClientRect().top;
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+    });
+
+    toggle.addEventListener('click', () => {
+        // A click that concludes a drag should not toggle the panel. `moved`
+        // stays set until the next pointerdown, so a genuine click (no drag)
+        // is never suppressed even if the post-drag click never fires.
+        if (moved) return;
+        toggleHistoryPanel();
+    });
+
+    // Keep the tab on-screen if the viewport is resized.
+    window.addEventListener('resize', () => {
+        if (toggle.classList.contains('is-positioned')) {
+            applyTop(parseFloat(toggle.style.top));
+        }
+    });
+}
 
 // Selection history exports
 window.recordSelection = recordSelection;
