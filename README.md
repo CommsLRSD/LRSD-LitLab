@@ -20,6 +20,11 @@ A beautiful, modern web application designed to help educators navigate the Mult
 
 #### 🎯 **Interventions System**
 - Three-tier intervention framework
+- **Visual journey view**: the flowchart is a connected trail, not a one-card-at-a-time wizard
+  - Sticky "The Process" map shows every step — done, in progress and still to come — at a glance
+  - Completed steps stay on screen as connected cards showing the answer that was given
+  - The live step is spotlighted (numbered marker, "You are here" flag) and the next step is previewed
+  - Any earlier step can be revisited by clicking its trail card or its entry in the process map
 - Beautiful tier landing pages with gradient headers
 - **Tier 1**: Universal Screening & Core Instruction
   - 8-principle checklist for explicit instruction (functional)
