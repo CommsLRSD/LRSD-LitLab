@@ -712,6 +712,7 @@ const FLOWCHART_DEFINITIONS = {
                 subtitle: 'Choose Your Literacy Screener',
                 description: 'Select the assessment tool you are using for universal screening',
                 options: 'screeners', // Will fetch from tierFlowchartData
+                nextNode: 'tier1-effectiveness',
                 nextHandler: 'selectTier1ScreenerVisual'
             },
             'tier1-effectiveness': {
@@ -821,6 +822,7 @@ const FLOWCHART_DEFINITIONS = {
                     title: 'Purpose of Drill Down Assessments',
                     text: 'These assessments provide more detailed information about specific skill gaps, helping you select the most appropriate intervention.'
                 },
+                nextNode: 'tier2-intervention',
                 nextHandler: 'selectTier2AssessmentVisual'
             },
             'tier2-intervention': {
@@ -834,6 +836,7 @@ const FLOWCHART_DEFINITIONS = {
                     title: '8-Week Intervention Cycle',
                     text: 'Implement the selected intervention for 8 weeks. Monitor student progress regularly during this period using progress monitoring tools.'
                 },
+                nextNode: 'tier2-progress',
                 nextHandler: 'selectTier2InterventionVisual'
             },
             'tier2-progress': {
@@ -916,6 +919,7 @@ const FLOWCHART_DEFINITIONS = {
                     title: 'Tier 3 Assessment',
                     text: 'These comprehensive assessments provide very detailed information to guide intensive intervention selection. Consider consulting with specialists.'
                 },
+                nextNode: 'tier3-intervention',
                 nextHandler: 'selectTier3AssessmentVisual'
             },
             'tier3-intervention': {
@@ -929,6 +933,7 @@ const FLOWCHART_DEFINITIONS = {
                     title: '8-Week Intensive Cycle',
                     text: 'Implement the intervention for 8 weeks with weekly progress monitoring. These programs often require specialized training.'
                 },
+                nextNode: 'tier3-progress',
                 nextHandler: 'selectTier3InterventionVisual'
             },
             'tier3-progress': {
@@ -1041,17 +1046,25 @@ function initIntegratedFlowchart(tierId) {
                 </div>
             </div>
             
-            <div class="flowchart-title-bar">
-                <button class="carousel-prev-btn" id="carousel-prev-btn" onclick="goToPreviousStep()" style="visibility: hidden;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                    </svg>
-                    Previous
-                </button>
-            </div>
-            
             <div class="flowchart-content-area" id="flowchart-content">
-                <div class="flowchart-steps" id="flowchart-steps"></div>
+                <div class="journey-shell">
+                    <aside class="journey-map" id="journey-map" aria-label="Process map">
+                        <div class="journey-map-head">
+                            <span class="journey-map-title">The Process</span>
+                            <span class="journey-map-count" id="journey-map-count">Step 1</span>
+                        </div>
+                        <div class="journey-map-bar"><span class="journey-map-bar-fill" id="journey-map-bar-fill"></span></div>
+                        <ol class="journey-map-list" id="journey-map-list"></ol>
+                        <button class="journey-map-back" id="carousel-prev-btn" onclick="goToPreviousStep()" style="visibility: hidden;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                            Back one step
+                        </button>
+                    </aside>
+
+                    <div class="journey-track" id="flowchart-steps"></div>
+                </div>
             </div>
 
             <div class="flowchart-tier-name-bar" id="flowchart-tier-name-bar" role="status" aria-label="Current tier">
@@ -1098,7 +1111,7 @@ function showGoToTierStep(tierId) {
     // Switch the colour theme now for an immediate visual cue of the new tier
     applyTierTheme(tierId);
 
-    stepsContainer.innerHTML = `
+    stepsContainer.innerHTML = buildCompletedTrailHTML(true) + `
         <div class="go-to-tier-step go-to-tier-${num}">
             <div class="go-to-tier-badge">Tier ${num}</div>
             <h2 class="go-to-tier-heading">Go to Tier ${num}</h2>
@@ -1111,8 +1124,6 @@ function showGoToTierStep(tierId) {
         </div>
     `;
 
-    const stepText = document.querySelector('.step-text');
-    if (stepText) stepText.textContent = `Go to Tier ${num}`;
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.visibility = 'hidden';
 
@@ -1123,10 +1134,13 @@ function showGoToTierStep(tierId) {
     const tierNameEl = document.getElementById('flowchart-tier-name-value');
     if (tierNameEl) tierNameEl.textContent = getTierName(flowchartDef.title);
 
+    completeJourneyMap(`Moving to Tier ${num}`);
+
     requestAnimationFrame(() => {
         const step = stepsContainer.querySelector('.go-to-tier-step');
         if (step) step.classList.add('go-to-tier-visible');
     });
+    scrollToActiveStep();
 }
 
 // Show a node in the integrated flowchart
@@ -1177,17 +1191,283 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
         return;
     }
     
-    // Carousel mode: clear container and show only this step
-    stepsContainer.innerHTML = '';
-    createIntegratedNodeElement(nodeData, stepsContainer, direction);
-    
-    // Scroll to top of content area
-    setTimeout(() => {
-        const contentArea = document.getElementById('flowchart-content');
-        if (contentArea) {
-            contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+    // Journey mode: keep every previous step on screen and render the whole
+    // trail, with this node as the active, spotlighted step at the end.
+    renderJourney(direction);
+}
+
+/* ============================================================
+   JOURNEY TRAIL — the whole process stays on screen
+   ------------------------------------------------------------
+   Every step the user has taken remains visible as a compact,
+   connected card above the active step, and the sticky process
+   map on the left shows completed, current and upcoming steps
+   so the entire process can be understood at a glance.
+   ============================================================ */
+
+// Escape a value for safe use inside a single-quoted inline handler attribute
+function escapeInlineArg(value) {
+    return String(value)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+// Strip the "Step 3: " prefix so numbering is owned by the trail itself
+function getStepShortTitle(nodeDef) {
+    return String(nodeDef?.title || '').replace(/^Step\s*\d+\s*[:.\-–]\s*/i, '').trim() || 'Step';
+}
+
+// Human label for a step type, used on the trail markers and map
+function getStepTypeLabel(type) {
+    const labels = {
+        checklist: 'Check',
+        selection: 'Choose',
+        decision: 'Decide',
+        info: 'Read',
+        endpoint: 'Outcome'
+    };
+    return labels[type] || 'Step';
+}
+
+// The answer the user gave at a step, shown on its completed trail card
+function getStepAnswerText(nodeId, nodeDef) {
+    const choice = appState.visualFlowchart.choices[nodeId];
+    if (choice && choice.name) return choice.name;
+    if (nodeDef?.type === 'checklist') return 'Reviewed';
+    return '';
+}
+
+// Look ahead from the current node so the user can see what is still to come.
+// Deterministic hops follow nextNode; a branch is shown as a single outcome.
+function projectUpcomingSteps(limit = 5) {
+    const vf = appState.visualFlowchart;
+    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const upcoming = [];
+    if (!tierDef) return upcoming;
+
+    const seen = new Set(vf.selectedPath.map(s => s.nodeId));
+    let current = tierDef.nodes[vf.currentNodeId];
+
+    while (current && upcoming.length < limit) {
+        if (current.type === 'decision') {
+            upcoming.push({ title: 'Outcome & recommendations', type: 'endpoint' });
+            break;
         }
-    }, 100);
+        if (current.type === 'endpoint') break;
+
+        const nextId = current.nextNode;
+        const next = nextId ? tierDef.nodes[nextId] : null;
+        if (!next || seen.has(nextId)) break;
+
+        seen.add(nextId);
+        upcoming.push({ id: nextId, title: getStepShortTitle(next), type: next.type });
+        current = next;
+    }
+
+    return upcoming;
+}
+
+// Marker + connector rail that sits beside every trail card
+function buildTrailRailHTML(number, state) {
+    const marker = state === 'done'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
+        : escapeHtml(String(number));
+    return `
+        <div class="trail-rail trail-rail-${state}">
+            <span class="trail-line trail-line-top"></span>
+            <span class="trail-marker trail-marker-${state}">${marker}</span>
+            <span class="trail-line trail-line-bottom"></span>
+        </div>
+    `;
+}
+
+// Compact card for a step that is already behind the user
+function buildTrailDoneCardHTML(nodeDef, number, answer) {
+    return `
+        <button type="button" class="trail-card trail-card-done" onclick="undoToStep('${escapeInlineArg(nodeDef.id)}')" title="Revisit this step">
+            <span class="trail-card-meta">
+                <span class="trail-card-num">Step ${escapeHtml(String(number))}</span>
+                <span class="trail-card-type">${escapeHtml(getStepTypeLabel(nodeDef.type))}</span>
+            </span>
+            <span class="trail-card-title">${escapeHtml(getStepShortTitle(nodeDef))}</span>
+            ${answer ? `<span class="trail-card-answer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                ${escapeHtml(answer)}
+            </span>` : ''}
+            <span class="trail-card-revisit">Revisit</span>
+        </button>
+    `;
+}
+
+// Ghost card teasing the next step in the process
+function buildTrailUpcomingHTML(step, number) {
+    return `
+        <div class="trail-item trail-item-upcoming">
+            ${buildTrailRailHTML(number, 'upcoming')}
+            <div class="trail-card trail-card-upcoming">
+                <span class="trail-card-meta">
+                    <span class="trail-card-num">Step ${escapeHtml(String(number))}</span>
+                    <span class="trail-card-type">${escapeHtml(getStepTypeLabel(step.type))}</span>
+                </span>
+                <span class="trail-card-title">${escapeHtml(step.title)}</span>
+                <span class="trail-card-next">Coming up next</span>
+            </div>
+        </div>
+    `;
+}
+
+// Build the compact trail for every completed step (used on their own by the
+// tier-transition and summary screens so context is never lost).
+function buildCompletedTrailHTML(includeCurrent = false) {
+    const vf = appState.visualFlowchart;
+    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    if (!tierDef) return '';
+
+    const path = vf.selectedPath;
+    const lastIndex = includeCurrent ? path.length - 1 : path.length - 2;
+    let html = '';
+    let number = 0;
+
+    path.forEach((step, index) => {
+        const nodeDef = tierDef.nodes[step.nodeId];
+        if (!nodeDef || nodeDef.type === 'endpoint' || index > lastIndex) return;
+        number += 1;
+        html += `<div class="trail-item trail-item-done">
+            ${buildTrailRailHTML(number, 'done')}
+            ${buildTrailDoneCardHTML(nodeDef, number, getStepAnswerText(step.nodeId, nodeDef))}
+        </div>`;
+    });
+
+    return html;
+}
+
+// Render the full journey: completed trail + spotlighted active step + what's next
+function renderJourney(direction = 'forward') {
+    const track = document.getElementById('flowchart-steps');
+    const vf = appState.visualFlowchart;
+    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    if (!track || !tierDef) return;
+
+    const path = vf.selectedPath;
+    const activeStep = path[path.length - 1];
+    const activeNode = activeStep ? tierDef.nodes[activeStep.nodeId] : null;
+
+    track.innerHTML = buildCompletedTrailHTML(false);
+
+    const activeNumber = track.querySelectorAll('.trail-item-done').length + 1;
+
+    if (activeNode) {
+        const item = document.createElement('div');
+        item.className = 'trail-item trail-item-active';
+        item.setAttribute('data-node-id', activeNode.id);
+        item.innerHTML = `
+            ${buildTrailRailHTML(activeNumber, 'active')}
+            <div class="trail-active-body">
+                <div class="trail-active-flag">
+                    <span class="trail-active-pulse"></span>
+                    You are here · Step ${escapeHtml(String(activeNumber))}
+                </div>
+            </div>
+        `;
+        track.appendChild(item);
+        createIntegratedNodeElement(activeNode, item.querySelector('.trail-active-body'), direction);
+    }
+
+    const upcoming = projectUpcomingSteps(1);
+    if (upcoming.length) {
+        track.insertAdjacentHTML('beforeend', buildTrailUpcomingHTML(upcoming[0], activeNumber + 1));
+    }
+
+    renderJourneyMap(activeNumber);
+    scrollToActiveStep();
+}
+
+// Sticky process map: completed, current and upcoming steps at a glance
+function renderJourneyMap(activeNumber) {
+    const list = document.getElementById('journey-map-list');
+    const countEl = document.getElementById('journey-map-count');
+    const barFill = document.getElementById('journey-map-bar-fill');
+    const vf = appState.visualFlowchart;
+    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    if (!list || !tierDef) return;
+
+    const path = vf.selectedPath;
+    const entries = [];
+    let number = 0;
+
+    path.forEach((step, index) => {
+        const nodeDef = tierDef.nodes[step.nodeId];
+        if (!nodeDef) return;
+        const isActive = index === path.length - 1;
+        if (nodeDef.type === 'endpoint' && !isActive) return;
+        number += 1;
+        entries.push({
+            id: nodeDef.id,
+            number,
+            title: getStepShortTitle(nodeDef),
+            type: nodeDef.type,
+            answer: isActive ? '' : getStepAnswerText(nodeDef.id, nodeDef),
+            state: isActive ? 'current' : 'done'
+        });
+    });
+
+    projectUpcomingSteps(4).forEach(step => {
+        number += 1;
+        entries.push({ number, title: step.title, type: step.type, answer: '', state: 'upcoming' });
+    });
+
+    list.innerHTML = entries.map(entry => {
+        const clickable = entry.state === 'done';
+        const marker = entry.state === 'done'
+            ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
+            : escapeHtml(String(entry.number));
+        return `
+            <li class="journey-map-item journey-map-${entry.state}"
+                ${clickable ? `role="button" tabindex="0" onclick="undoToStep('${escapeInlineArg(entry.id)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();undoToStep('${escapeInlineArg(entry.id)}');}" title="Revisit this step"` : ''}>
+                <span class="journey-map-marker">${marker}</span>
+                <span class="journey-map-text">
+                    <span class="journey-map-label">${escapeHtml(entry.title)}</span>
+                    ${entry.answer ? `<span class="journey-map-answer">${escapeHtml(entry.answer)}</span>` : ''}
+                    ${entry.state === 'current' ? '<span class="journey-map-now">In progress</span>' : ''}
+                </span>
+            </li>
+        `;
+    }).join('');
+
+    const total = entries.length || 1;
+    const current = Math.min(activeNumber || 1, total);
+    if (countEl) countEl.textContent = `Step ${current} of ${total}`;
+    if (barFill) barFill.style.width = `${Math.round(((current - 1) / total) * 100 + (100 / total) * 0.35)}%`;
+}
+
+// Mark the process map as finished once the journey summary is reached
+function completeJourneyMap(label = 'Journey complete') {
+    const countEl = document.getElementById('journey-map-count');
+    const barFill = document.getElementById('journey-map-bar-fill');
+    if (countEl) countEl.textContent = label;
+    if (barFill) barFill.style.width = '100%';
+    document.querySelectorAll('.journey-map-item.journey-map-current, .journey-map-item.journey-map-upcoming').forEach(item => {
+        item.classList.remove('journey-map-current', 'journey-map-upcoming');
+        item.classList.add('journey-map-done');
+        const now = item.querySelector('.journey-map-now');
+        if (now) now.remove();
+    });
+}
+
+// Bring the spotlighted step into view without losing sight of the trail above
+function scrollToActiveStep() {
+    const active = document.querySelector('.trail-item-active, .go-to-tier-step, .journey-review');
+    if (!active) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    requestAnimationFrame(() => {
+        const header = document.querySelector('.flowchart-glass-header');
+        const offset = (header?.getBoundingClientRect().height || 0) + 90;
+        const top = window.scrollY + active.getBoundingClientRect().top - offset;
+        window.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+    });
 }
 
 // Create integrated node element (carousel mode - single step)
@@ -1999,31 +2279,21 @@ function makeIntegratedDecision(nodeId, choiceId, nextNodeId) {
 
 // Mark a step as completed
 function markStepCompleted(nodeId) {
-    const node = document.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
+    const node = document.querySelector(`.flowchart-step[data-node-id="${CSS.escape(nodeId)}"]`);
     if (node) {
         node.classList.add('step-completed');
-        // Show undo button
-        const undoBtn = node.querySelector('.undo-btn');
-        if (undoBtn) {
-            undoBtn.style.display = 'flex';
-        }
         // Disable continue button if exists
         const btn = node.querySelector('.continue-btn');
         if (btn) btn.disabled = true;
     }
 }
 
-// Update carousel navigation (prev button, step indicator)
+// Update journey chrome (back button visibility)
 function updateCarouselNav() {
     const path = appState.visualFlowchart.selectedPath;
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) {
         prevBtn.style.visibility = path.length > 1 ? 'visible' : 'hidden';
-    }
-    
-    const stepText = document.querySelector('.step-text');
-    if (stepText) {
-        stepText.textContent = `Step ${path.length}`;
     }
 }
 
@@ -2117,11 +2387,6 @@ function switchToTier(tierId) {
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.visibility = 'hidden';
     
-    const stepText = document.querySelector('.step-text');
-    if (stepText) {
-        stepText.textContent = 'Step 1';
-    }
-    
     // Apply the tier colour theme for the newly active tier
     applyTierTheme(tierId);
 
@@ -2182,7 +2447,7 @@ function showTierTransitionChoice(nodeData) {
     const statusClasses = { success: 'journey-endpoint-success', info: 'journey-endpoint-info', warning: 'journey-endpoint-warning', danger: 'journey-endpoint-danger' };
     const statusClass = statusClasses[nodeData.status] || 'journey-endpoint-info';
 
-    stepsContainer.innerHTML = `
+    stepsContainer.innerHTML = buildCompletedTrailHTML(true) + `
         <div class="journey-review">
             <div class="journey-flow">
                 <div class="journey-endpoint ${statusClass}">
@@ -2199,12 +2464,12 @@ function showTierTransitionChoice(nodeData) {
 
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.visibility = 'hidden';
-    const stepText = document.querySelector('.step-text');
-    if (stepText) stepText.textContent = 'Next Step';
+    completeJourneyMap('Tier complete');
     requestAnimationFrame(() => {
         const review = stepsContainer.querySelector('.journey-review');
         if (review) review.classList.add('journey-review-visible');
     });
+    scrollToActiveStep();
 }
 
 // Show the complete cross-tier journey summary at a true terminal endpoint
@@ -2311,12 +2576,12 @@ function showFinalSummary(endpointNodeData) {
 
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.visibility = 'hidden';
-    const stepText = document.querySelector('.step-text');
-    if (stepText) stepText.textContent = 'Journey Complete';
+    completeJourneyMap();
     requestAnimationFrame(() => {
         const review = stepsContainer.querySelector('.journey-review');
         if (review) review.classList.add('journey-review-visible');
     });
+    scrollToActiveStep();
 }
 
 // Restart current tier
