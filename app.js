@@ -1073,6 +1073,10 @@ function initIntegratedFlowchart(tierId) {
         </div>
     `;
     
+    // One delegated listener handles "revisit this step" on both the trail
+    // cards and the process map, so no user data ends up in inline handlers.
+    wireJourneyRevisit(container);
+
     // Apply the tier colour theme so the user always knows which tier they are on
     applyTierTheme(tierId);
 
@@ -1205,14 +1209,31 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
    so the entire process can be understood at a glance.
    ============================================================ */
 
-// Escape a value for safe use inside a single-quoted inline handler attribute
-function escapeInlineArg(value) {
+// Delegate "revisit this step" clicks/keyboard activation for the trail and map
+function wireJourneyRevisit(root) {
+    if (!root || root.dataset.journeyRevisitWired === 'true') return;
+    root.dataset.journeyRevisitWired = 'true';
+
+    const activate = (event) => {
+        const target = event.target.closest('[data-revisit-node]');
+        if (!target || !root.contains(target)) return;
+        if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        undoToStep(target.dataset.revisitNode);
+    };
+
+    root.addEventListener('click', activate);
+    root.addEventListener('keydown', activate);
+}
+
+// Escape a value for safe use inside a double-quoted HTML attribute
+function escapeAttr(value) {
     return String(value)
-        .replace(/\\/g, '\\\\')
-        .replace(/'/g, "\\'")
-        .replace(/"/g, '&quot;')
+        .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 // Strip the "Step 3: " prefix so numbering is owned by the trail itself
@@ -1287,7 +1308,7 @@ function buildTrailRailHTML(number, state) {
 // Compact card for a step that is already behind the user
 function buildTrailDoneCardHTML(nodeDef, number, answer) {
     return `
-        <button type="button" class="trail-card trail-card-done" onclick="undoToStep('${escapeInlineArg(nodeDef.id)}')" title="Revisit this step">
+        <button type="button" class="trail-card trail-card-done" data-revisit-node="${escapeAttr(nodeDef.id)}" title="Revisit this step">
             <span class="trail-card-meta">
                 <span class="trail-card-num">Step ${escapeHtml(String(number))}</span>
                 <span class="trail-card-type">${escapeHtml(getStepTypeLabel(nodeDef.type))}</span>
@@ -1426,7 +1447,7 @@ function renderJourneyMap(activeNumber) {
             : escapeHtml(String(entry.number));
         return `
             <li class="journey-map-item journey-map-${entry.state}"
-                ${clickable ? `role="button" tabindex="0" onclick="undoToStep('${escapeInlineArg(entry.id)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();undoToStep('${escapeInlineArg(entry.id)}');}" title="Revisit this step"` : ''}>
+                ${clickable ? `role="button" tabindex="0" data-revisit-node="${escapeAttr(entry.id)}" title="Revisit this step"` : ''}>
                 <span class="journey-map-marker">${marker}</span>
                 <span class="journey-map-text">
                     <span class="journey-map-label">${escapeHtml(entry.title)}</span>
