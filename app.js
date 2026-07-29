@@ -1172,8 +1172,8 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
     
     // If this is an endpoint, route based on whether it's a tier transition or terminal
     if (nodeData.type === 'endpoint') {
-        // Refresh the panel first so the step just answered collapses into a
-        // recorded decision and the outcome opens in its own row.
+        // Refresh the panel first so the step just answered stays open and
+        // the outcome opens in its own row.
         renderJourneyMap(getActiveStepNumber());
         saveCurrentTierToFullJourney();
         const tierTransitionActions = new Set(['startTier2Visual', 'startTier3Visual', 'restartTier2Visual']);
@@ -1194,8 +1194,11 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
             // Multiple tier-transition options → show choice card (no journey review)
             showTierTransitionChoice(nodeData);
         } else {
-            // True terminal endpoint → show full cross-tier summary
-            showFinalSummary(nodeData);
+            // True terminal endpoint — render the endpoint card inline; the
+            // Your Decisions panel already shows the full journey, so no
+            // separate summary screen is needed.
+            renderJourney('forward');
+            completeJourneyMap();
         }
         return;
     }
@@ -1391,7 +1394,7 @@ function getActiveStepTarget() {
 }
 
 // Render the whole process inside the Your Decisions panel: answered steps
-// collapse into recorded decisions and the current step opens in its own row.
+// stay open and the current step opens in its own row below.
 function renderJourney(direction = 'forward') {
     const track = document.getElementById('flowchart-steps');
     const vf = appState.visualFlowchart;
@@ -1406,6 +1409,16 @@ function renderJourney(direction = 'forward') {
     if (track) track.innerHTML = '';
 
     renderJourneyMap(getActiveStepNumber());
+
+    // Re-populate each completed step's open slot so the full content
+    // remains visible (in a locked, read-only state) after the user
+    // has moved on — no collapsing.
+    path.slice(0, path.length - 1).forEach(step => {
+        const nodeDef = tierDef.nodes[step.nodeId];
+        if (!nodeDef || nodeDef.type === 'endpoint') return;
+        const doneSlot = document.getElementById(`journey-step-slot-done-${nodeDef.id}`);
+        if (doneSlot) doneSlot.appendChild(createCompletedStepElement(nodeDef));
+    });
 
     // The active step opens inside its own row in the panel, directly beneath
     // the steps already answered — never in a separate area below the list.
@@ -1481,6 +1494,7 @@ function renderJourneyMap(activeNumber) {
                         </span>` : ''}
                     ${isCurrent ? '<span class="journey-map-now"><span class="journey-map-now-dot"></span>In progress</span>' : ''}
                     ${isCurrent ? '<div class="journey-step-slot" id="journey-step-slot"></div>' : ''}
+                    ${isDone && entry.id ? `<div class="journey-step-slot-done" id="journey-step-slot-done-${escapeAttr(entry.id)}"></div>` : ''}
                 </span>
             </li>
         `;
@@ -1490,6 +1504,47 @@ function renderJourneyMap(activeNumber) {
     const current = Math.min(activeNumber || 1, total);
     if (countEl) countEl.textContent = `Step ${current} of ${total}`;
     if (barFill) barFill.style.width = `${Math.round(((current - 1) / total) * 100 + (100 / total) * 0.35)}%`;
+}
+
+// Build a compact, read-only view of a completed step so it stays visible
+// in its panel row rather than collapsing to just a title + answer chip.
+function createCompletedStepElement(nodeData) {
+    const el = document.createElement('div');
+    el.className = 'completed-step-view';
+    const choice = appState.visualFlowchart.choices[nodeData.id];
+
+    let html = '';
+
+    if (nodeData.type === 'decision' && nodeData.choices) {
+        const subtitleHtml = nodeData.subtitle
+            ? `<p class="completed-step-sub">${escapeHtml(nodeData.subtitle)}</p>`
+            : '';
+        const buttonsHtml = nodeData.choices.map(c => {
+            const taken = choice && c.id === choice.id;
+            return `<div class="decision-btn decision-${c.type}${taken ? '' : ' decision-not-taken'}" aria-disabled="true" role="presentation">
+                <div class="decision-content">
+                    <strong>${escapeHtml(c.label)}</strong>
+                    ${c.sublabel ? `<span>${escapeHtml(c.sublabel)}</span>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+        html = `${subtitleHtml}<div class="decision-grid completed-grid">${buttonsHtml}</div>`;
+    } else if (nodeData.type === 'selection' && choice) {
+        html = `<div class="journey-map-answer completed-step-answer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            ${escapeHtml(choice.name)}
+        </div>`;
+    } else if (nodeData.type === 'checklist') {
+        const count = nodeData.items?.length || 0;
+        html = `<div class="journey-map-answer completed-step-answer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            All ${count} items reviewed
+        </div>`;
+    }
+    // Info nodes have no meaningful choice to display; leave the slot empty.
+
+    el.innerHTML = html;
+    return el;
 }
 
 // Mark the process map as finished once the journey summary is reached
@@ -1969,9 +2024,6 @@ function fwSelectItem(itemId, itemName) {
 function createIntegratedDecisionNode(nodeData) {
     const choicesHTML = nodeData.choices.map(choice => `
         <button class="decision-btn decision-${choice.type}" onclick="makeIntegratedDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
-            <div class="decision-icon">
-                ${choice.type === 'success' ? ICONS.checkmark : choice.type === 'warning' ? ICONS.warning : ICONS.info}
-            </div>
             <div class="decision-content">
                 <strong>${choice.label}</strong>
                 <span>${choice.sublabel}</span>
@@ -2098,6 +2150,22 @@ function createIntegratedEndpointNode(nodeData) {
             ${nodeData.secondaryAction.text}
         </button>
     ` : '';
+
+    // For pure terminal endpoints (no tier-transition actions), always provide
+    // Start Over and Done so the user is never left without a next action.
+    const defaultActionsHTML = (!actionButtonHTML && !secondaryActionHTML) ? `
+        <button class="action-btn action-secondary" onclick="restartCurrentTier()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+            </svg>
+            Start Over
+        </button>
+        <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M20 6L9 17l-5-5"/></svg>
+            Done
+        </button>
+    ` : '';
     
     return `
         <div class="endpoint-card endpoint-${nodeData.status}">
@@ -2111,6 +2179,7 @@ function createIntegratedEndpointNode(nodeData) {
             <div class="endpoint-actions">
                 ${actionButtonHTML}
                 ${secondaryActionHTML}
+                ${defaultActionsHTML}
             </div>
         </div>
     `;

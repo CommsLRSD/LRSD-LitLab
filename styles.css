@@ -5719,6 +5719,159 @@ details > p {
   .journey-step-slot .flowchart-step.carousel-enter-back { animation: none; opacity: 1; }
 }
 
+/* ================================================================
+   PANEL-STYLE OVERRIDES — all interactive step elements inside the
+   Your Decisions panel adopt its compact, sleek visual language.
+   ================================================================ */
+
+/* Decision buttons: compact pills instead of large cards */
+.journey-step-slot .decision-grid,
+.journey-step-slot .decision-buttons {
+  gap: var(--space-xs);
+}
+
+.journey-step-slot .decision-btn {
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-pill);
+  border-width: 1.5px;
+  font-size: 0.84rem;
+  gap: var(--space-xs);
+}
+
+.journey-step-slot .decision-icon { display: none; }
+
+.journey-step-slot .decision-content strong,
+.journey-step-slot .decision-content h4 {
+  font-size: 0.84rem;
+}
+
+.journey-step-slot .decision-content span,
+.journey-step-slot .decision-content p {
+  font-size: 0.72rem;
+}
+
+/* Selection options: reduced padding and border weight */
+.journey-step-slot .selection-option {
+  padding: 0.55rem 0.8rem;
+  border-width: 1.5px;
+  gap: var(--space-sm);
+}
+
+.journey-step-slot .option-details h4,
+.journey-step-slot .option-details strong {
+  font-size: 0.88rem;
+}
+
+.journey-step-slot .option-icon { display: none; }
+
+/* Continue / Go-to-Tier buttons */
+.journey-step-slot .continue-btn {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-pill);
+  margin-top: var(--space-sm);
+}
+
+/* Action buttons on endpoint cards */
+.journey-step-slot .action-btn,
+.journey-step-slot .endpoint-actions .action-btn {
+  font-size: 0.8rem;
+  padding: 0.38rem 0.85rem;
+  border-radius: var(--radius-pill);
+}
+
+/* Go-to-Tier transition screen: compact, matching panel scale */
+.journey-step-slot .go-to-tier-step {
+  padding: var(--space-lg) var(--space-md);
+  gap: var(--space-xs);
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.journey-step-slot .go-to-tier-heading {
+  font-size: 1.25rem;
+}
+
+.journey-step-slot .go-to-tier-sub {
+  font-size: 0.9rem;
+}
+
+.journey-step-slot .go-to-tier-note {
+  font-size: 0.82rem;
+}
+
+.journey-step-slot .go-to-tier-btn {
+  font-size: 0.82rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-pill);
+  margin-top: 0;
+}
+
+/* Endpoint card inside the panel */
+.journey-step-slot .endpoint-card {
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+}
+
+.journey-step-slot .endpoint-card h2 {
+  font-size: 1.05rem;
+}
+
+.journey-step-slot .endpoint-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ----------------------------------------------------------------
+   Completed step view — shown when a step stays open after being
+   answered (replaces the interactive controls with a locked receipt).
+   ---------------------------------------------------------------- */
+.journey-step-slot-done {
+  margin-top: 0.35rem;
+}
+
+.completed-step-view {
+  margin-top: 0.1rem;
+}
+
+.completed-step-sub {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.45rem;
+  line-height: 1.4;
+}
+
+/* Completed decision grid: pointer-events off, non-taken options dimmed */
+.completed-grid {
+  pointer-events: none;
+  user-select: none;
+  gap: var(--space-xs);
+}
+
+.completed-grid .decision-btn {
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-pill);
+  border-width: 1.5px;
+  font-size: 0.82rem;
+  cursor: default;
+}
+
+.completed-grid .decision-content strong,
+.completed-grid .decision-content h4 { font-size: 0.82rem; }
+
+.completed-grid .decision-content span,
+.completed-grid .decision-content p  { font-size: 0.7rem; }
+
+.decision-btn.decision-not-taken {
+  opacity: 0.22;
+}
+
+/* Re-use the panel's answer chip style for selection/checklist answers */
+.completed-step-answer {
+  display: inline-flex;
+}
+
 /* ---------- The trail (only used for tier-transition & summary screens) ---------- */
 .journey-track {
   display: flex;
