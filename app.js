@@ -1048,8 +1048,6 @@ function initIntegratedFlowchart(tierId) {
             
             <div class="flowchart-content-area" id="flowchart-content">
                 <div class="journey-shell">
-                    <div class="journey-track" id="flowchart-steps"></div>
-
                     <aside class="journey-map" id="journey-map" aria-label="Decision summary">
                         <div class="journey-map-head">
                             <div class="journey-map-head-left">
@@ -1060,6 +1058,7 @@ function initIntegratedFlowchart(tierId) {
                         </div>
                         <div class="journey-map-bar"><span class="journey-map-bar-fill" id="journey-map-bar-fill"></span></div>
                         <ol class="journey-map-list" id="journey-map-list"></ol>
+                        <div class="journey-track" id="flowchart-steps"></div>
                         <button class="journey-map-back" id="carousel-prev-btn" onclick="goToPreviousStep()" style="visibility: hidden;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M19 12H5M12 19l-7-7 7-7"/>
@@ -1118,7 +1117,7 @@ function showGoToTierStep(tierId) {
     // Switch the colour theme now for an immediate visual cue of the new tier
     applyTierTheme(tierId);
 
-    stepsContainer.innerHTML = buildCompletedTrailHTML(true) + `
+    stepsContainer.innerHTML = `
         <div class="go-to-tier-step go-to-tier-${num}">
             <div class="go-to-tier-badge">Tier ${num}</div>
             <h2 class="go-to-tier-heading">Go to Tier ${num}</h2>
@@ -2489,7 +2488,7 @@ function showTierTransitionChoice(nodeData) {
     const statusClasses = { success: 'journey-endpoint-success', info: 'journey-endpoint-info', warning: 'journey-endpoint-warning', danger: 'journey-endpoint-danger' };
     const statusClass = statusClasses[nodeData.status] || 'journey-endpoint-info';
 
-    stepsContainer.innerHTML = buildCompletedTrailHTML(true) + `
+    stepsContainer.innerHTML = `
         <div class="journey-review">
             <div class="journey-flow">
                 <div class="journey-endpoint ${statusClass}">
