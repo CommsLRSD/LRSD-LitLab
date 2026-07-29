@@ -5019,7 +5019,9 @@ details > p {
   gap: 8px;
   margin-top: var(--space-sm);
   background: var(--tier-color, var(--primary));
+  color: var(--text-on-primary);
   border-color: var(--tier-color, var(--primary));
+  cursor: pointer;
 }
 
 .go-to-tier-1 { --tier-color: var(--tier-1); }
@@ -6164,4 +6166,209 @@ details > p {
   .journey-map-item { animation: none; opacity: 1; }
   .trail-item-active .flowchart-step.carousel-enter-forward,
   .trail-item-active .flowchart-step.carousel-enter-back { animation: none; opacity: 1; }
+}
+
+/* ============================================
+   SCREENER PILL BUTTONS — compact 2-column grid
+   ============================================ */
+.screener-pill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+@media (max-width: 440px) {
+  .screener-pill-grid { grid-template-columns: 1fr; }
+}
+
+.screener-pill-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0.55rem 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--duration) var(--ease);
+  font-family: inherit;
+}
+
+.screener-pill-btn:hover {
+  border-color: var(--primary-light);
+  background: var(--primary-faint);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.screener-pill-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.screener-pill-desc {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.screener-pill-btn.screener-pill-selected {
+  border-color: var(--primary);
+  background: var(--primary-faint);
+  box-shadow: 0 0 0 2px var(--primary);
+  pointer-events: none;
+}
+
+.screener-pill-btn.screener-pill-selected .screener-pill-name {
+  color: var(--primary);
+}
+
+.screener-pill-btn.screener-pill-other {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ============================================
+   COMPLETED SCREENER GRID — shown after selection
+   ============================================ */
+.completed-screener-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  pointer-events: none;
+  user-select: none;
+  margin-top: 0.3rem;
+}
+
+@media (max-width: 440px) {
+  .completed-screener-grid { grid-template-columns: 1fr; }
+}
+
+.completed-screener-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0.4rem 0.65rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.completed-screener-taken {
+  border-color: var(--primary);
+  background: var(--primary-faint);
+  color: var(--primary);
+}
+
+.completed-screener-check {
+  width: 13px;
+  height: 13px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.completed-screener-other {
+  opacity: 0.22;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   COMPLETED CHECKLIST — full items checked
+   ============================================ */
+.completed-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0.3rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.completed-checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.completed-checklist-item svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--success, #22c55e);
+  stroke: var(--success, #22c55e);
+}
+
+/* ============================================
+   FILE PATHWAY BREADCRUMB — drill-down selections
+   ============================================ */
+.step-pathway {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px 4px;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  margin-top: 0.3rem;
+}
+
+.step-pathway-sep {
+  color: var(--text-light);
+  font-size: 0.7rem;
+}
+
+.step-pathway-item {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-muted);
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+}
+
+.step-pathway-final {
+  background: var(--primary-faint);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ============================================
+   GO-TO-TIER button — override continue-btn grey
+   ============================================ */
+.go-to-tier-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-sm);
+  background: var(--tier-color, var(--primary));
+  color: var(--text-on-primary);
+  border-color: var(--tier-color, var(--primary));
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+.go-to-tier-btn:hover,
+.action-btn.go-to-tier-btn:hover {
+  background: color-mix(in srgb, var(--tier-color, var(--primary)) 85%, #000 15%);
+  border-color: color-mix(in srgb, var(--tier-color, var(--primary)) 85%, #000 15%);
+  color: var(--text-on-primary);
+}
+
+/* journey-step-slot override for go-to-tier-btn */
+.journey-step-slot .go-to-tier-btn {
+  font-size: 0.82rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-pill);
+  margin-top: 0;
 }

@@ -787,7 +787,7 @@ const FLOWCHART_DEFINITIONS = {
                     'Adjust pacing to ensure concept mastery',
                     'Collaborate with colleagues to refine approaches'
                 ],
-                actionButton: { text: 'Start Tier 1 Again', action: 'restartTier1Visual' }
+                actionButton: { text: 'Redo Tier 1', action: 'restartTier1Visual' }
             }
         }
     },
@@ -1123,7 +1123,7 @@ function showGoToTierStep(tierId) {
             <h2 class="go-to-tier-heading">Go to Tier ${num}</h2>
             ${subtitle ? `<p class="go-to-tier-sub">${escapeHtml(subtitle)}</p>` : ''}
             <p class="go-to-tier-note">You are moving on to the next tier of support.</p>
-            <button class="continue-btn go-to-tier-btn" onclick="switchToTier('${tierId}')">
+            <button class="action-btn action-primary go-to-tier-btn" onclick="switchToTier('${tierId}')">
                 Continue to Tier ${num}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
@@ -1511,7 +1511,8 @@ function renderJourneyMap(activeNumber) {
 function createCompletedStepElement(nodeData) {
     const el = document.createElement('div');
     el.className = 'completed-step-view';
-    const choice = appState.visualFlowchart.choices[nodeData.id];
+    const vf = appState.visualFlowchart;
+    const choice = vf.choices[nodeData.id];
 
     let html = '';
 
@@ -1530,16 +1531,40 @@ function createCompletedStepElement(nodeData) {
         }).join('');
         html = `${subtitleHtml}<div class="decision-grid completed-grid">${buttonsHtml}</div>`;
     } else if (nodeData.type === 'selection' && choice) {
-        html = `<div class="journey-map-answer completed-step-answer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-            ${escapeHtml(choice.name)}
-        </div>`;
+        if (nodeData.options === 'screeners') {
+            // Show all screener options: chosen highlighted, others greyed out
+            const tierData = appState.tierFlowchartData?.[vf.tierId];
+            const options = tierData?.screeners || [];
+            const buttonsHtml = options.map(opt => {
+                const taken = opt.id === choice.id || opt.name === choice.name;
+                return `<div class="completed-screener-option${taken ? ' completed-screener-taken' : ' completed-screener-other'}" aria-selected="${taken}" role="option">
+                    <span class="completed-screener-name">${escapeHtml(opt.name)}</span>
+                    ${taken ? `<svg class="completed-screener-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>` : ''}
+                </div>`;
+            }).join('');
+            html = `<div class="completed-screener-grid">${buttonsHtml}</div>`;
+        } else if (choice.pathway && choice.pathway.length > 0) {
+            // Show file-pathway breadcrumb for drill-down assessments/interventions
+            const crumbsHtml = choice.pathway.map((crumb, i) => {
+                const isLast = i === choice.pathway.length - 1;
+                return `${i > 0 ? '<span class="step-pathway-sep">›</span>' : ''}<span class="step-pathway-item${isLast ? ' step-pathway-final' : ''}">${escapeHtml(crumb)}</span>`;
+            }).join('');
+            html = `<div class="step-pathway">${crumbsHtml}</div>`;
+        } else {
+            html = `<div class="journey-map-answer completed-step-answer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                ${escapeHtml(choice.name)}
+            </div>`;
+        }
     } else if (nodeData.type === 'checklist') {
-        const count = nodeData.items?.length || 0;
-        html = `<div class="journey-map-answer completed-step-answer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-            All ${count} items reviewed
-        </div>`;
+        // Show the full checklist with all items checked
+        const items = nodeData.items || [];
+        const itemsHtml = items.map(item => `
+            <li class="completed-checklist-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                <span>${escapeHtml(item)}</span>
+            </li>`).join('');
+        html = `<ul class="completed-checklist">${itemsHtml}</ul>`;
     }
     // Info nodes have no meaningful choice to display; leave the slot empty.
 
@@ -1659,8 +1684,8 @@ function createIntegratedChecklistNode(nodeData) {
         <div class="step-header">
             <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${escapeHtml(nodeData.title)}</div>
             <button class="undo-btn" onclick="undoToStep('${escapeAttr(nodeData.id)}')" title="Return to this step">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="11 17 6 12 11 7"/><path d="M18 17v-2a4 4 0 0 0-4-4H6"/>
                 </svg>
             </button>
         </div>
@@ -1673,25 +1698,20 @@ function createIntegratedChecklistNode(nodeData) {
             <ul class="checklist-lines">
                 ${itemsHTML}
             </ul>
-            <button class="continue-btn checklist-continue" disabled>
-                Continue
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-            </button>
         </div>
     `;
 }
 
-// Wire every checklist item so progress updates live and the step can only be
-// completed once all points have been checked off.
+// Wire every checklist item so progress updates live and the step auto-advances
+// once all points have been checked off (no Continue button required).
 function wireIntegratedChecklist(nodeElement, nodeData) {
     const checkboxes = Array.from(nodeElement.querySelectorAll('.checklist-line input[type="checkbox"]'));
-    const continueBtn = nodeElement.querySelector('.checklist-continue');
     const fill = nodeElement.querySelector('.checklist-meter-fill');
     const count = nodeElement.querySelector('.checklist-meter-count');
     const total = checkboxes.length;
     if (!total) return;
+
+    let autoAdvanceTimer = null;
 
     const sync = () => {
         const vf = appState.visualFlowchart;
@@ -1705,17 +1725,20 @@ function wireIntegratedChecklist(nodeElement, nodeData) {
         });
         if (fill) fill.style.width = `${Math.round((checked / total) * 100)}%`;
         if (count) count.textContent = `${checked} of ${total} checked`;
-        if (continueBtn) continueBtn.disabled = checked < total;
+
+        // Auto-advance once all items are checked
+        if (checked === total && nodeData.nextNode) {
+            if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
+            autoAdvanceTimer = setTimeout(() => {
+                // Guard: only advance if this step is still the active one
+                if (appState.visualFlowchart.currentNodeId === nodeData.id) {
+                    proceedFromIntegratedChecklist(nodeData.id, nodeData.nextNode);
+                }
+            }, 600);
+        }
     };
 
     checkboxes.forEach(cb => cb.addEventListener('change', sync));
-    if (continueBtn) {
-        continueBtn.addEventListener('click', () => {
-            if (continueBtn.disabled) return;
-            proceedFromIntegratedChecklist(nodeData.id, nodeData.nextNode);
-        });
-    }
-
     sync();
 }
 
@@ -1772,8 +1795,8 @@ function createIntegratedSelectionNode(nodeData) {
             <div class="step-header">
                 <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
                 <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="11 17 6 12 11 7"/><path d="M18 17v-2a4 4 0 0 0-4-4H6"/>
                     </svg>
                 </button>
             </div>
@@ -1811,8 +1834,16 @@ function createIntegratedSelectionNode(nodeData) {
 
     // Default: flat list of options (used for screener selection in Tier 1)
     const options = tierData?.[nodeData.options] || [];
+    const isScreenerNode = nodeData.options === 'screeners';
 
-    const optionsHTML = options.map(option => `
+    const optionsHTML = isScreenerNode
+        ? options.map(option => `
+        <button class="screener-pill-btn" onclick="selectIntegratedOption('${escapeJsString(nodeData.id)}', '${escapeJsString(option.id)}', '${escapeJsString(option.name)}', '${escapeJsString(nodeData.nextHandler)}')">
+            <span class="screener-pill-name">${escapeHtml(option.name)}</span>
+            ${option.description ? `<span class="screener-pill-desc">${escapeHtml(option.description)}</span>` : ''}
+        </button>
+    `).join('')
+        : options.map(option => `
         <button class="selection-option" onclick="selectIntegratedOption('${escapeJsString(nodeData.id)}', '${escapeJsString(option.id)}', '${escapeJsString(option.name)}', '${escapeJsString(nodeData.nextHandler)}')">
             <div class="option-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1838,8 +1869,8 @@ function createIntegratedSelectionNode(nodeData) {
         <div class="step-header">
             <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="11 17 6 12 11 7"/><path d="M18 17v-2a4 4 0 0 0-4-4H6"/>
                 </svg>
             </button>
         </div>
@@ -1848,7 +1879,7 @@ function createIntegratedSelectionNode(nodeData) {
             <p>${nodeData.description}</p>
             ${infoBoxHTML}
             ${warningBoxHTML}
-            <div class="selection-grid">
+            <div class="${isScreenerNode ? 'screener-pill-grid' : 'selection-grid'}">
                 ${optionsHTML}
             </div>
         </div>
@@ -2011,12 +2042,29 @@ function fwLoadResults() {
 // Flowchart embedded intervention wizard: select an item and advance the flowchart
 function fwSelectItem(itemId, itemName) {
     if (!appState.fwState) return;
-    const { nodeId, handlerName, itemType } = appState.fwState;
+    const { nodeId, handlerName, itemType, screenerData, subtestData, pillars } = appState.fwState;
     if (nodeId && handlerName) {
         // Record the drill-down assessment / intervention selection so the teacher
         // can always keep track of what has been chosen (persisted to localStorage).
         recordSelection(itemType, itemId, itemName, appState.visualFlowchart?.tierId);
+
+        // Build a file-pathway breadcrumb for the completed view and pre-store it
+        // so selectIntegratedOption can preserve it when it writes the choice.
+        const pathway = [];
+        if (screenerData?.screener_name) pathway.push(screenerData.screener_name);
+        if (subtestData?.subtest_code) {
+            const subtestLabel = subtestData.subtest_name
+                ? `${subtestData.subtest_code} — ${subtestData.subtest_name}`
+                : subtestData.subtest_code;
+            pathway.push(subtestLabel);
+        }
+        if (pillars && pillars.length === 1) pathway.push(pillars[0]);
+        pathway.push(itemName);
+
+        // Pre-populate so selectIntegratedOption can merge it in
+        appState.visualFlowchart._pendingPathway = { nodeId, pathway };
         selectIntegratedOption(nodeId, itemId, itemName, handlerName);
+        appState.visualFlowchart._pendingPathway = null;
     }
 }
 
@@ -2056,8 +2104,8 @@ function createIntegratedDecisionNode(nodeData) {
         <div class="step-header">
             <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="11 17 6 12 11 7"/><path d="M18 17v-2a4 4 0 0 0-4-4H6"/>
                 </svg>
             </button>
         </div>
@@ -2095,8 +2143,8 @@ function createIntegratedInfoNode(nodeData) {
         <div class="step-header">
             <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
             <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="11 17 6 12 11 7"/><path d="M18 17v-2a4 4 0 0 0-4-4H6"/>
                 </svg>
             </button>
         </div>
@@ -2152,14 +2200,13 @@ function createIntegratedEndpointNode(nodeData) {
     ` : '';
 
     // For pure terminal endpoints (no tier-transition actions), always provide
-    // Start Over and Done so the user is never left without a next action.
+    // Redo Tier 1 and Done so the user is never left without a next action.
     const defaultActionsHTML = (!actionButtonHTML && !secondaryActionHTML) ? `
         <button class="action-btn action-secondary" onclick="restartCurrentTier()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
             </svg>
-            Start Over
+            Redo Tier 1
         </button>
         <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M20 6L9 17l-5-5"/></svg>
@@ -2270,16 +2317,30 @@ function proceedFromIntegratedInfo(fromNodeId, toNodeId) {
 
 // Select an option in selection node
 function selectIntegratedOption(nodeId, optionId, optionName, handlerName) {
-    // Store choice for summary
-    appState.visualFlowchart.choices[nodeId] = { id: optionId, name: optionName };
+    // Store choice for summary; merge any pending pathway from fwSelectItem
+    const pending = appState.visualFlowchart._pendingPathway;
+    const pathway = (pending && pending.nodeId === nodeId) ? pending.pathway : undefined;
+    appState.visualFlowchart.choices[nodeId] = pathway
+        ? { id: optionId, name: optionName, pathway }
+        : { id: optionId, name: optionName };
     
     markStepCompleted(nodeId);
     
-    // Highlight selected option
+    // Highlight selected option (handles both screener-pill-btn and selection-option)
     const node = document.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
     if (node) {
-        const options = node.querySelectorAll('.selection-option');
-        options.forEach(opt => {
+        // screener pill buttons
+        node.querySelectorAll('.screener-pill-btn').forEach(opt => {
+            opt.classList.add('screener-pill-other');
+        });
+        const selPill = Array.from(node.querySelectorAll('.screener-pill-btn'))
+            .find(btn => btn.getAttribute('onclick')?.includes(CSS.escape(optionId)));
+        if (selPill) {
+            selPill.classList.add('screener-pill-selected');
+            selPill.classList.remove('screener-pill-other');
+        }
+        // standard selection-option buttons
+        node.querySelectorAll('.selection-option').forEach(opt => {
             opt.classList.add('option-disabled');
         });
         const selectedOption = node.querySelector(`.selection-option[onclick*="${CSS.escape(optionId)}"]`);
@@ -2610,11 +2671,10 @@ function showFinalSummary(endpointNodeData) {
         actionsHTML += `<button class="action-btn action-primary" onclick="${fnName}()">${endpointNodeData.actionButton.text}</button>`;
     }
     actionsHTML += `<button class="action-btn action-secondary" onclick="restartCurrentTier()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-            <path d="M21 3v5h-5"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
         </svg>
-        Start Over
+        Redo Tier 1
     </button>
     <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
