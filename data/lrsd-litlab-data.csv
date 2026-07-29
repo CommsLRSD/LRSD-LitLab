@@ -1,0 +1,68 @@
+Record_Type,ID,Name,Full_Name,Language,Grade_Start,Grade_End,Subtest_Code,Subtest_Name,Subtest_Grade_Start,Subtest_Grade_End,Literacy_Pillars,Description,Assessment_Type,Evidence_Level,URL,Tiers
+Screener,DIBELS,DIBELS,Dynamic Indicators of Basic Early Literacy Skills,English,K,6,LNF,Letter Naming Fluency,K,3,Alphabetic Principle,Measures automaticity of letter naming,,,,
+Screener,DIBELS,DIBELS,Dynamic Indicators of Basic Early Literacy Skills,English,K,6,PSF,Phonemic Segmentation Fluency,K,2,Phonemic Awareness,Measures ability to segment phonemes,,,,
+Screener,DIBELS,DIBELS,Dynamic Indicators of Basic Early Literacy Skills,English,K,6,NWF-CLS,Nonsense Word Fluency: Correct Letter Sounds,K,2,Alphabetic Principle; Phonemic Awareness; Phonics,Measures letter-sound knowledge in isolation,,,,
+Screener,DIBELS,DIBELS,Dynamic Indicators of Basic Early Literacy Skills,English,K,6,NWF-WRC,Nonsense Word Fluency: Words Read Correctly,1,3,Alphabetic Principle; Phonics; Reading Fluency,Measures ability to blend sounds into words,,,,
+Screener,DIBELS,DIBELS,Dynamic Indicators of Basic Early Literacy Skills,English,K,6,WRF,Word Reading Fluency,1,6,Alphabetic Principle; Phonics; Reading Fluency,Measures automaticity of real word reading,,,,
+Screener,DIBELS,DIBELS,Dynamic Indicators of Basic Early Literacy Skills,English,K,6,ORF-ACC,Oral Reading Fluency: Accuracy,1,6,Phonics; Reading Fluency,Measures accuracy percentage in connected text,,,,
+Screener,DIBELS,DIBELS,Dynamic Indicators of Basic Early Literacy Skills,English,K,6,ORF-WC,Oral Reading Fluency: Words Correct,1,6,Phonics; Reading Fluency,Measures total words read correctly per minute,,,,
+Screener,DIBELS,DIBELS,Dynamic Indicators of Basic Early Literacy Skills,English,K,6,Maze,Maze,2,6,Reading Fluency; Reading Comprehension,Measures reading comprehension via word choice task,,,,
+Screener,CTOPP-2,CTOPP-2,"Comprehensive Test of Phonological Processing, Second Edition",English,K,3,Blending,Blending,K,3,Phonemic Awareness,Oral task: blend individual sounds into words,,,,
+Screener,CTOPP-2,CTOPP-2,"Comprehensive Test of Phonological Processing, Second Edition",English,K,3,Elision,Elision,K,3,Phonemic Awareness,Oral task: delete phonemes from words,,,,
+Screener,THaFoL,THaFoL,Test d'Habileté de Lecture,French,K,3,FNL,Facilité à nommer des lettres,K,3,Alphabetic Principle,Automaticity of letter naming in French,,,,
+Screener,THaFoL,THaFoL,Test d'Habileté de Lecture,French,K,3,FNM,Facilité à lire des non-mots,K,3,Phonics,Measures decoding ability with French phonics patterns,,,,
+Screener,THaFoL,THaFoL,Test d'Habileté de Lecture,French,K,3,FLM,Facilité à lire des mots,K,3,Phonics; Reading Fluency,Automaticity of real word reading in French,,,,
+Screener,THaFoL,THaFoL,Test d'Habileté de Lecture,French,K,3,FRO,Facilité en lecture orale,K,3,Reading Fluency,Connected text reading fluency in French,,,,
+Screener,IDAPEL,IDAPEL,Instruments de Dépistage de l'Alphabétisation Précoce en Lecture,French,K,3,FRO,Facilité en lecture orale,K,3,Reading Fluency,Connected text fluency assessment,,,,
+Assessment,ASSESS-001,CC3 & LeNS,,English,K,3,,,,,Alphabetic Principle,,Diagnostic,none,(SharePoint),2
+Assessment,ASSESS-002,CORE Phonics Survey,,English,K,12,,,,,Phonics,,Diagnostic,none,(SharePoint),2
+Assessment,ASSESS-003,French CORE Phonics Assessment,,French Immersion,K,12,,,,,Phonics,,Diagnostic,none,(SharePoint),2
+Assessment,ASSESS-004,Gallistel-Ellis (Reading),,English,K,2,,,,,Alphabetic Principle,,Diagnostic,none,(SharePoint),2
+Assessment,ASSESS-005,Heggerty -- Letter Name Sounds,,English,3,8,,,,,Alphabetic Principle,,Diagnostic,**,(SharePoint),2
+Assessment,ASSESS-006,Identification du nom et du son des lettres de l'alphabet,,French Immersion,M,2,,,,,Alphabetic Principle,,Diagnostic,none,(SharePoint),2
+Assessment,ASSESS-007,Letter Identification Assessment,,English,K,2,,,,,Alphabetic Principle,,Diagnostic,none,(SharePoint),2
+Assessment,ASSESS-008,Quick Phonics Screener,,English,K,12,,,,,Phonics,,Diagnostic,none,(SharePoint),2
+Assessment,ASSESS-009,Really Great Reading -- DAER,,English,K,K,,,,,Alphabetic Principle,,Diagnostic,none,,2
+Assessment,ASSESS-010,Really Great Reading -- DAEES,,English,1,1,,,,,Alphabetic Principle,,Diagnostic,none,,2
+Assessment,ASSESS-011,Lindamood Phoneme Sequencing (Assessment),,English,K,3,,,,,Phonemic Awareness,,Diagnostic,**,https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program,3
+Assessment,ASSESS-012,Lindamood Bell's Seeing Stars (Assessment),,English,2,12,,,,,Orthography,,Diagnostic,none,https://lindamoodbell.com/program/seeing-stars-program,3
+Assessment,ASSESS-013,Barton Reading and Spelling (Assessment),,English,3,12,,,,,Orthography,,Diagnostic,**,https://bartonreading.com/,3
+Assessment,ASSESS-014,Kilpatrick -- Phonemic Awareness Battery,,English,K,2,,,,,Phonemic Awareness,,Diagnostic,**,,3
+Assessment,ASSESS-015,SRA Reading Inventory,,English,K,6,,,,,Reading Fluency,,Diagnostic,*,(Nelson),2
+Intervention,INT-001,Abracadabra,,French Immersion,1,2,,,,,Alphabetic Principle; Phonemic Awareness; Phonics; Reading Fluency; Reading Comprehension,,,*,https://literacy.concordia.ca/resources/abra/teacher/fr/index.php,1; 2
+Intervention,INT-002,Alec,,French Immersion,M,5,,,,,Alphabetic Principle; Phonics,,,none,https://alec-edu.com/,1; 2
+Intervention,INT-003,Amira Learning,,English,K,8,,,,,Phonics; Reading Fluency,,,*,https://amiralearning.com/amira-reading,2; 3
+Intervention,INT-004,Barton Reading and Spelling,,English,3,12,,,,,Phonemic Awareness; Phonics; Vocabulary; Orthography,,,**,https://bartonreading.com/,2; 3
+Intervention,INT-005,Handwriting Without Tears,,English,K,2,,,,,Orthography,,,none,,1; 2
+Intervention,INT-006,Heggerty,,English,K,2,,,,,Alphabetic Principle; Phonemic Awareness,,,**,https://heggerty.org/,1; 2; 3
+Intervention,INT-007,Kilpatrick -- Equipped for Reading Success,,English,K,2,,,,,Phonemic Awareness,,,**,,2; 3
+Intervention,INT-008,Lexia Core 5,,French Immersion,K,5,,,,,Alphabetic Principle; Phonemic Awareness; Phonics; Reading Fluency; Vocabulary; Reading Comprehension; Orthography,,,*,https://www.lexialearning.com/core5,1
+Intervention,INT-009,Lexia Power Up,,English,6,12,,,,,Phonics; Reading Fluency; Vocabulary; Reading Comprehension; Orthography,,,*,https://www.lexialearning.com/powerup,2; 3
+Intervention,INT-010,Lindamood Bell's Seeing Stars,,English,2,12,,,,,Orthography,,,none,https://lindamoodbell.com/program/seeing-stars-program,2; 3
+Intervention,INT-011,Lindamood Phoneme Sequencing,,English,K,3,,,,,Phonemic Awareness,,,**,https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program,3
+Intervention,INT-012,Orton-Gillingham,,English,K,12,,,,,Alphabetic Principle; Phonemic Awareness; Reading Fluency; Reading Comprehension; Orthography,,,**,https://www.ortonacademy.org/,1; 2; 3
+Intervention,INT-013,Page par Page,,French Immersion,M,2,,,,,Alphabetic Principle; Phonics; Reading Fluency; Reading Comprehension,,,none,,1; 2; 3
+Intervention,INT-014,Phonémique -- Version 1,,French Immersion,M,3,,,,,Phonemic Awareness,,,none,,1; 2; 3
+Intervention,INT-015,Phonémique -- Version 2,,French Immersion,M,3,,,,,Phonemic Awareness,,,none,,1; 2; 3
+Intervention,INT-016,Programme d'intervention en lecture et en orthographe (PILO),,French Immersion,M,3,,,,,Alphabetic Principle; Phonics; Orthography,,,none,(SharePoint),2; 3
+Intervention,INT-017,Remediation Plus Systems,,English,K,3,,,,,Phonemic Awareness; Phonics; Reading Fluency; Reading Comprehension; Orthography,,,*,http://www.remediationplus.com/products/the-remediation-plus-system/,1; 2
+Intervention,INT-018,Remediation Plus Systems,,English,4,8,,,,,Reading Fluency; Reading Comprehension; Vocabulary,,,*,http://www.remediationplus.com/products/the-remediation-plus-system/,2
+Intervention,INT-019,Ressource CBE,,French Immersion,M,2,,,,,Alphabetic Principle; Phonics,,,none,,1; 2; 3
+Intervention,INT-020,Ressource CBE,,French Immersion,M,4,,,,,Alphabetic Principle,,,none,,2
+Intervention,INT-021,REWARDS,,English,4,12,,,,,Reading Fluency; Vocabulary; Orthography,,,**,https://www.voyagersopris.com/products/reading/rewards/overview,2; 3
+Intervention,INT-022,Saxon Reading Foundations,,English,K,2,,,,,Phonemic Awareness; Reading Fluency; Orthography,,,**,https://www.heinemann.com/saxon-reading-foundations/,1; 2; 3
+Intervention,INT-023,Son au graphe,,French Immersion,3,12,,,,,Alphabetic Principle; Phonics,,,none,,1; 2; 3
+Intervention,INT-024,SRA Corrective Reading,,English,K,3,,,,,Reading Comprehension; Orthography,,,*,(Nelson),2; 3
+Intervention,INT-025,SRA Corrective Reading,,English,3,12,,,,,Alphabetic Principle; Phonemic Awareness; Phonics; Reading Fluency; Reading Comprehension,,,*,(Nelson),2; 3
+Intervention,INT-026,SRA Early Interventions in Reading Skills,,English,K,3,,,,,Phonemic Awareness; Reading Fluency,,,*,(Nelson),2
+Intervention,INT-027,SRA Open Court,,English,K,3,,,,,Phonics; Reading Fluency; Vocabulary; Reading Comprehension,,,*,https://pages.nelson.com/assets/pdf/open_court.pdf,1; 2
+Intervention,INT-028,SRA Open Court,,English,4,6,,,,,Reading Fluency; Vocabulary; Reading Comprehension,,,*,https://pages.nelson.com/assets/pdf/open_court.pdf,2
+Intervention,INT-029,SRA Reading Mastery,,English,K,6,,,,,Alphabetic Principle; Phonemic Awareness; Phonics; Reading Fluency; Vocabulary; Reading Comprehension; Orthography,,,*,(Nelson),2
+Intervention,INT-030,STARI,,English,6,9,,,,,Reading Fluency; Reading Comprehension,,,**,https://www.serpinstitute.org/stari,2; 3
+Intervention,INT-031,UFLI Manual,,English,K,2,,,,,Alphabetic Principle; Phonemic Awareness; Phonics; Reading Fluency; Vocabulary; Reading Comprehension; Orthography,,,**,https://ufli.education.ufl.edu/foundations-materials/,1; 2
+Intervention,INT-032,UFLI Manual,,English,K,8,,,,,Alphabetic Principle; Phonemic Awareness; Phonics; Reading Fluency; Vocabulary; Reading Comprehension; Orthography,,,**,https://ufli.education.ufl.edu/foundations-materials/,2; 3
+Intervention,INT-033,Wilson Fundations,,English,K,3,,,,,Alphabetic Principle; Phonemic Awareness; Phonics; Reading Fluency; Vocabulary; Reading Comprehension; Orthography,,,*,https://www.wilsonlanguage.com/programs/fundations/,1; 2
+Intervention,INT-034,Wilson Reading System,,English,2,12,,,,,Alphabetic Principle; Orthography,,,**,https://www.wilsonlanguage.com/programs/wilson-reading-system/,3
+Intervention,INT-035,Words Their Way,,English,K,12,,,,,Orthography,,,none,,1; 2; 3
+Intervention,INT-036,WordGen Elementary,,English,4,5,,,,,Vocabulary,,,**,https://www.serpinstitute.org/wordgen-elementary,1
+Intervention,INT-037,WordGen Weekly,,English,6,8,,,,,Vocabulary,,,**,https://www.serpinstitute.org/wordgen-weekly,1
