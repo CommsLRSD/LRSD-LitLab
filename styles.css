@@ -2535,199 +2535,148 @@ details > p {
 }
 
 /* ============================================================
-   ONE-AT-A-TIME CHECKLIST SUB-STEPS
-   Each principle is shown alone so the user engages with every
-   sub-step explicitly. Blocky, app-like, with motion.
+   FULL CHECKLIST — every point visible in one list
+   All points stay on screen and each must be ticked off. A ticked
+   point grows slightly larger and bolder for instant feedback.
    ============================================================ */
-.checklist-substep {
+.checklist-full {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  gap: 0.7rem;
 }
 
-.substep-context {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--step-text);
-  opacity: 0.9;
-  margin-bottom: var(--space-md);
+.checklist-intro {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
-.substep-progress {
+.checklist-meter {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
+  gap: 0.7rem;
 }
 
-.substep-dots {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+.checklist-meter-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-muted);
+  overflow: hidden;
 }
 
-.substep-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--step-soft);
-  transition: transform var(--duration) var(--ease), background var(--duration) var(--ease);
+.checklist-meter-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: var(--radius-pill);
+  background: var(--tier-color, var(--step));
+  transition: width 0.35s var(--ease);
 }
 
-.substep-dot-done {
-  background: var(--step);
-}
-
-.substep-dot-active {
-  background: var(--step);
-  transform: scale(1.45);
-  box-shadow: 0 0 0 4px var(--step-soft);
-}
-
-.substep-count {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--step-text);
+.checklist-meter-count {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-light);
   white-space: nowrap;
 }
 
-/* The single large checklist block */
-.checklist-item-big {
+.checklist-lines {
+  list-style: none;
   display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-lg);
-  border: 2px solid var(--step-soft);
-  border-radius: var(--radius-lg);
-  background: #fff;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+}
+
+.checklist-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
   cursor: pointer;
-  min-height: 96px;
   transition: border-color var(--duration) var(--ease),
-              background var(--duration) var(--ease),
-              transform var(--duration) var(--ease),
-              box-shadow var(--duration) var(--ease);
+              background var(--duration) var(--ease);
 }
 
-.checklist-item-big:hover {
-  border-color: var(--step);
-  box-shadow: var(--shadow-md);
+.checklist-line:hover {
+  border-color: var(--tier-color, var(--step));
+  background: color-mix(in srgb, var(--tier-color, var(--step)) 4%, var(--bg));
 }
 
-.checklist-item-big.checked {
-  border-color: var(--step);
-  background: var(--step-bg);
-  animation: substepPop 0.3s var(--ease);
+.checklist-line.checked {
+  border-color: var(--tier-color, var(--step));
+  background: color-mix(in srgb, var(--tier-color, var(--step)) 8%, var(--bg));
 }
 
-.checklist-item-big input[type="checkbox"] {
+.checklist-line input[type="checkbox"] {
   position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
-  pointer-events: none;
 }
 
-.checkbox-check-big {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  border-radius: var(--radius);
-  border: 2px solid var(--step-soft);
-  background: var(--bg-alt);
-  display: flex;
+.checklist-line-box {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: transparent;
+  transition: background var(--duration) var(--ease),
+              border-color var(--duration) var(--ease),
+              color var(--duration) var(--ease);
+}
+
+.checklist-line-box svg { width: 12px; height: 12px; }
+
+.checklist-line.checked .checklist-line-box {
+  background: var(--tier-color, var(--step));
+  border-color: var(--tier-color, var(--step));
   color: #fff;
-  transition: all var(--duration) var(--ease);
 }
 
-.checkbox-check-big svg {
-  width: 24px;
-  height: 24px;
-  opacity: 0;
-  transform: scale(0.4);
-  transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease);
+.checklist-line-text {
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--text);
+  transition: font-size var(--duration) var(--ease),
+              font-weight var(--duration) var(--ease),
+              color var(--duration) var(--ease);
 }
 
-.checklist-item-big.checked .checkbox-check-big {
-  background: var(--step);
-  border-color: var(--step);
-}
-
-.checklist-item-big.checked .checkbox-check-big svg {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.checkbox-text-big {
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.4;
+/* Ticked points read slightly bigger and bolder */
+.checklist-line.checked .checklist-line-text {
+  font-size: 0.94rem;
+  font-weight: 700;
   color: var(--text);
 }
 
-.substep-hint {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  margin-top: var(--space-sm);
-  text-align: center;
+.checklist-line input[type="checkbox"]:focus-visible + .checklist-line-box {
+  outline: 2px solid var(--tier-color, var(--step));
+  outline-offset: 2px;
 }
 
-.substep-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  margin-top: var(--space-lg);
-}
-
-.substep-back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 0.55rem 1rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-muted);
-  border: none;
-  border-radius: var(--radius);
+.checklist-continue:not(:disabled) {
+  background: var(--tier-color, var(--step));
+  color: #fff;
   cursor: pointer;
-  transition: all var(--duration) var(--ease);
-}
-
-.substep-back-btn svg { width: 16px; height: 16px; }
-.substep-back-btn:hover { background: var(--border); color: var(--text); }
-
-/* Sub-step slide-in animations */
-.checklist-substep.subitem-enter-forward {
-  animation: subitemSlideInRight 0.3s var(--ease);
-}
-.checklist-substep.subitem-enter-back {
-  animation: subitemSlideInLeft 0.3s var(--ease);
-}
-
-@keyframes subitemSlideInRight {
-  from { opacity: 0; transform: translateX(28px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes subitemSlideInLeft {
-  from { opacity: 0; transform: translateX(-28px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes substepPop {
-  0%   { transform: scale(1); }
-  45%  { transform: scale(1.025); }
-  100% { transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .checklist-substep.subitem-enter-forward,
-  .checklist-substep.subitem-enter-back,
-  .checklist-item-big.checked,
   .flowchart-step.carousel-enter-forward,
   .flowchart-step.carousel-enter-back {
     animation: none;
@@ -5709,7 +5658,68 @@ details > p {
 .journey-map-back svg { width: 15px; height: 15px; }
 .journey-map-back:hover { background: var(--border); color: var(--text); }
 
-/* ---------- The trail (now embedded inside .journey-map) ---------- */
+/* ---------- The active step opens inside its own row ----------
+   Step 1 happens entirely inside the Step 1 row, then Step 2 opens
+   below it, and so on — there is no separate working area. */
+.journey-map-item.journey-map-current {
+  background: color-mix(in srgb, var(--tier-color, var(--step)) 4%, var(--bg));
+}
+
+.journey-step-slot {
+  display: block;
+  margin-top: 0.65rem;
+}
+
+.journey-step-slot .flowchart-step {
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-left: none;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+  opacity: 1;
+}
+
+/* The row itself already names the step, so the card header is redundant */
+.journey-step-slot .step-header { display: none; }
+
+.journey-step-slot .step-content { padding: 0; }
+
+.journey-step-slot .step-content h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.journey-step-slot .step-content > p {
+  font-size: 0.84rem;
+  margin-bottom: 0.7rem;
+}
+
+.journey-step-slot .flowchart-step.carousel-enter-forward {
+  animation: journeyStepOpen 0.32s var(--ease) forwards;
+}
+.journey-step-slot .flowchart-step.carousel-enter-back {
+  animation: journeyStepOpenBack 0.32s var(--ease) forwards;
+}
+
+@keyframes journeyStepOpen {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes journeyStepOpenBack {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-step-slot .flowchart-step.carousel-enter-forward,
+  .journey-step-slot .flowchart-step.carousel-enter-back { animation: none; opacity: 1; }
+}
+
+/* ---------- The trail (only used for tier-transition & summary screens) ---------- */
 .journey-track {
   display: flex;
   flex-direction: column;
