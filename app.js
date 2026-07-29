@@ -1059,7 +1059,7 @@ function initIntegratedFlowchart(tierId) {
                         <div class="journey-map-bar"><span class="journey-map-bar-fill" id="journey-map-bar-fill"></span></div>
                         <ol class="journey-map-list" id="journey-map-list"></ol>
                         <div class="journey-track" id="flowchart-steps"></div>
-                        <button class="journey-map-back" id="carousel-prev-btn" onclick="goToPreviousStep()" style="visibility: hidden;">
+                        <button class="journey-map-back" id="carousel-prev-btn" onclick="goToPreviousStep()" style="display: none;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M19 12H5M12 19l-7-7 7-7"/>
                             </svg>
@@ -1104,7 +1104,7 @@ function applyTierTheme(tierId) {
 // Show an explicit "Go to Tier #" transition step so the user is clearly aware
 // they are moving from one tier to another before the next tier's flow begins.
 function showGoToTierStep(tierId) {
-    const stepsContainer = document.getElementById('flowchart-steps');
+    const stepsContainer = getActiveStepTarget();
     const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
     if (!stepsContainer || !flowchartDef) {
         switchToTier(tierId);
@@ -1131,7 +1131,7 @@ function showGoToTierStep(tierId) {
     `;
 
     const prevBtn = document.getElementById('carousel-prev-btn');
-    if (prevBtn) prevBtn.style.visibility = 'hidden';
+    if (prevBtn) prevBtn.style.display = 'none';
 
     // Reflect the upcoming tier in the sticky top tabs and bottom name bar
     document.querySelectorAll('.tier-tab').forEach(tab => {
@@ -1172,6 +1172,9 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
     
     // If this is an endpoint, route based on whether it's a tier transition or terminal
     if (nodeData.type === 'endpoint') {
+        // Refresh the panel first so the step just answered collapses into a
+        // recorded decision and the outcome opens in its own row.
+        renderJourneyMap(getActiveStepNumber());
         saveCurrentTierToFullJourney();
         const tierTransitionActions = new Set(['startTier2Visual', 'startTier3Visual', 'restartTier2Visual']);
         const primaryAction = nodeData.actionButton?.action;
@@ -1367,46 +1370,50 @@ function buildCompletedTrailHTML(includeCurrent = false) {
     return html;
 }
 
-// Render the full journey: summary panel grows on the right, active step is spotlighted on the left.
-// Completed decisions are displayed in the summary panel, NOT in the main track.
+// The 1-based number of the step the user is currently on
+function getActiveStepNumber() {
+    const vf = appState.visualFlowchart;
+    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const path = vf.selectedPath;
+    if (!tierDef) return 1;
+    let completed = 0;
+    for (let i = 0; i < path.length - 1; i++) {
+        const node = tierDef.nodes[path[i].nodeId];
+        if (node && node.type !== 'endpoint') completed++;
+    }
+    return completed + 1;
+}
+
+// Everything happens inside the current step's row in the panel; the track is
+// only a fallback for when no row is open.
+function getActiveStepTarget() {
+    return document.getElementById('journey-step-slot') || document.getElementById('flowchart-steps');
+}
+
+// Render the whole process inside the Your Decisions panel: answered steps
+// collapse into recorded decisions and the current step opens in its own row.
 function renderJourney(direction = 'forward') {
     const track = document.getElementById('flowchart-steps');
     const vf = appState.visualFlowchart;
     const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
-    if (!track || !tierDef) return;
+    if (!tierDef) return;
 
     const path = vf.selectedPath;
     const activeStep = path[path.length - 1];
     const activeNode = activeStep ? tierDef.nodes[activeStep.nodeId] : null;
 
-    // Summary panel owns the history; the track shows only the active step.
-    track.innerHTML = '';
+    // The panel owns the whole process, so the old track stays empty.
+    if (track) track.innerHTML = '';
 
-    // Compute the current step number from the path (not the DOM)
-    let completedCount = 0;
-    for (let i = 0; i < path.length - 1; i++) {
-        const node = tierDef.nodes[path[i].nodeId];
-        if (node && node.type !== 'endpoint') completedCount++;
-    }
-    const activeNumber = completedCount + 1;
+    renderJourneyMap(getActiveStepNumber());
 
-    if (activeNode) {
-        const item = document.createElement('div');
-        item.className = 'trail-item trail-item-active';
-        item.setAttribute('data-node-id', activeNode.id);
-        item.innerHTML = `
-            <div class="trail-active-body">
-                <div class="trail-active-flag">
-                    <span class="trail-active-pulse"></span>
-                    Step ${escapeHtml(String(activeNumber))}
-                </div>
-            </div>
-        `;
-        track.appendChild(item);
-        createIntegratedNodeElement(activeNode, item.querySelector('.trail-active-body'), direction);
+    // The active step opens inside its own row in the panel, directly beneath
+    // the steps already answered — never in a separate area below the list.
+    const slot = document.getElementById('journey-step-slot');
+    if (activeNode && slot) {
+        createIntegratedNodeElement(activeNode, slot, direction);
     }
 
-    renderJourneyMap(activeNumber);
     scrollToActiveStep();
 }
 
@@ -1473,6 +1480,7 @@ function renderJourneyMap(activeNumber) {
                             ${escapeHtml(entry.answer)}
                         </span>` : ''}
                     ${isCurrent ? '<span class="journey-map-now"><span class="journey-map-now-dot"></span>In progress</span>' : ''}
+                    ${isCurrent ? '<div class="journey-step-slot" id="journey-step-slot"></div>' : ''}
                 </span>
             </li>
         `;
@@ -1500,7 +1508,7 @@ function completeJourneyMap(label = 'Journey complete') {
 
 // Bring the spotlighted step into view without losing sight of the trail above
 function scrollToActiveStep() {
-    const active = document.querySelector('.trail-item-active, .go-to-tier-step, .journey-review');
+    const active = document.querySelector('.journey-map-item.journey-map-current, .go-to-tier-step, .journey-review');
     if (!active) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     requestAnimationFrame(() => {
@@ -1521,12 +1529,11 @@ function createIntegratedNodeElement(nodeData, container, direction = 'forward')
     
     switch (nodeData.type) {
         case 'checklist':
-            // Checklists are walked one item at a time. Reset progress so the
-            // user must engage with every sub-step explicitly on each visit.
-            appState.visualFlowchart.checklistProgress[nodeData.id] = 0;
+            // Every point is visible at once, but each one has to be ticked
+            // off before the step can be completed.
             appState.visualFlowchart.checklistChecked = appState.visualFlowchart.checklistChecked || {};
             appState.visualFlowchart.checklistChecked[nodeData.id] = [];
-            content = createChecklistSubStepHTML(nodeData, 0);
+            content = createIntegratedChecklistNode(nodeData);
             break;
         case 'selection':
             content = createIntegratedSelectionNode(nodeData);
@@ -1553,9 +1560,9 @@ function createIntegratedNodeElement(nodeData, container, direction = 'forward')
         nodeElement.classList.add(animClass);
     });
     
-    // Wire up the single checklist sub-step if needed
+    // Wire up the checklist items if needed
     if (nodeData.type === 'checklist') {
-        wireChecklistSubStep(nodeElement, nodeData);
+        wireIntegratedChecklist(nodeElement, nodeData);
     }
 
     // For drill-down / intervention wizard nodes, if a screener has already been
@@ -1574,146 +1581,87 @@ function createIntegratedNodeElement(nodeData, container, direction = 'forward')
     }
 }
 
-// Create integrated checklist node – ONE item at a time (sub-step carousel).
-// Each principle is the only thing on screen so the user must engage with
-// every single sub-step explicitly before moving on.
-function createChecklistSubStepHTML(nodeData, index) {
-    // Sanitize text for use in HTML - prevents XSS
-    const sanitizeForHtml = (text) => {
-        const charMap = {
-            '"': '&quot;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '&': '&amp;',
-            "'": '&#39;'
-        };
-        return String(text).split('').map(c => charMap[c] || c).join('');
-    };
-
+// Create integrated checklist node – every point is visible in one list.
+// The user must tick each point off before the step can be completed; ticked
+// points grow slightly larger and bolder so progress is obvious at a glance.
+function createIntegratedChecklistNode(nodeData) {
     const items = nodeData.items || [];
     const total = items.length;
-    const safeIndex = Math.max(0, Math.min(index, total - 1));
-    const checkedState = (appState.visualFlowchart.checklistChecked &&
-        appState.visualFlowchart.checklistChecked[nodeData.id]) || [];
-    const isChecked = !!checkedState[safeIndex];
 
-    // Progress dots – one per sub-step
-    const dots = items.map((_, i) => {
-        let cls = 'substep-dot';
-        if (i < safeIndex) cls += ' substep-dot-done';
-        else if (i === safeIndex) cls += ' substep-dot-active';
-        return `<span class="${cls}"></span>`;
-    }).join('');
+    const itemsHTML = items.map((item, index) => `
+        <li class="checklist-line-item">
+            <label class="checklist-line">
+                <input type="checkbox" data-index="${index}">
+                <span class="checklist-line-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                </span>
+                <span class="checklist-line-text">${escapeHtml(item)}</span>
+            </label>
+        </li>
+    `).join('');
 
     return `
         <div class="step-header">
-            <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${nodeData.title}</div>
-            <button class="undo-btn" onclick="undoToStep('${nodeData.id}')" title="Return to this step">
+            <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${escapeHtml(nodeData.title)}</div>
+            <button class="undo-btn" onclick="undoToStep('${escapeAttr(nodeData.id)}')" title="Return to this step">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
                 </svg>
             </button>
         </div>
-        <div class="step-content checklist-substep">
-            <p class="substep-context">${sanitizeForHtml(nodeData.subtitle || '')}</p>
-            <div class="substep-progress">
-                <div class="substep-dots">${dots}</div>
-                <div class="substep-count">Point ${safeIndex + 1} of ${total}</div>
+        <div class="step-content checklist-full">
+            ${nodeData.subtitle ? `<p class="checklist-intro">${escapeHtml(nodeData.subtitle)}</p>` : ''}
+            <div class="checklist-meter">
+                <div class="checklist-meter-bar"><span class="checklist-meter-fill" style="width: 0%"></span></div>
+                <span class="checklist-meter-count">0 of ${total} checked</span>
             </div>
-            <label class="checklist-item-big ${isChecked ? 'checked' : ''}">
-                <input type="checkbox" ${isChecked ? 'checked' : ''}>
-                <span class="checkbox-check-big">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                </span>
-                <span class="checkbox-text-big">${sanitizeForHtml(items[safeIndex])}</span>
-            </label>
-            <p class="substep-hint">Tick the box to move to the next point.</p>
-            <div class="substep-nav">
-                <button class="substep-back-btn" onclick="checklistSubBack('${nodeData.id}')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    Back
-                </button>
-            </div>
+            <ul class="checklist-lines">
+                ${itemsHTML}
+            </ul>
+            <button class="continue-btn checklist-continue" disabled>
+                Continue
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
         </div>
     `;
 }
 
-// Wire the single checklist sub-step's checkbox to auto-advance
-function wireChecklistSubStep(nodeElement, nodeData) {
-    const checkbox = nodeElement.querySelector('.checklist-item-big input[type="checkbox"]');
-    const item = nodeElement.querySelector('.checklist-item-big');
-    if (!checkbox) return;
+// Wire every checklist item so progress updates live and the step can only be
+// completed once all points have been checked off.
+function wireIntegratedChecklist(nodeElement, nodeData) {
+    const checkboxes = Array.from(nodeElement.querySelectorAll('.checklist-line input[type="checkbox"]'));
+    const continueBtn = nodeElement.querySelector('.checklist-continue');
+    const fill = nodeElement.querySelector('.checklist-meter-fill');
+    const count = nodeElement.querySelector('.checklist-meter-count');
+    const total = checkboxes.length;
+    if (!total) return;
 
-    let advancing = false;
+    const sync = () => {
+        const vf = appState.visualFlowchart;
+        vf.checklistChecked = vf.checklistChecked || {};
+        vf.checklistChecked[nodeData.id] = checkboxes.map(cb => cb.checked);
 
-    checkbox.addEventListener('change', () => {
-        const index = appState.visualFlowchart.checklistProgress[nodeData.id] || 0;
-        appState.visualFlowchart.checklistChecked = appState.visualFlowchart.checklistChecked || {};
-        appState.visualFlowchart.checklistChecked[nodeData.id] =
-            appState.visualFlowchart.checklistChecked[nodeData.id] || [];
-        appState.visualFlowchart.checklistChecked[nodeData.id][index] = checkbox.checked;
+        const checked = checkboxes.filter(cb => cb.checked).length;
+        checkboxes.forEach(cb => {
+            const line = cb.closest('.checklist-line');
+            if (line) line.classList.toggle('checked', cb.checked);
+        });
+        if (fill) fill.style.width = `${Math.round((checked / total) * 100)}%`;
+        if (count) count.textContent = `${checked} of ${total} checked`;
+        if (continueBtn) continueBtn.disabled = checked < total;
+    };
 
-        if (item) item.classList.toggle('checked', checkbox.checked);
-        if (!checkbox.checked || advancing) return;
-
-        advancing = true;
-        const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300;
-        setTimeout(() => {
-            advancing = false;
-            if (checkbox.checked) {
-                confirmChecklistSubStep(nodeData.id);
-            }
-        }, delay);
-    });
-}
-
-// Re-render the current checklist sub-step in place with a slide animation
-function rerenderChecklistSubStep(nodeData, direction = 'forward') {
-    const nodeElement = document.querySelector(`.flowchart-step[data-node-id="${CSS.escape(nodeData.id)}"]`);
-    if (!nodeElement) return;
-    const index = appState.visualFlowchart.checklistProgress[nodeData.id] || 0;
-    nodeElement.innerHTML = createChecklistSubStepHTML(nodeData, index);
-    wireChecklistSubStep(nodeElement, nodeData);
-
-    const content = nodeElement.querySelector('.checklist-substep');
-    if (content) {
-        const animClass = direction === 'back' ? 'subitem-enter-back' : 'subitem-enter-forward';
-        requestAnimationFrame(() => content.classList.add(animClass));
+    checkboxes.forEach(cb => cb.addEventListener('change', sync));
+    if (continueBtn) {
+        continueBtn.addEventListener('click', () => {
+            if (continueBtn.disabled) return;
+            proceedFromIntegratedChecklist(nodeData.id, nodeData.nextNode);
+        });
     }
-}
 
-// Advance to the next checklist sub-step, or finish the checklist
-function confirmChecklistSubStep(nodeId) {
-    const vf = appState.visualFlowchart;
-    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
-    const nodeData = tierDef?.nodes?.[nodeId];
-    if (!nodeData) return;
-
-    const total = (nodeData.items || []).length;
-    const current = vf.checklistProgress[nodeId] || 0;
-
-    if (current < total - 1) {
-        vf.checklistProgress[nodeId] = current + 1;
-        rerenderChecklistSubStep(nodeData, 'forward');
-    } else {
-        proceedFromIntegratedChecklist(nodeId, nodeData.nextNode);
-    }
-}
-
-// Go back one checklist sub-step, or to the previous flow step if at the first
-function checklistSubBack(nodeId) {
-    const vf = appState.visualFlowchart;
-    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
-    const nodeData = tierDef?.nodes?.[nodeId];
-    if (!nodeData) return;
-
-    const current = vf.checklistProgress[nodeId] || 0;
-    if (current > 0) {
-        vf.checklistProgress[nodeId] = current - 1;
-        rerenderChecklistSubStep(nodeData, 'back');
-    } else {
-        goToPreviousStep();
-    }
+    sync();
 }
 
 // Create integrated selection node
@@ -2334,7 +2282,7 @@ function updateCarouselNav() {
     const path = appState.visualFlowchart.selectedPath;
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) {
-        prevBtn.style.visibility = path.length > 1 ? 'visible' : 'hidden';
+        prevBtn.style.display = path.length > 1 ? '' : 'none';
     }
 }
 
@@ -2426,7 +2374,7 @@ function switchToTier(tierId) {
     
     // Reset carousel navigation
     const prevBtn = document.getElementById('carousel-prev-btn');
-    if (prevBtn) prevBtn.style.visibility = 'hidden';
+    if (prevBtn) prevBtn.style.display = 'none';
     
     // Apply the tier colour theme for the newly active tier
     applyTierTheme(tierId);
@@ -2448,7 +2396,7 @@ function saveCurrentTierToFullJourney() {
 
 // Show a simple endpoint card for tier-transition endpoints (no journey history)
 function showTierTransitionChoice(nodeData) {
-    const stepsContainer = document.getElementById('flowchart-steps');
+    const stepsContainer = getActiveStepTarget();
     if (!stepsContainer) return;
 
     const actionFnMap = {
@@ -2504,7 +2452,7 @@ function showTierTransitionChoice(nodeData) {
     `;
 
     const prevBtn = document.getElementById('carousel-prev-btn');
-    if (prevBtn) prevBtn.style.visibility = 'hidden';
+    if (prevBtn) prevBtn.style.display = 'none';
     completeJourneyMap('Tier complete');
     requestAnimationFrame(() => {
         const review = stepsContainer.querySelector('.journey-review');
@@ -2515,7 +2463,7 @@ function showTierTransitionChoice(nodeData) {
 
 // Show the complete cross-tier journey summary at a true terminal endpoint
 function showFinalSummary(endpointNodeData) {
-    const stepsContainer = document.getElementById('flowchart-steps');
+    const stepsContainer = getActiveStepTarget();
     if (!stepsContainer) return;
 
     const fullJourney = appState.fullJourney || [];
@@ -2616,7 +2564,7 @@ function showFinalSummary(endpointNodeData) {
     `;
 
     const prevBtn = document.getElementById('carousel-prev-btn');
-    if (prevBtn) prevBtn.style.visibility = 'hidden';
+    if (prevBtn) prevBtn.style.display = 'none';
     completeJourneyMap();
     requestAnimationFrame(() => {
         const review = stepsContainer.querySelector('.journey-review');
@@ -6145,8 +6093,6 @@ window.proceedFromIntegratedChecklist = proceedFromIntegratedChecklist;
 window.proceedFromIntegratedInfo = proceedFromIntegratedInfo;
 window.selectIntegratedOption = selectIntegratedOption;
 window.makeIntegratedDecision = makeIntegratedDecision;
-window.confirmChecklistSubStep = confirmChecklistSubStep;
-window.checklistSubBack = checklistSubBack;
 window.fwOnScreenerChange = fwOnScreenerChange;
 window.fwOnSubtestChange = fwOnSubtestChange;
 window.fwOnPillarChange = fwOnPillarChange;
