@@ -5414,61 +5414,78 @@ details > p {
 }
 
 /* ============================================================
-   JOURNEY TRAIL & PROCESS MAP
+   JOURNEY TRAIL & DECISION SUMMARY PANEL
    ------------------------------------------------------------
-   The flowchart is no longer a one-card-at-a-time carousel.
-   Every step the educator completes stays on screen as a
-   connected card, a sticky map on the left shows the whole
-   process (done · now · next), and the live step is
-   spotlighted so attention always lands in the right place.
+   The flowchart is a two-column experience: the current active
+   step fills the left, while a persistent Decision Summary
+   panel builds on the right — every answer recorded as a
+   rich card so the complete pathway is always visible.
    ============================================================ */
 
 .journey-shell {
   display: grid;
-  grid-template-columns: minmax(230px, 270px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 330px); /* active LEFT, summary RIGHT */
   gap: var(--space-xl);
   align-items: start;
 }
 
-/* ---------- Sticky process map ---------- */
+/* ---------- Decision Summary Panel (right, sticky) ---------- */
 .journey-map {
   position: sticky;
-  top: calc(var(--nav-height) + 76px);
+  top: calc(var(--nav-height) + 72px);
+  max-height: calc(100vh - var(--nav-height) - 100px);
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  padding: var(--space-md);
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
 }
 
 .journey-map-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--space-xs);
+  padding: 0.8rem var(--space-md);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: var(--space-sm);
+}
+
+.journey-map-head-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.journey-map-head-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--tier-color, var(--step));
+  flex-shrink: 0;
 }
 
 .journey-map-title {
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--tier-color, var(--step));
 }
 
 .journey-map-count {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--text-light);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .journey-map-bar {
-  height: 5px;
-  border-radius: 3px;
+  flex-shrink: 0;
+  height: 3px;
   background: var(--bg-muted);
   overflow: hidden;
 }
@@ -5477,9 +5494,8 @@ details > p {
   display: block;
   height: 100%;
   width: 0;
-  border-radius: 3px;
   background: var(--tier-color, var(--step));
-  transition: width 0.45s var(--ease);
+  transition: width 0.5s var(--ease);
 }
 
 .journey-map-list {
@@ -5488,45 +5504,47 @@ details > p {
   flex-direction: column;
   margin: 0;
   padding: 0;
+  overflow-y: auto;
+  flex: 1;
+  overscroll-behavior: contain;
 }
 
+/* ---- Each decision entry ---- */
 .journey-map-item {
   position: relative;
   display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  padding: 0.5rem 0.5rem 0.5rem 0.35rem;
-  border-radius: var(--radius);
-  transition: background var(--duration) var(--ease), opacity var(--duration) var(--ease);
+  gap: 0.8rem;
+  padding: 0.9rem var(--space-md);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--duration) var(--ease);
+  animation: smEntryIn 0.28s var(--ease) both;
 }
 
-/* Connector running through the map markers */
-.journey-map-item::before {
-  content: '';
-  position: absolute;
-  left: calc(0.35rem + 12px);
-  top: 2.05rem;
-  bottom: -0.35rem;
-  width: 2px;
-  background: var(--border);
-}
-.journey-map-item:last-child::before { display: none; }
-.journey-map-done::before { background: var(--tier-color, var(--step)); opacity: 0.55; }
+.journey-map-item:last-child { border-bottom: none; }
 
+/* Remove old connector-line pseudo-element */
+.journey-map-item::before { display: none; }
+
+@keyframes smEntryIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Step number marker circle */
 .journey-map-marker {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 25px;
-  height: 25px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 800;
   border: 2px solid var(--border);
   background: var(--bg);
   color: var(--text-light);
-  z-index: 1;
+  margin-top: 2px;
 }
 .journey-map-marker svg { width: 13px; height: 13px; }
 
@@ -5541,51 +5559,140 @@ details > p {
   border-color: var(--tier-color, var(--step));
   color: var(--tier-color, var(--step));
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--tier-color, var(--step)) 18%, transparent);
+  animation: smMarkerPulse 2s ease-in-out infinite;
 }
 
-.journey-map-upcoming { opacity: 0.6; }
+@keyframes smMarkerPulse {
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--tier-color, var(--step)) 18%, transparent); }
+  50%       { box-shadow: 0 0 0 9px color-mix(in srgb, var(--tier-color, var(--step)) 7%, transparent); }
+}
+
+.journey-map-upcoming { opacity: 0.5; }
 .journey-map-upcoming .journey-map-marker { border-style: dashed; }
 
-.journey-map-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-
-.journey-map-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--text);
-}
-.journey-map-current .journey-map-label { color: var(--tier-color, var(--step)); font-weight: 800; }
-
-.journey-map-answer {
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* Text content column */
+.journey-map-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
 }
 
-.journey-map-now {
-  font-size: 0.66rem;
+/* Step-number + type chip row */
+.journey-map-step-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.journey-map-step-num {
+  font-size: 0.63rem;
   font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
+.journey-map-type-chip {
+  font-size: 0.6rem;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--tier-color, var(--step));
+  padding: 1px 7px;
+  background: color-mix(in srgb, var(--tier-color, var(--step)) 10%, transparent);
+  border-radius: var(--radius-pill);
 }
 
+/* Question / step title */
+.journey-map-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.journey-map-current .journey-map-label {
+  color: var(--tier-color, var(--step));
+  font-weight: 700;
+}
+
+/* ⭐ The answer — the star of the summary panel */
+.journey-map-answer {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--tier-color, var(--step));
+  line-height: 1.3;
+  padding: 3px 9px 3px 5px;
+  background: color-mix(in srgb, var(--tier-color, var(--step)) 9%, transparent);
+  border-radius: var(--radius-sm);
+  margin-top: 3px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  border-left: 3px solid var(--tier-color, var(--step));
+}
+.journey-map-answer svg {
+  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
+  margin-top: 3px;
+  color: var(--tier-color, var(--step));
+}
+
+/* "In progress" indicator */
+.journey-map-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tier-color, var(--step));
+  margin-top: 2px;
+}
+
+.journey-map-now-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tier-color, var(--step));
+  flex-shrink: 0;
+  animation: smNowPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes smNowPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.3; transform: scale(0.6); }
+}
+
+/* Revisit on hover */
 .journey-map-done[role="button"] { cursor: pointer; }
-.journey-map-done[role="button"]:hover { background: var(--bg-alt); }
+.journey-map-done[role="button"]:hover {
+  background: color-mix(in srgb, var(--tier-color, var(--step)) 5%, var(--bg-alt));
+}
 .journey-map-done[role="button"]:focus-visible {
   outline: 2px solid var(--tier-color, var(--step));
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
+/* "Back one step" button inside the panel */
 .journey-map-back {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin-top: 0.2rem;
-  padding: 0.45rem 0.7rem;
+  margin: 0.6rem var(--space-md);
+  padding: 0.45rem 0.85rem;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-secondary);
@@ -5593,6 +5700,8 @@ details > p {
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
+  flex-shrink: 0;
+  align-self: flex-start;
   transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
 }
 .journey-map-back svg { width: 15px; height: 15px; }
@@ -5779,7 +5888,12 @@ details > p {
   color: var(--text-light);
 }
 
-/* ---------- Spotlighted active step ---------- */
+/* ---------- Spotlighted active step (no trail-rail, full width) ---------- */
+.trail-item-active {
+  display: flex;
+  flex-direction: column;
+}
+
 .trail-active-body {
   display: flex;
   flex-direction: column;
@@ -5842,26 +5956,28 @@ details > p {
   to { opacity: 1; transform: none; }
 }
 
-/* The active step keeps focus: everything already done recedes slightly */
-.trail-item-done:hover ~ .trail-item-active .flowchart-step { box-shadow: var(--shadow-sm); }
-
-/* Endpoint / summary cards sit inside the same track */
+/* Endpoint / summary cards sit directly in the track (no trail-rail offset) */
 .journey-track > .journey-review,
-.journey-track > .go-to-tier-step { margin-left: calc(42px + var(--space-md)); }
+.journey-track > .go-to-tier-step { margin-left: 0; }
 
-/* ---------- Responsive: map becomes a horizontal ribbon ---------- */
+/* ---------- Responsive: two columns collapse to single-column stack ---------- */
 @media (max-width: 1000px) {
-  .journey-shell { grid-template-columns: minmax(0, 1fr); gap: var(--space-md); }
+  /* Summary panel moves below the active step */
+  .journey-shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-md);
+  }
 
   .journey-map {
-    position: sticky;
-    top: calc(var(--nav-height) + 62px);
-    z-index: 850;
+    position: static;
+    max-height: none;
+    /* Collapse to a compact horizontal-scroll row on narrow screens */
+    overflow: visible;
   }
 
   .journey-map-list {
     flex-direction: row;
-    gap: 0.35rem;
+    flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 2px;
     scrollbar-width: thin;
@@ -5869,34 +5985,30 @@ details > p {
 
   .journey-map-item {
     flex: 0 0 auto;
-    align-items: center;
-    max-width: 190px;
+    min-width: 180px;
+    max-width: 220px;
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+    padding: 0.75rem 0.9rem;
   }
-  .journey-map-item::before {
-    left: auto;
-    right: -0.35rem;
-    top: 50%;
-    bottom: auto;
-    width: 0.7rem;
-    height: 2px;
+  .journey-map-item:last-child { border-right: none; }
+
+  .journey-map-answer {
+    font-size: 0.8rem;
   }
-  .journey-map-answer { max-width: 130px; }
-  .journey-map-back { align-self: flex-start; }
 }
 
 @media (max-width: 640px) {
-  .trail-item { grid-template-columns: 30px minmax(0, 1fr); gap: 0.6rem; }
-  .trail-rail { width: 30px; }
-  .trail-marker { width: 26px; height: 26px; font-size: 0.75rem; }
-  .trail-marker svg { width: 13px; height: 13px; }
   .journey-track > .journey-review,
   .journey-track > .go-to-tier-step { margin-left: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .trail-marker-active,
-  .trail-active-pulse { animation: none; }
+  .trail-active-pulse,
+  .journey-map-now-dot,
+  .journey-map-current .journey-map-marker { animation: none; }
   .trail-card-done { animation: none; opacity: 0.85; }
+  .journey-map-item { animation: none; opacity: 1; }
   .trail-item-active .flowchart-step.carousel-enter-forward,
   .trail-item-active .flowchart-step.carousel-enter-back { animation: none; opacity: 1; }
 }

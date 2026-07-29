@@ -1048,9 +1048,14 @@ function initIntegratedFlowchart(tierId) {
             
             <div class="flowchart-content-area" id="flowchart-content">
                 <div class="journey-shell">
-                    <aside class="journey-map" id="journey-map" aria-label="Process map">
+                    <div class="journey-track" id="flowchart-steps"></div>
+
+                    <aside class="journey-map" id="journey-map" aria-label="Decision summary">
                         <div class="journey-map-head">
-                            <span class="journey-map-title">The Process</span>
+                            <div class="journey-map-head-left">
+                                <svg class="journey-map-head-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                                <span class="journey-map-title">Your Decisions</span>
+                            </div>
                             <span class="journey-map-count" id="journey-map-count">Step 1</span>
                         </div>
                         <div class="journey-map-bar"><span class="journey-map-bar-fill" id="journey-map-bar-fill"></span></div>
@@ -1062,8 +1067,6 @@ function initIntegratedFlowchart(tierId) {
                             Back one step
                         </button>
                     </aside>
-
-                    <div class="journey-track" id="flowchart-steps"></div>
                 </div>
             </div>
 
@@ -1365,7 +1368,8 @@ function buildCompletedTrailHTML(includeCurrent = false) {
     return html;
 }
 
-// Render the full journey: completed trail + spotlighted active step + what's next
+// Render the full journey: summary panel grows on the right, active step is spotlighted on the left.
+// Completed decisions are displayed in the summary panel, NOT in the main track.
 function renderJourney(direction = 'forward') {
     const track = document.getElementById('flowchart-steps');
     const vf = appState.visualFlowchart;
@@ -1376,20 +1380,26 @@ function renderJourney(direction = 'forward') {
     const activeStep = path[path.length - 1];
     const activeNode = activeStep ? tierDef.nodes[activeStep.nodeId] : null;
 
-    track.innerHTML = buildCompletedTrailHTML(false);
+    // Summary panel owns the history; the track shows only the active step.
+    track.innerHTML = '';
 
-    const activeNumber = track.querySelectorAll('.trail-item-done').length + 1;
+    // Compute the current step number from the path (not the DOM)
+    let completedCount = 0;
+    for (let i = 0; i < path.length - 1; i++) {
+        const node = tierDef.nodes[path[i].nodeId];
+        if (node && node.type !== 'endpoint') completedCount++;
+    }
+    const activeNumber = completedCount + 1;
 
     if (activeNode) {
         const item = document.createElement('div');
         item.className = 'trail-item trail-item-active';
         item.setAttribute('data-node-id', activeNode.id);
         item.innerHTML = `
-            ${buildTrailRailHTML(activeNumber, 'active')}
             <div class="trail-active-body">
                 <div class="trail-active-flag">
                     <span class="trail-active-pulse"></span>
-                    You are here · Step ${escapeHtml(String(activeNumber))}
+                    Step ${escapeHtml(String(activeNumber))}
                 </div>
             </div>
         `;
@@ -1397,16 +1407,13 @@ function renderJourney(direction = 'forward') {
         createIntegratedNodeElement(activeNode, item.querySelector('.trail-active-body'), direction);
     }
 
-    const upcoming = projectUpcomingSteps(1);
-    if (upcoming.length) {
-        track.insertAdjacentHTML('beforeend', buildTrailUpcomingHTML(upcoming[0], activeNumber + 1));
-    }
-
     renderJourneyMap(activeNumber);
     scrollToActiveStep();
 }
 
-// Sticky process map: completed, current and upcoming steps at a glance
+// Decision Summary panel: every completed step becomes a rich card; the current
+// step is shown as "in progress"; upcoming steps are previewed as faded entries.
+// The panel builds up as the user advances, making the whole journey visible.
 function renderJourneyMap(activeNumber) {
     const list = document.getElementById('journey-map-list');
     const countEl = document.getElementById('journey-map-count');
@@ -1435,24 +1442,38 @@ function renderJourneyMap(activeNumber) {
         });
     });
 
-    projectUpcomingSteps(4).forEach(step => {
+    projectUpcomingSteps(3).forEach(step => {
         number += 1;
         entries.push({ number, title: step.title, type: step.type, answer: '', state: 'upcoming' });
     });
 
-    list.innerHTML = entries.map(entry => {
+    list.innerHTML = entries.map((entry, idx) => {
         const clickable = entry.state === 'done';
-        const marker = entry.state === 'done'
+        const isCurrent = entry.state === 'current';
+        const isDone = entry.state === 'done';
+
+        const marker = isDone
             ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
             : escapeHtml(String(entry.number));
+
         return `
             <li class="journey-map-item journey-map-${entry.state}"
-                ${clickable ? `role="button" tabindex="0" data-revisit-node="${escapeAttr(entry.id)}" title="Revisit this step"` : ''}>
+                style="animation-delay:${idx * 0.05}s"
+                ${clickable ? `role="button" tabindex="0" data-revisit-node="${escapeAttr(entry.id)}" title="Revisit this step"` : ''}
+                ${isCurrent ? 'aria-current="step"' : ''}>
                 <span class="journey-map-marker">${marker}</span>
                 <span class="journey-map-text">
+                    <span class="journey-map-step-info">
+                        <span class="journey-map-step-num">Step ${escapeHtml(String(entry.number))}</span>
+                        <span class="journey-map-type-chip">${escapeHtml(getStepTypeLabel(entry.type))}</span>
+                    </span>
                     <span class="journey-map-label">${escapeHtml(entry.title)}</span>
-                    ${entry.answer ? `<span class="journey-map-answer">${escapeHtml(entry.answer)}</span>` : ''}
-                    ${entry.state === 'current' ? '<span class="journey-map-now">In progress</span>' : ''}
+                    ${entry.answer ? `
+                        <span class="journey-map-answer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                            ${escapeHtml(entry.answer)}
+                        </span>` : ''}
+                    ${isCurrent ? '<span class="journey-map-now"><span class="journey-map-now-dot"></span>In progress</span>' : ''}
                 </span>
             </li>
         `;
