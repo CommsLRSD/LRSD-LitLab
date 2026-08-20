@@ -653,8 +653,8 @@ function getTierName(fullTitle) {
 function getTierTitle(fullTitle, isMobile = window.innerWidth <= 768) {
     if (!isMobile) return fullTitle;
     
-    // Extract just the tier number (e.g., "Tier 1" from "Tier 1: Universal Screening & Core Instruction")
-    const match = fullTitle.match(/^(Tier \d+)/);
+    // Extract just the tier label (e.g., "Tier ONE" or "Tier 2") from the full title
+    const match = fullTitle.match(/^(Tier (?:\d+|[A-Z]+))/);
     return match ? match[1] : fullTitle;
 }
 
@@ -665,13 +665,15 @@ function updateTierTitleOnResize() {
     
     const currentText = header.textContent;
     // Check if we have a tier title pattern
-    if (currentText.match(/^Tier \d+/)) {
+    if (currentText.match(/^Tier (?:\d+|[A-Z]+)/)) {
         const isMobile = window.innerWidth <= 768;
         // Get the full title from FLOWCHART_DEFINITIONS if needed
-        const tierMatch = currentText.match(/^Tier (\d+)/);
+        const tierMatch = currentText.match(/^Tier (\d+|[A-Z]+)/);
         if (tierMatch) {
             const tierNum = tierMatch[1];
-            const tierKey = `tier${tierNum}`;
+            // Map word numbers to digit keys
+            const wordToDigit = { 'ONE': '1', 'TWO': '2', 'THREE': '3' };
+            const tierKey = `tier${wordToDigit[tierNum] || tierNum}`;
             if (FLOWCHART_DEFINITIONS[tierKey]) {
                 const fullTitle = FLOWCHART_DEFINITIONS[tierKey].title;
                 header.textContent = getTierTitle(fullTitle, isMobile);
@@ -683,24 +685,24 @@ function updateTierTitleOnResize() {
 // Node data definitions for each tier's flowchart
 const FLOWCHART_DEFINITIONS = {
     tier1: {
-        title: 'Tier 1: Universal Screening & Core Instruction',
+        title: 'Tier ONE: Universal Classroom',
         startNode: 'tier1-principles',
         nodes: {
             'tier1-principles': {
                 id: 'tier1-principles',
                 type: 'checklist',
-                title: 'Step 1: Review Principles',
-                subtitle: 'Review Principles of Explicit and Systematic Instruction',
-                description: 'Check off all 8 principles before proceeding',
+                title: 'Step 1: Principles of Explicit and Systematic Instruction',
+                subtitle: 'Principles of Explicit and Systematic Instruction',
+                description: 'Review the following principles before proceeding.',
                 items: [
-                    'Clear learning objectives are stated',
-                    'Instruction is sequenced and scaffolded',
-                    'Teacher models skills explicitly',
-                    'Guided practice with feedback is provided',
-                    'Independent practice opportunities are given',
-                    'Regular assessment and progress monitoring',
-                    'Cumulative review is integrated',
-                    'Instruction is responsive to student needs'
+                    'Are the lesson goals clearly stated?',
+                    'Is the content presented in digestible, understandable, and logically sequenced steps, as guided by the LRSD Scope and Sequence?',
+                    'Is immediate corrective feedback being provided?',
+                    'Is guided supported practice sufficient to lead the fluent application?',
+                    'Are the activities used to accomplish specific goals?',
+                    'Is there a plan for reteaching when necessary?',
+                    'Is progress being tracked?',
+                    'Does Instruction incorporate the simple view of reading?'
                 ],
                 nextNode: 'tier1-screener',
                 buttonText: 'Continue to Literacy Screener'
@@ -708,9 +710,9 @@ const FLOWCHART_DEFINITIONS = {
             'tier1-screener': {
                 id: 'tier1-screener',
                 type: 'selection',
-                title: 'Step 2: Select Screener',
-                subtitle: 'Choose Your Literacy Screener',
-                description: 'Select the assessment tool you are using for universal screening',
+                title: 'Step 2: Literacy Screener',
+                subtitle: 'Administer literacy screener.',
+                description: 'Administer literacy screener.\n\n(DIBELS, CTOPP-2, THaFol, IDAPEL)',
                 options: 'screeners', // Will fetch from tierFlowchartData
                 nextNode: 'tier1-effectiveness',
                 nextHandler: 'selectTier1ScreenerVisual'
@@ -718,58 +720,43 @@ const FLOWCHART_DEFINITIONS = {
             'tier1-effectiveness': {
                 id: 'tier1-effectiveness',
                 type: 'decision',
-                title: 'Step 3: Evaluate Effectiveness',
-                subtitle: 'Is the instruction effective for most students?',
-                description: 'Based on screener results and classroom observations',
-                infoBox: {
-                    title: 'Consider These Indicators',
-                    items: [
-                        'Are 80% or more students meeting benchmarks?',
-                        'Is student engagement high during lessons?',
-                        'Are learning objectives being achieved?',
-                        'Is progress evident through formative assessments?'
-                    ]
-                },
+                title: 'Step 2: Literacy Screener',
+                subtitle: 'Was instruction effective?',
+                description: 'Administer literacy screener. (DIBELS, CTOPP-2, THaFol, IDAPEL)\n\nIf you chose the Successful or Unsuccessful mistakenly, simply chose the correct option and continue.',
                 choices: [
-                    { id: 'effective', label: 'Yes, Instruction is Effective', sublabel: '80%+ students meeting benchmarks', type: 'success', nextNode: 'tier1-success' },
-                    { id: 'ineffective', label: 'No, Needs Improvement', sublabel: 'More than 20% students struggling', type: 'warning', nextNode: 'tier1-percentage' }
+                    { id: 'effective', label: 'Option A: Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier1-success' },
+                    { id: 'ineffective', label: 'Option B: Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier1-percentage' }
                 ]
             },
             'tier1-success': {
                 id: 'tier1-success',
                 type: 'endpoint',
                 status: 'success',
-                title: 'Core Instruction is Effective!',
-                description: 'Your explicit and systematic instruction is working well for the majority of students.',
+                title: 'Step 3: Success!',
+                description: 'Continue and monitor with general curriculum.',
                 recommendations: [
-                    'Continue with current instructional practices',
-                    'Monitor progress through regular formative assessments',
-                    'Conduct universal screening at the next benchmark period',
-                    'For students still struggling, consider Tier 2 interventions'
+                    'Continue and monitor with general curriculum'
                 ]
             },
             'tier1-percentage': {
                 id: 'tier1-percentage',
                 type: 'decision',
-                title: 'Step 4: Student Success Rate',
+                title: 'Route B: Instruction Ineffective',
                 subtitle: 'What percentage of students are unsuccessful?',
-                description: 'Based on assessment data, how many students are below benchmark?',
+                description: 'Based on screener results, how many students are below benchmark?',
                 choices: [
-                    { id: 'less-20', label: 'Less than 20% Unsuccessful', sublabel: 'Most students on track, small group needs support', type: 'primary', nextNode: 'tier1-move-tier2' },
-                    { id: 'more-20', label: '20% or More Unsuccessful', sublabel: 'Significant number need re-teaching', type: 'warning', nextNode: 'tier1-reteach' }
+                    { id: 'more-20', label: 'Option B1', sublabel: 'Instruction unsuccessful for 20% or more of students.', type: 'warning', nextNode: 'tier1-move-tier2' },
+                    { id: 'less-20', label: 'Option B2', sublabel: 'Instruction unsuccessful for fewer than 20% of students.', type: 'primary', nextNode: 'tier1-reteach' }
                 ]
             },
             'tier1-move-tier2': {
                 id: 'tier1-move-tier2',
                 type: 'endpoint',
                 status: 'info',
-                title: 'Small Group Intervention Recommended',
-                description: 'A small percentage of students need additional targeted support.',
+                title: 'Tier 2: Small Group Interventions',
+                description: 'Instruction unsuccessful for 20% or more of students. This route continues into the Tier Two flowchart.',
                 recommendations: [
-                    'Continue Tier 1 core instruction for all students',
-                    'Implement Tier 2 small group interventions for struggling students',
-                    'Use evidence-based intervention strategies',
-                    'Monitor progress every 2-4 weeks'
+                    'Continue into the Tier Two flowchart.'
                 ],
                 actionButton: { text: 'Start Tier 2 Flowchart', action: 'startTier2Visual' }
             },
@@ -777,15 +764,11 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier1-reteach',
                 type: 'endpoint',
                 status: 'warning',
-                title: 'Core Instruction Needs Adjustment',
-                description: 'When more than 20% of students are unsuccessful, the core instruction may need to be re-examined and adjusted.',
+                title: 'Step 3: Reteach General Curriculum',
+                description: 'Consider areas of weakness discovered via Literacy Screener. Use the Interventions Menu below to find resources.\n\nThis route remains within Tier One.',
                 recommendations: [
-                    'Re-teach using different instructional strategies',
-                    'Review the 8 principles of explicit instruction',
-                    'Differentiate instruction within Tier 1',
-                    'Increase modeling and guided practice opportunities',
-                    'Adjust pacing to ensure concept mastery',
-                    'Collaborate with colleagues to refine approaches'
+                    'Consider areas of weakness discovered via Literacy Screener.',
+                    'Use the Interventions Menu below to find resources.'
                 ],
                 actionButton: { text: 'Redo Tier 1', action: 'restartTier1Visual' }
             }
