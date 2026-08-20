@@ -3133,6 +3133,23 @@ details > p {
   margin-top: var(--space-sm);
 }
 
+.info-section {
+  margin-bottom: var(--space-md);
+}
+
+.info-section h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.info-section .feature-list {
+  margin-top: 0;
+}
+
 .feature-list li {
   position: relative;
   padding-left: 1.3rem;
