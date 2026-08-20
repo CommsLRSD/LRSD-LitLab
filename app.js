@@ -775,21 +775,21 @@ const FLOWCHART_DEFINITIONS = {
         }
     },
     tier2: {
-        title: 'Tier 2: Small Group Intervention',
+        title: 'Tier TWO: Small Group Intervention',
         startNode: 'tier2-principles',
         nodes: {
             'tier2-principles': {
                 id: 'tier2-principles',
                 type: 'checklist',
-                title: 'Step 1: Review Principles',
-                subtitle: 'Review Principles of Tier 2 Intervention',
-                description: 'Check off all 5 principles before proceeding',
+                title: 'Step 1: Entry',
+                subtitle: 'Rule out that challenges are not the result of:',
+                description: 'Informed by data (See progress monitoring tools).\n\nGroup Information: Led by classroom teachers. Approx. 3-5 students per group. Interventions are implemented for a suggested period of 20-40 minutes, three to five times per week for an 8 week period.\n\nProgress Monitoring: Weekly progress monitoring (ex. UFLI, DIBELS Progress Monitoring Assessments).\n\nCollaboration: Team members share progress monitoring results at school based meetings.',
                 items: [
-                    'Small group instruction (3-6 students)',
-                    'Daily sessions of 20-30 minutes',
-                    'Targeted skill instruction based on assessment data',
-                    'Progress monitoring every 2-4 weeks',
-                    'Evidence-based intervention program'
+                    'Vision impairments',
+                    'Hearing impairments',
+                    'Poor attendance',
+                    'MLL',
+                    'Other diagnosis'
                 ],
                 nextNode: 'tier2-assessment',
                 buttonText: 'Continue to Drill Down Assessment'
@@ -797,28 +797,20 @@ const FLOWCHART_DEFINITIONS = {
             'tier2-assessment': {
                 id: 'tier2-assessment',
                 type: 'selection',
-                title: 'Step 2: Select Assessment',
-                subtitle: 'Choose a Drill Down Assessment',
-                description: 'Select an assessment that aligns with the areas of weakness identified by the literacy screener',
+                title: 'Step 2: Drill Down Assessment',
+                subtitle: 'Administer a drill down assessment.',
+                description: 'Use the menu below to find and administer a drill down assessment that aligns with the needs of your students, as determined by the literacy screener.',
                 options: 'drillDownAssessments',
-                infoBox: {
-                    title: 'Purpose of Drill Down Assessments',
-                    text: 'These assessments provide more detailed information about specific skill gaps, helping you select the most appropriate intervention.'
-                },
                 nextNode: 'tier2-intervention',
                 nextHandler: 'selectTier2AssessmentVisual'
             },
             'tier2-intervention': {
                 id: 'tier2-intervention',
                 type: 'selection',
-                title: 'Step 3: Select Intervention',
-                subtitle: 'Choose an 8-Week Intervention',
-                description: 'Select an evidence-based intervention that matches the student\'s specific needs',
+                title: 'Step 3: 8-week Intervention',
+                subtitle: 'Select and administer an 8-week intervention.',
+                description: 'Use the menu below to find an appropriate intervention, monitor student response with progress monitoring tools (as required), and administer for an 8-week period.',
                 options: 'interventions',
-                infoBox: {
-                    title: '8-Week Intervention Cycle',
-                    text: 'Implement the selected intervention for 8 weeks. Monitor student progress regularly during this period using progress monitoring tools.'
-                },
                 nextNode: 'tier2-progress',
                 nextHandler: 'selectTier2InterventionVisual'
             },
@@ -826,44 +818,74 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier2-progress',
                 type: 'decision',
                 title: 'Step 4: Progress Monitoring',
-                subtitle: 'After 8 Weeks: Did the student show improvement?',
-                description: 'Administer a literacy screener to evaluate student progress',
-                infoBox: {
-                    title: 'Acceptable Screeners',
-                    items: ['DIBELS', 'CTOPP-2', 'THaFoL', 'IDAPEL']
-                },
+                subtitle: 'Was instruction effective?',
+                description: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).\n\nIf you chose the wrong option, simply choose the correct one and continue.',
                 choices: [
-                    { id: 'improved', label: 'Yes, Student Improved', sublabel: 'Blue or Green results - meeting benchmarks', type: 'success', nextNode: 'tier2-success' },
-                    { id: 'no-improvement', label: 'No Improvement', sublabel: 'Yellow or Red results - below benchmark', type: 'warning', nextNode: 'tier2-try-again' }
+                    { id: 'improved', label: 'Option A: Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier2-success' },
+                    { id: 'no-improvement', label: 'Option B: Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier2-cycle2-assessment' }
                 ]
             },
             'tier2-success': {
                 id: 'tier2-success',
                 type: 'endpoint',
                 status: 'success',
-                title: 'Student Made Good Progress!',
-                description: 'The 8-week Tier 2 intervention was effective. The student is now meeting benchmarks.',
+                title: 'Step 5: Success!',
+                description: 'Consider fading supports to Tier 1 and monitor.',
                 recommendations: [
-                    'Gradually fade the intervention support',
-                    'Continue to monitor progress closely',
-                    'Return to Tier 1 core instruction',
-                    'Celebrate the student\'s success!'
+                    'Consider fading supports to Tier 1 and monitor.'
                 ]
             },
-            'tier2-try-again': {
-                id: 'tier2-try-again',
+            'tier2-cycle2-assessment': {
+                id: 'tier2-cycle2-assessment',
+                type: 'selection',
+                title: 'Step 5: Drill Down Assessment',
+                subtitle: 'Administer a second drill down assessment.',
+                description: 'Use the menu again to find and administer a drill down assessment that aligns with the needs of your students, as determined by the latest literacy screener.',
+                options: 'drillDownAssessments',
+                nextNode: 'tier2-cycle2-intervention',
+                nextHandler: 'selectTier2AssessmentVisual'
+            },
+            'tier2-cycle2-intervention': {
+                id: 'tier2-cycle2-intervention',
+                type: 'selection',
+                title: 'Step 6: 8-week Intervention',
+                subtitle: 'Alter or continue Tier 2 interventions.',
+                description: 'Alter or continue Tier 2 interventions and regularly monitor student response to intervention with progress monitoring tools (as required).',
+                options: 'interventions',
+                nextNode: 'tier2-cycle2-progress',
+                nextHandler: 'selectTier2InterventionVisual'
+            },
+            'tier2-cycle2-progress': {
+                id: 'tier2-cycle2-progress',
+                type: 'decision',
+                title: 'Step 7: Progress Monitoring',
+                subtitle: 'Was instruction effective?',
+                description: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).\n\nIf you chose the wrong option, simply choose the correct one and continue.',
+                choices: [
+                    { id: 'improved', label: 'Option A: Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier2-cycle2-success' },
+                    { id: 'no-improvement', label: 'Option B: Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier2-move-tier3' }
+                ]
+            },
+            'tier2-cycle2-success': {
+                id: 'tier2-cycle2-success',
                 type: 'endpoint',
-                status: 'warning',
-                title: 'Second Intervention Cycle Needed',
-                description: 'The student did not make expected progress. Let\'s try a different intervention approach for another 8-week cycle.',
+                status: 'success',
+                title: 'Step 8: Success!',
+                description: 'Consider fading supports to Tier 1 and monitor.',
                 recommendations: [
-                    'Conduct another drill down assessment for more detail',
-                    'Select a different intervention strategy',
-                    'Implement for another 8-week cycle',
-                    'Monitor progress closely'
+                    'Consider fading supports to Tier 1 and monitor.'
+                ]
+            },
+            'tier2-move-tier3': {
+                id: 'tier2-move-tier3',
+                type: 'endpoint',
+                status: 'info',
+                title: 'Step 8: Move to Tier 3',
+                description: 'If student does not make expected progress in Tier 2 following two 8-week intervention cycles, they move into Tier 3. Fewer than 10% of students should need to be in Tier 3.\n\nThis route continues into the Tier Three flowchart.',
+                recommendations: [
+                    'Continue into the Tier Three flowchart.'
                 ],
-                actionButton: { text: 'Begin Second 8-Week Cycle', action: 'restartTier2Visual' },
-                secondaryAction: { text: 'Move to Tier 3', action: 'startTier3Visual' }
+                actionButton: { text: 'Start Tier 3 Flowchart', action: 'startTier3Visual' }
             }
         }
     },
@@ -2733,7 +2755,8 @@ function selectTier2AssessmentVisualIntegrated(nodeId, assessmentId, assessmentN
     appState.currentTierFlow.assessment = assessmentId;
     appState.currentTierFlow.assessmentName = assessmentName;
     
-    showIntegratedNode('tier2-intervention', nodeId, assessmentId);
+    const nextNode = nodeId === 'tier2-cycle2-assessment' ? 'tier2-cycle2-intervention' : 'tier2-intervention';
+    showIntegratedNode(nextNode, nodeId, assessmentId);
 }
 
 function selectTier2InterventionVisualIntegrated(nodeId, interventionId, interventionName) {
@@ -2741,7 +2764,8 @@ function selectTier2InterventionVisualIntegrated(nodeId, interventionId, interve
     appState.currentTierFlow.intervention = interventionId;
     appState.currentTierFlow.interventionName = interventionName;
     
-    showIntegratedNode('tier2-progress', nodeId, interventionId);
+    const nextNode = nodeId === 'tier2-cycle2-intervention' ? 'tier2-cycle2-progress' : 'tier2-progress';
+    showIntegratedNode(nextNode, nodeId, interventionId);
 }
 
 // Handler functions for integrated tier 3
@@ -3520,7 +3544,8 @@ function selectTier2AssessmentVisual(nodeId, assessmentId, assessmentName) {
     appState.currentTierFlow.assessment = assessmentId;
     appState.currentTierFlow.assessmentName = assessmentName;
     
-    showFlowchartNode('tier2-intervention', nodeId, assessmentId);
+    const nextNode = nodeId === 'tier2-cycle2-assessment' ? 'tier2-cycle2-intervention' : 'tier2-intervention';
+    showFlowchartNode(nextNode, nodeId, assessmentId);
 }
 
 function selectTier2InterventionVisual(nodeId, interventionId, interventionName) {
@@ -3528,7 +3553,8 @@ function selectTier2InterventionVisual(nodeId, interventionId, interventionName)
     appState.currentTierFlow.intervention = interventionId;
     appState.currentTierFlow.interventionName = interventionName;
     
-    showFlowchartNode('tier2-progress', nodeId, interventionId);
+    const nextNode = nodeId === 'tier2-cycle2-intervention' ? 'tier2-cycle2-progress' : 'tier2-progress';
+    showFlowchartNode(nextNode, nodeId, interventionId);
 }
 
 // Handler functions for tier 3
