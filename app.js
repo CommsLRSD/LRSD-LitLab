@@ -5785,7 +5785,7 @@ function setupEvidenceDefinitionsPopup() {
         popup.classList.add('active');
         popup.setAttribute('aria-hidden', 'false');
         document.body.classList.add('evidence-modal-open');
-    });
+    }, true);
 
     modal.addEventListener('click', (event) => {
         if (event.target === modal || event.target.closest('.evidence-definitions-close')) {
