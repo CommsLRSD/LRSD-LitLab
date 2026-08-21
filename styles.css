@@ -6207,10 +6207,16 @@ body.step-review-modal-open { overflow: hidden; }
 
 .journey-shell-tier1 {
   display: grid;
-  grid-template-columns: minmax(280px, 340px) minmax(0, 760px);
+  grid-template-columns: minmax(280px, 340px) minmax(0, 760px) minmax(0, 340px);
   gap: var(--space-lg);
   align-items: start;
   justify-content: center;
+  width: 100%;
+}
+
+/* Spacer pseudo-element balances the left sidebar so the main column is visually centred */
+.journey-shell-tier1::after {
+  content: '';
 }
 
 .tier1-success-sidebar {
@@ -7046,6 +7052,10 @@ body.step-review-modal-open { overflow: hidden; }
   .journey-shell-tier1 {
     grid-template-columns: 1fr;
     gap: var(--space-md);
+  }
+
+  .journey-shell-tier1::after {
+    display: none;
   }
 
   .tier1-success-sidebar {
