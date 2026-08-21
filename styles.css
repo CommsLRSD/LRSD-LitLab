@@ -461,7 +461,7 @@ strong { font-weight: 600; }
    BUBBLE BACKGROUND
    ------------------------------------------------------------ */
 
-#home-section {
+.content-section {
   position: relative;
   overflow: hidden;
 }
@@ -488,10 +488,14 @@ strong { font-weight: 600; }
 }
 
 /* Ensure content layers sit above bubbles */
-#home-section > .home-hero,
-#home-section > .home-content {
+.content-section > * {
   position: relative;
   z-index: 1;
+}
+
+.content-section > .bubble-bg {
+  position: absolute;
+  z-index: 0;
 }
 
 /* ------------------------------------------------------------

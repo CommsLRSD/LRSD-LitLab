@@ -80,8 +80,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 150); // Debounce resize events
     });
     
-    // Initialize bubble background on home section
-    initBubbles();
+    // Initialize bubble background on all page sections
+    document.querySelectorAll('.content-section').forEach(initBubbles);
 
     console.log('Literacy Interventions - Ready!');
 });
@@ -7745,8 +7745,20 @@ window.applyTierTheme = applyTierTheme;
 // ============================================
 // Bubble Background
 // ============================================
-function initBubbles() {
-    const section = document.getElementById('home-section');
+
+/**
+ * Bias a value in [0,1] toward the edges (0 and 1) and away from the centre.
+ * Uses a reflected power curve so the midpoint (0.5) stays at 0.5.
+ */
+function edgeBias(t, power) {
+    if (t < 0.5) {
+        return 0.5 * Math.pow(2 * t, power);
+    } else {
+        return 1 - 0.5 * Math.pow(2 * (1 - t), power);
+    }
+}
+
+function initBubbles(section) {
     if (!section) return;
 
     // Create container
@@ -7775,8 +7787,9 @@ function initBubbles() {
         el.className = 'bubble';
 
         const size   = 28 + Math.random() * 110;          // 28–138 px
-        const left   = Math.random() * 100;               // % across section
-        const top    = Math.random() * 100;               // % down section
+        // Bias positions toward screen edges on both axes (power > 1 = edge-heavy)
+        const left   = edgeBias(Math.random(), 2.2) * 100;
+        const top    = edgeBias(Math.random(), 2.2) * 100;
         const colour = colours[Math.floor(Math.random() * colours.length)];
         const opacity = 0.08 + Math.random() * 0.14;      // 0.08–0.22
         const speed  = 0.04 + Math.random() * 0.10;       // parallax factor
