@@ -39,6 +39,9 @@ const appState = {
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Literacy Interventions - Initializing...');
+
+    // Setup reusable evidence marker popup
+    setupEvidenceDefinitionsPopup();
     
     // Load intervention data
     await loadInterventionData();
@@ -5165,9 +5168,7 @@ function displayCompactResults(results, filters) {
                             <div class="result-meta-compact">
                                 <span class="badge-grade">${item.grade_range.start}-${item.grade_range.end}</span>
                                 <span class="badge-program">${item.program === 'English' ? 'EN' : 'FR'}</span>
-                                ${item.evidence_level && item.evidence_level !== 'none' 
-                                    ? `<span class="badge-evidence">${item.evidence_level}</span>` 
-                                    : ''}
+                                ${getEvidenceBadgeHtml(item.evidence_level)}
                                 ${item.tiers && item.tiers.length > 0
                                     ? `<span class="badge-tier">T${item.tiers.join(',')}</span>`
                                     : ''}
@@ -5734,6 +5735,73 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+function getEvidenceBadgeHtml(evidenceLevel) {
+    if (evidenceLevel !== '*' && evidenceLevel !== '**') return '';
+    return `
+        <span class="badge-evidence evidence-marker-group">
+            <span class="evidence-marker-text">${escapeHtml(evidenceLevel)}</span>
+            <button type="button" class="evidence-info-trigger" aria-label="Show evidence and research based definitions" onclick="event.stopPropagation();">
+                <span class="material-symbols-rounded" aria-hidden="true">info</span>
+            </button>
+        </span>
+    `;
+}
+
+function setupEvidenceDefinitionsPopup() {
+    if (document.getElementById('evidence-definitions-modal')) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'evidence-definitions-modal';
+    modal.className = 'evidence-definitions-modal';
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+        <div class="evidence-definitions-dialog" role="dialog" aria-modal="true" aria-label="Evidence definitions">
+            <button type="button" class="evidence-definitions-close" aria-label="Close">
+                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+            </button>
+            <div class="evidence-definition-block">
+                <strong>* Evidence Based: Most rigorous and trusted</strong>
+                <p>Definition: The program or practice has been tested through high-quality peer reviewed research (often randomized controlled trials or quasi-experimental studies) and has demonstrated statistically significant positive outcomes.</p>
+            </div>
+            <div class="evidence-definition-block">
+                <strong>** Research Based: Less rigorous than evidence-based</strong>
+                <p>Definition: The program is based on sound theories or methods that have been validated by some research, but the program itself may not have been directly studied for evidence of its effectiveness.</p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('.evidence-info-trigger');
+        if (!trigger) return;
+        const popup = document.getElementById('evidence-definitions-modal');
+        if (!popup) return;
+        popup.classList.add('active');
+        popup.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('evidence-modal-open');
+    });
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal || event.target.closest('.evidence-definitions-close')) {
+            closeEvidenceDefinitionsPopup();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('active')) {
+            closeEvidenceDefinitionsPopup();
+        }
+    });
+}
+
+function closeEvidenceDefinitionsPopup() {
+    const modal = document.getElementById('evidence-definitions-modal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('evidence-modal-open');
+}
+
 // Toggle pillar checkbox selection
 function togglePillarCheckbox(pillar, element, isChecked) {
     if (isChecked) {
@@ -5928,8 +5996,7 @@ function loadResults() {
         <div class="results-grid-compact">
             ${results.map((item, index) => {
                 const pillars = item.literacy_pillars || [item.literacy_pillar];
-                const evidenceLabel = item.evidence_level === '**' ? '★★ Research-Based' :
-                                     item.evidence_level === '*' ? '★ Evidence-Based' : '';
+                const evidenceBadge = getEvidenceBadgeHtml(item.evidence_level);
                 
                 // Escape and validate data
                 const itemName = escapeHtml(item.name);
@@ -5962,7 +6029,7 @@ function loadResults() {
                                 <div class="result-meta-compact">
                                     <span class="badge-grade">${item.grade_range.start}-${item.grade_range.end}</span>
                                     <span class="badge-program">${itemProgram === 'English' ? 'EN' : 'FR'}</span>
-                                    ${evidenceLabel ? `<span class="badge-evidence">${evidenceLabel}</span>` : ''}
+                                    ${evidenceBadge}
                                 </div>
                             </div>
                             <svg class="result-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

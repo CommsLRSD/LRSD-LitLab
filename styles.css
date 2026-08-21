@@ -1847,7 +1847,9 @@ details > p {
 }
 
 .badge-evidence {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 2px 6px;
   border-radius: var(--radius-pill);
   font-size: 0.65rem;
@@ -1855,6 +1857,90 @@ details > p {
   background: var(--success-light);
   color: #065f46;
 }
+
+.evidence-marker-group { white-space: nowrap; }
+
+.evidence-info-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(6, 95, 70, 0.16);
+  color: #065f46;
+  padding: 0;
+  cursor: pointer;
+}
+
+.evidence-info-trigger .material-symbols-rounded {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.evidence-info-trigger:hover,
+.evidence-info-trigger:focus-visible {
+  background: rgba(6, 95, 70, 0.28);
+  outline: none;
+}
+
+.evidence-definitions-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 2500;
+  padding: var(--space-md);
+}
+
+.evidence-definitions-modal.active { display: flex; }
+
+.evidence-definitions-dialog {
+  position: relative;
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: min(640px, 100%);
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+}
+
+.evidence-definitions-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.evidence-definitions-close .material-symbols-rounded {
+  font-size: 20px;
+}
+
+.evidence-definition-block + .evidence-definition-block {
+  margin-top: var(--space-md);
+}
+
+.evidence-definition-block strong {
+  display: block;
+  color: var(--text-primary);
+}
+
+.evidence-definition-block p {
+  margin-top: 6px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+body.evidence-modal-open { overflow: hidden; }
 
 .badge-tier {
   display: inline-block;
