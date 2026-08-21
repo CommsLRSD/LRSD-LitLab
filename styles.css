@@ -3954,6 +3954,252 @@ body.evidence-modal-open { overflow: hidden; }
   border-top: 1px solid var(--border);
 }
 
+/* ── Animated journey summary ──────────────────────────────────────── */
+
+@keyframes anim-pop-in {
+  0%   { opacity: 0; transform: translateY(18px) scale(0.96); }
+  60%  { opacity: 1; transform: translateY(-3px) scale(1.01); }
+  100% { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+@keyframes anim-line-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* Wrapper that sequences the items */
+.anim-journey-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Each item starts invisible; .anim-visible triggers the pop */
+.anim-journey-item {
+  width: 100%;
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+}
+
+.anim-journey-item.anim-visible {
+  animation: anim-pop-in 0.45s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+  opacity: 1;
+  transform: none;
+}
+
+/* Tier label pill */
+.anim-tier-badge {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.anim-tier-badge-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 18px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Plain-language step bubble */
+.anim-step-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 0;
+}
+
+.anim-step-bubble-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--step-soft);
+  color: var(--step);
+  flex-shrink: 0;
+}
+
+.anim-step-bubble-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.anim-step-bubble-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.anim-step-bubble-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light);
+  margin-bottom: 2px;
+}
+
+.anim-step-bubble-main {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.anim-step-bubble-sub {
+  font-size: 0.82rem;
+  color: var(--step-text);
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* Colour variants */
+.anim-step-bubble.anim-bubble-effective {
+  border-color: var(--effective);
+  background: var(--effective-bg);
+}
+.anim-step-bubble.anim-bubble-effective .anim-step-bubble-icon {
+  background: var(--effective-soft);
+  color: var(--effective-text);
+}
+.anim-step-bubble.anim-bubble-effective .anim-step-bubble-main {
+  color: var(--effective-text);
+}
+
+.anim-step-bubble.anim-bubble-ineffective {
+  border-color: var(--ineffective);
+  background: var(--ineffective-bg);
+}
+.anim-step-bubble.anim-bubble-ineffective .anim-step-bubble-icon {
+  background: var(--ineffective-soft);
+  color: var(--ineffective-text);
+}
+.anim-step-bubble.anim-bubble-ineffective .anim-step-bubble-main {
+  color: var(--ineffective-text);
+}
+
+/* Animated connector line between bubbles */
+.anim-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 0;
+  height: 36px;
+}
+
+.anim-connector-line {
+  width: 2px;
+  flex: 1;
+  background: var(--border);
+  transform-origin: top center;
+  transform: scaleY(0);
+}
+
+.anim-connector-line.anim-visible {
+  animation: anim-line-grow 0.3s ease-out both;
+  transform: scaleY(1);
+}
+
+.anim-connector-arrow {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--border);
+  margin-top: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.anim-connector.anim-visible .anim-connector-arrow {
+  opacity: 1;
+}
+
+/* Endpoint card in the animation */
+.anim-endpoint-card {
+  width: 100%;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--effective);
+  background: var(--effective-bg);
+  text-align: center;
+}
+
+.anim-endpoint-card.anim-endpoint-ineffective {
+  border-color: var(--ineffective);
+  background: var(--ineffective-bg);
+}
+
+.anim-endpoint-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+  color: var(--effective-text);
+}
+
+.anim-endpoint-card.anim-endpoint-ineffective .anim-endpoint-icon {
+  color: var(--ineffective-text);
+}
+
+.anim-endpoint-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.anim-endpoint-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--effective-text);
+  margin-bottom: 4px;
+}
+
+.anim-endpoint-card.anim-endpoint-ineffective .anim-endpoint-title {
+  color: var(--ineffective-text);
+}
+
+.anim-endpoint-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+/* Skip button (lets users jump to end without waiting) */
+.anim-skip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  color: var(--text-light);
+  cursor: pointer;
+  margin-bottom: var(--space-md);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.anim-skip-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 /* Summary / Review modal */
 .summary-overlay,
 .review-modal {
