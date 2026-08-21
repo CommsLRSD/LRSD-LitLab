@@ -5441,6 +5441,95 @@ details > p {
   padding: var(--space-lg) 0;
 }
 
+.journey-shell-tier1 {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 760px);
+  gap: var(--space-lg);
+  align-items: start;
+  justify-content: center;
+}
+
+.tier1-success-sidebar {
+  position: sticky;
+  top: 128px;
+  z-index: 3200;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-lg);
+}
+
+.tier1-success-sidebar-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+}
+
+.tier1-success-sidebar-icon {
+  font-size: 1.5rem;
+  color: var(--tier-1, #5eb892);
+  line-height: 1;
+}
+
+.tier1-success-sidebar h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.tier1-success-sidebar-block + .tier1-success-sidebar-block {
+  margin-top: 0.85rem;
+}
+
+.tier1-success-sidebar-label {
+  margin: 0 0 0.3rem;
+  font-weight: 700;
+}
+
+.tier1-success-sidebar-block p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.tier1-success-sidebar-note {
+  margin-top: 0.5rem !important;
+  font-weight: 600;
+}
+
+.tier1-success-sidebar-legend {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 0.85rem;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.tier1-success-sidebar-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.tier1-indicator-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.tier1-indicator-blue { background: #3b82f6; }
+.tier1-indicator-green { background: #16a34a; }
+.tier1-indicator-yellow { background: #facc15; }
+.tier1-indicator-red { background: #ef4444; }
+
 /* ---------- Decision Summary Panel — central full-width card ---------- */
 .journey-map {
   position: static;
@@ -6198,6 +6287,17 @@ details > p {
 
 /* ---------- Responsive: narrow screens ---------- */
 @media (max-width: 800px) {
+  .journey-shell-tier1 {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .tier1-success-sidebar {
+    position: static;
+    top: auto;
+    z-index: auto;
+  }
+
   .journey-map {
     border-radius: var(--radius);
   }
