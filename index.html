@@ -38,6 +38,10 @@
                     <span class="material-symbols-rounded nav-icon" aria-hidden="true">checklist</span>
                     Interventions
                 </button>
+                <button class="nav-link" data-page="scores" role="menuitem" aria-selected="false">
+                    <span class="material-symbols-rounded nav-icon" aria-hidden="true">bar_chart</span>
+                    Scores &amp; Percentiles
+                </button>
                 <button class="nav-link" data-page="original" role="menuitem" aria-selected="false">
                     <span class="material-symbols-rounded nav-icon" aria-hidden="true">menu_book</span>
                     Original Guide
@@ -67,6 +71,10 @@
             <button class="mobile-nav-item" data-page="interventions">
                 <span class="material-symbols-rounded" aria-hidden="true">checklist</span>
                 Interventions Menu
+            </button>
+            <button class="mobile-nav-item" data-page="scores">
+                <span class="material-symbols-rounded" aria-hidden="true">bar_chart</span>
+                Scores &amp; Percentiles
             </button>
             <button class="mobile-nav-item" data-page="original">
                 <span class="material-symbols-rounded" aria-hidden="true">menu_book</span>
@@ -110,6 +118,17 @@
                         <h3 class="cta-title">Interventions Menu</h3>
                         <p class="cta-desc">Browse interventions and assessments filtered by screener, subtest, and literacy pillar.</p>
                         <span class="cta-btn">Find Interventions
+                            <span class="material-symbols-rounded cta-btn-arrow" aria-hidden="true">arrow_forward</span>
+                        </span>
+                    </button>
+
+                    <button class="cta-card" onclick="navigateToPage('scores')" aria-label="Open Understanding Scores &amp; Percentiles">
+                        <div class="cta-icon" aria-hidden="true">
+                            <span class="material-symbols-rounded">bar_chart</span>
+                        </div>
+                        <h3 class="cta-title">Scores &amp; Percentiles</h3>
+                        <p class="cta-desc">Learn how standard scores, percentile ranks, and DIBELS risk categories are used to understand student performance.</p>
+                        <span class="cta-btn">Learn More
                             <span class="material-symbols-rounded cta-btn-arrow" aria-hidden="true">arrow_forward</span>
                         </span>
                     </button>
@@ -201,6 +220,161 @@
                     </div><!-- /.dropdown-wizard -->
                 </div><!-- /.interventions-page-body -->
             </div><!-- /.interventions-page-wrapper -->
+        </section>
+
+        <!-- ── SCORES & PERCENTILES ──────────────────────────── -->
+        <section id="scores-section" class="content-section" data-page="scores">
+            <div class="scores-page-wrapper">
+                <div class="hero-area">
+                    <h2 class="section-title">Understanding Scores &amp; Percentiles</h2>
+                    <p class="section-subtitle">A reference guide to interpreting student screening results</p>
+                </div>
+
+                <div class="scores-page-body">
+
+                    <!-- ── PERCENTILES BLOCK ── -->
+                    <div class="scores-block">
+                        <h3 class="scores-block-title">
+                            <span class="material-symbols-rounded" aria-hidden="true">percent</span>
+                            Understanding Percentiles
+                        </h3>
+
+                        <div class="scores-cards-row">
+                            <div class="scores-info-card">
+                                <div class="scores-info-card-header">
+                                    <span class="material-symbols-rounded" aria-hidden="true">leaderboard</span>
+                                    <h4>What Are Percentile Ranks?</h4>
+                                </div>
+                                <div class="scores-info-card-body">
+                                    <p>Percentile ranks help compare students' performance to other students of the same age. For example, if a student has a percentile rank of 16, they score higher than 16% of same-age peers. A percentile rank of 75 means they score as well or better than 75% of peers. Just like with standard scores, most students fall within the average percentile range, which represents the middle portion of the population. If a student falls between the 16th and 84th percentile, this is considered within the average range. Percentile ranks are not the same as the percentage of correct answers. They simply indicate how students' score compares to others.</p>
+                                </div>
+                                <div class="scores-callout scores-callout-blue">
+                                    <span class="material-symbols-rounded" aria-hidden="true">info</span>
+                                    <span>16th–84th percentile = <strong>average range</strong></span>
+                                </div>
+                            </div>
+
+                            <div class="scores-info-card">
+                                <div class="scores-info-card-header">
+                                    <span class="material-symbols-rounded" aria-hidden="true">equalizer</span>
+                                    <h4>What Are Standard Scores?</h4>
+                                </div>
+                                <div class="scores-info-card-body">
+                                    <p>To better compare scores from different test measures, we convert students' scores into a standard score. Most tests have an average standard score of 100. Increments of 15 are used to divide the population into sections such as below average, average, and above average.</p>
+                                    <p>For example, if a student gets a standard score between 85 and 115, this is considered within the average range. This part of the curve is the highest because most students fall in this range. A standard score below 85 is considered below the average range.</p>
+                                </div>
+                                <div class="scores-callout scores-callout-blue">
+                                    <span class="material-symbols-rounded" aria-hidden="true">info</span>
+                                    <span>Standard score 85–115 = <strong>average range</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── RISK CATEGORIES BLOCK ── -->
+                    <div class="scores-block">
+                        <h3 class="scores-block-title">
+                            <span class="material-symbols-rounded" aria-hidden="true">assessment</span>
+                            Understanding Scores
+                        </h3>
+
+                        <div class="scores-info-card scores-info-card-full">
+                            <div class="scores-info-card-header">
+                                <span class="material-symbols-rounded" aria-hidden="true">category</span>
+                                <h4>What are Risk Categories?</h4>
+                            </div>
+                            <div class="scores-info-card-body">
+                                <p>Results of DIBELS subtests are categorized according to the risk, or likelihood, that students will meet end-of-year grade-level goals in reading.</p>
+                            </div>
+                        </div>
+
+                        <div class="risk-categories-grid">
+
+                            <!-- Blue -->
+                            <div class="risk-card risk-card-blue">
+                                <div class="risk-card-header">
+                                    <span class="risk-badge risk-badge-blue">
+                                        <span class="material-symbols-rounded" aria-hidden="true">trending_up</span>
+                                    </span>
+                                    <div class="risk-card-label">
+                                        <span class="risk-colour-dot risk-dot-blue" aria-hidden="true"></span>
+                                        <h4>Blue <span class="risk-subtitle">— Above Benchmark</span></h4>
+                                    </div>
+                                </div>
+                                <div class="risk-card-body">
+                                    <p>Students above the benchmark are on track for reading success and should continue to receive the instruction they are getting – sometimes called "Core Support." We might call these students "Negligible Risk."</p>
+                                </div>
+                                <div class="risk-card-footer risk-footer-blue">
+                                    <span class="material-symbols-rounded" aria-hidden="true">school</span>
+                                    Core Support &mdash; Negligible Risk
+                                </div>
+                            </div>
+
+                            <!-- Green -->
+                            <div class="risk-card risk-card-green">
+                                <div class="risk-card-header">
+                                    <span class="risk-badge risk-badge-green">
+                                        <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
+                                    </span>
+                                    <div class="risk-card-label">
+                                        <span class="risk-colour-dot risk-dot-green" aria-hidden="true"></span>
+                                        <h4>Green <span class="risk-subtitle">— At Benchmark</span></h4>
+                                    </div>
+                                </div>
+                                <div class="risk-card-body">
+                                    <p>Students at the benchmark are on track for reading success and should continue receiving the instruction that they are getting – sometimes called "Core Support." We might call these students "Minimal Risk."</p>
+                                </div>
+                                <div class="risk-card-footer risk-footer-green">
+                                    <span class="material-symbols-rounded" aria-hidden="true">school</span>
+                                    Core Support &mdash; Minimal Risk
+                                </div>
+                            </div>
+
+                            <!-- Yellow -->
+                            <div class="risk-card risk-card-yellow">
+                                <div class="risk-card-header">
+                                    <span class="risk-badge risk-badge-yellow">
+                                        <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+                                    </span>
+                                    <div class="risk-card-label">
+                                        <span class="risk-colour-dot risk-dot-yellow" aria-hidden="true"></span>
+                                        <h4>Yellow <span class="risk-subtitle">— Some Risk</span></h4>
+                                    </div>
+                                </div>
+                                <div class="risk-card-body">
+                                    <p>Students with some risk may be struggling with one or more components of reading. They need additional instruction, usually in a small group setting. Their progress should be monitored in the area in which they are struggling. In other words, these students need "Strategic Support."</p>
+                                </div>
+                                <div class="risk-card-footer risk-footer-yellow">
+                                    <span class="material-symbols-rounded" aria-hidden="true">groups</span>
+                                    Strategic Support
+                                </div>
+                            </div>
+
+                            <!-- Red -->
+                            <div class="risk-card risk-card-red">
+                                <div class="risk-card-header">
+                                    <span class="risk-badge risk-badge-red">
+                                        <span class="material-symbols-rounded" aria-hidden="true">error</span>
+                                    </span>
+                                    <div class="risk-card-label">
+                                        <span class="risk-colour-dot risk-dot-red" aria-hidden="true"></span>
+                                        <h4>Red <span class="risk-subtitle">— At Risk</span></h4>
+                                    </div>
+                                </div>
+                                <div class="risk-card-body">
+                                    <p>Students at risk are struggling with reading, either scoring well below the benchmark or struggling with more than one component of reading. They need extra instruction in a small group or one-on-one setting. Their progress should be monitored in the areas in which they are struggling. In other words, these students need "Intensive Support."</p>
+                                </div>
+                                <div class="risk-card-footer risk-footer-red">
+                                    <span class="material-symbols-rounded" aria-hidden="true">person</span>
+                                    Intensive Support
+                                </div>
+                            </div>
+
+                        </div><!-- /.risk-categories-grid -->
+                    </div><!-- /.scores-block -->
+
+                </div><!-- /.scores-page-body -->
+            </div><!-- /.scores-page-wrapper -->
         </section>
 
         <!-- ── ORIGINAL GUIDE ─────────────────────────────── -->
