@@ -732,12 +732,12 @@ const FLOWCHART_DEFINITIONS = {
             'tier1-effectiveness': {
                 id: 'tier1-effectiveness',
                 type: 'decision',
-                title: 'Step 2: Literacy Screener',
+                title: 'Step 3: Result',
                 subtitle: 'Was instruction effective?',
                 description: 'Administer literacy screener. (DIBELS, CTOPP-2, THaFol, IDAPEL)\n\nIf you chose the Successful or Unsuccessful mistakenly, simply chose the correct option and continue.',
                 choices: [
-                    { id: 'effective', label: 'Option A: Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier1-success' },
-                    { id: 'ineffective', label: 'Option B: Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier1-percentage' }
+                    { id: 'effective', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier1-success' },
+                    { id: 'ineffective', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier1-percentage' }
                 ]
             },
             'tier1-success': {
@@ -757,8 +757,8 @@ const FLOWCHART_DEFINITIONS = {
                 subtitle: 'What percentage of students are unsuccessful?',
                 description: 'Based on screener results, how many students are below benchmark?',
                 choices: [
-                    { id: 'more-20', label: 'Option B1', sublabel: 'Instruction unsuccessful for 20% or more of students.', type: 'warning', nextNode: 'tier1-move-tier2' },
-                    { id: 'less-20', label: 'Option B2', sublabel: 'Instruction unsuccessful for fewer than 20% of students.', type: 'warning', nextNode: 'tier1-reteach' }
+                    { id: 'more-20', label: 'Instruction unsuccessful for 20% or more of students.', sublabel: '', type: 'warning', nextNode: 'tier1-move-tier2' },
+                    { id: 'less-20', label: 'Instruction unsuccessful for fewer than 20% of students.', sublabel: '', type: 'warning', nextNode: 'tier1-reteach' }
                 ]
             },
             'tier1-move-tier2': {
@@ -859,8 +859,8 @@ const FLOWCHART_DEFINITIONS = {
                 subtitle: 'Was instruction effective?',
                 description: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).\n\nIf you chose the wrong option, simply choose the correct one and continue.',
                 choices: [
-                    { id: 'improved', label: 'Option A: Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier2-success' },
-                    { id: 'no-improvement', label: 'Option B: Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier2-cycle2-assessment' }
+                    { id: 'improved', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier2-success' },
+                    { id: 'no-improvement', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier2-cycle2-assessment' }
                 ]
             },
             'tier2-success': {
@@ -900,8 +900,8 @@ const FLOWCHART_DEFINITIONS = {
                 subtitle: 'Was instruction effective?',
                 description: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).\n\nIf you chose the wrong option, simply choose the correct one and continue.',
                 choices: [
-                    { id: 'improved', label: 'Option A: Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier2-cycle2-success' },
-                    { id: 'no-improvement', label: 'Option B: Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier2-move-tier3' }
+                    { id: 'improved', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier2-cycle2-success' },
+                    { id: 'no-improvement', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier2-move-tier3' }
                 ]
             },
             'tier2-cycle2-success': {
@@ -1004,8 +1004,8 @@ const FLOWCHART_DEFINITIONS = {
                 subtitle: 'Was instruction effective?',
                 description: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).\n\nIf you chose the wrong option, simply choose the correct one and continue.',
                 choices: [
-                    { id: 'improved', label: 'Option A: Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier3-success' },
-                    { id: 'no-improvement', label: 'Option B: Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier3-specialist' }
+                    { id: 'improved', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier3-success' },
+                    { id: 'no-improvement', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier3-specialist' }
                 ]
             },
             'tier3-success': {
@@ -2166,10 +2166,10 @@ function fwSelectItem(itemId, itemName) {
 // Create integrated decision node
 function createIntegratedDecisionNode(nodeData) {
     const choicesHTML = nodeData.choices.map(choice => `
-        <button class="decision-btn decision-${choice.type}" onclick="makeIntegratedDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
+        <button class="decision-btn decision-${choice.type} ${choice.sublabel ? '' : 'decision-single-line'}" onclick="makeIntegratedDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
             <div class="decision-content">
                 <strong>${choice.label}</strong>
-                <span>${choice.sublabel}</span>
+                ${choice.sublabel ? `<span>${choice.sublabel}</span>` : ''}
             </div>
         </button>
     `).join('');
@@ -3637,13 +3637,13 @@ function createSelectionNode(nodeData) {
 // Create decision node HTML
 function createDecisionNode(nodeData) {
     const choicesHTML = nodeData.choices.map(choice => `
-        <button class="vf-decision-btn vf-decision-${choice.type}" onclick="makeDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
+        <button class="vf-decision-btn vf-decision-${choice.type} ${choice.sublabel ? '' : 'vf-decision-single-line'}" onclick="makeDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
             <div class="vf-decision-icon">
                 ${choice.type === 'success' ? ICONS.checkmark : choice.type === 'warning' ? ICONS.warning : ICONS.info}
             </div>
             <div class="vf-decision-content">
                 <strong>${choice.label}</strong>
-                <span>${choice.sublabel}</span>
+                ${choice.sublabel ? `<span>${choice.sublabel}</span>` : ''}
             </div>
         </button>
     `).join('');
@@ -4960,7 +4960,7 @@ function proceedToTier3ProgressMonitoring() {
                             <button class="decision-btn success" onclick="tier3StudentImproved()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                                 <div>
-                                    <strong>Option A: Instruction Effective</strong>
+                                    <strong>Instruction Effective</strong>
                                     <span>Subtest result Blue or Green</span>
                                 </div>
                             </button>
@@ -4968,7 +4968,7 @@ function proceedToTier3ProgressMonitoring() {
                             <button class="decision-btn warning" onclick="tier3StudentDidNotImprove()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                 <div>
-                                    <strong>Option B: Instruction Ineffective</strong>
+                                    <strong>Instruction Ineffective</strong>
                                     <span>Subtest result Yellow or Red</span>
                                 </div>
                             </button>
