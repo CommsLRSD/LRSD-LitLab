@@ -4258,6 +4258,193 @@ body.evidence-modal-open { overflow: hidden; }
   color: var(--primary);
 }
 
+/* ── Route completion gate (pre-animation screen) ─────────────────── */
+.route-complete-gate {
+  text-align: center;
+  padding: var(--space-xl) var(--space-lg);
+  max-width: 480px;
+  margin: 0 auto;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+
+.route-complete-gate.route-complete-gate-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.gate-icon {
+  width: 56px;
+  height: 56px;
+  background: color-mix(in srgb, var(--success, #059669) 12%, transparent);
+  color: var(--success, #059669);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-md);
+}
+
+.gate-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+  color: var(--text);
+}
+
+.gate-subtitle {
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.gate-tier-pill {
+  display: inline-block;
+  background: var(--step-soft);
+  color: var(--step);
+  border-radius: var(--radius-pill);
+  padding: 2px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.gate-desc {
+  font-size: 0.87rem;
+  color: var(--text-light);
+  margin-bottom: var(--space-lg);
+}
+
+.gate-summary-btn {
+  gap: 8px;
+  padding: 13px 28px;
+  font-size: 0.97rem;
+}
+
+/* ── Review button on each animation summary bubble ───────────────── */
+.anim-step-review-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: color 0.18s var(--ease), border-color 0.18s var(--ease), background 0.18s var(--ease);
+  white-space: nowrap;
+}
+
+.anim-step-review-btn:hover {
+  color: var(--step);
+  border-color: var(--step);
+  background: var(--step-soft);
+}
+
+/* ── Step review modal ─────────────────────────────────────────────── */
+.step-review-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: var(--space-lg);
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+
+.step-review-overlay.step-review-visible {
+  opacity: 1;
+}
+
+.step-review-dialog {
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 560px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform: translateY(8px) scale(0.98);
+  transition: transform 0.25s var(--ease);
+}
+
+.step-review-overlay.step-review-visible .step-review-dialog {
+  transform: translateY(0) scale(1);
+}
+
+.step-review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  gap: var(--space-sm);
+}
+
+.step-review-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  min-width: 0;
+  flex: 1;
+}
+
+.step-badge-modal {
+  font-size: 0.85rem;
+}
+
+.step-review-type-chip {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.step-review-body {
+  padding: var(--space-lg);
+}
+
+.review-subtitle {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-sm);
+}
+
+.review-description {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+.review-checklist-intro {
+  margin-bottom: var(--space-sm);
+}
+
+body.step-review-modal-open { overflow: hidden; }
+
 /* Summary / Review modal */
 .summary-overlay,
 .review-modal {
