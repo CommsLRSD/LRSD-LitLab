@@ -749,7 +749,7 @@ const FLOWCHART_DEFINITIONS = {
                 description: 'Based on screener results, how many students are below benchmark?',
                 choices: [
                     { id: 'more-20', label: 'Option B1', sublabel: 'Instruction unsuccessful for 20% or more of students.', type: 'warning', nextNode: 'tier1-move-tier2' },
-                    { id: 'less-20', label: 'Option B2', sublabel: 'Instruction unsuccessful for fewer than 20% of students.', type: 'primary', nextNode: 'tier1-reteach' }
+                    { id: 'less-20', label: 'Option B2', sublabel: 'Instruction unsuccessful for fewer than 20% of students.', type: 'warning', nextNode: 'tier1-reteach' }
                 ]
             },
             'tier1-move-tier2': {
