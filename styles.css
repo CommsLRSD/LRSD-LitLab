@@ -458,6 +458,43 @@ strong { font-weight: 600; }
 }
 
 /* ------------------------------------------------------------
+   BUBBLE BACKGROUND
+   ------------------------------------------------------------ */
+
+#home-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.bubble-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  animation: bubble-fade-in 1.2s ease forwards;
+  will-change: transform;
+}
+
+@keyframes bubble-fade-in {
+  to { opacity: var(--bubble-opacity, 0.18); }
+}
+
+/* Ensure content layers sit above bubbles */
+#home-section > .home-hero,
+#home-section > .home-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------
    6. HERO
    ------------------------------------------------------------ */
 

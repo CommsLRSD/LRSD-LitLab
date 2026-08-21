@@ -80,6 +80,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 150); // Debounce resize events
     });
     
+    // Initialize bubble background on home section
+    initBubbles();
+
     console.log('Literacy Interventions - Ready!');
 });
 
@@ -7738,3 +7741,74 @@ window.exportHistoryCsv = exportHistoryCsv;
 window.toggleHistoryPanel = toggleHistoryPanel;
 window.showGoToTierStep = showGoToTierStep;
 window.applyTierTheme = applyTierTheme;
+
+// ============================================
+// Bubble Background
+// ============================================
+function initBubbles() {
+    const section = document.getElementById('home-section');
+    if (!section) return;
+
+    // Create container
+    const bg = document.createElement('div');
+    bg.className = 'bubble-bg';
+    bg.setAttribute('aria-hidden', 'true');
+    section.insertBefore(bg, section.firstChild);
+
+    // Colour palette drawn from brand tokens (soft tints)
+    const colours = [
+        'rgba(27,  45, 107, 1)',   // navy
+        'rgba(45,  74, 158, 1)',   // primary-light
+        'rgba(255,214,  0, 1)',    // accent yellow
+        'rgba(240, 98,146, 1)',    // pink
+        'rgba(100,181,246, 1)',    // blue
+        'rgba(102,187,106, 1)',    // mint
+        'rgba(255,183,  0, 1)',    // amber
+        'rgba(121,134,203, 1)',    // indigo-light
+    ];
+
+    const bubbleCount = 22;
+    const bubbles = [];
+
+    for (let i = 0; i < bubbleCount; i++) {
+        const el = document.createElement('div');
+        el.className = 'bubble';
+
+        const size   = 28 + Math.random() * 110;          // 28–138 px
+        const left   = Math.random() * 100;               // % across section
+        const top    = Math.random() * 100;               // % down section
+        const colour = colours[Math.floor(Math.random() * colours.length)];
+        const opacity = 0.08 + Math.random() * 0.14;      // 0.08–0.22
+        const speed  = 0.04 + Math.random() * 0.10;       // parallax factor
+        const delay  = (Math.random() * 0.8).toFixed(2);  // stagger fade-in
+
+        el.style.cssText = [
+            `width:${size}px`,
+            `height:${size}px`,
+            `left:${left}%`,
+            `top:${top}%`,
+            `background:${colour}`,
+            `--bubble-opacity:${opacity}`,
+            `animation-delay:${delay}s`,
+        ].join(';');
+
+        el.dataset.speed = speed;
+        bg.appendChild(el);
+        bubbles.push(el);
+    }
+
+    // Parallax on scroll
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+            const scrollY = window.scrollY;
+            bubbles.forEach(b => {
+                const s = parseFloat(b.dataset.speed);
+                b.style.transform = `translateY(${scrollY * s}px)`;
+            });
+            ticking = false;
+        });
+    }, { passive: true });
+}
