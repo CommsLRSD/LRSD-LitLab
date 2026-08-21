@@ -1880,6 +1880,12 @@ function createIntegratedSelectionNode(nodeData) {
             <div class="step-content">
                 <h3>${nodeData.subtitle}</h3>
                 <p>${nodeData.description}</p>
+                <div class="evidence-popup-entry">
+                    <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation();">
+                        <span class="material-symbols-rounded" aria-hidden="true">info</span>
+                    </button>
+                    <span>Evidence and research based definitions</span>
+                </div>
                 ${infoBoxHTML}
                 ${warningBoxHTML}
                 <div class="fw-wizard">

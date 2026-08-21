@@ -1441,6 +1441,13 @@ details > p {
   margin-bottom: var(--space-md);
 }
 
+.wizard-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
 .wizard-title {
   font-size: 1.1rem;
   font-weight: 600;
@@ -1883,6 +1890,24 @@ details > p {
 .evidence-info-trigger:focus-visible {
   background: rgba(6, 95, 70, 0.28);
   outline: none;
+}
+
+.evidence-info-trigger-inline {
+  width: 22px;
+  height: 22px;
+}
+
+.evidence-info-trigger-inline .material-symbols-rounded {
+  font-size: 15px;
+}
+
+.evidence-popup-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
 }
 
 .evidence-definitions-modal {
