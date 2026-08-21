@@ -7417,6 +7417,18 @@ window.initializeAssessmentSchedules = initializeAssessmentSchedules;
 const SELECTION_HISTORY_KEY = 'litlab_selection_history';
 const SELECTION_HISTORY_SESSION_KEY = 'litlab_selection_history_session';
 
+function createHistoryToken(size = 8) {
+    if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+        const bytes = new Uint8Array(size);
+        window.crypto.getRandomValues(bytes);
+        return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('').slice(0, size);
+    }
+    const perf = typeof performance !== 'undefined' && typeof performance.now === 'function'
+        ? Math.floor(performance.now()).toString(36)
+        : '0';
+    return `${Date.now().toString(36)}${perf}`.slice(-size);
+}
+
 // Load the saved selection history from localStorage (returns an array).
 function loadSelectionHistory() {
     try {
@@ -7441,7 +7453,7 @@ function saveSelectionHistory(history) {
 
 function createSelectionHistorySession() {
     return {
-        id: `sess-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        id: `sess-${Date.now()}-${createHistoryToken(8)}`,
         startedAt: new Date().toISOString()
     };
 }
@@ -7482,7 +7494,7 @@ function recordSelection(type, itemId, itemName, tierId) {
     const screenerId = appState.fwState?.screener || getRememberedScreenerId() || '';
     const screenerName = appState.fwState?.screenerData?.screener_name || getScreenerName(screenerId) || '';
     const entry = {
-        id: `sel-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        id: `sel-${Date.now()}-${createHistoryToken(8)}`,
         type: type || 'Selection',
         itemId: itemId || '',
         name: itemName,
