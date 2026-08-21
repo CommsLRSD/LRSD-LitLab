@@ -52,11 +52,11 @@
        1. STEP        – every step (checklist, selection, decision, info)
        2. EFFECTIVE   – effective / positive routes & outcomes
        3. INEFFECTIVE – ineffective / needs-improvement routes & outcomes */
-  --step: #4c63a6;
-  --step-bg: #eef1fa;
-  --step-header: #e1e7f7;
-  --step-text: #2c3c72;
-  --step-soft: rgba(76, 99, 166, 0.18);
+  --step: #1b2d6b;
+  --step-bg: #eef0f8;
+  --step-header: #dde2f2;
+  --step-text: #1b2d6b;
+  --step-soft: rgba(27, 45, 107, 0.18);
 
   --effective: #2fa56f;
   --effective-bg: #e7f6ee;
@@ -523,9 +523,10 @@ strong { font-weight: 600; }
 }
 
 .hero-photo {
-  width: 340px;
-  height: 400px;
+  width: 460px;
+  height: 308px;
   object-fit: cover;
+  object-position: center 30%;
   border-radius: var(--radius-xl);
   display: block;
   box-shadow: 0 16px 48px rgba(0,0,0,0.35);
