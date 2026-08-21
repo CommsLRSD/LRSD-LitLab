@@ -52,11 +52,11 @@
        1. STEP        – every step (checklist, selection, decision, info)
        2. EFFECTIVE   – effective / positive routes & outcomes
        3. INEFFECTIVE – ineffective / needs-improvement routes & outcomes */
-  --step: #4c63a6;
-  --step-bg: #eef1fa;
-  --step-header: #e1e7f7;
-  --step-text: #2c3c72;
-  --step-soft: rgba(76, 99, 166, 0.18);
+  --step: #1b2d6b;
+  --step-bg: #eef0f8;
+  --step-header: #dde2f2;
+  --step-text: #1b2d6b;
+  --step-soft: rgba(27, 45, 107, 0.18);
 
   --effective: #2fa56f;
   --effective-bg: #e7f6ee;
@@ -523,9 +523,10 @@ strong { font-weight: 600; }
 }
 
 .hero-photo {
-  width: 340px;
-  height: 400px;
+  width: 460px;
+  height: 308px;
   object-fit: cover;
+  object-position: center 30%;
   border-radius: var(--radius-xl);
   display: block;
   box-shadow: 0 16px 48px rgba(0,0,0,0.35);
@@ -4902,15 +4903,17 @@ body.evidence-modal-open { overflow: hidden; }
    Original Guide (iframe embed)
    ------------------------------------------------------------ */
 .original-guide-wrapper {
-  max-width: 1100px;
-  width: 100%;
-  margin: 0 auto;
-  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-height));
 }
 
 .original-guide-body {
   position: relative;
+  max-width: 1100px;
   width: 100%;
+  margin: 0 auto;
+  padding: var(--space-lg);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -4921,8 +4924,7 @@ body.evidence-modal-open { overflow: hidden; }
 .original-guide-iframe {
   display: block;
   width: 100%;
-  height: 80vh;
-  min-height: 500px;
+  aspect-ratio: 16 / 9;
   border: none;
 }
 
@@ -5154,6 +5156,18 @@ body.evidence-modal-open { overflow: hidden; }
   width: 100%;
   margin: 0 auto;
   padding: var(--space-2xl) var(--space-lg);
+}
+
+/* Flowchart page layout */
+.flowchart-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-height));
+}
+
+.flowchart-page-body {
+  flex: 1;
+  width: 100%;
 }
 
 /* Step panel helpers */
@@ -6749,15 +6763,19 @@ body.evidence-modal-open { overflow: hidden; }
    ============================================================ */
 
 .scores-page-wrapper {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-height));
 }
 
 .scores-page-body {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-lg) 3rem;
 }
 
 .scores-quick-facts {
