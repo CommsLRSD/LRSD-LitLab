@@ -6207,7 +6207,7 @@ body.step-review-modal-open { overflow: hidden; }
 
 .journey-shell-tier1 {
   display: grid;
-  grid-template-columns: minmax(280px, 340px) minmax(0, 760px) minmax(0, 340px);
+  grid-template-columns: minmax(280px, 340px) minmax(34rem, 760px) minmax(0, 340px);
   gap: var(--space-lg);
   align-items: start;
   justify-content: center;
@@ -7048,7 +7048,7 @@ body.step-review-modal-open { overflow: hidden; }
 .journey-track > .go-to-tier-step { margin-left: 0; }
 
 /* ---------- Responsive: narrow screens ---------- */
-@media (max-width: 800px) {
+@media (max-width: 1260px) {
   .journey-shell-tier1 {
     grid-template-columns: 1fr;
     gap: var(--space-md);
