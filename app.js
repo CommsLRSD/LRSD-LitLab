@@ -782,8 +782,8 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier2-principles',
                 type: 'checklist',
                 title: 'Step 1: Entry',
+                leadText: 'Informed by data (See progress monitoring tools).',
                 subtitle: 'Rule out that challenges are not the result of:',
-                description: 'Informed by data (See progress monitoring tools).\n\nGroup Information: Led by classroom teachers. Approx. 3-5 students per group. Interventions are implemented for a suggested period of 20-40 minutes, three to five times per week for an 8 week period.\n\nProgress Monitoring: Weekly progress monitoring (ex. UFLI, DIBELS Progress Monitoring Assessments).\n\nCollaboration: Team members share progress monitoring results at school based meetings.',
                 items: [
                     'Vision impairments',
                     'Hearing impairments',
@@ -791,8 +791,32 @@ const FLOWCHART_DEFINITIONS = {
                     'MLL',
                     'Other diagnosis'
                 ],
+                postSections: [
+                    {
+                        title: 'Group Information',
+                        items: [
+                            'Led by classroom teachers.',
+                            'Approx. 3-5 students per group.',
+                            'Students receive intensive, explicit, and systematic instruction in small groups based on specific skill-based literacy goals (not necessarily grade), based on the five pillars of reading instruction as identified by classroom teachers, student services, and administrators.',
+                            'Interventions are implemented for a suggested period of 20-40 minutes, three to five times per week for an 8 week period.'
+                        ]
+                    },
+                    {
+                        title: 'Progress Monitoring',
+                        items: [
+                            'Weekly progress monitoring (ex. UFLI, DIBELS Progress Monitoring Assessments).'
+                        ]
+                    },
+                    {
+                        title: 'Collaboration',
+                        items: [
+                            'Team members share progress monitoring results at school based meetings.'
+                        ]
+                    }
+                ],
                 nextNode: 'tier2-assessment',
-                buttonText: 'Continue to Drill Down Assessment'
+                buttonText: 'Continue to Drill Down Assessment',
+                useButton: true
             },
             'tier2-assessment': {
                 id: 'tier2-assessment',
@@ -1112,9 +1136,6 @@ function showGoToTierStep(tierId) {
     const num = String(tierId).replace('tier', '');
     const subtitle = flowchartDef.title.split(':').slice(1).join(':').trim();
 
-    // Switch the colour theme now for an immediate visual cue of the new tier
-    applyTierTheme(tierId);
-
     stepsContainer.innerHTML = `
         <div class="go-to-tier-step go-to-tier-${num}">
             <div class="go-to-tier-badge">Tier ${num}</div>
@@ -1130,13 +1151,6 @@ function showGoToTierStep(tierId) {
 
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.display = 'none';
-
-    // Reflect the upcoming tier in the sticky top tabs and bottom name bar
-    document.querySelectorAll('.tier-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.tier === tierId);
-    });
-    const tierNameEl = document.getElementById('flowchart-tier-name-value');
-    if (tierNameEl) tierNameEl.textContent = getTierName(flowchartDef.title);
 
     completeJourneyMap(`Moving to Tier ${num}`);
 
@@ -1678,6 +1692,29 @@ function createIntegratedChecklistNode(nodeData) {
         </li>
     `).join('');
 
+    const leadTextHTML = nodeData.leadText
+        ? `<p class="checklist-lead-text">${escapeHtml(nodeData.leadText)}</p>`
+        : '';
+
+    const postSectionsHTML = nodeData.postSections
+        ? nodeData.postSections.map(section => `
+            <div class="checklist-post-section">
+                <h4 class="checklist-post-section-title">${escapeHtml(section.title)}</h4>
+                <ul class="checklist-post-section-list">
+                    ${section.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+                </ul>
+            </div>
+        `).join('')
+        : '';
+
+    const continueBtnHTML = nodeData.useButton
+        ? `<button class="continue-btn checklist-continue-btn" disabled
+               onclick="proceedFromIntegratedChecklist('${escapeAttr(nodeData.id)}', '${escapeAttr(nodeData.nextNode)}')">
+               ${escapeHtml(nodeData.buttonText || 'Continue')}
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+           </button>`
+        : '';
+
     return `
         <div class="step-header">
             <div class="step-badge"><span class="step-badge-icon">${getStepTypeIcon(nodeData.type)}</span>${escapeHtml(nodeData.title)}</div>
@@ -1688,6 +1725,7 @@ function createIntegratedChecklistNode(nodeData) {
             </button>
         </div>
         <div class="step-content checklist-full">
+            ${leadTextHTML}
             ${nodeData.subtitle ? `<p class="checklist-intro">${escapeHtml(nodeData.subtitle)}</p>` : ''}
             <div class="checklist-meter">
                 <div class="checklist-meter-bar"><span class="checklist-meter-fill" style="width: 0%"></span></div>
@@ -1696,16 +1734,20 @@ function createIntegratedChecklistNode(nodeData) {
             <ul class="checklist-lines">
                 ${itemsHTML}
             </ul>
+            ${postSectionsHTML}
+            ${continueBtnHTML}
         </div>
     `;
 }
 
 // Wire every checklist item so progress updates live and the step auto-advances
 // once all points have been checked off (no Continue button required).
+// If nodeData.useButton is true, a Continue button is enabled instead.
 function wireIntegratedChecklist(nodeElement, nodeData) {
     const checkboxes = Array.from(nodeElement.querySelectorAll('.checklist-line input[type="checkbox"]'));
     const fill = nodeElement.querySelector('.checklist-meter-fill');
     const count = nodeElement.querySelector('.checklist-meter-count');
+    const continueBtn = nodeElement.querySelector('.checklist-continue-btn');
     const total = checkboxes.length;
     if (!total) return;
 
@@ -1724,15 +1766,20 @@ function wireIntegratedChecklist(nodeElement, nodeData) {
         if (fill) fill.style.width = `${Math.round((checked / total) * 100)}%`;
         if (count) count.textContent = `${checked} of ${total} checked`;
 
-        // Auto-advance once all items are checked
-        if (checked === total && nodeData.nextNode) {
-            if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
-            autoAdvanceTimer = setTimeout(() => {
-                // Guard: only advance if this step is still the active one
-                if (appState.visualFlowchart.currentNodeId === nodeData.id) {
-                    proceedFromIntegratedChecklist(nodeData.id, nodeData.nextNode);
-                }
-            }, 600);
+        if (nodeData.useButton) {
+            // Enable the Continue button only when all items are checked
+            if (continueBtn) continueBtn.disabled = checked < total;
+        } else {
+            // Auto-advance once all items are checked
+            if (checked === total && nodeData.nextNode) {
+                if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
+                autoAdvanceTimer = setTimeout(() => {
+                    // Guard: only advance if this step is still the active one
+                    if (appState.visualFlowchart.currentNodeId === nodeData.id) {
+                        proceedFromIntegratedChecklist(nodeData.id, nodeData.nextNode);
+                    }
+                }, 600);
+            }
         }
     };
 
@@ -2161,7 +2208,7 @@ function createIntegratedInfoNode(nodeData) {
             ${nodeData.features ? `<h4>${nodeData.featuresTitle || 'Key Characteristics'}</h4>` : ''}
             ${featuresHTML}
             ${sectionsHTML}
-            <button class="continue-btn" onclick="proceedFromIntegratedInfo('${nodeData.id}', '${nodeData.nextNode}')">
+            <button class="action-btn action-primary" onclick="proceedFromIntegratedInfo('${nodeData.id}', '${nodeData.nextNode}')">
                 ${nodeData.buttonText}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M5 12h14M12 5l7 7-7 7"/>

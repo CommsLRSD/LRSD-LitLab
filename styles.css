@@ -2528,11 +2528,55 @@ details > p {
   transition: all var(--duration) var(--ease);
 }
 
+.continue-btn:not([disabled]) {
+  background: var(--tier-color, var(--primary));
+  color: #fff;
+  cursor: pointer;
+}
+
+.continue-btn:not([disabled]):hover {
+  filter: brightness(1.1);
+}
+
 .continue-btn svg {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
 }
+
+/* Post-section info blocks rendered after the checklist items */
+.checklist-post-section {
+  margin-top: var(--space-md);
+}
+
+.checklist-post-section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.checklist-post-section-list {
+  padding-left: 1.2rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.checklist-post-section-list li {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Lead text shown before the checkbox list */
+.checklist-lead-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
 
 /* ============================================================
    FULL CHECKLIST — every point visible in one list
