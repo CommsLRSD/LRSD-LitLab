@@ -5486,7 +5486,16 @@ details > p {
 
 .tier1-success-sidebar-label {
   margin: 0 0 0.3rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   font-weight: 700;
+}
+
+.tier1-success-sidebar-indicators {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
 }
 
 .tier1-success-sidebar-block p {
@@ -5497,23 +5506,6 @@ details > p {
 
 .tier1-success-sidebar-note {
   margin-top: 0.5rem !important;
-  font-weight: 600;
-}
-
-.tier1-success-sidebar-legend {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem 0.85rem;
-  margin: 1rem 0 0;
-  padding: 0;
-}
-
-.tier1-success-sidebar-legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.88rem;
   font-weight: 600;
 }
 
