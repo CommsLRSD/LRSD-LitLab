@@ -1091,7 +1091,7 @@ function initIntegratedFlowchart(tierId) {
                     ${showTier1SuccessSidebar ? `
                     <aside class="tier1-success-sidebar" aria-label="Tier 1 instruction success guidance">
                         <div class="tier1-success-sidebar-head">
-                            <span class="material-symbols-rounded tier1-success-sidebar-icon" aria-hidden="true">help</span>
+                            <span class="material-symbols-rounded tier1-success-sidebar-icon" aria-hidden="true" translate="no">help</span>
                             <h3>How do we determine if instruction is Successful or Unsuccessful?</h3>
                         </div>
                         <div class="tier1-success-sidebar-block">
@@ -1115,7 +1115,7 @@ function initIntegratedFlowchart(tierId) {
                             <p>If student screener results indicate Yellow or Red in any one area, instruction is unsuccessful.</p>
                             <p class="tier1-success-sidebar-note">Monitoring and interventions are needed.</p>
                             <button class="scores-ref-btn" onclick="navigateToPage('scores')" type="button">
-                                <span class="material-symbols-rounded" aria-hidden="true">bar_chart</span>
+                                <span class="material-symbols-rounded" aria-hidden="true" translate="no">bar_chart</span>
                                 See Understanding Scores &amp; Percentiles
                             </button>
                         </div>
@@ -1894,7 +1894,7 @@ function createIntegratedSelectionNode(nodeData) {
                 <p>${nodeData.description}</p>
                 <div class="evidence-popup-entry">
                     <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation();">
-                        <span class="material-symbols-rounded" aria-hidden="true">info</span>
+                        <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
                     </button>
                     <span>Evidence and research based definitions</span>
                 </div>
@@ -6184,7 +6184,7 @@ function getEvidenceBadgeHtml(evidenceLevel) {
         <span class="badge-evidence evidence-marker-group">
             <span class="evidence-marker-text">${escapeHtml(evidenceLevel)}</span>
             <button type="button" class="evidence-info-trigger" aria-label="Show evidence and research based definitions" onclick="event.stopPropagation();">
-                <span class="material-symbols-rounded" aria-hidden="true">info</span>
+                <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
             </button>
         </span>
     `;
@@ -6200,7 +6200,7 @@ function setupEvidenceDefinitionsPopup() {
     modal.innerHTML = `
         <div class="evidence-definitions-dialog" role="dialog" aria-modal="true" aria-label="Evidence definitions">
             <button type="button" class="evidence-definitions-close" aria-label="Close">
-                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                <span class="material-symbols-rounded" aria-hidden="true" translate="no">close</span>
             </button>
             <div class="evidence-definition-block">
                 <strong>* Evidence Based: Most rigorous and trusted</strong>
