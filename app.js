@@ -2897,7 +2897,7 @@ function showFinalSummary(endpointNodeData) {
         const tierLabel = tierDef.title || tierSnapshot.tierId;
 
         // Tier badge
-        if (!useDesktopSummaryModal && tierIndex > 0) {
+        if (tierIndex > 0) {
             items.push({ html: `<div class="anim-connector"><div class="anim-connector-line"></div><div class="anim-connector-arrow"></div></div>`, kind: 'connector' });
         }
         items.push({
@@ -2913,7 +2913,7 @@ function showFinalSummary(endpointNodeData) {
             const isEndpoint = nodeDef.type === 'endpoint';
 
             // Connector between steps
-            if (!useDesktopSummaryModal && stepIndex > 0) {
+            if (stepIndex > 0) {
                 items.push({ html: `<div class="anim-connector"><div class="anim-connector-line"></div><div class="anim-connector-arrow"></div></div>`, kind: 'connector' });
             }
 
