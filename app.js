@@ -890,109 +890,102 @@ const FLOWCHART_DEFINITIONS = {
         }
     },
     tier3: {
-        title: 'Tier 3: Intensive Individual Intervention',
+        title: 'Tier THREE: Personalized Intervention',
         startNode: 'tier3-intro',
         nodes: {
             'tier3-intro': {
                 id: 'tier3-intro',
                 type: 'info',
-                title: 'Begin Tier 3',
-                subtitle: 'Intensive Individual Intervention',
-                warningBox: {
-                    title: 'Important Note',
-                    text: 'Tier 3 interventions are for students who have not responded to two cycles of Tier 2 intervention. Typically, fewer than 10% of students require this level of support.'
-                },
-                featuresTitle: 'Characteristics of Tier 3 Interventions',
-                features: [
-                    'Individual or very small group (1-3 students)',
-                    'Intensive daily sessions (45-60 minutes)',
-                    'Highly specialized, research-based programs',
-                    'Weekly progress monitoring',
-                    'Collaboration with specialists and clinicians'
+                title: 'Entry Information',
+                subtitle: 'Review the following information before proceeding.',
+                sections: [
+                    {
+                        title: 'Entry',
+                        items: [
+                            'Below benchmark DIBELS composite scores.',
+                            'Minimum of two 8-week periods of Tier 2 interventions.',
+                            'Minimal progress in Tier 2 interventions, as measured by DIBELS benchmark and UFLI progress monitoring.',
+                            'Reading related diagnosis (e.g. specific learning disability in reading, i.e., dyslexia) OR on list for potential diagnosis.'
+                        ]
+                    },
+                    {
+                        title: 'Group Information',
+                        items: [
+                            '1-3 students per group.',
+                            'Intervention provided by a teacher trained in structured literacy and administrators of direct instruction.',
+                            'Students work towards individualized goals (up to 3) created by the intervention teacher and recorded in the Student-Specific Plan.',
+                            'Students receive specialized instruction based on their specific goals.',
+                            '25 minute sessions, 4-5 times/week minimum.',
+                            'Students with attendance impacting their ability to receive 4-5 lessons/week may be discontinued and placed back in Tier 2 intervention at the administrator\'s discretion.'
+                        ]
+                    },
+                    {
+                        title: 'Progress Monitoring',
+                        items: [
+                            'Interventions are implemented for a minimum of 8 weeks.',
+                            'Progress monitoring completed weekly.',
+                            'Divisional universal progress monitoring completed at 8-week mark.'
+                        ]
+                    },
+                    {
+                        title: 'Collaboration',
+                        items: [
+                            'Parents notified via letter that student will be receiving Tier 3 interventions.',
+                            'Team members share progress monitoring results at school-based meetings.',
+                            'Team members consult and collaborate with the School Psychologist, Speech-Language Pathologist, and Occupational Therapist.'
+                        ]
+                    }
                 ],
                 nextNode: 'tier3-assessment',
-                buttonText: 'Begin Tier 3 Process'
+                buttonText: 'I have reviewed this information'
             },
             'tier3-assessment': {
                 id: 'tier3-assessment',
                 type: 'selection',
-                title: 'Step 2: Comprehensive Assessment',
-                subtitle: 'Select Comprehensive Diagnostic Assessment',
-                description: 'Choose a highly targeted assessment to identify specific literacy gaps',
+                title: 'Step 1: Drill Down Assessment',
+                subtitle: 'Administer a drill down assessment.',
+                description: 'Use the menu below to find and administer a drill down assessment that aligns with the needs of your students, as determined by the literacy screener.',
                 options: 'drillDownAssessments',
-                warningBox: {
-                    title: 'Tier 3 Assessment',
-                    text: 'These comprehensive assessments provide very detailed information to guide intensive intervention selection. Consider consulting with specialists.'
-                },
                 nextNode: 'tier3-intervention',
                 nextHandler: 'selectTier3AssessmentVisual'
             },
             'tier3-intervention': {
                 id: 'tier3-intervention',
                 type: 'selection',
-                title: 'Step 3: Select Intervention',
-                subtitle: 'Choose an Intensive Intervention Program',
-                description: 'Select a highly specialized, research-based program for intensive support',
+                title: 'Step 2: 8-week Intervention',
+                subtitle: 'Select and administer an 8-week intervention.',
+                description: 'Use the menu below to find an appropriate intervention, and administer for an 8-week period. Monitor student response to intervention weekly.',
                 options: 'interventions',
-                warningBox: {
-                    title: '8-Week Intensive Cycle',
-                    text: 'Implement the intervention for 8 weeks with weekly progress monitoring. These programs often require specialized training.'
-                },
                 nextNode: 'tier3-progress',
                 nextHandler: 'selectTier3InterventionVisual'
             },
             'tier3-progress': {
                 id: 'tier3-progress',
                 type: 'decision',
-                title: 'Step 4: Progress Monitoring',
-                subtitle: 'After 8 Weeks: Evaluate Student Progress',
-                description: 'Administer a literacy screener to determine if the intensive intervention was effective',
-                warningBox: {
-                    title: 'Important',
-                    text: 'You should have been monitoring progress weekly throughout the 8-week cycle. Now it\'s time to evaluate overall progress.'
-                },
-                infoBox: {
-                    title: 'Acceptable Screeners',
-                    items: ['DIBELS', 'CTOPP-2', 'THaFoL', 'IDAPEL']
-                },
+                title: 'Step 3: Progress Monitoring',
+                subtitle: 'Was instruction effective?',
+                description: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).\n\nIf you chose the wrong option, simply choose the correct one and continue.',
                 choices: [
-                    { id: 'improved', label: 'Yes, Student Improved', sublabel: 'Blue or Green results - showing progress', type: 'success', nextNode: 'tier3-success' },
-                    { id: 'no-improvement', label: 'No Improvement', sublabel: 'Yellow or Red results - needs specialist support', type: 'warning', nextNode: 'tier3-specialist' }
+                    { id: 'improved', label: 'Option A: Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier3-success' },
+                    { id: 'no-improvement', label: 'Option B: Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier3-specialist' }
                 ]
             },
             'tier3-success': {
                 id: 'tier3-success',
                 type: 'endpoint',
                 status: 'success',
-                title: 'Student Showed Improvement!',
-                description: 'The intensive Tier 3 intervention was effective. The student is making progress.',
+                title: 'Step 4: Success!',
+                description: 'Consider fading supports to Tier 1 and monitor.',
                 recommendations: [
-                    'Gradually fade intervention support while monitoring closely',
-                    'Consider moving to Tier 2 with reduced intensity',
-                    'Continue progress monitoring frequently',
-                    'Celebrate progress and maintain momentum',
-                    'May return to Tier 1 if sufficient progress is maintained'
-                ],
-                actionButton: { text: 'Move to Tier 2', action: 'startTier2Visual' }
+                    'Consider fading supports to Tier 1 and monitor.'
+                ]
             },
             'tier3-specialist': {
                 id: 'tier3-specialist',
                 type: 'endpoint',
-                status: 'danger',
-                title: 'Clinician Consultation Required',
-                description: 'The student has not responded to intensive intervention. Specialized assessment and support is needed.',
-                recommendations: [
-                    'Schedule a meeting with school clinicians and specialists',
-                    'Consider referral to special education staff',
-                    'Consult with speech-language pathologists',
-                    'Work with school psychologists',
-                    'Collaborate with reading specialists',
-                    'Discuss formal special education assessment'
-                ],
-                warningBox: {
-                    title: 'Important Note',
-                    text: 'This student needs specialized support beyond what this app can provide. Work with your school\'s student support team to determine the best path forward.'
-                }
+                status: 'warning',
+                title: 'Step 4: Meet with Clinicians',
+                description: 'Meet with the appropriate clinicians to discuss next steps.'
             }
         }
     }
@@ -2134,6 +2127,15 @@ function createIntegratedInfoNode(nodeData) {
         </ul>
     ` : '';
     
+    const sectionsHTML = nodeData.sections ? nodeData.sections.map(section => `
+        <div class="info-section">
+            <h4>${escapeHtml(section.title)}</h4>
+            <ul class="feature-list">
+                ${section.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+            </ul>
+        </div>
+    `).join('') : '';
+
     const warningBoxHTML = nodeData.warningBox ? `
         <div class="warning-callout">
             ${ICONS.warning}
@@ -2158,6 +2160,7 @@ function createIntegratedInfoNode(nodeData) {
             ${warningBoxHTML}
             ${nodeData.features ? `<h4>${nodeData.featuresTitle || 'Key Characteristics'}</h4>` : ''}
             ${featuresHTML}
+            ${sectionsHTML}
             <button class="continue-btn" onclick="proceedFromIntegratedInfo('${nodeData.id}', '${nodeData.nextNode}')">
                 ${nodeData.buttonText}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -4290,26 +4293,15 @@ function proceedToTier3Assessment() {
                     </svg>
                     Back
                 </button>
-                <h2>Tier 3: Comprehensive Assessment</h2>
+                <h2>Tier 3: Drill Down Assessment</h2>
             </div>
             
             <div class="flowchart-content">
                 <div class="flowchart-step-wrapper active">
-                    <div class="step-indicator">Step 2</div>
+                    <div class="step-indicator">Step 1</div>
                     <div class="step-content-box">
-                        <h3>Select Comprehensive Diagnostic Assessment</h3>
-                        <p>Choose a highly targeted assessment to identify specific literacy gaps:</p>
-                        
-                        <div class="info-callout warning">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 8v4m0 4h.01"/>
-                            </svg>
-                            <div>
-                                <h4>Tier 3 Assessment</h4>
-                                <p>These comprehensive assessments provide very detailed information to guide intensive intervention selection. Consider consulting with specialists.</p>
-                            </div>
-                        </div>
+                        <h3>Administer a drill down assessment.</h3>
+                        <p>Use the menu below to find and administer a drill down assessment that aligns with the needs of your students, as determined by the literacy screener.</p>
                         
                         <div class="screener-selection-grid">
                             ${flowchartData.drillDownAssessments.map(assessment => `
@@ -4368,26 +4360,15 @@ function proceedToTier3Intervention() {
                     </svg>
                     Back
                 </button>
-                <h2>Tier 3: Select Intensive Intervention</h2>
+                <h2>Tier 3: 8-week Intervention</h2>
             </div>
             
             <div class="flowchart-content">
                 <div class="flowchart-step-wrapper active">
-                    <div class="step-indicator">Step 3</div>
+                    <div class="step-indicator">Step 2</div>
                     <div class="step-content-box">
-                        <h3>Choose an Intensive Intervention Program</h3>
-                        <p>Select a highly specialized, research-based program for intensive support:</p>
-                        
-                        <div class="info-callout warning">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 8v4m0 4h.01"/>
-                            </svg>
-                            <div>
-                                <h4>8-Week Intensive Cycle</h4>
-                                <p>Implement the intervention for 8 weeks with <strong>weekly progress monitoring</strong>. These programs often require specialized training.</p>
-                            </div>
-                        </div>
+                        <h3>Select and administer an 8-week intervention.</h3>
+                        <p>Use the menu below to find an appropriate intervention, and administer for an 8-week period. Monitor student response to intervention weekly.</p>
                         
                         <div class="screener-selection-grid">
                             ${flowchartData.interventions.map(intervention => `
@@ -4444,51 +4425,29 @@ function proceedToTier3ProgressMonitoring() {
             
             <div class="flowchart-content">
                 <div class="flowchart-step-wrapper active">
-                    <div class="step-indicator">Step 4</div>
+                    <div class="step-indicator">Step 3</div>
                     <div class="step-content-box">
-                        <h3>After 8 Weeks: Evaluate Student Progress</h3>
-                        <p>Administer a literacy screener to determine if the intensive intervention was effective:</p>
+                        <h3>Was instruction effective?</h3>
+                        <p>After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).</p>
                         
-                        <div class="info-callout warning">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 8v4m0 4h.01"/>
-                            </svg>
-                            <div>
-                                <h4>Important</h4>
-                                <p>You should have been monitoring progress <strong>weekly</strong> throughout the 8-week cycle. Now it's time to evaluate overall progress.</p>
-                            </div>
-                        </div>
+                        <p>If you chose the wrong option, simply choose the correct one and continue.</p>
                         
-                        <div class="info-callout">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                            <div>
-                                <h4>Acceptable Screeners</h4>
-                                <ul class="indicator-list">
-                                    <li>DIBELS (Dynamic Indicators of Basic Early Literacy Skills)</li>
-                                    <li>CTOPP-2 (Comprehensive Test of Phonological Processing)</li>
-                                    <li>THaFoL (French literacy screener)</li>
-                                    <li>IDAPEL (French early literacy indicators)</li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Did the student show improvement?</h4>
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Was instruction effective?</h4>
                         
                         <div class="decision-buttons">
                             <button class="decision-btn success" onclick="tier3StudentImproved()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                                 <div>
-                                    <strong>Yes, Student Improved</strong>
-                                    <span>Blue or Green results - showing progress</span>
+                                    <strong>Option A: Instruction Effective</strong>
+                                    <span>Subtest result Blue or Green</span>
                                 </div>
                             </button>
                             
                             <button class="decision-btn warning" onclick="tier3StudentDidNotImprove()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                 <div>
-                                    <strong>No Improvement</strong>
-                                    <span>Yellow or Red results - needs specialist support</span>
+                                    <strong>Option B: Instruction Ineffective</strong>
+                                    <span>Subtest result Yellow or Red</span>
                                 </div>
                             </button>
                         </div>
@@ -4512,7 +4471,7 @@ function tier3StudentImproved() {
                     </svg>
                     Back to Interventions
                 </button>
-                <h2>Tier 3: Progress Made!</h2>
+                <h2>Tier 3: Success!</h2>
             </div>
             
             <div class="flowchart-content">
@@ -4520,24 +4479,10 @@ function tier3StudentImproved() {
                     <div class="success-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
                     </div>
-                    <h2>Student Showed Improvement!</h2>
-                    <p>The intensive Tier 3 intervention was effective. The student is making progress.</p>
-                    
-                    <div class="recommendation-box">
-                        <h3>Next Steps:</h3>
-                        <ul>
-                            <li>Gradually fade intervention support while monitoring closely</li>
-                            <li>Consider moving to Tier 2 with reduced intensity</li>
-                            <li>Continue progress monitoring frequently</li>
-                            <li>Celebrate progress and maintain momentum</li>
-                            <li>May return to Tier 1 if sufficient progress is maintained</li>
-                        </ul>
-                    </div>
+                    <h2>Step 4: Success!</h2>
+                    <p>Consider fading supports to Tier 1 and monitor.</p>
                     
                     <div class="action-buttons">
-                        <button class="btn-primary" onclick="startTier2Flowchart()">
-                            Move to Tier 2
-                        </button>
                         <button class="btn-secondary" onclick="closeTierFlowchart()">
                             Return to Interventions
                         </button>
@@ -4561,7 +4506,7 @@ function tier3StudentDidNotImprove() {
                     </svg>
                     Back to Interventions
                 </button>
-                <h2>Tier 3: Specialist Support Needed</h2>
+                <h2>Tier 3: Meet with Clinicians</h2>
             </div>
             
             <div class="flowchart-content">
@@ -4569,37 +4514,8 @@ function tier3StudentDidNotImprove() {
                     <div class="warning-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
-                    <h2>Clinician Consultation Required</h2>
-                    <p>The student has not responded to intensive intervention. Specialized assessment and support is needed.</p>
-                    
-                    <div class="recommendation-box">
-                        <h3>Recommended Next Steps:</h3>
-                        <ul>
-                            <li><strong>Schedule a meeting</strong> with school clinicians and specialists</li>
-                            <li><strong>Consider referral</strong> to special education staff</li>
-                            <li><strong>Consult with:</strong>
-                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                                    <li>Speech-language pathologists</li>
-                                    <li>School psychologists</li>
-                                    <li>Reading specialists</li>
-                                    <li>Special education coordinators</li>
-                                </ul>
-                            </li>
-                            <li><strong>Discuss:</strong> Formal special education assessment</li>
-                            <li><strong>Explore:</strong> Medical or developmental evaluations if appropriate</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="info-callout warning">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 8v4m0 4h.01"/>
-                        </svg>
-                        <div>
-                            <h4>Important Note</h4>
-                            <p>This student needs specialized support beyond what this app can provide. Work with your school's student support team to determine the best path forward.</p>
-                        </div>
-                    </div>
+                    <h2>Step 4: Meet with Clinicians</h2>
+                    <p>Meet with the appropriate clinicians to discuss next steps.</p>
                     
                     <button class="btn-primary" onclick="closeTierFlowchart()">
                         Return to Interventions
