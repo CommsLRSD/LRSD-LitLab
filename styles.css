@@ -4231,6 +4231,65 @@ body.evidence-modal-open { overflow: hidden; }
   color: var(--primary);
 }
 
+/* ── Pre-animation gate screen ── */
+.pre-anim-gate .journey-review-header {
+  margin-bottom: var(--space-lg);
+}
+
+.pre-anim-outcome {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 2px solid transparent;
+  margin-bottom: var(--space-xl);
+}
+
+.pre-anim-badge-success { background: var(--effective-bg);   border-color: var(--effective); }
+.pre-anim-badge-info    { background: var(--effective-bg);   border-color: var(--effective); }
+.pre-anim-badge-warning { background: var(--ineffective-bg); border-color: var(--ineffective); }
+.pre-anim-badge-danger  { background: var(--ineffective-bg); border-color: var(--ineffective); }
+
+.pre-anim-outcome-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pre-anim-outcome-icon svg { width: 32px; height: 32px; }
+
+.pre-anim-outcome-body { flex: 1; }
+
+.pre-anim-outcome-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.pre-anim-outcome-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  white-space: pre-line;
+}
+
+.pre-anim-prompt {
+  display: flex;
+  justify-content: center;
+}
+
+.pre-anim-play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 1rem;
+  padding: 14px 28px;
+}
+
 /* Summary / Review modal */
 .summary-overlay,
 .review-modal {

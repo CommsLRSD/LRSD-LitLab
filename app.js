@@ -2747,8 +2747,59 @@ function buildAnimStepBubble(nodeDef, choice) {
         </div>`;
 }
 
-// Show the complete cross-tier journey summary at a true terminal endpoint
+// Stored for deferred animation play (set by showFinalSummary, consumed by playFinalSummaryAnimation)
+let _pendingEndpointNodeData = null;
+
+// Show the complete cross-tier journey summary at a true terminal endpoint.
+// First shows a summary gate screen; the animation plays when the user clicks "View Your Journey".
 function showFinalSummary(endpointNodeData) {
+    const stepsContainer = getActiveStepTarget();
+    if (!stepsContainer) return;
+
+    _pendingEndpointNodeData = endpointNodeData;
+
+    const prevBtn = document.getElementById('carousel-prev-btn');
+    if (prevBtn) prevBtn.style.display = 'none';
+    completeJourneyMap();
+
+    // ── Outcome badge styling ──
+    const statusBadgeClass = {
+        success: 'pre-anim-badge-success',
+        info:    'pre-anim-badge-info',
+        warning: 'pre-anim-badge-warning',
+        danger:  'pre-anim-badge-danger',
+    }[endpointNodeData?.status] || 'pre-anim-badge-info';
+
+    const statusIcon = ICONS[endpointNodeData?.status] || ICONS.info;
+
+    stepsContainer.innerHTML = `
+        <div class="pre-anim-gate journey-review journey-review-visible">
+            <div class="journey-review-header">
+                <h2>Route Complete</h2>
+                <p>You've finished this pathway. Review the outcome below, then view your full journey summary.</p>
+            </div>
+            <div class="pre-anim-outcome ${statusBadgeClass}">
+                <div class="pre-anim-outcome-icon">${statusIcon}</div>
+                <div class="pre-anim-outcome-body">
+                    <div class="pre-anim-outcome-title">${escapeHtml(endpointNodeData?.title || 'Route Complete')}</div>
+                    ${endpointNodeData?.description ? `<div class="pre-anim-outcome-desc">${escapeHtml(endpointNodeData.description)}</div>` : ''}
+                </div>
+            </div>
+            <div class="pre-anim-prompt">
+                <button class="action-btn action-primary pre-anim-play-btn" onclick="playFinalSummaryAnimation()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    View Your Journey
+                </button>
+            </div>
+        </div>
+    `;
+
+    scrollToActiveStep();
+}
+
+// Play the staggered journey animation after the user clicks "View Your Journey"
+function playFinalSummaryAnimation() {
+    const endpointNodeData = _pendingEndpointNodeData;
     const stepsContainer = getActiveStepTarget();
     if (!stepsContainer) return;
 
@@ -2840,9 +2891,6 @@ function showFinalSummary(endpointNodeData) {
         </div>
     `;
 
-    const prevBtn = document.getElementById('carousel-prev-btn');
-    if (prevBtn) prevBtn.style.display = 'none';
-    completeJourneyMap();
     requestAnimationFrame(() => {
         const review = stepsContainer.querySelector('.journey-review');
         if (review) review.classList.add('journey-review-visible');
