@@ -1042,6 +1042,9 @@ function initIntegratedFlowchart(tierId) {
     container.classList.remove('flowchart-hidden');
     container.innerHTML = `
         <div class="integrated-flowchart">
+            <div class="flowchart-tier-name-bar" id="flowchart-tier-name-bar" role="status" aria-label="Current tier">
+                <span class="flowchart-tier-name-value" id="flowchart-tier-name-value">${escapeHtml(getTierName(flowchartDef.title))}</span>
+            </div>
             <div class="flowchart-glass-header">
                 <button class="flowchart-back-btn" onclick="closeIntegratedFlowchart()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1127,9 +1130,6 @@ function initIntegratedFlowchart(tierId) {
                 </div>
             </div>
 
-            <div class="flowchart-tier-name-bar" id="flowchart-tier-name-bar" role="status" aria-label="Current tier">
-                <span class="flowchart-tier-name-value" id="flowchart-tier-name-value">${escapeHtml(getTierName(flowchartDef.title))}</span>
-            </div>
         </div>
     `;
     
@@ -1242,11 +1242,8 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
             // Multiple tier-transition options → show choice card (no journey review)
             showTierTransitionChoice(nodeData);
         } else {
-            // True terminal endpoint — render the endpoint card inline; the
-            // Your Decisions panel already shows the full journey, so no
-            // separate summary screen is needed.
-            renderJourney('forward');
-            completeJourneyMap();
+            // True terminal endpoint — show the full route animation summary.
+            showFinalSummary(nodeData);
         }
         return;
     }
