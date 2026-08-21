@@ -6636,3 +6636,341 @@ body.evidence-modal-open { overflow: hidden; }
   border-radius: var(--radius-pill);
   margin-top: 0;
 }
+
+/* ============================================================
+   SCORES & PERCENTILES PAGE
+   ============================================================ */
+
+.scores-page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.scores-page-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ── Block container ── */
+.scores-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.scores-block-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary-faint);
+}
+
+.scores-block-title .material-symbols-rounded {
+  font-size: 1.5rem;
+  color: var(--primary-light);
+}
+
+/* ── Info cards row ── */
+.scores-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 700px) {
+  .scores-cards-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scores-info-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.scores-info-card-full {
+  width: 100%;
+}
+
+.scores-info-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem;
+  background: var(--primary-faint);
+  border-bottom: 1px solid var(--border);
+}
+
+.scores-info-card-header .material-symbols-rounded {
+  font-size: 1.4rem;
+  color: var(--primary-light);
+  flex-shrink: 0;
+}
+
+.scores-info-card-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+}
+
+.scores-info-card-body {
+  padding: 1.1rem 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.scores-info-card-body p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* ── Callout strip ── */
+.scores-callout {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.88rem;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.scores-callout .material-symbols-rounded {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.scores-callout-blue {
+  background: var(--info-light);
+  color: var(--info-text);
+}
+
+.scores-callout-blue .material-symbols-rounded {
+  color: var(--info);
+}
+
+/* ── Risk categories grid ── */
+.risk-categories-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 700px) {
+  .risk-categories-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Risk card base ── */
+.risk-card {
+  border-radius: var(--radius-lg);
+  border: 2px solid;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.risk-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.risk-badge .material-symbols-rounded {
+  font-size: 1.3rem;
+}
+
+.risk-card-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.risk-colour-dot {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.risk-card-label h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.risk-subtitle {
+  font-weight: 400;
+  font-size: 0.9rem;
+}
+
+.risk-card-body {
+  padding: 1rem 1.25rem;
+  flex: 1;
+}
+
+.risk-card-body p {
+  font-size: 0.93rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.risk-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-top: 1px solid rgba(0,0,0,0.07);
+}
+
+.risk-card-footer .material-symbols-rounded {
+  font-size: 1.05rem;
+}
+
+/* ── Blue (Above Benchmark) ── */
+.risk-card-blue {
+  border-color: #5a9ec9;
+}
+
+.risk-card-blue .risk-card-header {
+  background: #edf5fc;
+}
+
+.risk-card-label h4 {
+  color: var(--text);
+}
+
+.risk-badge-blue {
+  background: rgba(90,158,201,0.18);
+  color: #2f6a92;
+}
+
+.risk-dot-blue { background: #5a9ec9; }
+
+.risk-footer-blue {
+  background: #edf5fc;
+  color: #2f6a92;
+}
+
+/* ── Green (At Benchmark) ── */
+.risk-card-green {
+  border-color: #5eb892;
+}
+
+.risk-card-green .risk-card-header {
+  background: #ecf8f2;
+}
+
+.risk-badge-green {
+  background: rgba(94,184,146,0.18);
+  color: var(--success-text);
+}
+
+.risk-dot-green { background: #5eb892; }
+
+.risk-footer-green {
+  background: #ecf8f2;
+  color: var(--success-text);
+}
+
+/* ── Yellow (Some Risk) ── */
+.risk-card-yellow {
+  border-color: #d1a44e;
+}
+
+.risk-card-yellow .risk-card-header {
+  background: #fdf6e8;
+}
+
+.risk-badge-yellow {
+  background: rgba(209,164,78,0.18);
+  color: var(--warning-text);
+}
+
+.risk-dot-yellow { background: #d1a44e; }
+
+.risk-footer-yellow {
+  background: #fdf6e8;
+  color: var(--warning-text);
+}
+
+/* ── Red (At Risk) ── */
+.risk-card-red {
+  border-color: #c27070;
+}
+
+.risk-card-red .risk-card-header {
+  background: #fdf0f0;
+}
+
+.risk-badge-red {
+  background: rgba(194,112,112,0.18);
+  color: #97333b;
+}
+
+.risk-dot-red { background: #c27070; }
+
+.risk-footer-red {
+  background: #fdf0f0;
+  color: #97333b;
+}
+
+/* ── Scores reference button (flowchart sidebar) ── */
+.scores-ref-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--info-text);
+  background: var(--info-light);
+  border: 1.5px solid var(--info);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.scores-ref-btn .material-symbols-rounded {
+  font-size: 1.05rem;
+}
+
+.scores-ref-btn:hover,
+.scores-ref-btn:focus-visible {
+  background: var(--info);
+  color: #fff;
+  outline: none;
+}

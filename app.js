@@ -1100,6 +1100,10 @@ function initIntegratedFlowchart(tierId) {
                             </p>
                             <p>If student screener results indicate Yellow or Red in any one area, instruction is unsuccessful.</p>
                             <p class="tier1-success-sidebar-note">Monitoring and interventions are needed.</p>
+                            <button class="scores-ref-btn" onclick="navigateToPage('scores')" type="button">
+                                <span class="material-symbols-rounded" aria-hidden="true">bar_chart</span>
+                                See Understanding Scores &amp; Percentiles
+                            </button>
                         </div>
                     </aside>` : ''}
                     <aside class="journey-map" id="journey-map" aria-label="Decision summary">
