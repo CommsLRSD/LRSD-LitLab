@@ -2687,53 +2687,163 @@ function showTierTransitionChoice(nodeData) {
     scrollToActiveStep();
 }
 
+// Per-node plain-language summary lookup. Keys are node IDs; for decision nodes
+// the value is an object keyed by choice outcome ('effective'/'ineffective'/etc.).
+const NODE_SUMMARIES = {
+    // ── Tier 1 ──
+    'tier1-principles': {
+        text: 'You confirmed that classroom instruction follows the principles of explicit and systematic teaching — the foundation is solid! 📚',
+        variant: 'step1'
+    },
+    'tier1-screener': {
+        text: (choice) => `You administered the ${choice || 'literacy screener'} to measure where students are right now. Time to look at the data! 📊`,
+        variant: 'selection'
+    },
+    'tier1-effectiveness': {
+        effective:   { text: 'The literacy screener came back Blue or Green — this student is on track and instruction is working! 🎉', variant: 'effective' },
+        ineffective: { text: 'The literacy screener showed Yellow or Red — instruction needs some adjustment for this student. 📋', variant: 'ineffective' }
+    },
+    'tier1-percentage': {
+        'more-20':   { text: 'More than 20% of students aren\'t at benchmark — this points to a whole-class instructional gap. Time to look at Tier 2 supports! 📊', variant: 'ineffective' },
+        'less-20':   { text: 'Fewer than 20% of students need extra help — targeted reteaching for a small group is the next step! 🔄', variant: 'ineffective' }
+    },
+
+    // ── Tier 2 ──
+    'tier2-principles': {
+        text: 'You ruled out vision, hearing, attendance, language, and other barriers — the student is ready for focused Tier 2 intervention! ✅',
+        variant: 'step1'
+    },
+    'tier2-assessment': {
+        text: (choice) => `You selected ${choice || 'a drill-down assessment'} to pinpoint exactly which literacy skills need the most support. 🔍`,
+        variant: 'selection'
+    },
+    'tier2-intervention': {
+        text: (choice) => `You chose ${choice || 'an intervention program'} for the 8-week intervention cycle — the focused, small-group work begins! 💪`,
+        variant: 'selection'
+    },
+    'tier2-progress': {
+        effective:        { text: 'After the 8-week cycle, the screener came back Blue or Green — the intervention worked! What a great result! 🌟', variant: 'effective' },
+        'no-improvement': { text: 'After 8 weeks, the results still show Yellow or Red — the student needs another cycle before we reassess. 📋', variant: 'ineffective' }
+    },
+    'tier2-cycle2-assessment': {
+        text: (choice) => `You selected ${choice || 'a drill-down assessment'} for the second cycle — let\'s get an even clearer picture. 🔍`,
+        variant: 'selection'
+    },
+    'tier2-cycle2-intervention': {
+        text: (choice) => `You chose ${choice || 'an intervention program'} for the second 8-week cycle — adjusted and ready to go! 💪`,
+        variant: 'selection'
+    },
+    'tier2-cycle2-progress': {
+        effective:        { text: 'The second intervention cycle paid off — the student\'s results are now Blue or Green! Time to consider fading back to Tier 1. 🎉', variant: 'effective' },
+        'no-improvement': { text: 'After two full cycles, the student needs more intensive, personalized support — moving on to Tier 3. 📋', variant: 'ineffective' }
+    },
+
+    // ── Tier 3 ──
+    'tier3-intro': {
+        text: 'You reviewed the Tier 3 entry criteria and confirmed this student meets the requirements for intensive, personalized intervention. 📋',
+        variant: 'step1'
+    },
+    'tier3-assessment': {
+        text: (choice) => `You selected ${choice || 'a drill-down assessment'} to guide the individualized Tier 3 intervention plan. 🔍`,
+        variant: 'selection'
+    },
+    'tier3-intervention': {
+        text: (choice) => `You chose ${choice || 'an intensive intervention program'} for personalized, small-group Tier 3 sessions — every minute counts! 💪`,
+        variant: 'selection'
+    },
+    'tier3-progress': {
+        effective:        { text: 'Tier 3 interventions are making a real difference — the student\'s results are now Blue or Green! Let\'s discuss next steps. 🌟', variant: 'effective' },
+        'no-improvement': { text: 'The student needs continued Tier 3 support and a closer look with specialists. The team is here for them! 📋', variant: 'ineffective' }
+    }
+};
+
+// Resolve a choice outcome key from a raw choice object
+function resolveChoiceOutcomeKey(choice) {
+    if (!choice) return null;
+    const id = (choice.id || '').toLowerCase();
+    const name = (choice.name || '').toLowerCase();
+    if (id.includes('effective') || id.includes('success') || id.includes('improved') ||
+        name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
+        return 'effective';
+    }
+    if (id.includes('ineffective') || id.includes('no-improvement') || id.includes('unsuccess') ||
+        name.includes('ineffective') || name.includes('unsuccess') || name.includes('yellow') || name.includes('red')) {
+        return 'ineffective';
+    }
+    return id || null;
+}
+
 // Build a plain-language sentence for each step in the journey animation
 function buildAnimStepBubble(nodeDef, choice) {
     const type = nodeDef.type;
-    let label = '';
+    const nodeId = nodeDef.id || '';
+    let label = 'Step summary';
     let mainText = '';
     let subText = '';
     let iconSVG = getStepTypeIcon(type);
-    let variant = ''; // '', 'effective', 'ineffective'
+    let variant = '';
     const typeClass = type ? ` anim-step-type-${type}` : '';
     const normalizeChoiceName = (raw) => (raw || '').replace(/^Option\s+[A-Z0-9]+\s*:\s*/i, '').trim();
     const chosenName = normalizeChoiceName(choice?.name || choice?.label || '');
 
-    if (type === 'checklist') {
-        label = 'Step summary';
-        mainText = nodeDef.journeySummary || `You completed this checklist: ${nodeDef.subtitle || nodeDef.title}.`;
-        subText = nodeDef.reviewHint || 'You can reopen this step from the process map to review details.';
-    } else if (type === 'info') {
-        label = 'Step summary';
-        mainText = nodeDef.journeySummary || `You reviewed key information for this step: ${nodeDef.title}.`;
-        subText = nodeDef.reviewHint || 'You can reopen this step from the process map to review details.';
-    } else if (type === 'selection') {
-        label = 'Step summary';
-        mainText = nodeDef.journeySummary
-            ? nodeDef.journeySummary.replace('{choice}', chosenName || 'your selected option')
-            : `You selected ${chosenName || 'an option'} for ${nodeDef.subtitle || nodeDef.title}.`;
-        subText = nodeDef.reviewHint || '';
-    } else if (type === 'decision') {
-        label = 'Step summary';
-        if (choice) {
-            mainText = nodeDef.journeySummary
-                ? nodeDef.journeySummary.replace('{choice}', chosenName || 'your decision')
-                : `You determined: ${chosenName || 'the next action'}.`;
-            // Colour-code by the choice
-            const id = (choice.id || '').toLowerCase();
-            const name = (choice.name || '').toLowerCase();
-            if (id.includes('effective') || id.includes('success') || name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
-                variant = 'effective';
-            } else if (id.includes('ineffective') || id.includes('unsuccess') || name.includes('ineffective') || name.includes('unsuccess') || name.includes('yellow') || name.includes('red') || name.includes('20%') || name.includes('20 %')) {
-                variant = 'ineffective';
+    // Look up rich summary for this specific node
+    const nodeSummary = NODE_SUMMARIES[nodeId];
+
+    if (nodeSummary) {
+        if (type === 'decision' && choice) {
+            // Decision nodes have per-outcome sub-objects
+            const outcomeKey = resolveChoiceOutcomeKey(choice);
+            const outcomeSummary = nodeSummary[outcomeKey] || nodeSummary[choice.id] || null;
+            if (outcomeSummary) {
+                mainText = outcomeSummary.text;
+                variant = outcomeSummary.variant || '';
             }
-        } else {
-            mainText = nodeDef.journeySummary || `You completed this decision step: ${nodeDef.title}.`;
+        } else if (typeof nodeSummary.text === 'function') {
+            mainText = nodeSummary.text(chosenName);
+            variant = nodeSummary.variant || '';
+        } else if (nodeSummary.text) {
+            mainText = nodeSummary.text;
+            variant = nodeSummary.variant || '';
         }
-        subText = nodeDef.reviewHint || '';
-    } else {
-        label = 'Step summary';
-        mainText = nodeDef.journeySummary || `You completed this step: ${nodeDef.title}.`;
+    }
+
+    // Fall back to journeySummary / generic text if no lookup hit
+    if (!mainText) {
+        if (type === 'checklist') {
+            mainText = nodeDef.journeySummary || `You completed the checklist "${nodeDef.subtitle || nodeDef.title}" and confirmed everything is in order.`;
+            variant = variant || 'step1';
+            subText = nodeDef.reviewHint || 'You can reopen this step from the process map to review details.';
+        } else if (type === 'info') {
+            mainText = nodeDef.journeySummary || `You reviewed the entry information for this stage and are ready to proceed.`;
+            variant = variant || 'step1';
+            subText = nodeDef.reviewHint || 'You can reopen this step from the process map to review details.';
+        } else if (type === 'selection') {
+            mainText = nodeDef.journeySummary
+                ? nodeDef.journeySummary.replace('{choice}', chosenName || 'your selected option')
+                : `You selected ${chosenName || 'an option'} — a great choice to guide the next steps!`;
+            variant = variant || 'selection';
+        } else if (type === 'decision') {
+            if (choice) {
+                mainText = nodeDef.journeySummary
+                    ? nodeDef.journeySummary.replace('{choice}', chosenName || 'your decision')
+                    : `Based on the results, you determined: ${chosenName || 'the next action'}.`;
+                // Colour-code by the choice if variant not already set
+                if (!variant) {
+                    const id = (choice.id || '').toLowerCase();
+                    const name = (choice.name || '').toLowerCase();
+                    if (id.includes('effective') || id.includes('success') || name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
+                        variant = 'effective';
+                    } else if (id.includes('ineffective') || id.includes('unsuccess') || name.includes('ineffective') || name.includes('unsuccess') || name.includes('yellow') || name.includes('red') || name.includes('20%') || name.includes('20 %')) {
+                        variant = 'ineffective';
+                    }
+                }
+            } else {
+                mainText = nodeDef.journeySummary || `You completed this decision step: ${nodeDef.title}.`;
+            }
+            subText = nodeDef.reviewHint || '';
+        } else {
+            mainText = nodeDef.journeySummary || `You completed this step: ${nodeDef.title}.`;
+        }
     }
 
     return `
