@@ -2688,23 +2688,84 @@ function showTierTransitionChoice(nodeData) {
     scrollToActiveStep();
 }
 
+// Build a plain-language sentence for each step in the journey animation
+function buildAnimStepBubble(nodeDef, choice) {
+    const type = nodeDef.type;
+    let label = '';
+    let mainText = '';
+    let subText = '';
+    let iconSVG = getStepTypeIcon(type);
+    let variant = ''; // '', 'effective', 'ineffective'
+
+    if (type === 'checklist') {
+        label = 'You reviewed';
+        mainText = nodeDef.title;
+        subText = 'Checklist completed ✓';
+    } else if (type === 'info') {
+        label = 'You reviewed';
+        mainText = nodeDef.title;
+        subText = nodeDef.subtitle || 'Information reviewed ✓';
+    } else if (type === 'selection') {
+        label = 'You selected';
+        mainText = choice ? choice.name : nodeDef.title;
+        subText = nodeDef.title;
+    } else if (type === 'decision') {
+        label = 'You decided';
+        if (choice) {
+            mainText = choice.name;
+            // Colour-code by the choice
+            const id = (choice.id || '').toLowerCase();
+            const name = (choice.name || '').toLowerCase();
+            if (id.includes('effective') || id.includes('success') || name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
+                variant = 'effective';
+            } else if (id.includes('ineffective') || id.includes('unsuccess') || name.includes('ineffective') || name.includes('unsuccess') || name.includes('yellow') || name.includes('red') || name.includes('20%') || name.includes('20 %')) {
+                variant = 'ineffective';
+            }
+        } else {
+            mainText = nodeDef.title;
+        }
+        subText = nodeDef.title;
+    } else {
+        label = 'Step';
+        mainText = nodeDef.title;
+    }
+
+    return `
+        <div class="anim-step-bubble${variant ? ' anim-bubble-' + variant : ''}">
+            <div class="anim-step-bubble-icon">${iconSVG}</div>
+            <div class="anim-step-bubble-text">
+                <div class="anim-step-bubble-label">${escapeHtml(label)}</div>
+                <div class="anim-step-bubble-main">${escapeHtml(mainText)}</div>
+                ${subText && subText !== mainText ? `<div class="anim-step-bubble-sub">${escapeHtml(subText)}</div>` : ''}
+            </div>
+        </div>`;
+}
+
 // Show the complete cross-tier journey summary at a true terminal endpoint
 function showFinalSummary(endpointNodeData) {
     const stepsContainer = getActiveStepTarget();
     if (!stepsContainer) return;
 
     const fullJourney = appState.fullJourney || [];
-    const statusClasses = { success: 'journey-endpoint-success', info: 'journey-endpoint-info', warning: 'journey-endpoint-warning', danger: 'journey-endpoint-danger' };
 
-    let journeyHTML = '';
+    // ── Collect all animation items (tier badges, step bubbles, connectors, endpoint) ──
+    // Each item is { html, isConnector }
+    const items = [];
+
     fullJourney.forEach((tierSnapshot, tierIndex) => {
         const tierDef = FLOWCHART_DEFINITIONS[tierSnapshot.tierId];
         if (!tierDef) return;
 
-        journeyHTML += `<div class="journey-tier-section">
-            <div class="journey-tier-header">
-                <span class="journey-tier-badge">${tierDef.title.split(':')[0].trim()}</span>
-            </div>`;
+        const tierLabel = tierDef.title || tierSnapshot.tierId;
+
+        // Tier badge
+        if (tierIndex > 0) {
+            items.push({ html: `<div class="anim-connector"><div class="anim-connector-line"></div><div class="anim-connector-arrow"></div></div>`, isConnector: true });
+        }
+        items.push({
+            html: `<div class="anim-tier-badge"><span class="anim-tier-badge-inner">${escapeHtml(tierLabel.split(':')[0].trim())}</span></div>`,
+            isConnector: false
+        });
 
         tierSnapshot.selectedPath.forEach((step, stepIndex) => {
             const nodeDef = tierDef.nodes[step.nodeId];
@@ -2713,54 +2774,29 @@ function showFinalSummary(endpointNodeData) {
             const choice = tierSnapshot.choices[step.nodeId];
             const isEndpoint = nodeDef.type === 'endpoint';
 
+            // Connector between steps
             if (stepIndex > 0) {
-                journeyHTML += `<div class="journey-connector">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-                        <path d="M12 5v14M5 12l7 7 7-7"/>
-                    </svg>
-                </div>`;
+                items.push({ html: `<div class="anim-connector"><div class="anim-connector-line"></div><div class="anim-connector-arrow"></div></div>`, isConnector: true });
             }
 
             if (isEndpoint) {
-                const statusClass = statusClasses[nodeDef.status] || 'journey-endpoint-info';
-                const recommendationsHTML = nodeDef.recommendations ? `
-                    <div class="recommendations-box">
-                        <h4>Recommendations</h4>
-                        <ul>${nodeDef.recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
-                    </div>` : '';
-                const warningBoxHTML = nodeDef.warningBox ? `
-                    <div class="warning-callout">
-                        ${ICONS.warning}
-                        <div><h4>${nodeDef.warningBox.title}</h4><p>${nodeDef.warningBox.text}</p></div>
-                    </div>` : '';
-                journeyHTML += `<div class="journey-endpoint ${statusClass}">
-                    <div class="journey-endpoint-icon">${ICONS[nodeDef.status] || ICONS.info}</div>
-                    <h3>${nodeDef.title}</h3>
-                    <p>${nodeDef.description || ''}</p>
-                    ${warningBoxHTML}
-                    ${recommendationsHTML}
-                </div>`;
+                const isNeg = nodeDef.status === 'warning' || nodeDef.status === 'danger';
+                const endIcon = isNeg ? ICONS.warning : ICONS.success;
+                items.push({
+                    html: `<div class="anim-endpoint-card${isNeg ? ' anim-endpoint-ineffective' : ''}">
+                        <div class="anim-endpoint-icon">${endIcon}</div>
+                        <div class="anim-endpoint-title">${escapeHtml(nodeDef.title)}</div>
+                        <div class="anim-endpoint-desc">${escapeHtml(nodeDef.description || '')}</div>
+                    </div>`,
+                    isConnector: false
+                });
             } else {
-                let choiceText = '';
-                if (choice) {
-                    choiceText = choice.name;
-                } else if (nodeDef.type === 'checklist') {
-                    choiceText = 'Completed';
-                }
-                journeyHTML += `<div class="journey-step journey-step-${nodeDef.type}">
-                    <div class="journey-step-marker"><span class="journey-marker-icon">${getStepTypeIcon(nodeDef.type)}</span></div>
-                    <div class="journey-step-details">
-                        <div class="journey-step-title">${nodeDef.title}</div>
-                        ${choiceText ? `<div class="journey-step-choice">${choiceText}</div>` : ''}
-                    </div>
-                </div>`;
+                items.push({ html: buildAnimStepBubble(nodeDef, choice), isConnector: false });
             }
         });
-
-        journeyHTML += '</div>';
     });
 
-    // Build action buttons
+    // ── Build action buttons ──
     let actionsHTML = '';
     const actionFnMap = { restartTier1Visual: 'restartTier1VisualIntegrated' };
     if (endpointNodeData?.actionButton && actionFnMap[endpointNodeData.actionButton.action]) {
@@ -2771,12 +2807,17 @@ function showFinalSummary(endpointNodeData) {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
             <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
         </svg>
-        Redo Tier 1
+        Start Over
     </button>
     <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
         Done
     </button>`;
+
+    // ── Render skeleton; all items hidden, to be revealed in sequence ──
+    const itemsHTML = items.map((item, i) =>
+        `<div class="anim-journey-item" data-anim-idx="${i}">${item.html}</div>`
+    ).join('');
 
     stepsContainer.innerHTML = `
         <div class="journey-review">
@@ -2784,8 +2825,12 @@ function showFinalSummary(endpointNodeData) {
                 <h2>Your Complete Journey</h2>
                 <p>A summary of your full intervention pathway</p>
             </div>
-            <div class="journey-flow">${journeyHTML}</div>
-            <div class="journey-actions">${actionsHTML}</div>
+            <button class="anim-skip-btn" onclick="revealAllAnimJourneyItems(this)" aria-label="Skip animation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                Skip animation
+            </button>
+            <div class="anim-journey-summary journey-flow">${itemsHTML}</div>
+            <div class="journey-actions" id="anim-journey-actions" style="display:none;">${actionsHTML}</div>
         </div>
     `;
 
@@ -2797,6 +2842,57 @@ function showFinalSummary(endpointNodeData) {
         if (review) review.classList.add('journey-review-visible');
     });
     scrollToActiveStep();
+
+    // ── Staggered reveal ──
+    const STEP_DELAY = 420;    // ms between each non-connector item
+    const CONN_DELAY = 180;    // ms for connector line
+    const allItems = stepsContainer.querySelectorAll('.anim-journey-item');
+    let timeout = 320; // initial delay before first item appears
+
+    allItems.forEach((el, i) => {
+        const isConnector = el.querySelector('.anim-connector') !== null;
+        const delay = isConnector ? CONN_DELAY : STEP_DELAY;
+        setTimeout(() => {
+            el.classList.add('anim-visible');
+            // Also trigger the inner connector line animation
+            const line = el.querySelector('.anim-connector-line');
+            const connector = el.querySelector('.anim-connector');
+            if (line) line.classList.add('anim-visible');
+            if (connector) connector.classList.add('anim-visible');
+            // If this is the last item, reveal actions
+            if (i === allItems.length - 1) {
+                setTimeout(() => {
+                    const actions = stepsContainer.querySelector('#anim-journey-actions');
+                    if (actions) {
+                        actions.style.display = '';
+                        actions.style.opacity = '0';
+                        actions.style.transition = 'opacity 0.4s ease';
+                        requestAnimationFrame(() => { actions.style.opacity = '1'; });
+                    }
+                    // Hide skip button once done
+                    const skipBtn = stepsContainer.querySelector('.anim-skip-btn');
+                    if (skipBtn) skipBtn.style.display = 'none';
+                }, 350);
+            }
+        }, timeout);
+        timeout += delay;
+    });
+}
+
+// Immediately reveal all animation items (called by "Skip animation" button)
+function revealAllAnimJourneyItems(btn) {
+    const container = btn?.closest('.journey-review');
+    if (!container) return;
+    btn.style.display = 'none';
+    container.querySelectorAll('.anim-journey-item').forEach(el => {
+        el.classList.add('anim-visible');
+        const line = el.querySelector('.anim-connector-line');
+        const connector = el.querySelector('.anim-connector');
+        if (line) line.classList.add('anim-visible');
+        if (connector) connector.classList.add('anim-visible');
+    });
+    const actions = container.querySelector('#anim-journey-actions');
+    if (actions) { actions.style.display = ''; actions.style.opacity = '1'; }
 }
 
 // Restart current tier
