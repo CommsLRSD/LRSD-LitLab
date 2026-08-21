@@ -1022,6 +1022,7 @@ function initIntegratedFlowchart(tierId) {
     
     const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
     if (!flowchartDef) return;
+    const showTier1SuccessSidebar = tierId === 'tier1';
     
     // Reset visual flowchart state
     appState.visualFlowchart = {
@@ -1069,7 +1070,29 @@ function initIntegratedFlowchart(tierId) {
             </div>
             
             <div class="flowchart-content-area" id="flowchart-content">
-                <div class="journey-shell">
+                <div class="journey-shell${showTier1SuccessSidebar ? ' journey-shell-tier1' : ''}">
+                    ${showTier1SuccessSidebar ? `
+                    <aside class="tier1-success-sidebar" aria-label="Tier 1 instruction success guidance">
+                        <div class="tier1-success-sidebar-head">
+                            <span class="material-symbols-rounded tier1-success-sidebar-icon" aria-hidden="true">help</span>
+                            <h3>How do we determine if instruction is Successful or Unsuccessful?</h3>
+                        </div>
+                        <div class="tier1-success-sidebar-block">
+                            <p class="tier1-success-sidebar-label">Blue and Green Indicators</p>
+                            <p>If student screener results indicate Blue or Green in all areas, instruction is successful.</p>
+                        </div>
+                        <div class="tier1-success-sidebar-block">
+                            <p class="tier1-success-sidebar-label">Yellow and Red Indicators</p>
+                            <p>If student screener results indicate Yellow or Red in any one area, instruction is unsuccessful.</p>
+                            <p class="tier1-success-sidebar-note">Monitoring and interventions are needed.</p>
+                        </div>
+                        <ul class="tier1-success-sidebar-legend" aria-label="Color indicator legend">
+                            <li><span class="tier1-indicator-dot tier1-indicator-blue" aria-hidden="true"></span><span>Blue</span></li>
+                            <li><span class="tier1-indicator-dot tier1-indicator-green" aria-hidden="true"></span><span>Green</span></li>
+                            <li><span class="tier1-indicator-dot tier1-indicator-yellow" aria-hidden="true"></span><span>Yellow</span></li>
+                            <li><span class="tier1-indicator-dot tier1-indicator-red" aria-hidden="true"></span><span>Red</span></li>
+                        </ul>
+                    </aside>` : ''}
                     <aside class="journey-map" id="journey-map" aria-label="Decision summary">
                         <div class="journey-map-head">
                             <div class="journey-map-head-left">
