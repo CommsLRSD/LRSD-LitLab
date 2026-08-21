@@ -785,6 +785,8 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier2-principles',
                 type: 'checklist',
                 title: 'Step 1: Entry',
+                journeySummary: 'You ruled out impairments and other barriers as a cause of literacy challenges and confirmed Tier 2 supports were set up correctly.',
+                reviewHint: 'Use the process map to reopen this step and review the checklist anytime.',
                 leadText: 'Informed by data (See progress monitoring tools).',
                 subtitle: 'Rule out that challenges are not the result of:',
                 items: [
@@ -2693,23 +2695,30 @@ function buildAnimStepBubble(nodeDef, choice) {
     let subText = '';
     let iconSVG = getStepTypeIcon(type);
     let variant = ''; // '', 'effective', 'ineffective'
+    const typeClass = type ? ` anim-step-type-${type}` : '';
+    const normalizeChoiceName = (raw) => (raw || '').replace(/^Option\s+[A-Z0-9]+\s*:\s*/i, '').trim();
+    const chosenName = normalizeChoiceName(choice?.name || choice?.label || '');
 
     if (type === 'checklist') {
-        label = 'You reviewed';
-        mainText = nodeDef.title;
-        subText = 'Checklist completed ✓';
+        label = 'Step summary';
+        mainText = nodeDef.journeySummary || `You completed this checklist: ${nodeDef.subtitle || nodeDef.title}.`;
+        subText = nodeDef.reviewHint || 'You can reopen this step from the process map to review details.';
     } else if (type === 'info') {
-        label = 'You reviewed';
-        mainText = nodeDef.title;
-        subText = nodeDef.subtitle || 'Information reviewed ✓';
+        label = 'Step summary';
+        mainText = nodeDef.journeySummary || `You reviewed key information for this step: ${nodeDef.title}.`;
+        subText = nodeDef.reviewHint || 'You can reopen this step from the process map to review details.';
     } else if (type === 'selection') {
-        label = 'You selected';
-        mainText = choice ? choice.name : nodeDef.title;
-        subText = nodeDef.title;
+        label = 'Step summary';
+        mainText = nodeDef.journeySummary
+            ? nodeDef.journeySummary.replace('{choice}', chosenName || 'your selected option')
+            : `You selected ${chosenName || 'an option'} for ${nodeDef.subtitle || nodeDef.title}.`;
+        subText = nodeDef.reviewHint || '';
     } else if (type === 'decision') {
-        label = 'You decided';
+        label = 'Step summary';
         if (choice) {
-            mainText = choice.name;
+            mainText = nodeDef.journeySummary
+                ? nodeDef.journeySummary.replace('{choice}', chosenName || 'your decision')
+                : `You determined: ${chosenName || 'the next action'}.`;
             // Colour-code by the choice
             const id = (choice.id || '').toLowerCase();
             const name = (choice.name || '').toLowerCase();
@@ -2719,16 +2728,16 @@ function buildAnimStepBubble(nodeDef, choice) {
                 variant = 'ineffective';
             }
         } else {
-            mainText = nodeDef.title;
+            mainText = nodeDef.journeySummary || `You completed this decision step: ${nodeDef.title}.`;
         }
-        subText = nodeDef.title;
+        subText = nodeDef.reviewHint || '';
     } else {
-        label = 'Step';
-        mainText = nodeDef.title;
+        label = 'Step summary';
+        mainText = nodeDef.journeySummary || `You completed this step: ${nodeDef.title}.`;
     }
 
     return `
-        <div class="anim-step-bubble${variant ? ' anim-bubble-' + variant : ''}">
+        <div class="anim-step-bubble${typeClass}${variant ? ' anim-bubble-' + variant : ''}">
             <div class="anim-step-bubble-icon">${iconSVG}</div>
             <div class="anim-step-bubble-text">
                 <div class="anim-step-bubble-label">${escapeHtml(label)}</div>

@@ -4066,6 +4066,42 @@ body.evidence-modal-open { overflow: hidden; }
 }
 
 /* Colour variants */
+.anim-step-bubble.anim-step-type-checklist {
+  background: var(--step-checklist-bg);
+  border-color: var(--step-checklist);
+}
+.anim-step-bubble.anim-step-type-checklist .anim-step-bubble-icon {
+  background: var(--step-checklist-header);
+  color: var(--step-checklist);
+}
+
+.anim-step-bubble.anim-step-type-selection {
+  background: var(--step-selection-bg);
+  border-color: var(--step-selection);
+}
+.anim-step-bubble.anim-step-type-selection .anim-step-bubble-icon {
+  background: var(--step-selection-header);
+  color: var(--step-selection);
+}
+
+.anim-step-bubble.anim-step-type-decision {
+  background: var(--step-decision-bg);
+  border-color: var(--step-decision);
+}
+.anim-step-bubble.anim-step-type-decision .anim-step-bubble-icon {
+  background: var(--step-decision-header);
+  color: var(--step-decision);
+}
+
+.anim-step-bubble.anim-step-type-info {
+  background: var(--step-info-bg);
+  border-color: var(--step-info);
+}
+.anim-step-bubble.anim-step-type-info .anim-step-bubble-icon {
+  background: var(--step-info-header);
+  color: var(--step-info);
+}
+
 .anim-step-bubble.anim-bubble-effective {
   border-color: var(--effective);
   background: var(--effective-bg);
