@@ -6944,3 +6944,33 @@ body.evidence-modal-open { overflow: hidden; }
   background: #fdf0f0;
   color: #97333b;
 }
+
+/* ── Scores reference button (flowchart sidebar) ── */
+.scores-ref-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--info-text);
+  background: var(--info-light);
+  border: 1.5px solid var(--info);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.scores-ref-btn .material-symbols-rounded {
+  font-size: 1.05rem;
+}
+
+.scores-ref-btn:hover,
+.scores-ref-btn:focus-visible {
+  background: var(--info);
+  color: #fff;
+  outline: none;
+}
