@@ -4126,6 +4126,33 @@ body.evidence-modal-open { overflow: hidden; }
   color: var(--ineffective-text);
 }
 
+/* Step 1 checklist bubbles – use the step (navy) colour prominently */
+.anim-step-bubble.anim-bubble-step1 {
+  border-color: var(--step);
+  background: var(--step-bg);
+}
+.anim-step-bubble.anim-bubble-step1 .anim-step-bubble-icon {
+  background: var(--step-soft);
+  color: var(--step);
+}
+.anim-step-bubble.anim-bubble-step1 .anim-step-bubble-main {
+  color: var(--step-text);
+  font-weight: 600;
+}
+
+/* Assessment / intervention selection bubbles – use info (blue) colour */
+.anim-step-bubble.anim-bubble-selection {
+  border-color: var(--info);
+  background: var(--info-light);
+}
+.anim-step-bubble.anim-bubble-selection .anim-step-bubble-icon {
+  background: rgba(90, 158, 201, 0.18);
+  color: var(--info-text);
+}
+.anim-step-bubble.anim-bubble-selection .anim-step-bubble-main {
+  color: var(--info-text);
+}
+
 /* Animated connector line between bubbles */
 .anim-connector {
   display: flex;
