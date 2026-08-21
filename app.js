@@ -2884,9 +2884,10 @@ function showFinalSummary(endpointNodeData) {
     if (!stepsContainer) return;
 
     const fullJourney = appState.fullJourney || [];
+    const useDesktopSummaryModal = window.matchMedia('(min-width: 1024px)').matches;
 
     // ── Collect all animation items (tier badges, step bubbles, connectors, endpoint) ──
-    // Each item is { html, isConnector }
+    // Each item is { html, kind }
     const items = [];
 
     fullJourney.forEach((tierSnapshot, tierIndex) => {
@@ -2896,12 +2897,12 @@ function showFinalSummary(endpointNodeData) {
         const tierLabel = tierDef.title || tierSnapshot.tierId;
 
         // Tier badge
-        if (tierIndex > 0) {
-            items.push({ html: `<div class="anim-connector"><div class="anim-connector-line"></div><div class="anim-connector-arrow"></div></div>`, isConnector: true });
+        if (!useDesktopSummaryModal && tierIndex > 0) {
+            items.push({ html: `<div class="anim-connector"><div class="anim-connector-line"></div><div class="anim-connector-arrow"></div></div>`, kind: 'connector' });
         }
         items.push({
             html: `<div class="anim-tier-badge"><span class="anim-tier-badge-inner">${escapeHtml(tierLabel.split(':')[0].trim())}</span></div>`,
-            isConnector: false
+            kind: 'tier'
         });
 
         tierSnapshot.selectedPath.forEach((step, stepIndex) => {
@@ -2912,8 +2913,8 @@ function showFinalSummary(endpointNodeData) {
             const isEndpoint = nodeDef.type === 'endpoint';
 
             // Connector between steps
-            if (stepIndex > 0) {
-                items.push({ html: `<div class="anim-connector"><div class="anim-connector-line"></div><div class="anim-connector-arrow"></div></div>`, isConnector: true });
+            if (!useDesktopSummaryModal && stepIndex > 0) {
+                items.push({ html: `<div class="anim-connector"><div class="anim-connector-line"></div><div class="anim-connector-arrow"></div></div>`, kind: 'connector' });
             }
 
             if (isEndpoint) {
@@ -2925,10 +2926,10 @@ function showFinalSummary(endpointNodeData) {
                         <div class="anim-endpoint-title">${escapeHtml(nodeDef.title)}</div>
                         <div class="anim-endpoint-desc">${escapeHtml(nodeDef.description || '')}</div>
                     </div>`,
-                    isConnector: false
+                    kind: 'endpoint'
                 });
             } else {
-                items.push({ html: buildAnimStepBubble(nodeDef, choice, tierSnapshot.tierId), isConnector: false });
+                items.push({ html: buildAnimStepBubble(nodeDef, choice, tierSnapshot.tierId), kind: 'step' });
             }
         });
     });
@@ -2952,12 +2953,15 @@ function showFinalSummary(endpointNodeData) {
     </button>`;
 
     // ── Render skeleton; all items hidden, to be revealed in sequence ──
-    const itemsHTML = items.map((item, i) =>
-        `<div class="anim-journey-item" data-anim-idx="${i}">${item.html}</div>`
-    ).join('');
+    const itemsHTML = items.map((item, i) => {
+        const desktopClass = useDesktopSummaryModal ? ' anim-grid-item' : '';
+        const kindClass = item.kind ? ` anim-kind-${item.kind}` : '';
+        return `<div class="anim-journey-item${desktopClass}${kindClass}" data-anim-idx="${i}">${item.html}</div>`;
+    }).join('');
 
     stepsContainer.innerHTML = `
-        <div class="journey-review">
+        <div class="${useDesktopSummaryModal ? 'anim-summary-modal-overlay' : ''}">
+        <div class="journey-review${useDesktopSummaryModal ? ' journey-review-modal' : ''}">
             <div class="journey-review-header">
                 <h2>Your Complete Journey</h2>
                 <p>A summary of your full intervention pathway</p>
@@ -2966,8 +2970,9 @@ function showFinalSummary(endpointNodeData) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
                 Skip animation
             </button>
-            <div class="anim-journey-summary journey-flow">${itemsHTML}</div>
+            <div class="anim-journey-summary journey-flow${useDesktopSummaryModal ? ' anim-layout-rows' : ''}">${itemsHTML}</div>
             <div class="journey-actions" id="anim-journey-actions" style="display:none;">${actionsHTML}</div>
+        </div>
         </div>
     `;
 

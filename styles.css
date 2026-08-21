@@ -4034,6 +4034,60 @@ body.evidence-modal-open { overflow: hidden; }
   transform: none;
 }
 
+@media (min-width: 1024px) {
+  .anim-summary-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1400;
+    background: rgba(10, 24, 43, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(12px, 2vw, 24px);
+  }
+
+  .journey-review.journey-review-modal {
+    width: min(1180px, 94vw);
+    max-width: none;
+    max-height: 92vh;
+    overflow: auto;
+    margin: 0;
+    padding: clamp(16px, 2.1vw, 28px);
+    border-radius: var(--radius-xl);
+    background: var(--bg);
+    box-shadow: 0 20px 50px rgba(14, 28, 45, 0.28);
+  }
+
+  .anim-journey-summary.anim-layout-rows {
+    max-width: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .anim-journey-summary.anim-layout-rows .anim-journey-item {
+    width: calc(50% - 6px);
+  }
+
+  .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-tier,
+  .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-endpoint {
+    width: 100%;
+  }
+
+  .anim-journey-summary.anim-layout-rows .anim-tier-badge {
+    justify-content: flex-start;
+    margin: 6px 0 0;
+  }
+
+  .anim-journey-summary.anim-layout-rows .anim-step-bubble,
+  .anim-journey-summary.anim-layout-rows .anim-endpoint-card {
+    height: 100%;
+  }
+}
+
 /* Tier label pill */
 .anim-tier-badge {
   display: flex;
