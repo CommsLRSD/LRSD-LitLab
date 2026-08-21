@@ -4903,15 +4903,17 @@ body.evidence-modal-open { overflow: hidden; }
    Original Guide (iframe embed)
    ------------------------------------------------------------ */
 .original-guide-wrapper {
-  max-width: 1100px;
-  width: 100%;
-  margin: 0 auto;
-  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-height));
 }
 
 .original-guide-body {
   position: relative;
+  max-width: 1100px;
   width: 100%;
+  margin: 0 auto;
+  padding: var(--space-lg);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -4922,8 +4924,7 @@ body.evidence-modal-open { overflow: hidden; }
 .original-guide-iframe {
   display: block;
   width: 100%;
-  height: 80vh;
-  min-height: 500px;
+  aspect-ratio: 16 / 9;
   border: none;
 }
 
@@ -5155,6 +5156,18 @@ body.evidence-modal-open { overflow: hidden; }
   width: 100%;
   margin: 0 auto;
   padding: var(--space-2xl) var(--space-lg);
+}
+
+/* Flowchart page layout */
+.flowchart-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-height));
+}
+
+.flowchart-page-body {
+  flex: 1;
+  width: 100%;
 }
 
 /* Step panel helpers */
@@ -6750,15 +6763,19 @@ body.evidence-modal-open { overflow: hidden; }
    ============================================================ */
 
 .scores-page-wrapper {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-height));
 }
 
 .scores-page-body {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-lg) 3rem;
 }
 
 .scores-quick-facts {
