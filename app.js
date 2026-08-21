@@ -7415,6 +7415,19 @@ window.initializeAssessmentSchedules = initializeAssessmentSchedules;
 // add notes to each entry and export the whole history as a CSV file.
 
 const SELECTION_HISTORY_KEY = 'litlab_selection_history';
+const SELECTION_HISTORY_SESSION_KEY = 'litlab_selection_history_session';
+
+function createHistoryToken(size = 8) {
+    if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+        const bytes = new Uint8Array(size);
+        window.crypto.getRandomValues(bytes);
+        return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('').slice(0, size);
+    }
+    const perf = typeof performance !== 'undefined' && typeof performance.now === 'function'
+        ? Math.floor(performance.now()).toString(36)
+        : '0';
+    return `${Date.now().toString(36)}${perf}`.slice(-size);
+}
 
 // Load the saved selection history from localStorage (returns an array).
 function loadSelectionHistory() {
@@ -7438,6 +7451,33 @@ function saveSelectionHistory(history) {
     }
 }
 
+function createSelectionHistorySession() {
+    return {
+        id: `sess-${Date.now()}-${createHistoryToken(8)}`,
+        startedAt: new Date().toISOString()
+    };
+}
+
+function getCurrentSelectionHistorySession() {
+    try {
+        const raw = sessionStorage.getItem(SELECTION_HISTORY_SESSION_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.id && parsed.startedAt) return parsed;
+        }
+    } catch (err) {
+        console.error('Could not read selection history session:', err);
+    }
+
+    const session = createSelectionHistorySession();
+    try {
+        sessionStorage.setItem(SELECTION_HISTORY_SESSION_KEY, JSON.stringify(session));
+    } catch (err) {
+        console.error('Could not save selection history session:', err);
+    }
+    return session;
+}
+
 // Turn a tierId such as "tier2" into a friendly label such as "Tier 2".
 function tierLabelFromId(tierId) {
     const num = String(tierId || '').replace('tier', '');
@@ -7448,17 +7488,20 @@ function tierLabelFromId(tierId) {
 function recordSelection(type, itemId, itemName, tierId) {
     if (!itemName) return;
     const history = loadSelectionHistory();
+    const historySession = getCurrentSelectionHistorySession();
     // Capture the screener that was active for this selection so entries can be
-    // grouped by screener in the history panel.
+    // shown with context in the history panel.
     const screenerId = appState.fwState?.screener || getRememberedScreenerId() || '';
     const screenerName = appState.fwState?.screenerData?.screener_name || getScreenerName(screenerId) || '';
     const entry = {
-        id: `sel-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        id: `sel-${Date.now()}-${createHistoryToken(8)}`,
         type: type || 'Selection',
         itemId: itemId || '',
         name: itemName,
         tier: tierLabelFromId(tierId),
         screener: screenerName,
+        sessionId: historySession.id,
+        sessionStartedAt: historySession.startedAt,
         date: new Date().toISOString(),
         notes: ''
     };
@@ -7479,6 +7522,11 @@ function formatHistoryDate(iso) {
         year: 'numeric', month: 'short', day: 'numeric',
         hour: 'numeric', minute: '2-digit'
     });
+}
+
+function formatSessionLabel(iso) {
+    const label = formatHistoryDate(iso);
+    return label ? `Session · ${label}` : 'Session';
 }
 
 // Render the history list and count badge inside the static panel shell.
@@ -7503,7 +7551,7 @@ function renderHistoryPanel() {
         return;
     }
 
-    // Newest first, grouped into sections by the screener that was active.
+    // Newest first, grouped into sections by browser session.
     const ordered = history.slice().reverse();
 
     const renderEntry = (entry) => {
@@ -7525,14 +7573,18 @@ function renderHistoryPanel() {
             </div>`;
     };
 
-    // Preserve the order in which each screener group first appears (newest first).
+    // Preserve the order in which each session group first appears (newest first).
     const groups = [];
     const groupIndex = {};
-    ordered.forEach(entry => {
-        const key = entry.screener && String(entry.screener).trim() ? entry.screener : '';
+    ordered.forEach((entry, index) => {
+        const key = entry.sessionId || `legacy-${entry.id || entry.date || index}`;
         if (!(key in groupIndex)) {
             groupIndex[key] = groups.length;
-            groups.push({ key, label: key || 'No screener selected', entries: [] });
+            groups.push({
+                key,
+                label: formatSessionLabel(entry.sessionStartedAt || entry.date),
+                entries: []
+            });
         }
         groups[groupIndex[key]].entries.push(entry);
     });
@@ -7593,8 +7645,9 @@ function exportHistoryCsv() {
         return;
     }
 
-    const headers = ['Type', 'Name', 'Tier', 'Date Selected', 'Notes'];
+    const headers = ['Session', 'Type', 'Name', 'Tier', 'Date Selected', 'Notes'];
     const rows = history.map(e => [
+        formatSessionLabel(e.sessionStartedAt || e.date),
         e.type === 'Assessment' ? 'Drill-Down Assessment' : (e.type || 'Selection'),
         e.name,
         e.tier,
