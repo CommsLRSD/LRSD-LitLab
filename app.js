@@ -644,6 +644,12 @@ function getStepTypeIcon(nodeType) {
     return map[nodeType] || '';
 }
 
+// Remove emoji characters from a string
+function stripEmoji(str) {
+    if (!str) return str;
+    return str.replace(/\p{Extended_Pictographic}/gu, '').replace(/\s+/g, ' ').trim();
+}
+
 // Helper that returns just the descriptive tier name, stripping the leading
 // "Tier N:" prefix (e.g. "Universal Screening & Core Instruction").
 function getTierName(fullTitle) {
@@ -1244,8 +1250,8 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
             // Multiple tier-transition options → show choice card (no journey review)
             showTierTransitionChoice(nodeData);
         } else {
-            // True terminal endpoint — show the full route animation summary.
-            showFinalSummary(nodeData);
+            // True terminal endpoint — show the route completion gate, then animation summary.
+            showRouteCompleteGate(nodeData);
         }
         return;
     }
@@ -2774,10 +2780,10 @@ function resolveChoiceOutcomeKey(choice) {
 }
 
 // Build a plain-language sentence for each step in the journey animation
-function buildAnimStepBubble(nodeDef, choice) {
+function buildAnimStepBubble(nodeDef, choice, tierId) {
     const type = nodeDef.type;
     const nodeId = nodeDef.id || '';
-    let label = 'Step summary';
+    let label = nodeDef.title || 'Step summary';
     let mainText = '';
     let subText = '';
     let iconSVG = getStepTypeIcon(type);
@@ -2846,6 +2852,17 @@ function buildAnimStepBubble(nodeDef, choice) {
         }
     }
 
+    // Strip emojis from summary text
+    mainText = stripEmoji(mainText);
+    subText = stripEmoji(subText);
+
+    // Build the "Review this step" button if tierId is available
+    const reviewBtnHTML = tierId ? `
+        <button class="anim-step-review-btn" onclick="openStepReviewModal('${escapeAttr(nodeId)}', '${escapeAttr(tierId)}')" title="Review this step as it appeared in the flowchart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Review step
+        </button>` : '';
+
     return `
         <div class="anim-step-bubble${typeClass}${variant ? ' anim-bubble-' + variant : ''}">
             <div class="anim-step-bubble-icon">${iconSVG}</div>
@@ -2853,6 +2870,7 @@ function buildAnimStepBubble(nodeDef, choice) {
                 <div class="anim-step-bubble-label">${escapeHtml(label)}</div>
                 <div class="anim-step-bubble-main">${escapeHtml(mainText)}</div>
                 ${subText && subText !== mainText ? `<div class="anim-step-bubble-sub">${escapeHtml(subText)}</div>` : ''}
+                ${reviewBtnHTML}
             </div>
         </div>`;
 }
@@ -2907,7 +2925,7 @@ function showFinalSummary(endpointNodeData) {
                     isConnector: false
                 });
             } else {
-                items.push({ html: buildAnimStepBubble(nodeDef, choice), isConnector: false });
+                items.push({ html: buildAnimStepBubble(nodeDef, choice, tierSnapshot.tierId), isConnector: false });
             }
         });
     });
@@ -3009,6 +3027,206 @@ function revealAllAnimJourneyItems(btn) {
     });
     const actions = container.querySelector('#anim-journey-actions');
     if (actions) { actions.style.display = ''; actions.style.opacity = '1'; }
+}
+
+// Show the route completion gate — a simple "well done" screen that the user
+// must click through before the animated journey summary plays.
+function showRouteCompleteGate(endpointNodeData) {
+    const stepsContainer = getActiveStepTarget();
+    if (!stepsContainer) return;
+
+    const fullJourney = appState.fullJourney || [];
+    let totalSteps = 0;
+    const tierNames = [];
+    fullJourney.forEach(tierSnapshot => {
+        const tierDef = FLOWCHART_DEFINITIONS[tierSnapshot.tierId];
+        if (tierDef) tierNames.push(tierDef.title.split(':')[0].trim());
+        tierSnapshot.selectedPath.forEach(step => {
+            const nodeDef = tierDef?.nodes[step.nodeId];
+            if (nodeDef && nodeDef.type !== 'endpoint') totalSteps++;
+        });
+    });
+
+    const tierPillsHTML = tierNames.map(name =>
+        `<span class="gate-tier-pill">${escapeHtml(name)}</span>`
+    ).join('');
+
+    stepsContainer.innerHTML = `
+        <div class="route-complete-gate">
+            <div class="gate-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28" aria-hidden="true">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </div>
+            <h2 class="gate-title">Route Complete</h2>
+            <p class="gate-subtitle">You completed ${totalSteps} step${totalSteps !== 1 ? 's' : ''} across ${tierPillsHTML}</p>
+            <p class="gate-desc">Click below to see a visual summary of your complete intervention pathway.</p>
+            <button class="action-btn action-primary gate-summary-btn" id="gate-summary-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><polyline points="10 8 16 12 10 16"/>
+                </svg>
+                View Journey Summary
+            </button>
+        </div>
+    `;
+
+    const prevBtn = document.getElementById('carousel-prev-btn');
+    if (prevBtn) prevBtn.style.display = 'none';
+    completeJourneyMap();
+    requestAnimationFrame(() => {
+        const gate = stepsContainer.querySelector('.route-complete-gate');
+        if (gate) gate.classList.add('route-complete-gate-visible');
+    });
+    scrollToActiveStep();
+
+    const btn = document.getElementById('gate-summary-btn');
+    if (btn) {
+        btn.addEventListener('click', () => showFinalSummary(endpointNodeData));
+    }
+}
+
+// Open a modal dialog showing a step as it appeared during the flowchart
+function openStepReviewModal(nodeId, tierId) {
+    const tierDef = FLOWCHART_DEFINITIONS[tierId];
+    if (!tierDef) return;
+    const nodeDef = tierDef.nodes[nodeId];
+    if (!nodeDef) return;
+
+    // Retrieve the user's choice from the stored full journey
+    const tierSnap = (appState.fullJourney || []).find(s => s.tierId === tierId);
+    const choice = tierSnap?.choices?.[nodeId];
+
+    const contentHTML = buildStepReviewContent(nodeDef, choice);
+
+    const existing = document.getElementById('step-review-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'step-review-modal';
+    modal.className = 'step-review-overlay';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', `Review: ${nodeDef.title}`);
+    modal.innerHTML = `
+        <div class="step-review-dialog" role="document">
+            <div class="step-review-header">
+                <div class="step-review-title-group">
+                    <span class="step-badge step-badge-modal">
+                        <span class="step-badge-icon">${getStepTypeIcon(nodeDef.type)}</span>
+                        ${escapeHtml(nodeDef.title)}
+                    </span>
+                    <span class="step-review-type-chip">${escapeHtml(getStepTypeLabel(nodeDef.type))}</span>
+                </div>
+                <button class="close-summary-btn" onclick="closeStepReviewModal()" aria-label="Close review">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="step-review-body">
+                ${contentHTML}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.classList.add('step-review-modal-open');
+
+    modal.addEventListener('click', e => { if (e.target === modal) closeStepReviewModal(); });
+
+    const keyHandler = e => {
+        if (e.key === 'Escape') { closeStepReviewModal(); document.removeEventListener('keydown', keyHandler); }
+    };
+    document.addEventListener('keydown', keyHandler);
+
+    requestAnimationFrame(() => modal.classList.add('step-review-visible'));
+}
+
+function closeStepReviewModal() {
+    const modal = document.getElementById('step-review-modal');
+    if (!modal) return;
+    modal.classList.remove('step-review-visible');
+    document.body.classList.remove('step-review-modal-open');
+    setTimeout(() => modal.remove(), 280);
+}
+
+// Build the body HTML for the step review modal, mirroring how the step
+// looked during the flowchart process (read-only, choices highlighted).
+function buildStepReviewContent(nodeDef, choice) {
+    const type = nodeDef.type;
+    let html = '';
+
+    if (nodeDef.subtitle && type !== 'checklist') {
+        html += `<h3 class="review-subtitle">${escapeHtml(nodeDef.subtitle)}</h3>`;
+    }
+    if (nodeDef.description) {
+        html += `<p class="review-description">${escapeHtml(nodeDef.description)}</p>`;
+    }
+
+    if (type === 'checklist') {
+        if (nodeDef.subtitle) {
+            html += `<p class="checklist-intro review-checklist-intro">${escapeHtml(nodeDef.subtitle)}</p>`;
+        }
+        if (nodeDef.leadText) {
+            html += `<p class="checklist-lead-text">${escapeHtml(nodeDef.leadText)}</p>`;
+        }
+        const items = nodeDef.items || [];
+        const itemsHTML = items.map(item => `
+            <li class="completed-checklist-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                <span>${escapeHtml(item)}</span>
+            </li>`).join('');
+        html += `<ul class="completed-checklist">${itemsHTML}</ul>`;
+        if (nodeDef.postSections) {
+            nodeDef.postSections.forEach(section => {
+                html += `
+                    <div class="checklist-post-section">
+                        <h4 class="checklist-post-section-title">${escapeHtml(section.title)}</h4>
+                        <ul class="checklist-post-section-list">
+                            ${section.items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}
+                        </ul>
+                    </div>`;
+            });
+        }
+    } else if (type === 'decision') {
+        const buttonsHTML = (nodeDef.choices || []).map(c => {
+            const taken = choice && c.id === choice.id;
+            return `<div class="decision-btn decision-${c.type}${taken ? '' : ' decision-not-taken'}" aria-selected="${taken}" role="option">
+                <div class="decision-content">
+                    <strong>${escapeHtml(c.label)}</strong>
+                    ${c.sublabel ? `<span>${escapeHtml(c.sublabel)}</span>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+        html += `<div class="decision-grid completed-grid">${buttonsHTML}</div>`;
+    } else if (type === 'selection') {
+        if (choice) {
+            if (choice.pathway && choice.pathway.length > 0) {
+                const crumbsHTML = choice.pathway.map((crumb, i) => {
+                    const isLast = i === choice.pathway.length - 1;
+                    return `${i > 0 ? '<span class="step-pathway-sep">›</span>' : ''}<span class="step-pathway-item${isLast ? ' step-pathway-final' : ''}">${escapeHtml(crumb)}</span>`;
+                }).join('');
+                html += `<div class="step-pathway">${crumbsHTML}</div>`;
+            } else {
+                html += `<div class="journey-map-answer completed-step-answer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    ${escapeHtml(choice.name || '')}
+                </div>`;
+            }
+        }
+    } else if (type === 'info') {
+        if (nodeDef.sections) {
+            nodeDef.sections.forEach(section => {
+                html += `
+                    <div class="info-section">
+                        <h4>${escapeHtml(section.title)}</h4>
+                        <ul class="feature-list">
+                            ${section.items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}
+                        </ul>
+                    </div>`;
+            });
+        }
+    }
+
+    return html;
 }
 
 // Restart current tier
@@ -6517,6 +6735,9 @@ window.fwOnSubtestChange = fwOnSubtestChange;
 window.fwOnPillarChange = fwOnPillarChange;
 window.fwSelectItem = fwSelectItem;
 window.showFinalSummary = showFinalSummary;
+window.showRouteCompleteGate = showRouteCompleteGate;
+window.openStepReviewModal = openStepReviewModal;
+window.closeStepReviewModal = closeStepReviewModal;
 window.selectTier1ScreenerVisualIntegrated = selectTier1ScreenerVisualIntegrated;
 window.selectTier2AssessmentVisualIntegrated = selectTier2AssessmentVisualIntegrated;
 window.selectTier2InterventionVisualIntegrated = selectTier2InterventionVisualIntegrated;
