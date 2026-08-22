@@ -4601,7 +4601,7 @@ body.step-review-modal-open { overflow: hidden; }
   background: var(--bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  max-width: 600px;
+  max-width: min(90vw, 1100px);
   width: 100%;
   max-height: 85vh;
   overflow-y: auto;
