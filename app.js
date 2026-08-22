@@ -2771,13 +2771,13 @@ function resolveChoiceOutcomeKey(choice) {
     if (!choice) return null;
     const id = (choice.id || '').toLowerCase();
     const name = (choice.name || '').toLowerCase();
-    if (id.includes('effective') || id.includes('success') || id.includes('improved') ||
-        name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
-        return 'effective';
-    }
     if (id.includes('ineffective') || id.includes('no-improvement') || id.includes('unsuccess') ||
         name.includes('ineffective') || name.includes('unsuccess') || name.includes('yellow') || name.includes('red')) {
         return 'ineffective';
+    }
+    if (id.includes('effective') || id.includes('success') || id.includes('improved') ||
+        name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
+        return 'effective';
     }
     return id || null;
 }
@@ -2840,10 +2840,10 @@ function buildAnimStepBubble(nodeDef, choice, tierId) {
                 if (!variant) {
                     const id = (choice.id || '').toLowerCase();
                     const name = (choice.name || '').toLowerCase();
-                    if (id.includes('effective') || id.includes('success') || name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
-                        variant = 'effective';
-                    } else if (id.includes('ineffective') || id.includes('unsuccess') || name.includes('ineffective') || name.includes('unsuccess') || name.includes('yellow') || name.includes('red') || name.includes('20%') || name.includes('20 %')) {
+                    if (id.includes('ineffective') || id.includes('unsuccess') || name.includes('ineffective') || name.includes('unsuccess') || name.includes('yellow') || name.includes('red') || name.includes('20%') || name.includes('20 %')) {
                         variant = 'ineffective';
+                    } else if (id.includes('effective') || id.includes('success') || name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
+                        variant = 'effective';
                     }
                 }
             } else {
