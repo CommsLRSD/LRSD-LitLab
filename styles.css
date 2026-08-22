@@ -4047,7 +4047,7 @@ body.evidence-modal-open { overflow: hidden; }
   }
 
   .journey-review.journey-review-modal {
-    width: min(1180px, 94vw);
+    width: min(1500px, 96vw);
     max-width: none;
     max-height: 92vh;
     overflow: auto;
@@ -4069,12 +4069,23 @@ body.evidence-modal-open { overflow: hidden; }
   }
 
   .anim-journey-summary.anim-layout-rows .anim-journey-item {
-    width: calc(50% - 6px);
+    flex: 1 1 180px;
+    max-width: 260px;
+    width: auto;
   }
 
   .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-tier,
   .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-endpoint {
+    flex: 0 0 100%;
+    max-width: 100%;
     width: 100%;
+  }
+
+  .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-connector {
+    flex: 0 0 auto;
+    max-width: none;
+    width: auto;
+    align-self: center;
   }
 
   .anim-journey-summary.anim-layout-rows .anim-tier-badge {
@@ -4085,6 +4096,30 @@ body.evidence-modal-open { overflow: hidden; }
   .anim-journey-summary.anim-layout-rows .anim-step-bubble,
   .anim-journey-summary.anim-layout-rows .anim-endpoint-card {
     height: 100%;
+  }
+
+  /* Horizontal connectors in row layout */
+  .anim-journey-summary.anim-layout-rows .anim-kind-connector .anim-connector {
+    flex-direction: row;
+    align-items: center;
+    height: auto;
+    padding: 0;
+    width: 36px;
+  }
+
+  .anim-journey-summary.anim-layout-rows .anim-kind-connector .anim-connector-line {
+    width: 100%;
+    height: 2px;
+    flex: 1;
+    transform-origin: left center;
+  }
+
+  .anim-journey-summary.anim-layout-rows .anim-kind-connector .anim-connector-arrow {
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 6px solid var(--border);
+    border-right: 0;
+    margin-top: 0;
   }
 }
 
@@ -6284,7 +6319,7 @@ body.step-review-modal-open { overflow: hidden; }
 .tier1-success-sidebar {
   position: sticky;
   top: 128px;
-  z-index: 3200;
+  z-index: 200;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
