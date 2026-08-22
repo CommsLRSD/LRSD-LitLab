@@ -3755,6 +3755,10 @@ body.evidence-modal-open { overflow: hidden; }
   margin-bottom: var(--space-xl);
 }
 
+.journey-review-header-copy {
+  min-width: 0;
+}
+
 .journey-review-header h2 {
   font-size: 1.1rem;
   margin-bottom: 4px;
@@ -4044,18 +4048,36 @@ body.evidence-modal-open { overflow: hidden; }
     align-items: center;
     justify-content: center;
     padding: clamp(12px, 2vw, 24px);
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+
+  .anim-summary-modal-overlay.final-summary-modal-visible {
+    opacity: 1;
+  }
+
+  body.final-summary-modal-open {
+    overflow: hidden;
   }
 
   .journey-review.journey-review-modal {
-    width: min(1500px, 96vw);
+    width: min(1680px, calc(100vw - clamp(24px, 4vw, 56px)));
     max-width: none;
     max-height: 92vh;
     overflow: auto;
     margin: 0;
-    padding: clamp(16px, 2.1vw, 28px);
+    padding: clamp(20px, 2.4vw, 32px);
     border-radius: var(--radius-xl);
     background: var(--bg);
     box-shadow: 0 20px 50px rgba(14, 28, 45, 0.28);
+  }
+
+  .journey-review.journey-review-modal .journey-review-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+    text-align: left;
   }
 
   .anim-journey-summary.anim-layout-rows {

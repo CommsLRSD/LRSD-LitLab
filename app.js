@@ -1033,6 +1033,7 @@ const FLOWCHART_DEFINITIONS = {
 function initIntegratedFlowchart(tierId) {
     const container = document.getElementById('flowchart-container');
     if (!container) return;
+    closeFinalSummaryDialog({ immediate: true });
     
     const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
     if (!flowchartDef) return;
@@ -2885,6 +2886,7 @@ function showFinalSummary(endpointNodeData) {
 
     const fullJourney = appState.fullJourney || [];
     const useDesktopSummaryModal = window.matchMedia('(min-width: 1024px)').matches;
+    closeFinalSummaryDialog({ immediate: true });
 
     // ── Collect all animation items (tier badges, step bubbles, connectors, endpoint) ──
     // Each item is { html, kind }
@@ -2959,12 +2961,17 @@ function showFinalSummary(endpointNodeData) {
         return `<div class="anim-journey-item${desktopClass}${kindClass}" data-anim-idx="${i}">${item.html}</div>`;
     }).join('');
 
-    stepsContainer.innerHTML = `
-        <div class="${useDesktopSummaryModal ? 'anim-summary-modal-overlay' : ''}">
+    const summaryContentHTML = `
         <div class="journey-review${useDesktopSummaryModal ? ' journey-review-modal' : ''}">
-            <div class="journey-review-header">
-                <h2>Your Complete Journey</h2>
-                <p>A summary of your full intervention pathway</p>
+            <div class="journey-review-header${useDesktopSummaryModal ? ' journey-review-header-modal' : ''}">
+                <div class="journey-review-header-copy">
+                    <h2>Your Complete Journey</h2>
+                    <p>A summary of your full intervention pathway</p>
+                </div>
+                ${useDesktopSummaryModal ? `
+                    <button class="close-summary-btn" type="button" onclick="closeFinalSummaryDialog()" aria-label="Close journey summary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>` : ''}
             </div>
             <button class="anim-skip-btn" onclick="revealAllAnimJourneyItems(this)" aria-label="Skip animation">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
@@ -2973,22 +2980,47 @@ function showFinalSummary(endpointNodeData) {
             <div class="anim-journey-summary journey-flow${useDesktopSummaryModal ? ' anim-layout-rows' : ''}">${itemsHTML}</div>
             <div class="journey-actions" id="anim-journey-actions" style="display:none;">${actionsHTML}</div>
         </div>
-        </div>
     `;
+
+    let renderRoot = stepsContainer;
+    if (useDesktopSummaryModal) {
+        const modal = document.createElement('div');
+        modal.id = 'final-summary-modal';
+        modal.className = 'anim-summary-modal-overlay final-summary-modal-overlay';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', 'Your complete journey summary');
+        modal.innerHTML = summaryContentHTML;
+        document.body.appendChild(modal);
+        document.body.classList.add('final-summary-modal-open');
+        modal.addEventListener('click', event => {
+            if (event.target === modal) closeFinalSummaryDialog();
+        });
+
+        const keyHandler = event => {
+            if (event.key === 'Escape') closeFinalSummaryDialog();
+        };
+        appState.finalSummaryKeyHandler = keyHandler;
+        document.addEventListener('keydown', keyHandler);
+        renderRoot = modal;
+    } else {
+        stepsContainer.innerHTML = summaryContentHTML;
+    }
 
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.display = 'none';
     completeJourneyMap();
     requestAnimationFrame(() => {
-        const review = stepsContainer.querySelector('.journey-review');
+        const review = renderRoot.querySelector('.journey-review');
         if (review) review.classList.add('journey-review-visible');
+        if (useDesktopSummaryModal) renderRoot.classList.add('final-summary-modal-visible');
     });
-    scrollToActiveStep();
+    if (!useDesktopSummaryModal) scrollToActiveStep();
 
     // ── Staggered reveal ──
     const STEP_DELAY = 420;    // ms between each non-connector item
     const CONN_DELAY = 180;    // ms for connector line
-    const allItems = stepsContainer.querySelectorAll('.anim-journey-item');
+    const allItems = renderRoot.querySelectorAll('.anim-journey-item');
     let timeout = 320; // initial delay before first item appears
 
     allItems.forEach((el, i) => {
@@ -3004,7 +3036,7 @@ function showFinalSummary(endpointNodeData) {
             // If this is the last item, reveal actions
             if (i === allItems.length - 1) {
                 setTimeout(() => {
-                    const actions = stepsContainer.querySelector('#anim-journey-actions');
+                    const actions = renderRoot.querySelector('#anim-journey-actions');
                     if (actions) {
                         actions.style.display = '';
                         actions.style.opacity = '0';
@@ -3012,7 +3044,7 @@ function showFinalSummary(endpointNodeData) {
                         requestAnimationFrame(() => { actions.style.opacity = '1'; });
                     }
                     // Hide skip button once done
-                    const skipBtn = stepsContainer.querySelector('.anim-skip-btn');
+                    const skipBtn = renderRoot.querySelector('.anim-skip-btn');
                     if (skipBtn) skipBtn.style.display = 'none';
                 }, 350);
             }
@@ -3035,6 +3067,28 @@ function revealAllAnimJourneyItems(btn) {
     });
     const actions = container.querySelector('#anim-journey-actions');
     if (actions) { actions.style.display = ''; actions.style.opacity = '1'; }
+}
+
+function closeFinalSummaryDialog(options = {}) {
+    const modal = document.getElementById('final-summary-modal');
+    if (!modal) return;
+
+    if (appState.finalSummaryKeyHandler) {
+        document.removeEventListener('keydown', appState.finalSummaryKeyHandler);
+        appState.finalSummaryKeyHandler = null;
+    }
+
+    document.body.classList.remove('final-summary-modal-open');
+
+    if (options.immediate) {
+        modal.remove();
+        return;
+    }
+
+    modal.classList.remove('final-summary-modal-visible');
+    const review = modal.querySelector('.journey-review');
+    if (review) review.classList.remove('journey-review-visible');
+    setTimeout(() => modal.remove(), 220);
 }
 
 // Show the route completion gate — a simple "well done" screen that the user
