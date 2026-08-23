@@ -4091,8 +4091,8 @@ body.evidence-modal-open { overflow: hidden; }
   }
 
   .anim-journey-summary.anim-layout-rows .anim-journey-item {
-    flex: 1 1 180px;
-    max-width: 260px;
+    flex: 0 0 200px;
+    max-width: 200px;
     width: auto;
   }
 
@@ -4220,7 +4220,7 @@ body.evidence-modal-open { overflow: hidden; }
 .anim-step-bubble-sub {
   font-size: 0.82rem;
   color: var(--step-text);
-  margin-top: 3px;
+  margin-top: 7px;
   font-weight: 500;
 }
 
@@ -5668,6 +5668,20 @@ body.step-review-modal-open { overflow: hidden; }
   }
   .journey-selections {
     max-width: 100%;
+  }
+
+  /* Align step content padding with step header for visual consistency on mobile */
+  .step-content, .node-content {
+    padding: var(--space-lg);
+  }
+
+  /* Centre the flowchart card content area on mobile */
+  .journey-shell {
+    align-items: center;
+  }
+  .journey-map {
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
