@@ -4090,10 +4090,11 @@ body.evidence-modal-open { overflow: hidden; }
     gap: 12px;
   }
 
+  /* Fixed uniform width — bubbles never grow/shrink, they wrap to the next row */
   .anim-journey-summary.anim-layout-rows .anim-journey-item {
-    flex: 1 1 210px;
-    max-width: 250px;
-    width: auto;
+    flex: 0 0 240px;
+    width: 240px;
+    max-width: 240px;
   }
 
   /* Tier badges span the full row as section separators */
@@ -4103,11 +4104,11 @@ body.evidence-modal-open { overflow: hidden; }
     width: 100%;
   }
 
-  /* Endpoint cards are the same size as step bubbles */
+  /* Endpoint cards use the same fixed width as step bubbles */
   .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-endpoint {
-    flex: 1 1 210px;
-    max-width: 250px;
-    width: auto;
+    flex: 0 0 240px;
+    width: 240px;
+    max-width: 240px;
   }
 
   .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-connector {
@@ -4122,11 +4123,38 @@ body.evidence-modal-open { overflow: hidden; }
     margin: 6px 0 0;
   }
 
-  /* Bubbles maintain consistent height; long text adds width via flex-grow */
+  /* Desktop bubbles: column layout so the icon sits above the text */
   .anim-journey-summary.anim-layout-rows .anim-step-bubble,
   .anim-journey-summary.anim-layout-rows .anim-endpoint-card {
-    min-height: 120px;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 160px;
     height: auto;
+    width: 100%;
+    padding: 16px 18px 14px;
+    gap: 0;
+  }
+
+  /* Larger, more prominent icon on desktop summary */
+  .anim-journey-summary.anim-layout-rows .anim-step-bubble-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
+  }
+
+  .anim-journey-summary.anim-layout-rows .anim-step-bubble-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Label sits directly under the icon */
+  .anim-journey-summary.anim-layout-rows .anim-step-bubble-text {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
   }
 
   /* Horizontal connectors in row layout */
