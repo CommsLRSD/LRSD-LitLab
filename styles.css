@@ -4079,7 +4079,7 @@ body.final-summary-modal-open {
   text-align: left;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 769px) {
   .journey-review.journey-review-modal {
     width: min(1680px, calc(100vw - clamp(24px, 4vw, 56px)));
     padding: clamp(20px, 2.4vw, 32px);
