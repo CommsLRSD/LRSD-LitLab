@@ -4038,46 +4038,51 @@ body.evidence-modal-open { overflow: hidden; }
   transform: none;
 }
 
+.anim-summary-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  background: rgba(10, 24, 43, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(10px, 2vw, 20px);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.anim-summary-modal-overlay.final-summary-modal-visible {
+  opacity: 1;
+}
+
+body.final-summary-modal-open {
+  overflow: hidden;
+}
+
+.journey-review.journey-review-modal {
+  width: min(1100px, calc(100vw - 20px));
+  max-width: none;
+  max-height: 92vh;
+  overflow: auto;
+  margin: 0;
+  padding: clamp(16px, 2.4vw, 28px);
+  border-radius: var(--radius-xl);
+  background: var(--bg);
+  box-shadow: 0 20px 50px rgba(14, 28, 45, 0.28);
+}
+
+.journey-review.journey-review-modal .journey-review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  text-align: left;
+}
+
 @media (min-width: 1024px) {
-  .anim-summary-modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1400;
-    background: rgba(10, 24, 43, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(12px, 2vw, 24px);
-    opacity: 0;
-    transition: opacity 0.22s ease;
-  }
-
-  .anim-summary-modal-overlay.final-summary-modal-visible {
-    opacity: 1;
-  }
-
-  body.final-summary-modal-open {
-    overflow: hidden;
-  }
-
   .journey-review.journey-review-modal {
     width: min(1680px, calc(100vw - clamp(24px, 4vw, 56px)));
-    max-width: none;
-    max-height: 92vh;
-    overflow: auto;
-    margin: 0;
     padding: clamp(20px, 2.4vw, 32px);
-    border-radius: var(--radius-xl);
-    background: var(--bg);
-    box-shadow: 0 20px 50px rgba(14, 28, 45, 0.28);
-  }
-
-  .journey-review.journey-review-modal .journey-review-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--space-md);
-    text-align: left;
   }
 
   .anim-journey-summary.anim-layout-rows {
@@ -4092,9 +4097,9 @@ body.evidence-modal-open { overflow: hidden; }
 
   /* Fixed uniform width — bubbles never grow/shrink, they wrap to the next row */
   .anim-journey-summary.anim-layout-rows .anim-journey-item {
-    flex: 0 0 240px;
-    width: 240px;
-    max-width: 240px;
+    flex: 0 0 280px;
+    width: 280px;
+    max-width: 280px;
   }
 
   /* Tier badges span the full row as section separators */
@@ -4106,9 +4111,9 @@ body.evidence-modal-open { overflow: hidden; }
 
   /* Endpoint cards use the same fixed width as step bubbles */
   .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-endpoint {
-    flex: 0 0 240px;
-    width: 240px;
-    max-width: 240px;
+    flex: 0 0 280px;
+    width: 280px;
+    max-width: 280px;
   }
 
   .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-connector {
