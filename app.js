@@ -1043,6 +1043,9 @@ function initIntegratedFlowchart(tierId) {
     if (!flowchartDef) return;
     const showTier1SuccessSidebar = tierId === 'tier1';
     
+    // Preserve layout mode across tier switches so the user's view preference is retained
+    const prevLayoutMode = appState.visualFlowchart?.layoutMode || 'standard';
+
     // Reset visual flowchart state
     appState.visualFlowchart = {
         nodes: [],
@@ -1051,7 +1054,8 @@ function initIntegratedFlowchart(tierId) {
         selectedPath: [],
         tierId: tierId,
         choices: {}, // Track all choices for summary
-        checklistProgress: {} // Track per-checklist sub-step index (one item at a time)
+        checklistProgress: {}, // Track per-checklist sub-step index (one item at a time)
+        layoutMode: prevLayoutMode // 'standard' | 'horizontal'
     };
     appState.fullJourney = [];
     
@@ -1131,6 +1135,11 @@ function initIntegratedFlowchart(tierId) {
                                 <svg class="journey-map-head-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
                                 <span class="journey-map-title">Your Decisions</span>
                             </div>
+                            <button class="layout-toggle-btn" id="layout-toggle-btn" type="button" onclick="toggleLayoutMode()" aria-pressed="false" title="Switch to summary view">
+                                <svg class="layout-toggle-icon layout-toggle-icon-summary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><rect x="2" y="7" width="5" height="10" rx="1"/><rect x="9.5" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="5" height="10" rx="1"/></svg>
+                                <svg class="layout-toggle-icon layout-toggle-icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
+                                <span class="layout-toggle-label">Summary View</span>
+                            </button>
                             <span class="journey-map-count" id="journey-map-count">Step 1</span>
                         </div>
                         <div class="journey-map-bar"><span class="journey-map-bar-fill" id="journey-map-bar-fill"></span></div>
@@ -1158,6 +1167,9 @@ function initIntegratedFlowchart(tierId) {
 
     // Reflect any previously chosen screener in the visible header indicator.
     updateScreenerIndicator();
+
+    // Sync the layout toggle button label to the current mode
+    updateLayoutToggleBtn();
 
     // Show the first node
     showIntegratedNode(flowchartDef.startNode, null);
@@ -1456,7 +1468,17 @@ function getActiveStepTarget() {
 
 // Render the whole process inside the Your Decisions panel: answered steps
 // stay open and the current step opens in its own row below.
+// Dispatches to the correct layout mode (standard list or horizontal bubbles).
 function renderJourney(direction = 'forward') {
+    const vf = appState.visualFlowchart;
+    if (vf?.layoutMode === 'horizontal') {
+        renderJourneyHorizontal(direction);
+    } else {
+        renderJourneyStandard(direction);
+    }
+}
+
+function renderJourneyStandard(direction = 'forward') {
     const track = document.getElementById('flowchart-steps');
     const vf = appState.visualFlowchart;
     const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
@@ -1489,6 +1511,130 @@ function renderJourney(direction = 'forward') {
     }
 
     scrollToActiveStep();
+}
+
+// Horizontal "Summary View" layout: completed steps appear as bubbles arranged
+// left-to-right (like the final journey summary), with the active step's
+// question form rendered below the track. Toggled via the layout-toggle-btn.
+function renderJourneyHorizontal(direction = 'forward') {
+    const track = document.getElementById('flowchart-steps');
+    const vf = appState.visualFlowchart;
+    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    if (!tierDef) return;
+
+    if (track) track.innerHTML = '';
+
+    const path = vf.selectedPath;
+    const activeStep = path[path.length - 1];
+    const activeNode = activeStep ? tierDef.nodes[activeStep.nodeId] : null;
+    const activeNumber = getActiveStepNumber();
+
+    // Update progress count and bar
+    const list = document.getElementById('journey-map-list');
+    const countEl = document.getElementById('journey-map-count');
+    const barFill = document.getElementById('journey-map-bar-fill');
+    const upcomingCount = projectUpcomingSteps(3).length;
+    const total = activeNumber + upcomingCount;
+    if (countEl) countEl.textContent = `Step ${activeNumber} of ${total}`;
+    if (barFill) barFill.style.width = `${Math.round(((activeNumber - 1) / total) * 100 + (100 / total) * 0.35)}%`;
+
+    // Build the horizontal bubble track
+    let bubblesHTML = '';
+    let stepNum = 0;
+
+    path.forEach((step, index) => {
+        const nodeDef = tierDef.nodes[step.nodeId];
+        if (!nodeDef || nodeDef.type === 'endpoint') return;
+        const isActive = index === path.length - 1;
+        stepNum++;
+
+        if (stepNum > 1) {
+            bubblesHTML += `<div class="horiz-connector" aria-hidden="true">
+                <div class="horiz-connector-line"></div>
+                <div class="horiz-connector-arrow"></div>
+            </div>`;
+        }
+
+        const iconSVG = getStepTypeIcon(nodeDef.type);
+
+        if (isActive) {
+            bubblesHTML += `<div class="horiz-bubble horiz-bubble-active horiz-bubble-type-${nodeDef.type}" id="horiz-active-bubble" aria-current="step">
+                <div class="horiz-bubble-icon">${iconSVG}</div>
+                <div class="horiz-bubble-body">
+                    <div class="horiz-bubble-meta">Step ${stepNum}\u202f\u00b7\u202f${escapeHtml(getStepTypeLabel(nodeDef.type))}</div>
+                    <div class="horiz-bubble-title">${escapeHtml(getStepShortTitle(nodeDef))}</div>
+                    <span class="journey-map-now horiz-bubble-now"><span class="journey-map-now-dot"></span>In progress</span>
+                </div>
+            </div>`;
+        } else {
+            const answer = getStepAnswerText(step.nodeId, nodeDef);
+            bubblesHTML += `<button type="button" class="horiz-bubble horiz-bubble-done horiz-bubble-type-${nodeDef.type}" data-revisit-node="${escapeAttr(nodeDef.id)}" title="Revisit step ${stepNum}">
+                <div class="horiz-bubble-check" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
+                <div class="horiz-bubble-icon">${iconSVG}</div>
+                <div class="horiz-bubble-body">
+                    <div class="horiz-bubble-meta">Step ${stepNum}\u202f\u00b7\u202f${escapeHtml(getStepTypeLabel(nodeDef.type))}</div>
+                    <div class="horiz-bubble-title">${escapeHtml(getStepShortTitle(nodeDef))}</div>
+                    ${answer
+                        ? `<div class="horiz-bubble-answer">
+                               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                               ${escapeHtml(answer)}
+                           </div>`
+                        : `<div class="horiz-bubble-revisit">Revisit</div>`}
+                </div>
+            </button>`;
+        }
+    });
+
+    if (list) {
+        list.innerHTML = `
+            <li class="horiz-track-li">
+                <div class="horiz-track-scroll" role="list" aria-label="Your decisions so far">
+                    ${bubblesHTML}
+                </div>
+            </li>
+            <li class="horiz-step-content-li">
+                <div class="journey-step-slot" id="journey-step-slot"></div>
+            </li>
+        `;
+    }
+
+    // Render the active step question into the slot
+    const slot = document.getElementById('journey-step-slot');
+    if (activeNode && slot) {
+        createIntegratedNodeElement(activeNode, slot, direction);
+    }
+
+    // Scroll the active bubble into view inside the track
+    requestAnimationFrame(() => {
+        const activeBubble = document.getElementById('horiz-active-bubble');
+        if (activeBubble) {
+            activeBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' });
+        }
+    });
+
+    scrollToActiveStep();
+}
+
+// Toggle between 'standard' (vertical list) and 'horizontal' (bubble track) layout modes
+function toggleLayoutMode() {
+    const vf = appState.visualFlowchart;
+    if (!vf) return;
+    vf.layoutMode = (vf.layoutMode === 'horizontal') ? 'standard' : 'horizontal';
+    updateLayoutToggleBtn();
+    renderJourney();
+}
+
+// Sync the layout toggle button's label and icon to the current layout mode
+function updateLayoutToggleBtn() {
+    const btn = document.getElementById('layout-toggle-btn');
+    if (!btn) return;
+    const isHoriz = appState.visualFlowchart?.layoutMode === 'horizontal';
+    btn.setAttribute('aria-pressed', isHoriz ? 'true' : 'false');
+    btn.title = isHoriz ? 'Switch to standard view' : 'Switch to summary view';
+    const label = btn.querySelector('.layout-toggle-label');
+    if (label) label.textContent = isHoriz ? 'Standard View' : 'Summary View';
 }
 
 // Decision Summary panel: every completed step becomes a rich card; the current
@@ -1649,7 +1795,7 @@ function completeJourneyMap(label = 'Journey complete') {
 
 // Bring the spotlighted step into view without losing sight of the trail above
 function scrollToActiveStep() {
-    const active = document.querySelector('.journey-map-item.journey-map-current, .go-to-tier-step, .journey-review');
+    const active = document.querySelector('.journey-map-item.journey-map-current, #horiz-active-bubble, .go-to-tier-step, .journey-review');
     if (!active) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     requestAnimationFrame(() => {
