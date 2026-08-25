@@ -7794,3 +7794,298 @@ body.step-review-modal-open { overflow: hidden; }
   box-shadow: 0 6px 18px rgba(0,0,0,0.18);
   outline: none;
 }
+
+/* ====================================================================
+   LAYOUT TOGGLE BUTTON — "Your Decisions" panel header
+   ==================================================================== */
+
+.layout-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.28rem 0.62rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.layout-toggle-btn:hover {
+  background: var(--step-bg);
+  color: var(--step-text);
+  border-color: var(--step-soft);
+}
+
+.layout-toggle-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* When aria-pressed="true" (horizontal / summary mode is active) */
+.layout-toggle-btn[aria-pressed="true"] {
+  background: var(--step-bg);
+  color: var(--step-text);
+  border-color: var(--step-soft);
+}
+
+/* Show/hide the right icon based on the active mode */
+/* Default: standard mode → show "3 columns" icon, hide list icon */
+.layout-toggle-icon-list { display: none; }
+.layout-toggle-icon-summary { display: block; }
+
+/* Horizontal mode active → show list icon, hide columns icon */
+.layout-toggle-btn[aria-pressed="true"] .layout-toggle-icon-list { display: block; }
+.layout-toggle-btn[aria-pressed="true"] .layout-toggle-icon-summary { display: none; }
+
+/* ====================================================================
+   HORIZONTAL / SUMMARY-VIEW LAYOUT MODE
+   Used when layoutMode === 'horizontal'. The journey-map-list shows a
+   left-to-right scrollable row of step bubbles instead of a stacked list.
+   ==================================================================== */
+
+/* List items that hold the track and the active step form */
+.horiz-track-li,
+.horiz-step-content-li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ── Horizontal scrollable bubble track ── */
+.horiz-track-scroll {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding: var(--space-md) var(--space-lg);
+  gap: 0;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.horiz-track-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.horiz-track-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* ── Individual step bubble ── */
+.horiz-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  min-width: 164px;
+  max-width: 200px;
+  flex-shrink: 0;
+  padding: 12px 14px 11px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  gap: 7px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: box-shadow var(--duration) var(--ease), transform var(--duration) var(--ease);
+}
+
+/* Completed (clickable) bubble */
+button.horiz-bubble-done {
+  cursor: pointer;
+}
+button.horiz-bubble-done:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+button.horiz-bubble-done:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Active (in-progress) bubble */
+.horiz-bubble-active {
+  border-color: var(--tier-color, var(--step));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tier-color, var(--step)) 14%, transparent);
+}
+
+/* Small checkmark badge on completed bubbles (top-right corner) */
+.horiz-bubble-check {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  background: var(--effective);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border: 1.5px solid var(--bg);
+}
+
+/* ── Bubble icon ── */
+.horiz-bubble-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--step-bg);
+  color: var(--step-text);
+}
+
+.horiz-bubble-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* Type-specific icon colours (reuse flowchart step variables) */
+.horiz-bubble-type-checklist .horiz-bubble-icon {
+  background: var(--step-checklist-bg);
+  color: var(--step-checklist);
+}
+.horiz-bubble-type-selection .horiz-bubble-icon {
+  background: var(--step-selection-bg);
+  color: var(--step-selection);
+}
+.horiz-bubble-type-decision .horiz-bubble-icon {
+  background: var(--step-decision-bg);
+  color: var(--step-decision);
+}
+.horiz-bubble-type-info .horiz-bubble-icon {
+  background: var(--step-info-bg);
+  color: var(--step-info);
+}
+
+/* ── Bubble text area ── */
+.horiz-bubble-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  width: 100%;
+}
+
+.horiz-bubble-meta {
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.horiz-bubble-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.horiz-bubble-answer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--effective);
+  line-height: 1.3;
+}
+
+.horiz-bubble-answer svg {
+  flex-shrink: 0;
+  color: var(--effective);
+}
+
+.horiz-bubble-revisit {
+  margin-top: 3px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--step);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity var(--duration) var(--ease);
+}
+
+button.horiz-bubble-done:hover .horiz-bubble-revisit,
+button.horiz-bubble-done:focus-visible .horiz-bubble-revisit {
+  opacity: 1;
+}
+
+.horiz-bubble-now {
+  margin-top: 3px;
+  display: inline-flex;
+  font-size: 0.72rem;
+}
+
+/* ── Connector arrow between bubbles ── */
+.horiz-connector {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  align-self: center;
+}
+
+.horiz-connector-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+}
+
+.horiz-connector-arrow {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 6px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Active step content area (below the track) ── */
+.horiz-step-content-li {
+  border-top: 1px solid var(--border);
+}
+
+.horiz-step-content-li .journey-step-slot {
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+}
+
+/* On small screens, reduce bubble size slightly */
+@media (max-width: 600px) {
+  .horiz-bubble {
+    min-width: 140px;
+    max-width: 170px;
+    padding: 10px 11px 9px;
+  }
+  .horiz-bubble-title {
+    font-size: 0.78rem;
+  }
+  .horiz-track-scroll {
+    padding: var(--space-sm) var(--space-md);
+  }
+}
