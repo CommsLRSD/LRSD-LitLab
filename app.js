@@ -2773,11 +2773,21 @@ function switchToTier(tierId) {
 function saveCurrentTierToFullJourney() {
     const vf = appState.visualFlowchart;
     if (!appState.fullJourney) appState.fullJourney = [];
-    appState.fullJourney.push({
+    // Replace any existing snapshot for this tier so that going back and
+    // re-doing steps doesn't produce duplicate entries in the journey summary.
+    const existingIdx = appState.fullJourney.findIndex(s => s.tierId === vf.tierId);
+    const snapshot = {
         tierId: vf.tierId,
         selectedPath: vf.selectedPath.slice(),
         choices: Object.assign({}, vf.choices)
-    });
+    };
+    if (existingIdx !== -1) {
+        // Also remove any snapshots for tiers that came after this one,
+        // since going back and taking a different path may change which
+        // tiers follow.
+        appState.fullJourney.splice(existingIdx);
+    }
+    appState.fullJourney.push(snapshot);
 }
 
 // Show a simple endpoint card for tier-transition endpoints (no journey history)
