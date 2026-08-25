@@ -2883,13 +2883,30 @@ function buildAnimStepBubble(nodeDef, choice, tierId) {
         </div>`;
 }
 
+function isTrueMobileSummaryDevice() {
+    return window.matchMedia('(max-width: 768px) and (hover: none) and (pointer: coarse)').matches;
+}
+
+function normalizeFinalSummaryCardHeights(renderRoot) {
+    const summary = renderRoot?.querySelector('.anim-journey-summary');
+    if (!summary) return;
+    const cards = Array.from(summary.querySelectorAll('.anim-step-bubble, .anim-endpoint-card'));
+    if (!cards.length) return;
+
+    cards.forEach(card => { card.style.minHeight = ''; });
+    const maxHeight = cards.reduce((max, card) => Math.max(max, card.offsetHeight), 0);
+    if (!maxHeight) return;
+    cards.forEach(card => { card.style.minHeight = `${maxHeight}px`; });
+}
+
 // Show the complete cross-tier journey summary at a true terminal endpoint
 function showFinalSummary(endpointNodeData) {
     const stepsContainer = getActiveStepTarget();
     if (!stepsContainer) return;
 
     const fullJourney = appState.fullJourney || [];
-    const useDesktopSummaryModal = window.matchMedia('(min-width: 1024px)').matches;
+    const useSummaryModal = !isTrueMobileSummaryDevice();
+    const useDesktopSummaryLayout = useSummaryModal && window.matchMedia('(min-width: 1024px)').matches;
     closeFinalSummaryDialog({ immediate: true });
 
     // ── Collect all animation items (tier badges, step bubbles, connectors, endpoint) ──
@@ -2960,19 +2977,19 @@ function showFinalSummary(endpointNodeData) {
 
     // ── Render skeleton; all items hidden, to be revealed in sequence ──
     const itemsHTML = items.map((item, i) => {
-        const desktopClass = useDesktopSummaryModal ? ' anim-grid-item' : '';
+        const desktopClass = useDesktopSummaryLayout ? ' anim-grid-item' : '';
         const kindClass = item.kind ? ` anim-kind-${item.kind}` : '';
         return `<div class="anim-journey-item${desktopClass}${kindClass}" data-anim-idx="${i}">${item.html}</div>`;
     }).join('');
 
     const summaryContentHTML = `
-        <div class="journey-review${useDesktopSummaryModal ? ' journey-review-modal' : ''}">
-            <div class="journey-review-header${useDesktopSummaryModal ? ' journey-review-header-modal' : ''}">
+        <div class="journey-review${useSummaryModal ? ' journey-review-modal' : ''}">
+            <div class="journey-review-header${useSummaryModal ? ' journey-review-header-modal' : ''}">
                 <div class="journey-review-header-copy">
                     <h2>Your Complete Journey</h2>
                     <p>A summary of your full intervention pathway</p>
                 </div>
-                ${useDesktopSummaryModal ? `
+                ${useSummaryModal ? `
                     <button class="close-summary-btn" type="button" onclick="closeFinalSummaryDialog()" aria-label="Close journey summary">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>` : ''}
@@ -2981,13 +2998,13 @@ function showFinalSummary(endpointNodeData) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
                 Skip animation
             </button>
-            <div class="anim-journey-summary journey-flow${useDesktopSummaryModal ? ' anim-layout-rows' : ''}">${itemsHTML}</div>
+            <div class="anim-journey-summary journey-flow${useDesktopSummaryLayout ? ' anim-layout-rows' : ''}">${itemsHTML}</div>
             <div class="journey-actions" id="anim-journey-actions" style="display:none;">${actionsHTML}</div>
         </div>
     `;
 
     let renderRoot = stepsContainer;
-    if (useDesktopSummaryModal) {
+    if (useSummaryModal) {
         const modal = document.createElement('div');
         modal.id = 'final-summary-modal';
         modal.className = 'anim-summary-modal-overlay final-summary-modal-overlay';
@@ -3006,6 +3023,10 @@ function showFinalSummary(endpointNodeData) {
         };
         appState.finalSummaryKeyHandler = keyHandler;
         document.addEventListener('keydown', keyHandler);
+
+        const resizeHandler = () => normalizeFinalSummaryCardHeights(modal);
+        appState.finalSummaryResizeHandler = resizeHandler;
+        window.addEventListener('resize', resizeHandler);
         renderRoot = modal;
     } else {
         stepsContainer.innerHTML = summaryContentHTML;
@@ -3017,9 +3038,10 @@ function showFinalSummary(endpointNodeData) {
     requestAnimationFrame(() => {
         const review = renderRoot.querySelector('.journey-review');
         if (review) review.classList.add('journey-review-visible');
-        if (useDesktopSummaryModal) renderRoot.classList.add('final-summary-modal-visible');
+        if (useSummaryModal) renderRoot.classList.add('final-summary-modal-visible');
+        if (useSummaryModal) normalizeFinalSummaryCardHeights(renderRoot);
     });
-    if (!useDesktopSummaryModal) scrollToActiveStep();
+    if (!useSummaryModal) scrollToActiveStep();
 
     // ── Staggered reveal ──
     const STEP_DELAY = 420;    // ms between each non-connector item
@@ -3080,6 +3102,10 @@ function closeFinalSummaryDialog(options = {}) {
     if (appState.finalSummaryKeyHandler) {
         document.removeEventListener('keydown', appState.finalSummaryKeyHandler);
         appState.finalSummaryKeyHandler = null;
+    }
+    if (appState.finalSummaryResizeHandler) {
+        window.removeEventListener('resize', appState.finalSummaryResizeHandler);
+        appState.finalSummaryResizeHandler = null;
     }
 
     document.body.classList.remove('final-summary-modal-open');
