@@ -4091,8 +4091,8 @@ body.evidence-modal-open { overflow: hidden; }
   }
 
   .anim-journey-summary.anim-layout-rows .anim-journey-item {
-    flex: 0 0 180px;
-    max-width: 220px;
+    flex: 1 1 210px;
+    max-width: 250px;
     width: auto;
   }
 
@@ -4105,8 +4105,8 @@ body.evidence-modal-open { overflow: hidden; }
 
   /* Endpoint cards are the same size as step bubbles */
   .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-endpoint {
-    flex: 0 0 180px;
-    max-width: 220px;
+    flex: 1 1 210px;
+    max-width: 250px;
     width: auto;
   }
 
