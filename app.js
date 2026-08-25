@@ -2906,7 +2906,7 @@ function showFinalSummary(endpointNodeData) {
 
     const fullJourney = appState.fullJourney || [];
     const useSummaryModal = !isTrueMobileSummaryDevice();
-    const useDesktopSummaryLayout = useSummaryModal && window.matchMedia('(min-width: 1024px)').matches;
+    const useDesktopSummaryLayout = useSummaryModal && window.matchMedia('(min-width: 769px)').matches;
     closeFinalSummaryDialog({ immediate: true });
 
     // ── Collect all animation items (tier badges, step bubbles, connectors, endpoint) ──
