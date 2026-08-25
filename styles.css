@@ -4085,22 +4085,29 @@ body.evidence-modal-open { overflow: hidden; }
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    align-items: stretch;
+    align-items: flex-start;
     justify-content: flex-start;
     gap: 12px;
   }
 
   .anim-journey-summary.anim-layout-rows .anim-journey-item {
-    flex: 0 0 200px;
-    max-width: 200px;
+    flex: 0 0 180px;
+    max-width: 220px;
     width: auto;
   }
 
-  .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-tier,
-  .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-endpoint {
+  /* Tier badges span the full row as section separators */
+  .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-tier {
     flex: 0 0 100%;
     max-width: 100%;
     width: 100%;
+  }
+
+  /* Endpoint cards are the same size as step bubbles */
+  .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-endpoint {
+    flex: 0 0 180px;
+    max-width: 220px;
+    width: auto;
   }
 
   .anim-journey-summary.anim-layout-rows .anim-journey-item.anim-kind-connector {
@@ -4115,9 +4122,11 @@ body.evidence-modal-open { overflow: hidden; }
     margin: 6px 0 0;
   }
 
+  /* Bubbles maintain consistent height; long text adds width via flex-grow */
   .anim-journey-summary.anim-layout-rows .anim-step-bubble,
   .anim-journey-summary.anim-layout-rows .anim-endpoint-card {
-    height: 100%;
+    min-height: 120px;
+    height: auto;
   }
 
   /* Horizontal connectors in row layout */
@@ -4142,6 +4151,26 @@ body.evidence-modal-open { overflow: hidden; }
     border-left: 6px solid var(--border);
     border-right: 0;
     margin-top: 0;
+  }
+}
+
+/* Mobile: journey summary inside the step slot — full-width rectangles,
+   shifted left to visually centre within the full item width
+   (compensates for the 28px marker circle + 0.9rem gap on the left). */
+@media (max-width: 1023px) {
+  .journey-step-slot .anim-journey-summary {
+    max-width: none;
+    margin-left: calc(-1 * (28px + 0.9rem));
+    width: calc(100% + 28px + 0.9rem);
+  }
+
+  .journey-step-slot .anim-step-bubble {
+    border-radius: var(--radius);
+    padding: 12px 14px;
+  }
+
+  .journey-step-slot .anim-endpoint-card {
+    border-radius: var(--radius);
   }
 }
 
