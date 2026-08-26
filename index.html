@@ -12,7 +12,7 @@
 </head>
 <body>
     <!-- Skip to content for keyboard navigation -->
-    <a href="#main-content" class="skip-to-content">Skip to content</a>
+    <a href="#main-content" class="skip-to-content" data-i18n="skip_to_content">Skip to content</a>
 
     <!-- Top Navigation -->
     <nav class="top-nav" role="navigation" aria-label="Main navigation">
@@ -28,29 +28,34 @@
             <nav class="nav-links" role="menubar" aria-label="Site sections">
                 <button class="nav-link active" data-page="home" role="menuitem" aria-selected="true">
                     <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">home</span>
-                    Home
+                    <span data-i18n="nav_home">Home</span>
                 </button>
                 <button class="nav-link" data-page="flowchart" role="menuitem" aria-selected="false">
                     <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">account_tree</span>
-                    Flowchart
+                    <span data-i18n="nav_flowchart">Flowchart</span>
                 </button>
                 <button class="nav-link" data-page="interventions" role="menuitem" aria-selected="false">
                     <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">checklist</span>
-                    Interventions
+                    <span data-i18n="nav_interventions">Interventions</span>
                 </button>
                 <button class="nav-link" data-page="scores" role="menuitem" aria-selected="false">
                     <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">bar_chart</span>
-                    Understanding Scores &amp; Percentiles
+                    <span data-i18n="nav_scores">Understanding Scores &amp; Percentiles</span>
                 </button>
                 <button class="nav-link" data-page="original" role="menuitem" aria-selected="false">
                     <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">menu_book</span>
-                    Original Guide
+                    <span data-i18n="nav_original">Original Guide</span>
                 </button>
                 <button class="nav-link" data-page="about" role="menuitem" aria-selected="false">
                     <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">info</span>
-                    About
+                    <span data-i18n="nav_about">About</span>
                 </button>
             </nav>
+
+            <!-- Language toggle -->
+            <button class="lang-toggle-btn" id="lang-toggle-btn" onclick="toggleLanguage()" aria-label="Switch to French" data-i18n-aria="nav_lang_toggle_label">
+                <span class="lang-toggle-code" id="lang-toggle-code">FR</span>
+            </button>
 
             <!-- Mobile menu button -->
             <button class="mobile-menu-btn" aria-label="Open navigation menu" aria-expanded="false">
@@ -66,27 +71,27 @@
         <div class="mobile-nav-content">
             <button class="mobile-nav-item active" data-page="home">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">home</span>
-                Home
+                <span data-i18n="nav_home">Home</span>
             </button>
             <button class="mobile-nav-item" data-page="flowchart">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">account_tree</span>
-                Flowchart
+                <span data-i18n="nav_flowchart">Flowchart</span>
             </button>
             <button class="mobile-nav-item" data-page="interventions">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">checklist</span>
-                Interventions Menu
+                <span data-i18n="nav_interventions_mobile">Interventions Menu</span>
             </button>
             <button class="mobile-nav-item" data-page="scores">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">bar_chart</span>
-                Understanding Scores &amp; Percentiles
+                <span data-i18n="nav_scores">Understanding Scores &amp; Percentiles</span>
             </button>
             <button class="mobile-nav-item" data-page="original">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">menu_book</span>
-                Original Guide
+                <span data-i18n="nav_original">Original Guide</span>
             </button>
             <button class="mobile-nav-item" data-page="about">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
-                About
+                <span data-i18n="nav_about">About</span>
             </button>
                 Original Guide
             </button>
@@ -101,9 +106,9 @@
             <div class="home-hero">
                 <div class="hero-inner">
                     <div class="hero-content">
-                        <span class="hero-eyebrow">LRSD Literacy Resource</span>
-                        <h2 class="hero-title">Building <span class="accent-word">Lifelong</span><br>Literacy Together</h2>
-                        <p class="hero-subtitle">Supporting educators in identifying and implementing effective literacy interventions for every learner.</p>
+                        <span class="hero-eyebrow" data-i18n="hero_eyebrow">LRSD Literacy Resource</span>
+                        <h2 class="hero-title" data-i18n-html="hero_title_html">Building <span class="accent-word">Lifelong</span><br>Literacy Together</h2>
+                        <p class="hero-subtitle" data-i18n="hero_subtitle">Supporting educators in identifying and implementing effective literacy interventions for every learner.</p>
                     </div>
                     <div class="hero-photo-wrap" aria-hidden="true">
                         <img class="hero-photo" src="images/COD_0471.jpg" alt="Two students reading together in a library" loading="eager">
@@ -119,9 +124,9 @@
                         <div class="cta-icon" aria-hidden="true">
                             <span class="material-symbols-rounded" translate="no">account_tree</span>
                         </div>
-                        <h3 class="cta-title">Intervention Flowchart</h3>
-                        <p class="cta-desc">Step-by-step decision guide to navigate tiers of support based on student screening results.</p>
-                        <span class="cta-btn">Start Flowchart
+                        <h3 class="cta-title" data-i18n="cta_flowchart_title">Intervention Flowchart</h3>
+                        <p class="cta-desc" data-i18n="cta_flowchart_desc">Step-by-step decision guide to navigate tiers of support based on student screening results.</p>
+                        <span class="cta-btn"><span data-i18n="cta_flowchart_btn">Start Flowchart</span>
                             <span class="material-symbols-rounded cta-btn-arrow" aria-hidden="true" translate="no">arrow_forward</span>
                         </span>
                     </button>
@@ -130,9 +135,9 @@
                         <div class="cta-icon" aria-hidden="true">
                             <span class="material-symbols-rounded" translate="no">checklist</span>
                         </div>
-                        <h3 class="cta-title">Interventions Menu</h3>
-                        <p class="cta-desc">Browse interventions and assessments filtered by screener, subtest, and literacy pillar.</p>
-                        <span class="cta-btn">Find Interventions
+                        <h3 class="cta-title" data-i18n="cta_interventions_title">Interventions Menu</h3>
+                        <p class="cta-desc" data-i18n="cta_interventions_desc">Browse interventions and assessments filtered by screener, subtest, and literacy pillar.</p>
+                        <span class="cta-btn"><span data-i18n="cta_interventions_btn">Find Interventions</span>
                             <span class="material-symbols-rounded cta-btn-arrow" aria-hidden="true" translate="no">arrow_forward</span>
                         </span>
                     </button>
@@ -141,9 +146,9 @@
                         <div class="cta-icon" aria-hidden="true">
                             <span class="material-symbols-rounded" translate="no">bar_chart</span>
                         </div>
-                        <h3 class="cta-title">Understanding Scores &amp; Percentiles</h3>
-                        <p class="cta-desc">Learn how standard scores, percentile ranks, and DIBELS risk categories are used to understand student performance.</p>
-                        <span class="cta-btn">Learn More
+                        <h3 class="cta-title" data-i18n="cta_scores_title">Understanding Scores &amp; Percentiles</h3>
+                        <p class="cta-desc" data-i18n="cta_scores_desc">Learn how standard scores, percentile ranks, and DIBELS risk categories are used to understand student performance.</p>
+                        <span class="cta-btn"><span data-i18n="cta_scores_btn">Learn More</span>
                             <span class="material-symbols-rounded cta-btn-arrow" aria-hidden="true" translate="no">arrow_forward</span>
                         </span>
                     </button>
@@ -152,9 +157,9 @@
                         <div class="cta-icon" aria-hidden="true">
                             <span class="material-symbols-rounded" translate="no">menu_book</span>
                         </div>
-                        <h3 class="cta-title">Original Literacy Interventions</h3>
-                        <p class="cta-desc">View the original LRSD Literacy Interventions guide document in its published format.</p>
-                        <span class="cta-btn">View Guide
+                        <h3 class="cta-title" data-i18n="cta_original_title">Original Literacy Interventions</h3>
+                        <p class="cta-desc" data-i18n="cta_original_desc">View the original LRSD Literacy Interventions guide document in its published format.</p>
+                        <span class="cta-btn"><span data-i18n="cta_original_btn">View Guide</span>
                             <span class="material-symbols-rounded cta-btn-arrow" aria-hidden="true" translate="no">arrow_forward</span>
                         </span>
                     </button>
@@ -166,8 +171,8 @@
         <section id="flowchart-section" class="content-section" data-page="flowchart">
             <div class="flowchart-page-wrapper">
                 <div class="hero-area">
-                    <h2 class="section-title">Intervention Flowchart</h2>
-                    <p class="section-subtitle">Step-by-step decision guide to navigate tiers of support based on student screening results</p>
+                    <h2 class="section-title" data-i18n="flowchart_section_title">Intervention Flowchart</h2>
+                    <p class="section-subtitle" data-i18n="flowchart_section_subtitle">Step-by-step decision guide to navigate tiers of support based on student screening results</p>
                 </div>
                 <div class="flowchart-page-body">
                     <div id="flowchart-container"></div>
@@ -183,15 +188,15 @@
         <section id="interventions-section" class="content-section" data-page="interventions">
             <div class="interventions-page-wrapper">
                 <div class="hero-area">
-                    <h2 class="section-title">Interventions &amp; Assessments Menu</h2>
-                    <p class="section-subtitle">Follow the steps below to find resources matched to your screening results</p>
+                    <h2 class="section-title" data-i18n="interventions_section_title">Interventions &amp; Assessments Menu</h2>
+                    <p class="section-subtitle" data-i18n="interventions_section_subtitle">Follow the steps below to find resources matched to your screening results</p>
                 </div>
 
                 <div class="interventions-page-body">
                     <div class="dropdown-wizard" aria-label="Intervention menu dropdown workflow">
                         <div class="dropdown-wizard-header">
                             <div class="wizard-title-row">
-                                <h3 class="wizard-title"><span class="material-symbols-rounded" aria-hidden="true" translate="no">tune</span>Choose each step in order</h3>
+                                <h3 class="wizard-title"><span class="material-symbols-rounded" aria-hidden="true" translate="no">tune</span><span data-i18n="wizard_choose_steps">Choose each step in order</span></h3>
                                 <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation();">
                                     <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
                                 </button>
@@ -200,13 +205,13 @@
 
                         <div class="dropdown-row">
                             <div class="dropdown-group">
-                                <label for="screener-select">Step 1 · Screener</label>
+                                <label for="screener-select" data-i18n="wizard_step1_label">Step 1 · Screener</label>
                                 <select id="screener-select" class="styled-select" onchange="onScreenerDropdownChange(this.value)">
                                     <option value="">Select...</option>
                                 </select>
                             </div>
                             <div class="dropdown-group">
-                                <label for="subtest-select">Step 2 · Subtest</label>
+                                <label for="subtest-select" data-i18n="wizard_step2_label">Step 2 · Subtest</label>
                                 <select id="subtest-select" class="styled-select" onchange="onSubtestDropdownChange(this.value)" disabled>
                                     <option value="">Select...</option>
                                 </select>
@@ -215,13 +220,13 @@
 
                         <div class="dropdown-row">
                             <div class="dropdown-group">
-                                <label for="pillar-select">Step 3 · Pillar</label>
+                                <label for="pillar-select" data-i18n="wizard_step3_label">Step 3 · Pillar</label>
                                 <select id="pillar-select" class="styled-select" onchange="onPillarDropdownChange(this.value)" disabled>
                                     <option value="">Select...</option>
                                 </select>
                             </div>
                             <div class="dropdown-group">
-                                <label for="type-select">Step 4 · Resource Type</label>
+                                <label for="type-select" data-i18n="wizard_step4_label">Step 4 · Resource Type</label>
                                 <select id="type-select" class="styled-select" onchange="onTypeDropdownChange(this.value)" disabled>
                                     <option value="">Select...</option>
                                     <option value="Intervention">Intervention</option>
@@ -238,7 +243,7 @@
                         </div>
 
                         <div class="step-panel-actions">
-                            <button class="reset-btn-minimal" onclick="restartMenu()"><span class="material-symbols-rounded" aria-hidden="true" translate="no">restart_alt</span>Start Over</button>
+                            <button class="reset-btn-minimal" onclick="restartMenu()"><span class="material-symbols-rounded" aria-hidden="true" translate="no">restart_alt</span><span data-i18n="wizard_start_over">Start Over</span></button>
                         </div>
                     </div><!-- /.dropdown-wizard -->
                 </div><!-- /.interventions-page-body -->
@@ -249,8 +254,8 @@
         <section id="scores-section" class="content-section" data-page="scores">
             <div class="scores-page-wrapper">
                 <div class="hero-area">
-                    <h2 class="section-title">Understanding Scores &amp; Percentiles</h2>
-                    <p class="section-subtitle">A reference guide to interpreting student screening results</p>
+                    <h2 class="section-title" data-i18n="scores_section_title">Understanding Scores &amp; Percentiles</h2>
+                    <p class="section-subtitle" data-i18n="scores_section_subtitle">A reference guide to interpreting student screening results</p>
                 </div>
 
                 <div class="scores-page-body">
@@ -258,15 +263,15 @@
                         <div class="scores-fact-card">
                             <span class="material-symbols-rounded" aria-hidden="true" translate="no">percent</span>
                             <div>
-                                <h3>Average Percentile Range</h3>
-                                <p>16th to 84th percentile</p>
+                                <h3 data-i18n="scores_avg_percentile_title">Average Percentile Range</h3>
+                                <p data-i18n="scores_avg_percentile_value">16th to 84th percentile</p>
                             </div>
                         </div>
                         <div class="scores-fact-card">
                             <span class="material-symbols-rounded" aria-hidden="true" translate="no">equalizer</span>
                             <div>
-                                <h3>Average Standard Score Range</h3>
-                                <p>85 to 115 standard score</p>
+                                <h3 data-i18n="scores_avg_standard_title">Average Standard Score Range</h3>
+                                <p data-i18n="scores_avg_standard_value">85 to 115 standard score</p>
                             </div>
                         </div>
                     </div>
@@ -275,48 +280,48 @@
                         <details class="scores-accordion-item" open>
                             <summary>
                                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">leaderboard</span>
-                                What percentile ranks mean
+                                <span data-i18n="scores_acc_percentile_title">What percentile ranks mean</span>
                             </summary>
                             <div class="scores-accordion-content">
-                                <p>Percentile ranks compare a student to same-age peers. A percentile of 16 means the student scored as well as or better than 16% of peers; a percentile of 75 means as well as or better than 75% of peers.</p>
-                                <p>Percentiles are not the same as percent correct. They show relative standing, not the number of test items answered correctly.</p>
+                                <p data-i18n="scores_acc_percentile_p1">Percentile ranks compare a student to same-age peers. A percentile of 16 means the student scored as well as or better than 16% of peers; a percentile of 75 means as well as or better than 75% of peers.</p>
+                                <p data-i18n="scores_acc_percentile_p2">Percentiles are not the same as percent correct. They show relative standing, not the number of test items answered correctly.</p>
                             </div>
                         </details>
 
                         <details class="scores-accordion-item">
                             <summary>
                                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">insights</span>
-                                What standard scores mean
+                                <span data-i18n="scores_acc_standard_title">What standard scores mean</span>
                             </summary>
                             <div class="scores-accordion-content">
-                                <p>Standard scores make it easier to compare results across measures. Most tests use 100 as the average score and 15-point intervals to describe score ranges.</p>
-                                <p>A standard score from 85 to 115 is typically considered average.</p>
+                                <p data-i18n="scores_acc_standard_p1">Standard scores make it easier to compare results across measures. Most tests use 100 as the average score and 15-point intervals to describe score ranges.</p>
+                                <p data-i18n="scores_acc_standard_p2">A standard score from 85 to 115 is typically considered average.</p>
                             </div>
                         </details>
 
                         <details class="scores-accordion-item">
                             <summary>
                                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">category</span>
-                                DIBELS risk categories
+                                <span data-i18n="scores_acc_dibels_title">DIBELS risk categories</span>
                             </summary>
                             <div class="scores-accordion-content">
-                                <p>DIBELS categories indicate the likelihood of meeting end-of-year grade-level reading goals.</p>
+                                <p data-i18n="scores_acc_dibels_intro">DIBELS categories indicate the likelihood of meeting end-of-year grade-level reading goals.</p>
                                 <div class="scores-risk-list">
                                     <div class="scores-risk-item scores-risk-blue">
-                                        <strong>Blue — Above Benchmark</strong>
-                                        <span>Core support; negligible risk.</span>
+                                        <strong data-i18n="scores_dibels_blue">Blue — Above Benchmark</strong>
+                                        <span data-i18n="scores_dibels_blue_desc">Core support; negligible risk.</span>
                                     </div>
                                     <div class="scores-risk-item scores-risk-green">
-                                        <strong>Green — At Benchmark</strong>
-                                        <span>Core support; minimal risk.</span>
+                                        <strong data-i18n="scores_dibels_green">Green — At Benchmark</strong>
+                                        <span data-i18n="scores_dibels_green_desc">Core support; minimal risk.</span>
                                     </div>
                                     <div class="scores-risk-item scores-risk-yellow">
-                                        <strong>Yellow — Some Risk</strong>
-                                        <span>Strategic small-group support and progress monitoring.</span>
+                                        <strong data-i18n="scores_dibels_yellow">Yellow — Some Risk</strong>
+                                        <span data-i18n="scores_dibels_yellow_desc">Strategic small-group support and progress monitoring.</span>
                                     </div>
                                     <div class="scores-risk-item scores-risk-red">
-                                        <strong>Red — At Risk</strong>
-                                        <span>Intensive support with close progress monitoring.</span>
+                                        <strong data-i18n="scores_dibels_red">Red — At Risk</strong>
+                                        <span data-i18n="scores_dibels_red_desc">Intensive support with close progress monitoring.</span>
                                     </div>
                                 </div>
                             </div>
@@ -331,8 +336,8 @@
         <section id="original-section" class="content-section" data-page="original">
             <div class="original-guide-wrapper">
                 <div class="hero-area">
-                    <h2 class="section-title">Original Literacy Interventions</h2>
-                    <p class="section-subtitle">View the original LRSD Literacy Interventions guide document</p>
+                    <h2 class="section-title" data-i18n="original_section_title">Original Literacy Interventions</h2>
+                    <p class="section-subtitle" data-i18n="original_section_subtitle">View the original LRSD Literacy Interventions guide document</p>
                 </div>
                 <div class="original-guide-body">
                     <iframe
@@ -350,58 +355,58 @@
         <section id="about-section" class="content-section" data-page="about">
             <div class="about-page-wrapper">
                 <div class="hero-area">
-                    <h2 class="section-title">About</h2>
-                    <p class="section-subtitle">Welcome to Literacy Interventions, an interactive teaching guide by the Louis Riel School Division.</p>
+                    <h2 class="section-title" data-i18n="about_section_title">About</h2>
+                    <p class="section-subtitle" data-i18n="about_section_subtitle">Welcome to Literacy Interventions, an interactive teaching guide by the Louis Riel School Division.</p>
                 </div>
 
                 <div class="about-page-body">
                     <div class="about-content">
 
                         <div class="about-block">
-                            <h3 class="about-heading">Purpose of This Document</h3>
-                            <p>This document is designed to support teachers, clinicians, principals, and vice-principals in interpreting data while collaboratively and effectively planning for instruction and intervention.</p>
-                            <p>It includes a schedule detailing the universal screening and progress monitoring required at each grade level for both English and French Immersion programs. Additionally, it features interactive content to help interpret data and determine next steps.</p>
+                            <h3 class="about-heading" data-i18n="about_heading_purpose">Purpose of This Document</h3>
+                            <p data-i18n="about_purpose_p1">This document is designed to support teachers, clinicians, principals, and vice-principals in interpreting data while collaboratively and effectively planning for instruction and intervention.</p>
+                            <p data-i18n="about_purpose_p2">It includes a schedule detailing the universal screening and progress monitoring required at each grade level for both English and French Immersion programs. Additionally, it features interactive content to help interpret data and determine next steps.</p>
                         </div>
 
                         <div class="about-block">
-                            <h3 class="about-heading">Frequency of Screening and Progress Monitoring</h3>
-                            <p>In 2023, the Ontario Human Rights Commission's Two-Year Update Right to Read report recommended conducting at least two screenings per year in K-2. The Saskatchewan Human Rights Commission suggested two to three times annually. The creators of DIBELS at the University of Oregon recommend progress monitoring three times per year. Reviewing the HRC reports, various research studies, and consultations with researchers in the field informed the Screening and Progress Monitoring Schedule adopted by LRSD and included in this document. The schedule applies to all students in LRSD in K-8. This schedule will be reviewed annually to ensure the timing and frequency of assessments continue to support student learning and educator needs while also being aligned with best practices as outlined in the research.</p>
+                            <h3 class="about-heading" data-i18n="about_heading_frequency">Frequency of Screening and Progress Monitoring</h3>
+                            <p data-i18n="about_frequency_p1">In 2023, the Ontario Human Rights Commission's Two-Year Update Right to Read report recommended conducting at least two screenings per year in K-2. The Saskatchewan Human Rights Commission suggested two to three times annually. The creators of DIBELS at the University of Oregon recommend progress monitoring three times per year. Reviewing the HRC reports, various research studies, and consultations with researchers in the field informed the Screening and Progress Monitoring Schedule adopted by LRSD and included in this document. The schedule applies to all students in LRSD in K-8. This schedule will be reviewed annually to ensure the timing and frequency of assessments continue to support student learning and educator needs while also being aligned with best practices as outlined in the research.</p>
                         </div>
 
                         <div class="about-block">
-                            <h3 class="about-heading">Access to Data and Its Importance</h3>
-                            <p>Specific reports have been developed for teachers to access student screening and progress monitoring data in Power BI. These reports are available in the PowerBI teacher workspace. School leaders and student services teachers also have access to school- and system-level reports through their respective Power BI workspaces. Using this evidence-based data to inform instructional planning is essential, which is why the screening process is so important.</p>
+                            <h3 class="about-heading" data-i18n="about_heading_access">Access to Data and Its Importance</h3>
+                            <p data-i18n="about_access_p1">Specific reports have been developed for teachers to access student screening and progress monitoring data in Power BI. These reports are available in the PowerBI teacher workspace. School leaders and student services teachers also have access to school- and system-level reports through their respective Power BI workspaces. Using this evidence-based data to inform instructional planning is essential, which is why the screening process is so important.</p>
                         </div>
 
                         <div class="about-block">
-                            <h3 class="about-heading">Planning for Intervention: RTI and MTSS</h3>
-                            <p>This document provides a step-by-step tool that allows teachers to input observations and data results, leading to recommendations for next steps. LRSD strongly advocates for the application of the principles of Response to Intervention (RTI) and Multi-Tiered System of Supports (MTSS) to guide all intervention planning, ensuring all students, including those with reading difficulties or learning disabilities, receive high-quality instruction and targeted support.</p>
-                            <p>RTI is a proactive, data-driven framework that helps teachers make informed decisions and adjust instruction to improve student learning. It follows a three-tier model:</p>
+                            <h3 class="about-heading" data-i18n="about_heading_rti">Planning for Intervention: RTI and MTSS</h3>
+                            <p data-i18n="about_rti_p1">This document provides a step-by-step tool that allows teachers to input observations and data results, leading to recommendations for next steps. LRSD strongly advocates for the application of the principles of Response to Intervention (RTI) and Multi-Tiered System of Supports (MTSS) to guide all intervention planning, ensuring all students, including those with reading difficulties or learning disabilities, receive high-quality instruction and targeted support.</p>
+                            <p data-i18n="about_rti_p2">RTI is a proactive, data-driven framework that helps teachers make informed decisions and adjust instruction to improve student learning. It follows a three-tier model:</p>
                             <ul class="about-list">
-                                <li><strong>Tier 1:</strong> Research-supported teaching practices in regular classrooms.</li>
-                                <li><strong>Tier 2:</strong> Targeted support for students needing additional assistance.</li>
-                                <li><strong>Tier 3:</strong> Intensive, individualized interventions for students who continue to struggle.</li>
+                                <li data-i18n-html="about_rti_tier1"><strong>Tier 1:</strong> Research-supported teaching practices in regular classrooms.</li>
+                                <li data-i18n-html="about_rti_tier2"><strong>Tier 2:</strong> Targeted support for students needing additional assistance.</li>
+                                <li data-i18n-html="about_rti_tier3"><strong>Tier 3:</strong> Intensive, individualized interventions for students who continue to struggle.</li>
                             </ul>
-                            <p>MTSS builds on RTI by incorporating a tiered approach that addresses not only academic needs but also social, emotional, and behavioral development. Within MTSS, reading interventions are categorized based on their place in the framework, focusing on foundational skills for struggling readers and using progress monitoring assessments to guide intervention planning.</p>
-                            <p>All interventions should be evidence-based or aligned with effective classroom instruction methods to maximize student success.</p>
+                            <p data-i18n="about_rti_p3">MTSS builds on RTI by incorporating a tiered approach that addresses not only academic needs but also social, emotional, and behavioral development. Within MTSS, reading interventions are categorized based on their place in the framework, focusing on foundational skills for struggling readers and using progress monitoring assessments to guide intervention planning.</p>
+                            <p data-i18n="about_rti_p4">All interventions should be evidence-based or aligned with effective classroom instruction methods to maximize student success.</p>
                         </div>
 
                         <div class="about-block">
-                            <h3 class="about-heading">A Living Document</h3>
-                            <p>This resource is a living document that will be updated periodically. Please continue using the provided link to ensure you are accessing the latest version. There is also a link provided to collect feedback. Please use the link to share your feedback to support the improvement of this document over time.</p>
+                            <h3 class="about-heading" data-i18n="about_heading_living">A Living Document</h3>
+                            <p data-i18n="about_living_p1">This resource is a living document that will be updated periodically. Please continue using the provided link to ensure you are accessing the latest version. There is also a link provided to collect feedback. Please use the link to share your feedback to support the improvement of this document over time.</p>
                         </div>
 
                         <div class="about-block">
-                            <h3 class="about-heading">Development and Acknowledgements</h3>
-                            <p>This document is the result of a collaborative effort to make the vast resources available on the Teaching and Learning Portal more practical and accessible for educators. It is intended to reflect best practices based on widely accepted research, extensive consultations, and numerous discussions with researchers, practitioners, and specialists in the field of evidence-based literacy instruction and intervention.</p>
-                            <p>LRSD would like to acknowledge Rob George, Karla Gutierrez, Nicholas Kelly, Kristen McDowell, Geneviève Shyiak, Lisa Tymchuk, and Dr. Caroline Erdos for their contributions to this resource. Additionally, we must recognize Cody Sellar for his vision and creativity in bringing this project to life in its electronic and interactive format.</p>
+                            <h3 class="about-heading" data-i18n="about_heading_dev">Development and Acknowledgements</h3>
+                            <p data-i18n="about_dev_p1">This document is the result of a collaborative effort to make the vast resources available on the Teaching and Learning Portal more practical and accessible for educators. It is intended to reflect best practices based on widely accepted research, extensive consultations, and numerous discussions with researchers, practitioners, and specialists in the field of evidence-based literacy instruction and intervention.</p>
+                            <p data-i18n="about_dev_p2">LRSD would like to acknowledge Rob George, Karla Gutierrez, Nicholas Kelly, Kristen McDowell, Geneviève Shyiak, Lisa Tymchuk, and Dr. Caroline Erdos for their contributions to this resource. Additionally, we must recognize Cody Sellar for his vision and creativity in bringing this project to life in its electronic and interactive format.</p>
                         </div>
 
                         <div class="about-feedback">
-                            <p class="about-feedback-text">We want to hear from you! Let us know what you think of this project.</p>
+                            <p class="about-feedback-text" data-i18n="about_feedback_text">We want to hear from you! Let us know what you think of this project.</p>
                             <a href="https://forms.office.com/r/ZQFqkNDpmG?origin=lprLink" target="_blank" rel="noopener noreferrer" class="about-feedback-btn">
                                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">rate_review</span>
-                                Provide your feedback
+                                <span data-i18n="about_feedback_btn">Provide your feedback</span>
                             </a>
                         </div>
 
@@ -417,29 +422,29 @@
         <button class="selection-tracker-toggle" type="button"
                 aria-expanded="false" aria-controls="selection-tracker-panel">
             <svg class="selection-tracker-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-            <span class="selection-tracker-toggle-label">History</span>
+            <span class="selection-tracker-toggle-label" data-i18n="history_label">History</span>
             <span class="selection-tracker-count is-empty" id="selection-tracker-count">0</span>
         </button>
         <div class="selection-tracker-panel" id="selection-tracker-panel" role="region" aria-label="Selected drill-downs and interventions">
             <div class="selection-tracker-header">
-                <h3>Selection History</h3>
+                <h3 data-i18n="history_panel_label">Selection History</h3>
                 <button class="selection-tracker-close" type="button" onclick="toggleHistoryPanel(false)" aria-label="Hide history panel">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
-            <p class="selection-tracker-intro">A running record of every drill-down assessment and intervention you select in the flowchart, grouped by session with the date you chose each item.</p>
+            <p class="selection-tracker-intro" data-i18n="history_panel_intro">A running record of every drill-down assessment and intervention you select in the flowchart, grouped by session with the date you chose each item.</p>
             <div class="selection-tracker-warning" role="note">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <span>This history is saved only in this browser. Clearing your browser cache or site data will permanently erase it. Export to CSV to keep a copy.</span>
+                <span data-i18n="history_panel_warning">This history is saved only in this browser. Clearing your browser cache or site data will permanently erase it. Export to CSV to keep a copy.</span>
             </div>
             <div class="selection-tracker-actions">
                 <button class="selection-tracker-btn selection-tracker-btn-primary" type="button" onclick="exportHistoryCsv()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-                    Export CSV
+                    <span data-i18n="history_export_csv">Export CSV</span>
                 </button>
                 <button class="selection-tracker-btn selection-tracker-btn-danger" type="button" onclick="clearSelectionHistory()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
-                    Clear All
+                    <span data-i18n="history_clear_all">Clear All</span>
                 </button>
             </div>
             <div class="selection-tracker-list" id="selection-tracker-list"></div>
@@ -448,9 +453,10 @@
 
     <!-- Footer -->
     <footer class="site-footer" role="contentinfo">
-        <p>&copy; 2025–2026 LitLab &middot; Louis Riel School Division &middot; Supporting educators in literacy intervention</p>
+        <p data-i18n="footer_text">&copy; 2025–2026 LitLab &middot; Louis Riel School Division &middot; Supporting educators in literacy intervention</p>
     </footer>
 
+    <script src="translations.js"></script>
     <script src="app.js"></script>
 
     <script>

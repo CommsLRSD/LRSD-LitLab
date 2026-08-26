@@ -13,6 +13,9 @@ const appState = {
     currentPath: [],
     interventionHistory: [],
     currentTierFlow: null,
+    // UI language: 'en' (English) or 'fr' (French).
+    // Assessment Names, Screener Names, and Intervention Names are excluded from translation.
+    language: 'en',
     // Screener the user selected (remembered across tiers and the menu so they
     // are never forced to re-choose it). Stored as the intervention-menu
     // screener_id, e.g. "DIBELS".
@@ -35,10 +38,136 @@ const appState = {
 };
 
 // ============================================
+// Internationalisation (i18n)
+// ============================================
+
+// Return the translated string for `key` in the current UI language.
+// Falls back to English if the key is missing from the active language.
+function t(key) {
+    const lang = appState.language || 'en';
+    const tr = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : null;
+    const en = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS.en) ? TRANSLATIONS.en : null;
+    if (tr && tr[key] !== undefined) return tr[key];
+    if (en && en[key] !== undefined) return en[key];
+    return key;
+}
+
+// Return the FLOWCHART_DEFINITIONS for the current language.
+function getFlowchartDefs() {
+    if (appState.language === 'fr' && typeof FLOWCHART_DEFINITIONS_FR !== 'undefined') {
+        return FLOWCHART_DEFINITIONS_FR;
+    }
+    return FLOWCHART_DEFINITIONS;
+}
+
+// Return the NODE_SUMMARIES for the current language.
+function getNodeSummaries() {
+    if (appState.language === 'fr' && typeof NODE_SUMMARIES_FR !== 'undefined') {
+        return NODE_SUMMARIES_FR;
+    }
+    return NODE_SUMMARIES;
+}
+
+// Update all elements with data-i18n / data-i18n-html / data-i18n-aria attributes.
+function applyTranslations() {
+    // Plain text content
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        const val = t(key);
+        if (typeof val === 'string') el.textContent = val;
+    });
+    // innerHTML (for elements containing HTML like <strong>, <span>, <br>)
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.dataset.i18nHtml;
+        const val = t(key);
+        if (typeof val === 'string') el.innerHTML = val;
+    });
+    // aria-label attribute
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        const key = el.dataset.i18nAria;
+        const val = t(key);
+        if (typeof val === 'string') el.setAttribute('aria-label', val);
+    });
+    // <option> text (data-i18n-opt)
+    document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+        const key = el.dataset.i18nOpt;
+        const val = t(key);
+        if (typeof val === 'string') el.textContent = val;
+    });
+    // Update the <html lang> attribute
+    document.documentElement.lang = appState.language;
+    // Update the page <title>
+    document.title = t('page_title');
+}
+
+// Toggle language between English and French and refresh the UI.
+function toggleLanguage() {
+    appState.language = appState.language === 'en' ? 'fr' : 'en';
+    applyTranslations();
+    updateLanguageToggleBtn();
+    rerenderForLanguage();
+}
+
+// Sync the language toggle button label to the current language.
+function updateLanguageToggleBtn() {
+    const btn = document.getElementById('lang-toggle-btn');
+    const code = document.getElementById('lang-toggle-code');
+    if (!btn) return;
+    const label = t('nav_lang_toggle_label');
+    btn.setAttribute('aria-label', label);
+    if (code) code.textContent = t('nav_lang_code');
+    btn.classList.toggle('lang-active-fr', appState.language === 'fr');
+}
+
+// Re-render any dynamic sections that are currently visible so they pick up
+// the new language immediately.  Assessment Names, Screener Names, and
+// Intervention Names are rendered from JSON data and are intentionally kept
+// in their original form regardless of the UI language.
+function rerenderForLanguage() {
+    // Flowchart: re-initialise at the same tier if one is open
+    const fc = document.getElementById('flowchart-container');
+    if (fc && fc.dataset.initialized) {
+        const tierId = appState.visualFlowchart && appState.visualFlowchart.tierId;
+        if (tierId) {
+            initIntegratedFlowchart(tierId);
+        } else {
+            openInteractiveFlowchart();
+        }
+    }
+    // Evidence definitions popup: re-create with new language
+    const evidenceModal = document.getElementById('evidence-definitions-modal');
+    if (evidenceModal) {
+        evidenceModal.remove();
+        setupEvidenceDefinitionsPopup();
+    }
+    // Intervention wizard dropdowns: refresh placeholder/select text that was
+    // set programmatically and is not covered by data-i18n-opt.
+    refreshWizardSelectPlaceholders();
+}
+
+// Refresh the programmatically-set placeholder options in the wizard selects.
+function refreshWizardSelectPlaceholders() {
+    const subtestSel = document.getElementById('subtest-select');
+    const pillarSel = document.getElementById('pillar-select');
+    if (subtestSel && subtestSel.options[0] && subtestSel.disabled) {
+        subtestSel.options[0].textContent = t('wizard_select_screener_first');
+    }
+    if (pillarSel && pillarSel.options[0] && pillarSel.disabled) {
+        pillarSel.options[0].textContent = t('wizard_select_subtest_first');
+    }
+}
+
+window.toggleLanguage = toggleLanguage;
+
+// ============================================
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Literacy Interventions - Initializing...');
+
+    // Apply initial translations (English by default) and sync lang toggle
+    applyTranslations();
+    updateLanguageToggleBtn();
 
     // Setup reusable evidence marker popup
     setupEvidenceDefinitionsPopup();
@@ -690,8 +819,8 @@ function updateTierTitleOnResize() {
             // Map word numbers to digit keys
             const wordToDigit = { 'ONE': '1', 'TWO': '2', 'THREE': '3' };
             const tierKey = `tier${wordToDigit[tierNum] || tierNum}`;
-            if (FLOWCHART_DEFINITIONS[tierKey]) {
-                const fullTitle = FLOWCHART_DEFINITIONS[tierKey].title;
+            if (getFlowchartDefs()[tierKey]) {
+                const fullTitle = getFlowchartDefs()[tierKey].title;
                 header.textContent = getTierTitle(fullTitle, isMobile);
             }
         }
@@ -1039,7 +1168,7 @@ function initIntegratedFlowchart(tierId) {
     if (!container) return;
     closeFinalSummaryDialog({ immediate: true });
     
-    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    const flowchartDef = getFlowchartDefs()[tierId];
     if (!flowchartDef) return;
     const showTier1SuccessSidebar = tierId === 'tier1';
     
@@ -1070,27 +1199,27 @@ function initIntegratedFlowchart(tierId) {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
-                    <span>Back</span>
+                    <span>${escapeHtml(t('fc_back'))}</span>
                 </button>
                 
                 <div class="tier-tabs">
                     <button class="tier-tab ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')" data-tier="tier1">
                         <span class="tier-number">1</span>
-                        <span class="tier-label">Tier 1</span>
+                        <span class="tier-label">${escapeHtml(t('tier1_label'))}</span>
                     </button>
                     <button class="tier-tab ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')" data-tier="tier2">
                         <span class="tier-number">2</span>
-                        <span class="tier-label">Tier 2</span>
+                        <span class="tier-label">${escapeHtml(t('tier2_label'))}</span>
                     </button>
                     <button class="tier-tab ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')" data-tier="tier3">
                         <span class="tier-number">3</span>
-                        <span class="tier-label">Tier 3</span>
+                        <span class="tier-label">${escapeHtml(t('tier3_label'))}</span>
                     </button>
                 </div>
 
                 <div class="flowchart-screener-indicator" id="flowchart-screener-indicator" hidden>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    <span class="flowchart-screener-indicator-label">Screener:</span>
+                    <span class="flowchart-screener-indicator-label">${escapeHtml(t('fc_screener_label'))}</span>
                     <span class="flowchart-screener-indicator-value" id="flowchart-screener-indicator-value"></span>
                 </div>
             </div>
@@ -1101,7 +1230,7 @@ function initIntegratedFlowchart(tierId) {
                     <aside class="tier1-success-sidebar" aria-label="Tier 1 instruction success guidance">
                         <div class="tier1-success-sidebar-head">
                             <span class="material-symbols-rounded tier1-success-sidebar-icon" aria-hidden="true" translate="no">help</span>
-                            <h3>How do we determine if instruction is Successful or Unsuccessful?</h3>
+                            <h3>${escapeHtml(t('tier1_sidebar_heading'))}</h3>
                         </div>
                         <div class="tier1-success-sidebar-block">
                             <p class="tier1-success-sidebar-label">
@@ -1109,9 +1238,9 @@ function initIntegratedFlowchart(tierId) {
                                     <span class="tier1-indicator-dot tier1-indicator-blue"></span>
                                     <span class="tier1-indicator-dot tier1-indicator-green"></span>
                                 </span>
-                                <span>Blue and Green Indicators</span>
+                                <span>${escapeHtml(t('tier1_blue_green_label'))}</span>
                             </p>
-                            <p>If student screener results indicate Blue or Green in all areas, instruction is successful.</p>
+                            <p>${escapeHtml(t('tier1_blue_green_desc'))}</p>
                         </div>
                         <div class="tier1-success-sidebar-block">
                             <p class="tier1-success-sidebar-label">
@@ -1119,13 +1248,13 @@ function initIntegratedFlowchart(tierId) {
                                     <span class="tier1-indicator-dot tier1-indicator-yellow"></span>
                                     <span class="tier1-indicator-dot tier1-indicator-red"></span>
                                 </span>
-                                <span>Yellow and Red Indicators</span>
+                                <span>${escapeHtml(t('tier1_yellow_red_label'))}</span>
                             </p>
-                            <p>If student screener results indicate Yellow or Red in any one area, instruction is unsuccessful.</p>
-                            <p class="tier1-success-sidebar-note">Monitoring and interventions are needed.</p>
+                            <p>${escapeHtml(t('tier1_yellow_red_desc'))}</p>
+                            <p class="tier1-success-sidebar-note">${escapeHtml(t('tier1_monitoring_note'))}</p>
                             <button class="scores-ref-btn" onclick="navigateToPage('scores')" type="button">
                                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">bar_chart</span>
-                                See Understanding Scores &amp; Percentiles
+                                ${escapeHtml(t('tier1_see_scores'))}
                             </button>
                         </div>
                     </aside>` : ''}
@@ -1133,14 +1262,14 @@ function initIntegratedFlowchart(tierId) {
                         <div class="journey-map-head">
                             <div class="journey-map-head-left">
                                 <svg class="journey-map-head-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-                                <span class="journey-map-title">Your Decisions</span>
+                                <span class="journey-map-title">${escapeHtml(t('fc_your_decisions'))}</span>
                             </div>
-                            <button class="layout-toggle-btn" id="layout-toggle-btn" type="button" onclick="toggleLayoutMode()" aria-pressed="false" title="Switch to summary view">
+                            <button class="layout-toggle-btn" id="layout-toggle-btn" type="button" onclick="toggleLayoutMode()" aria-pressed="false" title="${escapeHtml(t('fc_switch_summary'))}">
                                 <svg class="layout-toggle-icon layout-toggle-icon-summary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><rect x="2" y="7" width="5" height="10" rx="1"/><rect x="9.5" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="5" height="10" rx="1"/></svg>
                                 <svg class="layout-toggle-icon layout-toggle-icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
-                                <span class="layout-toggle-label">Summary View</span>
+                                <span class="layout-toggle-label">${escapeHtml(t('fc_summary_view'))}</span>
                             </button>
-                            <span class="journey-map-count" id="journey-map-count">Step 1</span>
+                            <span class="journey-map-count" id="journey-map-count">${escapeHtml(t('fc_step_label'))} 1</span>
                         </div>
                         <div class="journey-map-bar"><span class="journey-map-bar-fill" id="journey-map-bar-fill"></span></div>
                         <ol class="journey-map-list" id="journey-map-list"></ol>
@@ -1149,7 +1278,7 @@ function initIntegratedFlowchart(tierId) {
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M19 12H5M12 19l-7-7 7-7"/>
                             </svg>
-                            Back one step
+                            ${escapeHtml(t('fc_back_one_step'))}
                         </button>
                     </aside>
                 </div>
@@ -1191,7 +1320,7 @@ function applyTierTheme(tierId) {
 // they are moving from one tier to another before the next tier's flow begins.
 function showGoToTierStep(tierId) {
     const stepsContainer = getActiveStepTarget();
-    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    const flowchartDef = getFlowchartDefs()[tierId];
     if (!stepsContainer || !flowchartDef) {
         switchToTier(tierId);
         return;
@@ -1202,12 +1331,12 @@ function showGoToTierStep(tierId) {
 
     stepsContainer.innerHTML = `
         <div class="go-to-tier-step go-to-tier-${num}">
-            <div class="go-to-tier-badge">Tier ${num}</div>
-            <h2 class="go-to-tier-heading">Go to Tier ${num}</h2>
+            <div class="go-to-tier-badge">${escapeHtml(t('fc_tier_label'))} ${num}</div>
+            <h2 class="go-to-tier-heading">${escapeHtml(t('go_to_tier'))} ${num}</h2>
             ${subtitle ? `<p class="go-to-tier-sub">${escapeHtml(subtitle)}</p>` : ''}
-            <p class="go-to-tier-note">You are moving on to the next tier of support.</p>
+            <p class="go-to-tier-note">${escapeHtml(t('go_to_tier_note'))}</p>
             <button class="action-btn action-primary go-to-tier-btn" onclick="switchToTier('${tierId}')">
-                Continue to Tier ${num}
+                ${escapeHtml(t('continue_to_tier'))} ${num}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
         </div>
@@ -1216,7 +1345,7 @@ function showGoToTierStep(tierId) {
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.display = 'none';
 
-    completeJourneyMap(`Moving to Tier ${num}`);
+    completeJourneyMap(`${t('moving_to_tier')} ${num}`);
 
     requestAnimationFrame(() => {
         const step = stepsContainer.querySelector('.go-to-tier-step');
@@ -1228,7 +1357,7 @@ function showGoToTierStep(tierId) {
 // Show a node in the integrated flowchart
 function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'forward') {
     const tierId = appState.visualFlowchart.tierId;
-    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    const flowchartDef = getFlowchartDefs()[tierId];
     const nodeData = flowchartDef.nodes[nodeId];
     
     if (!nodeData) {
@@ -1325,20 +1454,20 @@ function getStepShortTitle(nodeDef) {
 // Human label for a step type, used on the trail markers and map
 function getStepTypeLabel(type) {
     const labels = {
-        checklist: 'Check',
-        selection: 'Choose',
-        decision: 'Decide',
-        info: 'Read',
-        endpoint: 'Outcome'
+        checklist: t('step_type_check'),
+        selection: t('step_type_choose'),
+        decision: t('step_type_decide'),
+        info: t('step_type_read'),
+        endpoint: t('step_type_outcome')
     };
-    return labels[type] || 'Step';
+    return labels[type] || t('step_type_step');
 }
 
 // The answer the user gave at a step, shown on its completed trail card
 function getStepAnswerText(nodeId, nodeDef) {
     const choice = appState.visualFlowchart.choices[nodeId];
     if (choice && choice.name) return choice.name;
-    if (nodeDef?.type === 'checklist') return 'Reviewed';
+    if (nodeDef?.type === 'checklist') return t('step_type_reviewed');
     return '';
 }
 
@@ -1346,7 +1475,7 @@ function getStepAnswerText(nodeId, nodeDef) {
 // Deterministic hops follow nextNode; a branch is shown as a single outcome.
 function projectUpcomingSteps(limit = 5) {
     const vf = appState.visualFlowchart;
-    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const tierDef = getFlowchartDefs()[vf.tierId];
     const upcoming = [];
     if (!tierDef) return upcoming;
 
@@ -1355,7 +1484,7 @@ function projectUpcomingSteps(limit = 5) {
 
     while (current && upcoming.length < limit) {
         if (current.type === 'decision') {
-            upcoming.push({ title: 'Outcome & recommendations', type: 'endpoint' });
+            upcoming.push({ title: t('step_type_outcome'), type: 'endpoint' });
             break;
         }
         if (current.type === 'endpoint') break;
@@ -1391,7 +1520,7 @@ function buildTrailDoneCardHTML(nodeDef, number, answer) {
     return `
         <button type="button" class="trail-card trail-card-done" data-revisit-node="${escapeAttr(nodeDef.id)}" title="Revisit this step">
             <span class="trail-card-meta">
-                <span class="trail-card-num">Step ${escapeHtml(String(number))}</span>
+                <span class="trail-card-num">${escapeHtml(t('fc_step_label'))} ${escapeHtml(String(number))}</span>
                 <span class="trail-card-type">${escapeHtml(getStepTypeLabel(nodeDef.type))}</span>
             </span>
             <span class="trail-card-title">${escapeHtml(getStepShortTitle(nodeDef))}</span>
@@ -1399,7 +1528,7 @@ function buildTrailDoneCardHTML(nodeDef, number, answer) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                 ${escapeHtml(answer)}
             </span>` : ''}
-            <span class="trail-card-revisit">Revisit</span>
+            <span class="trail-card-revisit">${escapeHtml(t('fc_revisit'))}</span>
         </button>
     `;
 }
@@ -1411,7 +1540,7 @@ function buildTrailUpcomingHTML(step, number) {
             ${buildTrailRailHTML(number, 'upcoming')}
             <div class="trail-card trail-card-upcoming">
                 <span class="trail-card-meta">
-                    <span class="trail-card-num">Step ${escapeHtml(String(number))}</span>
+                    <span class="trail-card-num">${escapeHtml(t('fc_step_label'))} ${escapeHtml(String(number))}</span>
                     <span class="trail-card-type">${escapeHtml(getStepTypeLabel(step.type))}</span>
                 </span>
                 <span class="trail-card-title">${escapeHtml(step.title)}</span>
@@ -1425,7 +1554,7 @@ function buildTrailUpcomingHTML(step, number) {
 // tier-transition and summary screens so context is never lost).
 function buildCompletedTrailHTML(includeCurrent = false) {
     const vf = appState.visualFlowchart;
-    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const tierDef = getFlowchartDefs()[vf.tierId];
     if (!tierDef) return '';
 
     const path = vf.selectedPath;
@@ -1449,7 +1578,7 @@ function buildCompletedTrailHTML(includeCurrent = false) {
 // The 1-based number of the step the user is currently on
 function getActiveStepNumber() {
     const vf = appState.visualFlowchart;
-    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const tierDef = getFlowchartDefs()[vf.tierId];
     const path = vf.selectedPath;
     if (!tierDef) return 1;
     let completed = 0;
@@ -1481,7 +1610,7 @@ function renderJourney(direction = 'forward') {
 function renderJourneyStandard(direction = 'forward') {
     const track = document.getElementById('flowchart-steps');
     const vf = appState.visualFlowchart;
-    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const tierDef = getFlowchartDefs()[vf.tierId];
     if (!tierDef) return;
 
     const path = vf.selectedPath;
@@ -1519,7 +1648,7 @@ function renderJourneyStandard(direction = 'forward') {
 function renderJourneyHorizontal(direction = 'forward') {
     const track = document.getElementById('flowchart-steps');
     const vf = appState.visualFlowchart;
-    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const tierDef = getFlowchartDefs()[vf.tierId];
     if (!tierDef) return;
 
     if (track) track.innerHTML = '';
@@ -1535,7 +1664,7 @@ function renderJourneyHorizontal(direction = 'forward') {
     const barFill = document.getElementById('journey-map-bar-fill');
     const upcomingCount = projectUpcomingSteps(3).length;
     const total = activeNumber + upcomingCount;
-    if (countEl) countEl.textContent = `Step ${activeNumber} of ${total}`;
+    if (countEl) countEl.textContent = `${t('fc_step_label')} ${activeNumber} ${t('fc_step_of')} ${total}`;
     if (barFill) barFill.style.width = `${Math.round(((activeNumber - 1) / total) * 100 + (100 / total) * 0.35)}%`;
 
     // Build the horizontal bubble track
@@ -1561,9 +1690,9 @@ function renderJourneyHorizontal(direction = 'forward') {
             bubblesHTML += `<div class="horiz-bubble horiz-bubble-active horiz-bubble-type-${nodeDef.type}" id="horiz-active-bubble" aria-current="step">
                 <div class="horiz-bubble-icon">${iconSVG}</div>
                 <div class="horiz-bubble-body">
-                    <div class="horiz-bubble-meta">Step ${stepNum}\u202f\u00b7\u202f${escapeHtml(getStepTypeLabel(nodeDef.type))}</div>
+                    <div class="horiz-bubble-meta">${escapeHtml(t('fc_step_label'))} ${stepNum}\u202f\u00b7\u202f${escapeHtml(getStepTypeLabel(nodeDef.type))}</div>
                     <div class="horiz-bubble-title">${escapeHtml(getStepShortTitle(nodeDef))}</div>
-                    <span class="journey-map-now horiz-bubble-now"><span class="journey-map-now-dot"></span>In progress</span>
+                    <span class="journey-map-now horiz-bubble-now"><span class="journey-map-now-dot"></span>${escapeHtml(t('fc_in_progress'))}</span>
                 </div>
             </div>`;
         } else {
@@ -1574,14 +1703,14 @@ function renderJourneyHorizontal(direction = 'forward') {
                 </div>
                 <div class="horiz-bubble-icon">${iconSVG}</div>
                 <div class="horiz-bubble-body">
-                    <div class="horiz-bubble-meta">Step ${stepNum}\u202f\u00b7\u202f${escapeHtml(getStepTypeLabel(nodeDef.type))}</div>
+                    <div class="horiz-bubble-meta">${escapeHtml(t('fc_step_label'))} ${stepNum}\u202f\u00b7\u202f${escapeHtml(getStepTypeLabel(nodeDef.type))}</div>
                     <div class="horiz-bubble-title">${escapeHtml(getStepShortTitle(nodeDef))}</div>
                     ${answer
                         ? `<div class="horiz-bubble-answer">
                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                                ${escapeHtml(answer)}
                            </div>`
-                        : `<div class="horiz-bubble-revisit">Revisit</div>`}
+                        : `<div class="horiz-bubble-revisit">${escapeHtml(t('fc_revisit'))}</div>`}
                 </div>
             </button>`;
         }
@@ -1632,9 +1761,9 @@ function updateLayoutToggleBtn() {
     if (!btn) return;
     const isHoriz = appState.visualFlowchart?.layoutMode === 'horizontal';
     btn.setAttribute('aria-pressed', isHoriz ? 'true' : 'false');
-    btn.title = isHoriz ? 'Switch to standard view' : 'Switch to summary view';
+    btn.title = isHoriz ? t('fc_switch_standard') : t('fc_switch_summary');
     const label = btn.querySelector('.layout-toggle-label');
-    if (label) label.textContent = isHoriz ? 'Standard View' : 'Summary View';
+    if (label) label.textContent = isHoriz ? t('fc_standard_view') : t('fc_summary_view');
 }
 
 // Decision Summary panel: every completed step becomes a rich card; the current
@@ -1645,7 +1774,7 @@ function renderJourneyMap(activeNumber) {
     const countEl = document.getElementById('journey-map-count');
     const barFill = document.getElementById('journey-map-bar-fill');
     const vf = appState.visualFlowchart;
-    const tierDef = FLOWCHART_DEFINITIONS[vf.tierId];
+    const tierDef = getFlowchartDefs()[vf.tierId];
     if (!list || !tierDef) return;
 
     const path = vf.selectedPath;
@@ -1690,7 +1819,7 @@ function renderJourneyMap(activeNumber) {
                 <span class="journey-map-marker">${marker}</span>
                 <span class="journey-map-text">
                     <span class="journey-map-step-info">
-                        <span class="journey-map-step-num">Step ${escapeHtml(String(entry.number))}</span>
+                        <span class="journey-map-step-num">${escapeHtml(t('fc_step_label'))} ${escapeHtml(String(entry.number))}</span>
                         <span class="journey-map-type-chip">${escapeHtml(getStepTypeLabel(entry.type))}</span>
                     </span>
                     <span class="journey-map-label">${escapeHtml(entry.title)}</span>
@@ -2054,21 +2183,21 @@ function createIntegratedSelectionNode(nodeData) {
                 <div class="fw-wizard">
                     <div class="fw-wizard-selects">
                         <div class="fw-select-group">
-                            <label for="fw-screener-select">Screener</label>
+                            <label for="fw-screener-select">${escapeHtml(t('wizard_step1_label'))}</label>
                             <select id="fw-screener-select" class="fw-select" onchange="fwOnScreenerChange(this.value)">
                                 ${screenerOptionsHtml}
                             </select>
                         </div>
                         <div class="fw-select-group">
-                            <label for="fw-subtest-select">Subtest</label>
+                            <label for="fw-subtest-select">${escapeHtml(t('wizard_step2_label'))}</label>
                             <select id="fw-subtest-select" class="fw-select" onchange="fwOnSubtestChange(this.value)" disabled>
-                                <option value="">Select screener first…</option>
+                                <option value="">${escapeHtml(t('wizard_select_screener_first'))}</option>
                             </select>
                         </div>
                         <div class="fw-select-group">
-                            <label for="fw-pillar-select">Literacy Pillar</label>
+                            <label for="fw-pillar-select">${escapeHtml(t('wizard_step3_label'))}</label>
                             <select id="fw-pillar-select" class="fw-select" onchange="fwOnPillarChange(this.value)" disabled>
-                                <option value="">Select subtest first…</option>
+                                <option value="">${escapeHtml(t('wizard_select_subtest_first'))}</option>
                             </select>
                         </div>
                     </div>
@@ -2145,11 +2274,11 @@ function fwOnScreenerChange(value) {
     appState.fwState.subtestData = null;
     appState.fwState.pillars = [];
 
-    if (pillarSel) { pillarSel.innerHTML = '<option value="">Select subtest first…</option>'; pillarSel.disabled = true; }
+    if (pillarSel) { pillarSel.innerHTML = `<option value="">${t('wizard_select_subtest_first')}</option>`; pillarSel.disabled = true; }
     if (resultsEl) resultsEl.innerHTML = '';
 
     if (!value) {
-        if (subtestSel) { subtestSel.innerHTML = '<option value="">Select screener first…</option>'; subtestSel.disabled = true; }
+        if (subtestSel) { subtestSel.innerHTML = `<option value="">${t('wizard_select_screener_first')}</option>`; subtestSel.disabled = true; }
         return;
     }
 
@@ -2161,7 +2290,7 @@ function fwOnScreenerChange(value) {
     setRememberedScreener(value);
 
     if (subtestSel) {
-        subtestSel.innerHTML = '<option value="">Select…</option>';
+        subtestSel.innerHTML = `<option value="">${t('wizard_select_placeholder')}</option>`;
         (screenerData.subtests || []).forEach(st => {
             const opt = document.createElement('option');
             opt.value = st.subtest_code;
@@ -2184,7 +2313,7 @@ function fwOnSubtestChange(value) {
     if (resultsEl) resultsEl.innerHTML = '';
 
     if (!value) {
-        if (pillarSel) { pillarSel.innerHTML = '<option value="">Select subtest first…</option>'; pillarSel.disabled = true; }
+        if (pillarSel) { pillarSel.innerHTML = `<option value="">${t('wizard_select_subtest_first')}</option>`; pillarSel.disabled = true; }
         return;
     }
 
@@ -2194,11 +2323,11 @@ function fwOnSubtestChange(value) {
 
     const pillars = subtestData.literacy_pillars || [];
     if (pillarSel) {
-        pillarSel.innerHTML = '<option value="">Select…</option>';
+        pillarSel.innerHTML = `<option value="">${t('wizard_select_placeholder')}</option>`;
         if (pillars.length > 1) {
             const allOpt = document.createElement('option');
             allOpt.value = 'ALL';
-            allOpt.textContent = 'All Pillars';
+            allOpt.textContent = t('wizard_all_pillars');
             pillarSel.appendChild(allOpt);
         }
         pillars.forEach(p => {
@@ -2260,23 +2389,23 @@ function fwLoadResults() {
     }
 
     if (filtered.length === 0) {
-        resultsEl.innerHTML = '<p class="fw-no-results">No matching items found for the selected criteria.</p>';
+        resultsEl.innerHTML = `<p class="fw-no-results">${escapeHtml(t('fw_no_results'))}</p>`;
         return;
     }
 
     const escapeJs = (s) => String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     resultsEl.innerHTML = `
-        <div class="fw-results-header">${filtered.length} result${filtered.length !== 1 ? 's' : ''}</div>
+        <div class="fw-results-header">${typeof t('fw_results_label') === 'function' ? escapeHtml(t('fw_results_label')(filtered.length)) : `${filtered.length} results`}</div>
         <div class="fw-results-list">
             ${filtered.map(item => {
                 const gradeText = `${item.grade_range?.start || 'K'}–${item.grade_range?.end || '12'}`;
                 const detailText = item.duration
                     ? `${item.duration} • ${item.frequency}`
-                    : item.administrationTime ? `Time: ${item.administrationTime}` : '';
+                    : item.administrationTime ? `${t('fw_time_prefix')} ${item.administrationTime}` : '';
                 return `<button class="fw-result-item" onclick="fwSelectItem('${escapeJs(item.item_id)}', '${escapeJs(item.name)}')">
                     <div class="fw-result-info">
                         <div class="fw-result-name">${escapeHtml(item.name)}</div>
-                        <div class="fw-result-meta">${detailText ? escapeHtml(detailText) + ' • ' : ''}Gr. ${gradeText}</div>
+                        <div class="fw-result-meta">${detailText ? escapeHtml(detailText) + ' • ' : ''}${escapeHtml(t('fw_grade_prefix'))} ${gradeText}</div>
                     </div>
                     <svg class="fw-result-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M9 18l6-6-6-6"/></svg>
                 </button>`;
@@ -2423,7 +2552,7 @@ function createIntegratedInfoNode(nodeData) {
 function createIntegratedEndpointNode(nodeData) {
     const recommendationsHTML = nodeData.recommendations ? `
         <div class="recommendations-box">
-            <h4>Recommendations</h4>
+            <h4>${escapeHtml(t('recommendations_title'))}</h4>
             <ul>
                 ${nodeData.recommendations.map(r => `<li>${r}</li>`).join('')}
             </ul>
@@ -2521,12 +2650,12 @@ function updateIntegratedChecklistProgress(nodeId) {
 function proceedFromIntegratedChecklist(fromNodeId, toNodeId) {
     // Store checklist completion in choices for summary
     const tierId = appState.visualFlowchart.tierId;
-    const tierDef = FLOWCHART_DEFINITIONS[tierId];
+    const tierDef = getFlowchartDefs()[tierId];
     const nodeDef = tierDef?.nodes?.[fromNodeId];
     const itemCount = nodeDef?.items?.length || 0;
     appState.visualFlowchart.choices[fromNodeId] = { 
         id: 'completed', 
-        name: `All ${itemCount} principles reviewed ✓`
+        name: (typeof t('all_reviewed') === 'function') ? t('all_reviewed')(itemCount) : `All ${itemCount} principles reviewed \u2713`
     };
     markStepCompleted(fromNodeId);
     showIntegratedNode(toNodeId, fromNodeId, 'continue');
@@ -2550,7 +2679,7 @@ function toggleCheckAll(nodeId) {
     if (btn) {
         const label = btn.querySelector('.check-all-label');
         if (label) {
-            label.textContent = newState ? 'Uncheck All' : 'Check All';
+            label.textContent = newState ? t('uncheck_all') : t('check_all');
         }
     }
     
@@ -2561,7 +2690,7 @@ function toggleCheckAll(nodeId) {
 function proceedFromIntegratedInfo(fromNodeId, toNodeId) {
     // Store info acknowledgment in choices for summary
     const tierId = appState.visualFlowchart.tierId;
-    const tierDef = FLOWCHART_DEFINITIONS[tierId];
+    const tierDef = getFlowchartDefs()[tierId];
     const nodeDef = tierDef?.nodes?.[fromNodeId];
     appState.visualFlowchart.choices[fromNodeId] = { 
         id: 'acknowledged', 
@@ -2739,7 +2868,7 @@ function switchToTier(tierId) {
     }
     
     // Reset state for new tier
-    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    const flowchartDef = getFlowchartDefs()[tierId];
     if (!flowchartDef) return;
     
     appState.visualFlowchart = {
@@ -2812,12 +2941,12 @@ function showTierTransitionChoice(nodeData) {
     }
     actionsHTML += `<button class="action-btn action-secondary" onclick="goToPreviousStep()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Go Back
+        ${escapeHtml(t('go_back'))}
     </button>`;
 
     const recommendationsHTML = nodeData.recommendations ? `
         <div class="recommendations-box">
-            <h4>Recommendations</h4>
+            <h4>${escapeHtml(t('recommendations_title'))}</h4>
             <ul>${nodeData.recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
         </div>
     ` : '';
@@ -2849,7 +2978,7 @@ function showTierTransitionChoice(nodeData) {
 
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.display = 'none';
-    completeJourneyMap('Tier complete');
+    completeJourneyMap(t('tier_complete'));
     requestAnimationFrame(() => {
         const review = stepsContainer.querySelector('.journey-review');
         if (review) review.classList.add('journey-review-visible');
@@ -2957,7 +3086,7 @@ function buildAnimStepBubble(nodeDef, choice, tierId) {
     const chosenName = normalizeChoiceName(choice?.name || choice?.label || '');
 
     // Look up rich summary for this specific node
-    const nodeSummary = NODE_SUMMARIES[nodeId];
+    const nodeSummary = getNodeSummaries()[nodeId];
 
     if (nodeSummary) {
         if (type === 'decision' && choice) {
@@ -3070,7 +3199,7 @@ function showFinalSummary(endpointNodeData) {
     const items = [];
 
     fullJourney.forEach((tierSnapshot, tierIndex) => {
-        const tierDef = FLOWCHART_DEFINITIONS[tierSnapshot.tierId];
+        const tierDef = getFlowchartDefs()[tierSnapshot.tierId];
         if (!tierDef) return;
 
         const tierLabel = tierDef.title || tierSnapshot.tierId;
@@ -3152,7 +3281,7 @@ function showFinalSummary(endpointNodeData) {
             </div>
             <button class="anim-skip-btn" onclick="revealAllAnimJourneyItems(this)" aria-label="Skip animation">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
-                Skip animation
+                ${escapeHtml(t('anim_skip'))}
             </button>
             <div class="anim-journey-summary journey-flow${useDesktopSummaryLayout ? ' anim-layout-rows' : ''}">${itemsHTML}</div>
             <div class="journey-actions" id="anim-journey-actions" style="display:none;">${actionsHTML}</div>
@@ -3287,7 +3416,7 @@ function showRouteCompleteGate(endpointNodeData) {
     let totalSteps = 0;
     const tierNames = [];
     fullJourney.forEach(tierSnapshot => {
-        const tierDef = FLOWCHART_DEFINITIONS[tierSnapshot.tierId];
+        const tierDef = getFlowchartDefs()[tierSnapshot.tierId];
         if (tierDef) tierNames.push(tierDef.title.split(':')[0].trim());
         tierSnapshot.selectedPath.forEach(step => {
             const nodeDef = tierDef?.nodes[step.nodeId];
@@ -3307,14 +3436,14 @@ function showRouteCompleteGate(endpointNodeData) {
                     <polyline points="22 4 12 14.01 9 11.01"/>
                 </svg>
             </div>
-            <h2 class="gate-title">Route Complete</h2>
-            <p class="gate-subtitle">You completed ${totalSteps} step${totalSteps !== 1 ? 's' : ''} across ${tierPillsHTML}</p>
-            <p class="gate-desc">Click below to see a visual summary of your complete intervention pathway.</p>
+            <h2 class="gate-title">${escapeHtml(t('gate_title'))}</h2>
+            <p class="gate-subtitle">${escapeHtml(typeof t('gate_subtitle_steps') === 'function' ? t('gate_subtitle_steps')(totalSteps) : `You completed ${totalSteps} step${totalSteps !== 1 ? 's' : ''} across`)} ${tierPillsHTML}</p>
+            <p class="gate-desc">${escapeHtml(t('gate_desc'))}</p>
             <button class="action-btn action-primary gate-summary-btn" id="gate-summary-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
                     <circle cx="12" cy="12" r="10"/><polyline points="10 8 16 12 10 16"/>
                 </svg>
-                View Journey Summary
+                ${escapeHtml(t('gate_view_summary'))}
             </button>
         </div>
     `;
@@ -3336,7 +3465,7 @@ function showRouteCompleteGate(endpointNodeData) {
 
 // Open a modal dialog showing a step as it appeared during the flowchart
 function openStepReviewModal(nodeId, tierId) {
-    const tierDef = FLOWCHART_DEFINITIONS[tierId];
+    const tierDef = getFlowchartDefs()[tierId];
     if (!tierDef) return;
     const nodeDef = tierDef.nodes[nodeId];
     if (!nodeDef) return;
@@ -3564,7 +3693,7 @@ function initVisualFlowchart(tierId) {
 // Show a flowchart node with animation
 function showFlowchartNode(nodeId, fromNodeId, choiceId = null) {
     const tierId = appState.visualFlowchart.tierId;
-    const flowchartDef = FLOWCHART_DEFINITIONS[tierId];
+    const flowchartDef = getFlowchartDefs()[tierId];
     const nodeData = flowchartDef.nodes[nodeId];
     
     if (!nodeData) {
@@ -5551,7 +5680,7 @@ function updateScreenerOptions() {
 
 // Shared helper function to build screener dropdown HTML
 function buildScreenerDropdownHtml(languageFilter, selectedId) {
-    if (!appState.interventionMenuData) return '<option value="">Select...</option>';
+    if (!appState.interventionMenuData) return `<option value="">${escapeHtml(t('wizard_select_placeholder'))}</option>`;
     
     let englishScreeners = [];
     let frenchScreeners = [];
@@ -5571,7 +5700,7 @@ function buildScreenerDropdownHtml(languageFilter, selectedId) {
         return `<option value="${s.screener_id}"${isSelected}>${s.screener_name}</option>`;
     };
 
-    let html = '<option value="">Select...</option>';
+    let html = `<option value="">${escapeHtml(t('wizard_select_placeholder'))}</option>`;
     
     if (englishScreeners.length > 0) {
         html += '<optgroup label="English">';
@@ -5657,7 +5786,7 @@ function updateSubtestOptions() {
     const screenerId = screenerSelect.value;
     
     if (!screenerId) {
-        subtestSelect.innerHTML = '<option value="">All Subtests</option>';
+        subtestSelect.innerHTML = `<option value="">${escapeHtml(t('wizard_all_subtests'))}</option>`;
         return;
     }
 
@@ -5667,7 +5796,7 @@ function updateSubtestOptions() {
 
     if (!screener) return;
 
-    subtestSelect.innerHTML = '<option value="">All Subtests</option>' +
+    subtestSelect.innerHTML = `<option value="">${escapeHtml(t('wizard_all_subtests'))}</option>` +
         screener.subtests.map(st => 
             `<option value="${st.subtest_code}">${st.subtest_code} - ${st.subtest_name}</option>`
         ).join('');
@@ -5679,7 +5808,7 @@ function updatePillarOptions() {
 
     const pillars = appState.interventionMenuData.literacy_pillars.map(p => p.name);
     
-    pillarSelect.innerHTML = '<option value="">All Pillars</option>' +
+    pillarSelect.innerHTML = `<option value="">${escapeHtml(t('wizard_all_pillars'))}</option>` +
         pillars.map(p => `<option value="${p}">${p}</option>`).join('');
 }
 
@@ -5704,15 +5833,15 @@ function performCompactSearch() {
 
     // Validate that mandatory filters are selected
     if (!filters.tier) {
-        displayValidationError('Please select a Tier before searching.');
+        displayValidationError(t('wizard_validation_tier'));
         return;
     }
     if (!filters.pillar) {
-        displayValidationError('Please select a Literacy Pillar before searching.');
+        displayValidationError(t('wizard_validation_pillar'));
         return;
     }
     if (!filters.type) {
-        displayValidationError('Please select a Type (Assessment or Intervention) before searching.');
+        displayValidationError(t('wizard_validation_type'));
         return;
     }
 
@@ -6448,12 +6577,12 @@ function setupEvidenceDefinitionsPopup() {
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">close</span>
             </button>
             <div class="evidence-definition-block">
-                <strong>* Evidence Based: Most rigorous and trusted</strong>
-                <p>Definition: The program or practice has been tested through high-quality peer reviewed research (often randomized controlled trials or quasi-experimental studies) and has demonstrated statistically significant positive outcomes.</p>
+                <strong>${escapeHtml(t('evidence_eb_title'))}</strong>
+                <p>${escapeHtml(t('evidence_eb_desc'))}</p>
             </div>
             <div class="evidence-definition-block">
-                <strong>** Research Based: Less rigorous than evidence-based</strong>
-                <p>Definition: The program is based on sound theories or methods that have been validated by some research, but the program itself may not have been directly studied for evidence of its effectiveness.</p>
+                <strong>${escapeHtml(t('evidence_rb_title'))}</strong>
+                <p>${escapeHtml(t('evidence_rb_desc'))}</p>
             </div>
         </div>
     `;
@@ -7076,14 +7205,14 @@ function onSubtestDropdownChange(subtestCode) {
     // Populate pillar dropdown
     const pillarSelect = document.getElementById('pillar-select');
     if (pillarSelect) {
-        pillarSelect.innerHTML = '<option value="">Select...</option>';
+        pillarSelect.innerHTML = `<option value="">${escapeHtml(t('wizard_select_placeholder'))}</option>`;
         const pillars = subtestData.literacy_pillars || [];
         
         // Add "All Pillars" option if multiple
         if (pillars.length > 1) {
             const allOption = document.createElement('option');
             allOption.value = 'ALL';
-            allOption.textContent = 'All Pillars';
+            allOption.textContent = t('wizard_all_pillars');
             pillarSelect.appendChild(allOption);
         }
         

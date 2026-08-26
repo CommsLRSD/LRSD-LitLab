@@ -373,6 +373,46 @@ strong { font-weight: 600; }
 }
 
 /* ------------------------------------------------------------
+   Language Toggle Button
+   ------------------------------------------------------------ */
+
+.lang-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1.5px solid var(--border, rgba(0,0,0,0.15));
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 4px 10px;
+  font-family: var(--font-ui, inherit);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #666);
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  flex-shrink: 0;
+}
+
+.lang-toggle-btn:hover,
+.lang-toggle-btn:focus-visible {
+  background: var(--surface-2, #f0f0f0);
+  border-color: var(--primary, #4a90d9);
+  color: var(--primary, #4a90d9);
+  outline: none;
+}
+
+.lang-toggle-btn.lang-active-fr {
+  background: var(--primary, #4a90d9);
+  border-color: var(--primary, #4a90d9);
+  color: #fff;
+}
+
+.lang-toggle-code {
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
    4. MOBILE MENU
    ------------------------------------------------------------ */
 
