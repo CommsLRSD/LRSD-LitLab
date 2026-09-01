@@ -1374,13 +1374,26 @@ details > p {
 }
 
 .program-title {
-  font-size: 0.9rem;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text);
+  margin: 0;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
 }
 
+.schedule-program:nth-of-type(1) .program-title { border-left: 4px solid var(--success); }
+.schedule-program:nth-of-type(2) .program-title { border-left: 4px solid var(--danger); }
+
 .program-icon {
-  font-size: 1rem;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--primary);
 }
 
 .grade-cards {
@@ -1518,6 +1531,13 @@ details > p {
 .badge-thafol  { background: var(--success-light); color: var(--success-text); }
 .badge-idapel  { background: var(--warning-light); color: var(--warning-text); }
 
+/* Assessment badge / legend badge colour variants (mapped from JSON legend colours) */
+.assessment-badge.blue,   .legend-badge.blue   { background: var(--info-light);    color: var(--info-text); }
+.assessment-badge.orange, .legend-badge.orange { background: #faf0f5;              color: #a37590; }
+.assessment-badge.green,  .legend-badge.green  { background: var(--success-light); color: var(--success-text); }
+.assessment-badge.purple, .legend-badge.purple { background: var(--warning-light); color: var(--warning-text); }
+.assessment-badge.gray,   .legend-badge.gray   { background: var(--bg-muted);      color: var(--text-secondary); }
+
 /* Table View */
 .table-container {
   overflow-x: auto;
@@ -1538,6 +1558,11 @@ details > p {
   border: 1px solid var(--border);
   border-bottom: none;
 }
+
+.program-header .program-icon { width: 20px; height: 20px; color: var(--primary); }
+.program-header h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); }
+.program-block:nth-of-type(1) .program-header { border-left: 4px solid var(--success); }
+.program-block:nth-of-type(2) .program-header { border-left: 4px solid var(--danger); }
 
 .schedule-table,
 .assessment-table {
@@ -7845,6 +7870,42 @@ body.step-review-modal-open { overflow: hidden; }
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.18);
   outline: none;
+}
+
+/* ============================================================
+   ASSESSMENT SCHEDULE PAGE
+   ============================================================ */
+
+.schedule-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-height));
+}
+
+.schedule-page-body {
+  display: flex;
+  flex-direction: column;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-lg) 3rem;
+}
+
+.schedule-page-body .schedule-toggle {
+  align-self: center;
+}
+
+.schedule-page-body .schedule-view {
+  margin-top: var(--space-md);
+}
+
+@media (max-width: 640px) {
+  .schedule-page-body { padding: var(--space-xl) var(--space-md) 2.5rem; }
+  .grade-cards { grid-template-columns: 1fr; }
+  .program-title { font-size: 1rem; }
+  .program-title,
+  .program-header { padding: var(--space-md); }
+  .schedule-table, .assessment-table { font-size: 0.78rem; }
 }
 
 /* ====================================================================
