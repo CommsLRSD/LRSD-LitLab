@@ -272,8 +272,10 @@ strong { font-weight: 600; }
 .logo-section {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: var(--space-sm);
   text-decoration: none;
+  flex: 1 1 0;
   flex-shrink: 0;
 }
 
@@ -294,7 +296,9 @@ strong { font-weight: 600; }
 .nav-links {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-sm);
+  flex: 1 1 0;
 }
 
 .nav-link {
@@ -332,6 +336,14 @@ strong { font-weight: 600; }
   background: var(--primary);
   color: var(--text-on-primary);
   box-shadow: var(--shadow-sm);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  flex: 1 1 0;
 }
 
 /* Mobile Menu Button */
