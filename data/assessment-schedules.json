@@ -18,7 +18,7 @@
               "type": "assessment",
               "label": "CTOPP-2",
               "period": "Sep-Oct",
-              "note": "Given once in fall (mid-September to end of October)"
+              "note": "Given once in fall (all of September and October)"
             },
             {
               "type": "assessment",
@@ -39,7 +39,12 @@
             {
               "type": "intervention",
               "start": "Nov",
-              "end": "Apr"
+              "end": "Dec"
+            },
+            {
+              "type": "intervention",
+              "start": "Feb",
+              "end": "Mar"
             }
           ]
         },
@@ -71,7 +76,12 @@
             {
               "type": "intervention",
               "start": "Nov",
-              "end": "Apr"
+              "end": "Dec"
+            },
+            {
+              "type": "intervention",
+              "start": "Feb",
+              "end": "Mar"
             }
           ]
         },
@@ -103,7 +113,12 @@
             {
               "type": "intervention",
               "start": "Nov",
-              "end": "Apr"
+              "end": "Dec"
+            },
+            {
+              "type": "intervention",
+              "start": "Feb",
+              "end": "Mar"
             }
           ]
         }
@@ -126,7 +141,7 @@
               "type": "assessment",
               "label": "CTOPP-2",
               "period": "Fall (Sep-Oct)",
-              "note": "All of September and October"
+              "note": "Mid-September to end of October"
             },
             {
               "type": "assessment",
@@ -145,7 +160,12 @@
             {
               "type": "intervention",
               "start": "Nov",
-              "end": "Apr"
+              "end": "Dec"
+            },
+            {
+              "type": "intervention",
+              "start": "Feb",
+              "end": "Mar"
             }
           ]
         },
@@ -176,7 +196,12 @@
             {
               "type": "intervention",
               "start": "Nov",
-              "end": "Apr"
+              "end": "Dec"
+            },
+            {
+              "type": "intervention",
+              "start": "Feb",
+              "end": "Mar"
             }
           ]
         },
@@ -213,7 +238,12 @@
             {
               "type": "intervention",
               "start": "Nov",
-              "end": "Apr"
+              "end": "Dec"
+            },
+            {
+              "type": "intervention",
+              "start": "Feb",
+              "end": "Mar"
             }
           ]
         },
@@ -262,7 +292,12 @@
             {
               "type": "intervention",
               "start": "Nov",
-              "end": "Apr"
+              "end": "Dec"
+            },
+            {
+              "type": "intervention",
+              "start": "Feb",
+              "end": "Mar"
             }
           ]
         },
@@ -294,7 +329,12 @@
             {
               "type": "intervention",
               "start": "Nov",
-              "end": "Apr"
+              "end": "Dec"
+            },
+            {
+              "type": "intervention",
+              "start": "Feb",
+              "end": "Mar"
             }
           ]
         }
@@ -322,8 +362,9 @@
   },
   "notes": [
     "* Asterisk indicates all subtests required for students below Winter benchmark",
-    "Fall assessment period: Mid-September to end of October (except K French Immersion: all of Sept-Oct)",
+    "Fall assessment period: Mid-September to end of October (except K English Program: all of Sept-Oct)",
     "Winter assessments: January",
-    "Spring assessments: April"
+    "Spring assessments: April",
+    "Intervention periods run between assessment windows (Nov-Dec and Feb-Mar) and pause during Winter and Spring assessments"
   ]
 }

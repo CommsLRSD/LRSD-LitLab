@@ -7566,11 +7566,15 @@ function renderScheduleCalendar(data) {
         program.grades.forEach(grade => {
             const assessments = grade.events.filter(e => e.type === 'assessment');
             const reports = grade.events.find(e => e.type === 'report');
-            const intervention = grade.events.find(e => e.type === 'intervention');
+            // Grades can have more than one intervention window (e.g. one
+            // between the Fall and Winter assessments, another between the
+            // Winter and Spring assessments), so collect them all rather
+            // than assuming a single continuous block.
+            const interventions = grade.events.filter(e => e.type === 'intervention');
 
             // Work out which months each event touches so it can be placed
             // in the matching column(s) of the calendar row.
-            const monthContent = SCHEDULE_MONTHS.map(() => ({ assessments: [], hasReport: false, inIntervention: false }));
+            const monthContent = SCHEDULE_MONTHS.map(() => ({ assessments: [], hasReport: false, inIntervention: false, intervention: null }));
             const monthIndex = id => SCHEDULE_MONTHS.findIndex(m => m.id === id);
 
             assessments.forEach(assessment => {
@@ -7590,15 +7594,18 @@ function renderScheduleCalendar(data) {
                 });
             }
 
-            if (intervention) {
+            interventions.forEach(intervention => {
                 const startIds = getScheduleMonthIds(intervention.start);
                 const endIds = getScheduleMonthIds(intervention.end);
                 const startIdx = startIds.length ? monthIndex(startIds[0]) : -1;
                 const endIdx = endIds.length ? monthIndex(endIds[0]) : -1;
                 if (startIdx !== -1 && endIdx !== -1) {
-                    for (let i = startIdx; i <= endIdx; i++) monthContent[i].inIntervention = true;
+                    for (let i = startIdx; i <= endIdx; i++) {
+                        monthContent[i].inIntervention = true;
+                        monthContent[i].intervention = intervention;
+                    }
                 }
-            }
+            });
 
             html += `
                 <div class="calendar-row">
@@ -7627,7 +7634,7 @@ function renderScheduleCalendar(data) {
                                     </span>
                                 ` : ''}
                             </div>
-                            <div class="${barClasses}" ${cell.inIntervention ? `title="${t('schedule_intervention_period')}: ${safeText(intervention.start)} - ${safeText(intervention.end)}"` : ''}></div>
+                            <div class="${barClasses}" ${cell.inIntervention ? `title="${t('schedule_intervention_period')}: ${safeText(cell.intervention.start)} - ${safeText(cell.intervention.end)}"` : ''}></div>
                         </div>
                     `;
                     }).join('')}
