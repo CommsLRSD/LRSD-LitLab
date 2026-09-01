@@ -1325,151 +1325,276 @@ details > p {
   padding: var(--space-md);
 }
 
-/* Calendar container */
+/* Calendar app shell */
 .calendar-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
+  display: block;
 }
 
-.schedule-program {
+.cal-app {
+  --cal-label-width: 132px;
+  --cal-lane-height: 22px;
+  --cal-columns: 22;
   background: var(--bg);
-  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
-.program-title {
+/* Toolbar: current program + the English / French filter */
+.cal-toolbar {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-md);
   padding: var(--space-md) var(--space-lg);
   background: var(--bg-alt);
   border-bottom: 1px solid var(--border);
 }
 
-.schedule-program:nth-of-type(1) .program-title { border-left: 4px solid var(--success); }
-.schedule-program:nth-of-type(2) .program-title { border-left: 4px solid var(--danger); }
+.cal-toolbar-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
 
-.program-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
+.cal-toolbar-label {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-light);
+}
+
+.cal-toolbar-program {
+  font-size: 1.05rem;
+  font-weight: 700;
   color: var(--primary);
 }
 
-/* Grid: a fixed grade-label column + 11 equal month columns */
-.calendar-grid {
-  display: flex;
-  flex-direction: column;
+.cal-filter {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-pill);
+}
+
+.cal-filter-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+
+.cal-filter-btn:hover { color: var(--primary); }
+
+.cal-filter-btn.active {
+  background: var(--bg);
+  color: var(--primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.cal-filter-btn:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 2px;
+}
+
+/* Sheet: a fixed grade-label column + 11 month columns, each month split
+   into two identical half-month slots. */
+.cal-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-.calendar-row {
+.cal-sheet {
+  min-width: 780px;
+}
+
+.cal-head {
   display: flex;
   align-items: stretch;
   border-bottom: 1px solid var(--border);
-  min-width: 640px;
 }
 
-.calendar-row:last-child { border-bottom: none; }
+.cal-corner {
+  flex: 0 0 var(--cal-label-width);
+  width: var(--cal-label-width);
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-sm);
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-light);
+  border-right: 1px solid var(--border);
+}
 
-.calendar-row-label {
-  flex: 0 0 130px;
-  width: 130px;
+.cal-months {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(var(--cal-columns), minmax(0, 1fr));
+}
+
+.cal-month-head {
+  padding: 10px 2px;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+  border-left: 1px solid var(--border);
+}
+
+.cal-months .cal-month-head:first-child { border-left: none; }
+
+.cal-row {
+  display: flex;
+  align-items: stretch;
+  border-top: 1px solid var(--border);
+}
+
+.cal-head + .cal-row { border-top: none; }
+
+.cal-row:hover { background: var(--primary-faint); }
+
+.cal-row-label {
+  flex: 0 0 var(--cal-label-width);
+  width: var(--cal-label-width);
+  display: flex;
+  align-items: center;
   padding: var(--space-sm);
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text);
-  display: flex;
-  align-items: center;
   background: var(--bg-alt);
   border-right: 1px solid var(--border);
 }
 
-.calendar-row-header {
-  background: var(--bg-muted);
-  border-bottom: 1px solid var(--border);
-}
-
-.calendar-row-header .calendar-row-label {
-  background: var(--bg-muted);
-}
-
-.month-col-header {
-  flex: 1 1 0;
-  min-width: 50px;
-  padding: var(--space-xs) 4px;
-  text-align: center;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--text-light);
-}
-
-.month-cell {
-  flex: 1 1 0;
-  min-width: 50px;
-  padding: 4px 3px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  border-right: 1px solid var(--border-light, var(--border));
+.cal-track {
   position: relative;
+  flex: 1 1 auto;
+  min-height: 52px;
+  padding: 8px 0;
 }
 
-.month-cell:last-child { border-right: none; }
-
-/* The "Before School" column only ever holds the K Questionnaire badge,
-   whose label is longer than the other assessment labels; give it a
-   little extra room so the text wraps cleanly instead of overflowing
-   into neighbouring columns. */
-.calendar-row-header .month-col-header:nth-child(2),
-.calendar-row .month-cell:nth-child(2) {
-  flex: 1.4 1 0;
-  min-width: 64px;
+/* Background grid — drawn identically for every month so a bar that starts
+   mid-month always lines up with a visible mid-month divider. */
+.cal-slots {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--cal-columns), minmax(0, 1fr));
+  pointer-events: none;
 }
 
-.month-cell-events {
+.cal-slot { border-left: 1px solid var(--border); }
+.cal-slot-second { border-left: 1px dashed var(--border); }
+.cal-slots .cal-slot:first-child { border-left: none; }
+
+.cal-lanes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cal-columns), minmax(0, 1fr));
+  row-gap: 4px;
+  align-content: center;
+}
+
+/* Calendar items (assessments, interventions, report cards) */
+.cal-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  min-height: 20px;
-  width: 100%;
-}
-
-/* Intervention bar — a thin strip along the bottom of each active month
-   cell; adjoining active cells are visually joined into one continuous bar. */
-.intervention-bar {
-  width: 100%;
-  height: 6px;
+  gap: 5px;
+  min-width: 0;
+  height: var(--cal-lane-height);
+  margin: 0 2px;
+  padding: 0 8px;
   border-radius: var(--radius-pill);
+  border-left: 3px solid transparent;
+  font-size: 0.66rem;
+  font-weight: 600;
+  cursor: default;
+  transition: transform var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
 }
 
-.intervention-bar.active {
-  background: var(--warning);
+.cal-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
-.intervention-bar.active.joined-prev,
-.intervention-bar.active.joined-next {
-  border-radius: 0;
+.cal-item:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 1px;
 }
 
-.intervention-bar.active.joined-prev { border-top-left-radius: 0; border-bottom-left-radius: 0; }
-.intervention-bar.active.joined-next { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.cal-item-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-.intervention-bar.legend-swatch {
-  width: 24px;
+.cal-item-intervention {
+  background: repeating-linear-gradient(135deg, var(--warning-light), var(--warning-light) 6px, var(--bg) 6px, var(--bg) 12px);
+  border-left-color: var(--warning);
+  color: var(--warning-text);
+}
+
+.cal-item-report {
+  background: var(--bg-muted);
+  border-left-color: var(--info);
+  color: var(--text-secondary);
+}
+
+.cal-item-dot {
+  width: 6px;
   height: 6px;
+  border-radius: 50%;
+  background: var(--info);
   flex-shrink: 0;
+}
+
+/* Hover / focus tooltip */
+.cal-tooltip {
+  position: fixed;
+  z-index: 1200;
+  max-width: 260px;
+  padding: 10px 12px;
+  background: var(--text);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.74rem;
+  line-height: 1.45;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration) var(--ease);
+}
+
+.cal-tooltip.visible { opacity: 1; }
+
+.cal-tooltip-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.cal-tooltip-meta {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.cal-tooltip-note {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 /* Legend */
@@ -1499,7 +1624,7 @@ details > p {
 .legend-items {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
+  gap: var(--space-sm) var(--space-md);
   align-items: center;
 }
 
@@ -1519,6 +1644,33 @@ details > p {
   font-weight: 600;
 }
 
+.legend-swatch {
+  display: inline-block;
+  width: 22px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+}
+
+.legend-swatch-intervention {
+  background: repeating-linear-gradient(135deg, var(--warning-light), var(--warning-light) 6px, var(--bg) 6px, var(--bg) 12px);
+  border: 1px solid var(--warning);
+}
+
+.legend-swatch-report {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--info);
+}
+
+.legend-swatch-half {
+  width: 0;
+  height: 16px;
+  border-left: 1px dashed var(--text-light);
+  border-radius: 0;
+}
+
 .notes-section {
   margin-top: var(--space-md);
   padding: var(--space-md);
@@ -1531,36 +1683,18 @@ details > p {
   color: var(--text-secondary);
 }
 
-/* Assessment badges */
-.assessment-badge {
-  display: inline-block;
-  max-width: 100%;
-  padding: 1px 6px;
-  border-radius: var(--radius-pill);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  white-space: normal;
-  overflow-wrap: break-word;
-  text-align: center;
-  line-height: 1.25;
-  cursor: default;
-}
+/* Item / legend colour variants (mapped from the JSON legend colours) */
+.cal-item-assessment.blue,   .legend-badge.blue   { background: var(--info-light);    color: var(--info-text); }
+.cal-item-assessment.orange, .legend-badge.orange { background: #faf0f5;              color: #a37590; }
+.cal-item-assessment.green,  .legend-badge.green  { background: var(--success-light); color: var(--success-text); }
+.cal-item-assessment.purple, .legend-badge.purple { background: var(--warning-light); color: var(--warning-text); }
+.cal-item-assessment.gray,   .legend-badge.gray   { background: var(--bg-muted);      color: var(--text-secondary); }
 
-/* Report card indicator */
-.event-icon.report-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--info);
-}
-
-/* Assessment badge / legend badge colour variants (mapped from JSON legend colours) */
-.assessment-badge.blue,   .legend-badge.blue   { background: var(--info-light);    color: var(--info-text); }
-.assessment-badge.orange, .legend-badge.orange { background: #faf0f5;              color: #a37590; }
-.assessment-badge.green,  .legend-badge.green  { background: var(--success-light); color: var(--success-text); }
-.assessment-badge.purple, .legend-badge.purple { background: var(--warning-light); color: var(--warning-text); }
-.assessment-badge.gray,   .legend-badge.gray   { background: var(--bg-muted);      color: var(--text-secondary); }
+.cal-item-assessment.blue   { border-left-color: var(--info); }
+.cal-item-assessment.orange { border-left-color: #d190b3; }
+.cal-item-assessment.green  { border-left-color: var(--success); }
+.cal-item-assessment.purple { border-left-color: var(--warning); }
+.cal-item-assessment.gray   { border-left-color: var(--text-light); }
 
 /* ------------------------------------------------------------
    16. BEST PRACTICES
@@ -7836,9 +7970,10 @@ body.step-review-modal-open { overflow: hidden; }
 
 @media (max-width: 640px) {
   .schedule-page-body { padding: var(--space-xl) var(--space-md) 2.5rem; }
-  .program-title { font-size: 1rem; }
-  .program-title { padding: var(--space-md); }
-  .calendar-row-label { flex-basis: 90px; width: 90px; font-size: 0.7rem; }
+  .cal-app { --cal-label-width: 96px; }
+  .cal-toolbar { padding: var(--space-md); }
+  .cal-toolbar-program { font-size: 0.95rem; }
+  .cal-row-label { font-size: 0.7rem; }
 }
 
 /* ====================================================================
