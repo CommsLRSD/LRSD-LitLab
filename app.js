@@ -7587,17 +7587,12 @@ function getScheduleProgramName(program) {
     return label === key ? program.name : label;
 }
 
-function getScheduleMonthLabel(id) {
-    const month = SCHEDULE_MONTHS.find(m => m.id === id);
-    return month ? t(month.i18nKey) : id;
-}
-
-function getScheduleSpanLabel(span) {
-    const startMonth = SCHEDULE_MONTHS[Math.floor(span.start / SCHEDULE_HALVES_PER_MONTH)];
-    const endMonth = SCHEDULE_MONTHS[Math.ceil(span.end / SCHEDULE_HALVES_PER_MONTH) - 1];
-    const startLabel = startMonth ? getScheduleMonthLabel(startMonth.id) : '';
-    const endLabel = endMonth ? getScheduleMonthLabel(endMonth.id) : startLabel;
-    return startLabel === endLabel ? startLabel : `${startLabel} \u2013 ${endLabel}`;
+// Compact abbreviation (EN / FR) used by the mobile program toggle so the
+// full filter fits on a single row on narrow screens.
+function getScheduleProgramShortName(program) {
+    const key = `schedule_program_${program.id}_short`;
+    const label = t(key);
+    return label === key ? program.id.slice(0, 2).toUpperCase() : label;
 }
 
 function getActiveScheduleGrades(program) {
@@ -7728,35 +7723,54 @@ function renderScheduleGradeRow(grade, data) {
     `;
 }
 
+// Render one grade's mobile card: the same month-by-month timeline as the
+// desktop grid, rotated so months run top-to-bottom instead of left-to-right.
+// Overlapping items are packed into side-by-side lane columns (instead of
+// stacked lane rows) so items that overlap in time still sit together.
 function renderScheduleMobileGrade(grade, data) {
-    const { assessments, interventions, reports } = getScheduleGradeItems(grade, data);
-    const itemOrder = { assessment: 0, intervention: 1, report: 2 };
-    const items = [
-        ...assessments.map(item => ({ ...item, type: 'assessment' })),
-        ...interventions.map(item => ({ ...item, type: 'intervention' })),
-        ...reports.map(item => ({ ...item, type: 'report' }))
-    ].sort((a, b) => a.span.start - b.span.start || itemOrder[a.type] - itemOrder[b.type]);
+    const { assessments, interventions, reports, interventionLane, reportLane, laneCount } = getScheduleGradeItems(grade, data);
 
-    const itemsHtml = items.map(item => {
-        const typeClass = item.type === 'assessment'
-            ? `cal-mobile-item-assessment ${item.color}`
-            : `cal-mobile-item-${item.type}`;
-        return `
-            <div class="cal-mobile-item ${typeClass}">
-                <div class="cal-mobile-item-main">
-                    <span class="cal-mobile-item-label">${safeText(item.label)}</span>
-                    <span class="cal-mobile-item-months">${safeText(getScheduleSpanLabel(item.span))}</span>
-                </div>
-                ${item.meta ? `<div class="cal-mobile-item-meta">${safeText(item.meta)}</div>` : ''}
-                ${item.note ? `<div class="cal-mobile-item-note">${safeText(item.note)}</div>` : ''}
-            </div>
-        `;
+    const itemStyle = item => `grid-row: ${item.span.start + 1} / ${item.span.end + 1}; grid-column: ${item.lane + 2};`;
+
+    const monthsHtml = SCHEDULE_MONTHS.map((m, idx) => `
+        <div class="cal-vert-month-label" style="grid-row: ${idx * SCHEDULE_HALVES_PER_MONTH + 1} / span ${SCHEDULE_HALVES_PER_MONTH};">
+            ${t(m.i18nKey)}
+        </div>
+    `).join('');
+
+    const slotsHtml = Array.from({ length: SCHEDULE_SLOT_COUNT }, (_, i) => {
+        const half = i % SCHEDULE_HALVES_PER_MONTH === 0 ? 'first' : 'second';
+        return `<div class="cal-vert-slot cal-vert-slot-${half}" style="grid-row: ${i + 1};"></div>`;
     }).join('');
+
+    const assessmentHtml = assessments.map(item => `
+        <div class="cal-item cal-item--vert cal-item-assessment ${item.color}" style="${itemStyle(item)}" tabindex="0"
+            ${scheduleTipAttrs(item.label, item.meta, item.note)}>
+            <span class="cal-item-label">${safeText(item.label)}</span>
+        </div>
+    `).join('');
+    const interventionHtml = interventions.map(item => `
+        <div class="cal-item cal-item--vert cal-item-intervention" style="${itemStyle({ span: item.span, lane: interventionLane })}"
+            tabindex="0" ${scheduleTipAttrs(item.label, item.meta, item.note)}>
+            <span class="cal-item-label">${safeText(item.label)}</span>
+        </div>
+    `).join('');
+    const reportHtml = reports.map(item => `
+        <div class="cal-item cal-item--vert cal-item-report" style="${itemStyle({ span: item.span, lane: reportLane })}" tabindex="0"
+            ${scheduleTipAttrs(item.label, item.meta)}>
+            <span class="cal-item-dot"></span>
+            <span class="cal-item-label">${safeText(item.label)}</span>
+        </div>
+    `).join('');
 
     return `
         <section class="cal-mobile-grade">
             <h3 class="cal-mobile-grade-title">${safeText(grade.label)}</h3>
-            <div class="cal-mobile-events">${itemsHtml}</div>
+            <div class="cal-vert-track" style="grid-template-columns: var(--cal-v-label-width) repeat(${laneCount}, minmax(0, 1fr)); grid-template-rows: repeat(${SCHEDULE_SLOT_COUNT}, minmax(26px, auto));">
+                ${monthsHtml}
+                ${slotsHtml}
+                ${assessmentHtml}${interventionHtml}${reportHtml}
+            </div>
         </section>
     `;
 }
@@ -7776,7 +7790,8 @@ function renderScheduleCalendar(data) {
     const filterHtml = data.programs.map(p => `
         <button type="button" class="cal-filter-btn${p.id === program.id ? ' active' : ''}"
             role="tab" aria-selected="${p.id === program.id}" data-program="${safeText(p.id)}">
-            ${safeText(getScheduleProgramName(p))}
+            <span class="cal-filter-btn-full">${safeText(getScheduleProgramName(p))}</span>
+            <span class="cal-filter-btn-short">${safeText(getScheduleProgramShortName(p))}</span>
         </button>
     `).join('');
 
