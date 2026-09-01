@@ -1316,42 +1316,8 @@ details > p {
 }
 
 /* ------------------------------------------------------------
-   15. ASSESSMENT SCHEDULES
+   15. ASSESSMENT SCHEDULES — yearly, month-by-month calendar
    ------------------------------------------------------------ */
-
-.schedule-toggle {
-  display: inline-flex;
-  background: var(--bg-muted);
-  border-radius: var(--radius-pill);
-  padding: 3px;
-  margin-bottom: var(--space-lg);
-}
-
-.toggle-segment {
-  padding: 0.3rem 0.75rem;
-  border-radius: var(--radius-pill);
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: var(--text-secondary);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: all var(--duration) var(--ease);
-}
-
-.toggle-segment.active {
-  background: var(--bg);
-  color: var(--text);
-  box-shadow: var(--shadow-xs);
-}
-
-.schedule-view {
-  display: none;
-}
-
-.schedule-view.active {
-  display: block;
-}
 
 .content-wrapper {
   max-width: 1100px;
@@ -1359,7 +1325,7 @@ details > p {
   padding: var(--space-md);
 }
 
-/* Calendar View */
+/* Calendar container */
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -1396,48 +1362,103 @@ details > p {
   color: var(--primary);
 }
 
-.grade-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--space-sm);
-  padding: var(--space-sm);
+/* Grid: a fixed grade-label column + 11 equal month columns */
+.calendar-grid {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.grade-card {
-  background: var(--bg-alt);
-  border-radius: var(--radius);
-  padding: var(--space-sm);
-  border: 1px solid var(--border);
+.calendar-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+  min-width: 640px;
 }
 
-.grade-header {
-  font-weight: 500;
+.calendar-row:last-child { border-bottom: none; }
+
+.calendar-row-label {
+  flex: 0 0 130px;
+  width: 130px;
+  padding: var(--space-sm);
   font-size: 0.78rem;
-  color: var(--primary);
-  margin-bottom: var(--space-xs);
-  padding-bottom: var(--space-xs);
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  background: var(--bg-alt);
+  border-right: 1px solid var(--border);
+}
+
+.calendar-row-header {
+  background: var(--bg-muted);
   border-bottom: 1px solid var(--border);
 }
 
-.timeline {
+.calendar-row-header .calendar-row-label {
+  background: var(--bg-muted);
+}
+
+.month-col-header {
+  flex: 1 1 0;
+  min-width: 50px;
+  padding: var(--space-xs) 4px;
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-light);
+}
+
+.month-cell {
+  flex: 1 1 0;
+  min-width: 50px;
+  padding: 4px 3px 8px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.timeline-item {
-  display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-  padding: var(--space-xs) 0;
+  gap: 2px;
+  border-right: 1px solid var(--border-light, var(--border));
+  position: relative;
 }
 
-.period-label {
-  font-weight: 500;
-  min-width: 50px;
-  color: var(--text);
+.month-cell:last-child { border-right: none; }
+
+.month-cell-events {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 20px;
+}
+
+/* Intervention bar — a thin strip along the bottom of each active month
+   cell; adjoining active cells are visually joined into one continuous bar. */
+.intervention-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-pill);
+}
+
+.intervention-bar.active {
+  background: var(--warning);
+}
+
+.intervention-bar.active.joined-prev,
+.intervention-bar.active.joined-next {
+  border-radius: 0;
+}
+
+.intervention-bar.active.joined-prev { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.intervention-bar.active.joined-next { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+
+.intervention-bar.legend-swatch {
+  width: 24px;
+  height: 6px;
+  flex-shrink: 0;
 }
 
 /* Legend */
@@ -1468,6 +1489,7 @@ details > p {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
+  align-items: center;
 }
 
 .legend-item {
@@ -1493,43 +1515,30 @@ details > p {
   border-radius: var(--radius);
 }
 
-.note {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-xs);
-}
-
 .note-text {
   font-size: 0.8rem;
   color: var(--text-secondary);
 }
 
-.intervention-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--warning);
-}
-
-.report-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--info);
-}
-
 /* Assessment badges */
 .assessment-badge {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: var(--radius-pill);
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: default;
 }
 
-.badge-dibels  { background: var(--info-light); color: var(--info-text); }
-.badge-ctopp   { background: #faf0f5; color: #a37590; }
-.badge-thafol  { background: var(--success-light); color: var(--success-text); }
-.badge-idapel  { background: var(--warning-light); color: var(--warning-text); }
+/* Report card indicator */
+.event-icon.report-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--info);
+}
 
 /* Assessment badge / legend badge colour variants (mapped from JSON legend colours) */
 .assessment-badge.blue,   .legend-badge.blue   { background: var(--info-light);    color: var(--info-text); }
@@ -1537,84 +1546,6 @@ details > p {
 .assessment-badge.green,  .legend-badge.green  { background: var(--success-light); color: var(--success-text); }
 .assessment-badge.purple, .legend-badge.purple { background: var(--warning-light); color: var(--warning-text); }
 .assessment-badge.gray,   .legend-badge.gray   { background: var(--bg-muted);      color: var(--text-secondary); }
-
-/* Table View */
-.table-container {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.program-block {
-  margin-bottom: var(--space-xl);
-}
-
-.program-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-md);
-  background: var(--bg-alt);
-  border-radius: var(--radius) var(--radius) 0 0;
-  border: 1px solid var(--border);
-  border-bottom: none;
-}
-
-.program-header .program-icon { width: 20px; height: 20px; color: var(--primary); }
-.program-header h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); }
-.program-block:nth-of-type(1) .program-header { border-left: 4px solid var(--success); }
-.program-block:nth-of-type(2) .program-header { border-left: 4px solid var(--danger); }
-
-.schedule-table,
-.assessment-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid var(--border);
-  font-size: 0.85rem;
-}
-
-.schedule-table th,
-.assessment-table th {
-  background: var(--bg-muted);
-  font-weight: 600;
-  text-align: left;
-  padding: 0.6rem 0.75rem;
-  color: var(--text);
-  border: 1px solid var(--border);
-  font-size: 0.8rem;
-  white-space: nowrap;
-}
-
-.schedule-table td,
-.assessment-table td {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  vertical-align: top;
-}
-
-.schedule-row.header { font-weight: 600; }
-
-/* Assessment grid */
-.assessment-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--space-md);
-}
-
-.calendar-program {
-  background: var(--bg);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  padding: var(--space-md);
-}
-
-.calendar-grade {
-  padding: var(--space-sm) 0;
-}
-
-.calendar-cell {
-  padding: var(--space-xs);
-}
 
 /* ------------------------------------------------------------
    16. BEST PRACTICES
@@ -5759,8 +5690,6 @@ body.step-review-modal-open { overflow: hidden; }
   .decision-buttons,
   .vf-decision-grid { flex-direction: column; }
 
-  .grade-cards { grid-template-columns: 1fr; }
-  .assessment-grid { grid-template-columns: 1fr; }
   .interventions-grid { grid-template-columns: 1fr; }
 
   .summary-modal, .review-modal-content { max-width: 95%; max-height: 90vh; }
@@ -5852,7 +5781,6 @@ body.step-review-modal-open { overflow: hidden; }
 
   .faq-question { padding: var(--space-sm); font-size: 0.82rem; }
 
-  .schedule-toggle { width: 100%; justify-content: center; }
   .endpoint-card, .vf-endpoint { padding: var(--space-lg); }
 
   .flowchart-glass-header,
@@ -7891,21 +7819,11 @@ body.step-review-modal-open { overflow: hidden; }
   padding: var(--space-2xl) var(--space-lg) 3rem;
 }
 
-.schedule-page-body .schedule-toggle {
-  align-self: center;
-}
-
-.schedule-page-body .schedule-view {
-  margin-top: var(--space-md);
-}
-
 @media (max-width: 640px) {
   .schedule-page-body { padding: var(--space-xl) var(--space-md) 2.5rem; }
-  .grade-cards { grid-template-columns: 1fr; }
   .program-title { font-size: 1rem; }
-  .program-title,
-  .program-header { padding: var(--space-md); }
-  .schedule-table, .assessment-table { font-size: 0.78rem; }
+  .program-title { padding: var(--space-md); }
+  .calendar-row-label { flex-basis: 90px; width: 90px; font-size: 0.7rem; }
 }
 
 /* ====================================================================
