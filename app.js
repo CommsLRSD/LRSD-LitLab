@@ -1830,6 +1830,7 @@ function renderJourneyMap(activeNumber) {
             number,
             title: getStepShortTitle(nodeDef),
             type: nodeDef.type,
+            variant: isActive ? '' : getStepSummaryVariant(nodeDef, vf.choices[nodeDef.id]),
             answer: isActive ? '' : getStepAnswerText(nodeDef.id, nodeDef),
             state: isActive ? 'current' : 'done'
         });
@@ -1850,7 +1851,7 @@ function renderJourneyMap(activeNumber) {
             : escapeHtml(String(entry.number));
 
         return `
-            <li class="journey-map-item journey-map-${entry.state}"
+            <li class="journey-map-item journey-map-${entry.state}${isDone && entry.type ? ` journey-map-type-${entry.type}` : ''}${isDone && entry.variant ? ` journey-map-variant-${entry.variant}` : ''}"
                 style="animation-delay:${idx * 0.05}s"
                 ${clickable ? `role="button" tabindex="0" data-revisit-node="${escapeAttr(entry.id)}" title="Revisit this step"` : ''}
                 ${isCurrent ? 'aria-current="step"' : ''}>
@@ -3110,6 +3111,42 @@ function resolveChoiceOutcomeKey(choice) {
     return id || null;
 }
 
+// Resolve the colour variant used to code a step in the journey summary.
+// Shared by the animated summary bubbles and the "Your Decisions" panel so
+// both views colour-code a step in exactly the same way.
+function getStepSummaryVariant(nodeDef, choice) {
+    if (!nodeDef) return '';
+    const type = nodeDef.type;
+    const nodeSummary = getNodeSummaries()[nodeDef.id || ''];
+
+    if (nodeSummary) {
+        if (type === 'decision' && choice) {
+            const outcomeKey = resolveChoiceOutcomeKey(choice);
+            const outcomeSummary = nodeSummary[outcomeKey] || nodeSummary[choice.id] || null;
+            if (outcomeSummary && outcomeSummary.text) return outcomeSummary.variant || '';
+        } else if (typeof nodeSummary.text === 'function') {
+            return nodeSummary.variant || '';
+        } else if (nodeSummary.text) {
+            return nodeSummary.variant || '';
+        }
+    }
+
+    // Fallbacks mirroring the generic summary text rules
+    if (type === 'checklist' || type === 'info') return 'step1';
+    if (type === 'selection') return 'selection';
+    if (type === 'decision' && choice) {
+        const id = (choice.id || '').toLowerCase();
+        const name = (choice.name || '').toLowerCase();
+        if (id.includes('ineffective') || id.includes('unsuccess') || name.includes('ineffective') || name.includes('unsuccess') || name.includes('yellow') || name.includes('red') || name.includes('20%') || name.includes('20 %')) {
+            return 'ineffective';
+        }
+        if (id.includes('effective') || id.includes('success') || name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
+            return 'effective';
+        }
+    }
+    return '';
+}
+
 // Build a plain-language sentence for each step in the journey animation
 function buildAnimStepBubble(nodeDef, choice, tierId) {
     const type = nodeDef.type;
@@ -3118,7 +3155,7 @@ function buildAnimStepBubble(nodeDef, choice, tierId) {
     let mainText = '';
     let subText = '';
     let iconSVG = getStepTypeIcon(type);
-    let variant = '';
+    const variant = getStepSummaryVariant(nodeDef, choice);
     const typeClass = type ? ` anim-step-type-${type}` : '';
     const normalizeChoiceName = (raw) => (raw || '').replace(/^Option\s+[A-Z0-9]+\s*:\s*/i, '').trim();
     const chosenName = normalizeChoiceName(choice?.name || choice?.label || '');
@@ -3133,14 +3170,11 @@ function buildAnimStepBubble(nodeDef, choice, tierId) {
             const outcomeSummary = nodeSummary[outcomeKey] || nodeSummary[choice.id] || null;
             if (outcomeSummary) {
                 mainText = outcomeSummary.text;
-                variant = outcomeSummary.variant || '';
             }
         } else if (typeof nodeSummary.text === 'function') {
             mainText = nodeSummary.text(chosenName);
-            variant = nodeSummary.variant || '';
         } else if (nodeSummary.text) {
             mainText = nodeSummary.text;
-            variant = nodeSummary.variant || '';
         }
     }
 
@@ -3148,32 +3182,19 @@ function buildAnimStepBubble(nodeDef, choice, tierId) {
     if (!mainText) {
         if (type === 'checklist') {
             mainText = nodeDef.journeySummary || `You completed the checklist "${nodeDef.subtitle || nodeDef.title}" and confirmed everything is in order.`;
-            variant = variant || 'step1';
             subText = nodeDef.reviewHint || 'You can reopen this step from the process map to review details.';
         } else if (type === 'info') {
             mainText = nodeDef.journeySummary || `You reviewed the entry information for this stage and are ready to proceed.`;
-            variant = variant || 'step1';
             subText = nodeDef.reviewHint || 'You can reopen this step from the process map to review details.';
         } else if (type === 'selection') {
             mainText = nodeDef.journeySummary
                 ? nodeDef.journeySummary.replace('{choice}', chosenName || 'your selected option')
                 : `You selected ${chosenName || 'an option'} — a great choice to guide the next steps!`;
-            variant = variant || 'selection';
         } else if (type === 'decision') {
             if (choice) {
                 mainText = nodeDef.journeySummary
                     ? nodeDef.journeySummary.replace('{choice}', chosenName || 'your decision')
                     : `Based on the results, you determined: ${chosenName || 'the next action'}.`;
-                // Colour-code by the choice if variant not already set
-                if (!variant) {
-                    const id = (choice.id || '').toLowerCase();
-                    const name = (choice.name || '').toLowerCase();
-                    if (id.includes('ineffective') || id.includes('unsuccess') || name.includes('ineffective') || name.includes('unsuccess') || name.includes('yellow') || name.includes('red') || name.includes('20%') || name.includes('20 %')) {
-                        variant = 'ineffective';
-                    } else if (id.includes('effective') || id.includes('success') || name.includes('effective') || name.includes('success') || name.includes('blue') || name.includes('green')) {
-                        variant = 'effective';
-                    }
-                }
             } else {
                 mainText = nodeDef.journeySummary || `You completed this decision step: ${nodeDef.title}.`;
             }

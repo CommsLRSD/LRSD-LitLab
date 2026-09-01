@@ -836,7 +836,7 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
 
 .cta-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-lg);
 }
 
@@ -990,11 +990,241 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
   border-color: var(--primary-light);
 }
 
+@media (max-width: 1024px) {
+  .cta-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .cta-grid {
     grid-template-columns: 1fr;
   }
 }
+
+/* --------------------------------------------------------
+   Home "Go deeper" section — reference & resources
+   -------------------------------------------------------- */
+
+.explore-more {
+  margin-top: var(--space-xl);
+  padding: var(--space-xl);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+}
+
+.explore-more-head {
+  margin-bottom: var(--space-lg);
+}
+
+.explore-more-eyebrow {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+
+.explore-more-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.35rem;
+}
+
+.explore-more-sub {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  max-width: 60ch;
+}
+
+.explore-more-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+}
+
+.explore-tile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  text-align: left;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--duration) var(--ease),
+              border-color var(--duration) var(--ease),
+              transform var(--duration) var(--ease);
+}
+
+.explore-tile:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: var(--accent);
+  transform: translateX(4px);
+}
+
+.explore-tile:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.explore-tile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--primary);
+}
+
+.explore-tile-icon .material-symbols-rounded { font-size: 24px; }
+
+.explore-tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.explore-tile-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.explore-tile-desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.explore-tile-arrow {
+  flex-shrink: 0;
+  font-size: 20px;
+  color: var(--accent);
+  transition: transform var(--duration) var(--ease);
+}
+
+.explore-tile:hover .explore-tile-arrow { transform: translateX(3px); }
+
+@media (max-width: 640px) {
+  .explore-more { padding: var(--space-lg); }
+  .explore-tile { align-items: flex-start; }
+}
+
+/* --------------------------------------------------------
+   Resources page
+   -------------------------------------------------------- */
+
+.resources-page-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.resources-note {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.resource-group {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.resource-group-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--space-md);
+}
+
+.resource-group-title .material-symbols-rounded {
+  font-size: 22px;
+  color: var(--primary);
+}
+
+.resource-link-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.resource-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--bg-alt, var(--bg));
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color var(--duration) var(--ease),
+              background var(--duration) var(--ease),
+              transform var(--duration) var(--ease);
+}
+
+.resource-link:hover {
+  border-color: var(--primary);
+  background: var(--primary-faint);
+  transform: translateX(3px);
+}
+
+.resource-link:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.resource-link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius);
+  background: var(--card-yellow-bg);
+  color: var(--primary);
+}
+
+.resource-link-icon .material-symbols-rounded { font-size: 20px; }
+
+.resource-link-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.resource-link-arrow {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--text-light);
+}
+
+.resource-link:hover .resource-link-arrow { color: var(--primary); }
 
 .card-header-row {
   display: flex;
@@ -7046,6 +7276,47 @@ body.step-review-modal-open { overflow: hidden; }
 }
 .journey-map-back svg { width: 15px; height: 15px; }
 .journey-map-back:hover { background: var(--border); color: var(--text); }
+
+/* ---- Colour coding for completed steps ----
+   Mirrors the journey summary bubbles (.anim-step-bubble / .anim-bubble-*)
+   so a step is coded the same way in both views. */
+.journey-map-item.journey-map-type-checklist {
+  background: var(--step-checklist-bg);
+  --tier-color: var(--step-checklist);
+}
+.journey-map-item.journey-map-type-selection {
+  background: var(--step-selection-bg);
+  --tier-color: var(--step-selection);
+}
+.journey-map-item.journey-map-type-decision {
+  background: var(--step-decision-bg);
+  --tier-color: var(--step-decision);
+}
+.journey-map-item.journey-map-type-info {
+  background: var(--step-info-bg);
+  --tier-color: var(--step-info);
+}
+
+.journey-map-item.journey-map-variant-step1 {
+  background: var(--step-bg);
+  --tier-color: var(--step);
+}
+.journey-map-item.journey-map-variant-selection {
+  background: var(--info-light);
+  --tier-color: var(--info-text);
+}
+.journey-map-item.journey-map-variant-effective {
+  background: var(--effective-bg);
+  --tier-color: var(--effective-text);
+}
+.journey-map-item.journey-map-variant-ineffective {
+  background: var(--ineffective-bg);
+  --tier-color: var(--ineffective-text);
+}
+
+.journey-map-item.journey-map-done[role="button"]:hover {
+  background: color-mix(in srgb, var(--tier-color, var(--step)) 12%, var(--bg));
+}
 
 /* ---------- The active step opens inside its own row ----------
    Step 1 happens entirely inside the Step 1 row, then Step 2 opens
