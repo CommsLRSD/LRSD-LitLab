@@ -18,7 +18,6 @@ const TRANSLATIONS = {
         nav_interventions: 'Interventions',
         nav_scores: 'Understanding Scores & Percentiles',
         nav_resources: 'Resources',
-        nav_original: 'Original Guide',
         nav_about: 'About',
         nav_interventions_mobile: 'Interventions Menu',
         nav_schedule: 'Assessment Schedule',
@@ -47,9 +46,9 @@ const TRANSLATIONS = {
         cta_resources_title: 'Resources',
         cta_resources_desc: 'Scope and sequence documents, learning progressions, and the division literacy screening summary.',
         cta_resources_btn: 'Browse Resources',
-        cta_original_title: 'Original Literacy Interventions',
-        cta_original_desc: 'View the original LRSD Literacy Interventions guide document in its published format.',
-        cta_original_btn: 'View Guide',
+        cta_about_title: 'About This Guide',
+        cta_about_desc: 'Learn about the purpose of this guide, the screening schedule, and the RTI/MTSS framework behind it.',
+        cta_about_btn: 'Learn More',
 
         // ── Home explore-more section ──
         explore_eyebrow: 'Go deeper',
@@ -152,10 +151,6 @@ const TRANSLATIONS = {
         resources_link_fr_46: 'Progression des apprentissages 4-6 année',
         resources_link_fi_24: 'French Immersion: Grades 2-4 Scope and Sequence for Structured Literacy',
         resources_link_fi_56: 'French Immersion: Grades 5-6 Scope and Sequence for Structured Literacy',
-        // ── Original guide section ──
-        original_section_title: 'Original Literacy Interventions',
-        original_section_subtitle: 'View the original LRSD Literacy Interventions guide document',
-
         // ── About section ──
         about_section_title: 'About',
         about_section_subtitle: 'Welcome to Literacy Interventions, an interactive teaching guide by the Louis Riel School Division.',
@@ -287,7 +282,6 @@ const TRANSLATIONS = {
         nav_interventions: 'Interventions',
         nav_scores: 'Comprendre les scores et les percentiles',
         nav_resources: 'Ressources',
-        nav_original: 'Guide original',
         nav_about: 'À propos',
         nav_interventions_mobile: 'Menu des interventions',
         nav_schedule: 'Calendrier d\'évaluation',
@@ -316,9 +310,9 @@ const TRANSLATIONS = {
         cta_resources_title: 'Ressources',
         cta_resources_desc: 'Documents de portée et de séquence, progressions des apprentissages et sommaire du dépistage en littératie de la division.',
         cta_resources_btn: 'Parcourir les ressources',
-        cta_original_title: 'Interventions en littératie — guide original',
-        cta_original_desc: 'Consulter le document original du guide d\'interventions en littératie de la DSLR dans son format publié.',
-        cta_original_btn: 'Voir le guide',
+        cta_about_title: 'À propos de ce guide',
+        cta_about_desc: 'Découvrez l\'objectif de ce guide, l\'horaire de dépistage et le cadre RTI/MTSS qui le sous-tend.',
+        cta_about_btn: 'En savoir plus',
 
         // ── Home explore-more section ──
         explore_eyebrow: 'Pour aller plus loin',
@@ -421,10 +415,6 @@ const TRANSLATIONS = {
         resources_link_fr_46: 'Progression des apprentissages 4-6 année',
         resources_link_fi_24: 'Immersion française : portée et séquence 2e-4e année pour la littératie structurée',
         resources_link_fi_56: 'Immersion française : portée et séquence 5e-6e année pour la littératie structurée',
-        // ── Original guide section ──
-        original_section_title: 'Interventions en littératie — guide original',
-        original_section_subtitle: 'Consulter le document original du guide d\'interventions en littératie de la DSLR',
-
         // ── About section ──
         about_section_title: 'À propos',
         about_section_subtitle: 'Bienvenue dans Interventions en littératie, un guide d\'enseignement interactif de la Division scolaire Louis-Riel.',

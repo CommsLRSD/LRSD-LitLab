@@ -1004,14 +1004,72 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
 
 /* --------------------------------------------------------
    Home "Go deeper" section — reference & resources
+   Full-bleed happy/bright band with a dot-grid + circle
+   motif that echoes the header dot-grid and bubble circles,
+   while its content stays aligned to the page's content width.
    -------------------------------------------------------- */
 
 .explore-more {
-  margin-top: var(--space-xl);
-  padding: var(--space-xl);
-  border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  color: #fff;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  margin-top: var(--space-2xl);
+  padding: var(--space-2xl) 0;
+  overflow: hidden;
+  background-color: #ffd88a;
+  background-image:
+    linear-gradient(135deg, #ffe9b0 0%, #ffcf7a 40%, #ff9f7a 75%, #ff7aa2 100%),
+    radial-gradient(circle, rgba(27, 45, 107, 0.12) 1.5px, transparent 1.5px);
+  background-size: 100% 100%, 26px 26px;
+  background-position: center, center;
+  color: var(--primary);
+}
+
+.explore-more-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.explore-more-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+}
+
+.explore-more-blob-1 {
+  width: 200px;
+  height: 200px;
+  top: -70px;
+  left: -50px;
+  background: #66bb6a;
+}
+
+.explore-more-blob-2 {
+  width: 150px;
+  height: 150px;
+  bottom: -60px;
+  right: 10%;
+  background: #64b5f6;
+}
+
+.explore-more-blob-3 {
+  width: 100px;
+  height: 100px;
+  top: 18%;
+  right: -30px;
+  background: #7986cb;
+}
+
+.explore-more-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
 }
 
 .explore-more-head {
@@ -1024,60 +1082,66 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 0.35rem;
+  color: var(--primary);
+  background: rgba(255, 255, 255, 0.55);
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  margin-bottom: 0.5rem;
 }
 
 .explore-more-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--primary);
   margin: 0 0 0.35rem;
 }
 
 .explore-more-sub {
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(27, 45, 107, 0.78);
   margin: 0;
   max-width: 60ch;
 }
 
 .explore-more-list {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-sm);
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
 }
 
-.explore-tile {
+.explore-card {
   display: flex;
-  align-items: center;
-  gap: var(--space-md);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
   width: 100%;
   text-align: left;
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-lg);
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  border: 1px solid rgba(27, 45, 107, 0.12);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--primary);
   font-family: inherit;
   cursor: pointer;
   transition: background var(--duration) var(--ease),
               border-color var(--duration) var(--ease),
-              transform var(--duration) var(--ease);
+              transform var(--duration) var(--ease),
+              box-shadow var(--duration) var(--ease);
 }
 
-.explore-tile:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: var(--accent);
-  transform: translateX(4px);
+.explore-card:hover {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
-.explore-tile:focus-visible {
-  outline: 3px solid var(--accent);
+.explore-card:focus-visible {
+  outline: 3px solid var(--primary);
   outline-offset: 2px;
 }
 
-.explore-tile-icon {
+.explore-card-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1085,44 +1149,47 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
   width: 46px;
   height: 46px;
   border-radius: var(--radius);
-  background: var(--accent);
-  color: var(--primary);
-}
-
-.explore-tile-icon .material-symbols-rounded { font-size: 24px; }
-
-.explore-tile-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.explore-tile-title {
-  font-size: 1.02rem;
-  font-weight: 700;
+  background: var(--primary);
   color: #fff;
 }
 
-.explore-tile-desc {
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.82);
+.explore-card-icon .material-symbols-rounded { font-size: 24px; }
+
+.explore-card-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--primary);
 }
 
-.explore-tile-arrow {
-  flex-shrink: 0;
+.explore-card-desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(27, 45, 107, 0.78);
+  flex: 1;
+}
+
+.explore-card-arrow {
+  align-self: flex-end;
+  margin-top: auto;
+  display: inline-flex;
   font-size: 20px;
-  color: var(--accent);
+  color: var(--primary);
   transition: transform var(--duration) var(--ease);
 }
 
-.explore-tile:hover .explore-tile-arrow { transform: translateX(3px); }
+.explore-card:hover .explore-card-arrow { transform: translateX(3px); }
+
+@media (max-width: 1024px) {
+  .explore-more-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 
 @media (max-width: 640px) {
-  .explore-more { padding: var(--space-lg); }
-  .explore-tile { align-items: flex-start; }
+  .explore-more { padding: var(--space-xl) 0; }
+  .explore-more-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* --------------------------------------------------------
@@ -6175,35 +6242,6 @@ body.step-review-modal-open { overflow: hidden; }
 .fade-in.visible {
   opacity: 1;
   transform: translateY(0);
-}
-
-/* ------------------------------------------------------------
-   Original Guide (iframe embed)
-   ------------------------------------------------------------ */
-.original-guide-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100vh - var(--nav-height));
-}
-
-.original-guide-body {
-  position: relative;
-  max-width: 1100px;
-  width: 100%;
-  margin: 0 auto;
-  padding: var(--space-lg);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-  background: var(--bg);
-  border: 1px solid var(--border);
-}
-
-.original-guide-iframe {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: none;
 }
 
 /* ------------------------------------------------------------

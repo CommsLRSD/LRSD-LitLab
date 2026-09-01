@@ -202,9 +202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize assessment schedules
     await initializeAssessmentSchedules();
     
-    // Fix iframe scroll: prevent parent page from scrolling when hovering over the original guide iframe
-    setupIframeScrollCapture();
-    
     // Add resize listener to update connection line positions and tier titles
     let resizeTimeout;
     window.addEventListener('resize', () => {
@@ -347,22 +344,6 @@ function setupSubTabs() {
             const panel = document.getElementById(`subtab-${target}`);
             if (panel) panel.classList.add('active');
         });
-    });
-}
-
-// ============================================
-// Iframe Scroll Capture
-// ============================================
-function setupIframeScrollCapture() {
-    const iframeWrapper = document.querySelector('.original-guide-body');
-    if (!iframeWrapper) return;
-    
-    iframeWrapper.addEventListener('mouseenter', () => {
-        document.body.style.overflow = 'hidden';
-    });
-    
-    iframeWrapper.addEventListener('mouseleave', () => {
-        document.body.style.overflow = '';
     });
 }
 

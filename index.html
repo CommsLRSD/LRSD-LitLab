@@ -77,10 +77,6 @@
                 <span class="nav-link-label" data-i18n="nav_history">History</span>
                 <span class="nav-badge is-empty" id="side-nav-history-badge">0</span>
             </button>
-            <button class="nav-link" data-page="original" role="menuitem" aria-selected="false">
-                <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">menu_book</span>
-                <span class="nav-link-label" data-i18n="nav_original">Original Guide</span>
-            </button>
             <button class="nav-link" data-page="about" role="menuitem" aria-selected="false">
                 <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">info</span>
                 <span class="nav-link-label" data-i18n="nav_about">About</span>
@@ -119,10 +115,6 @@
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">history</span>
                 <span data-i18n="nav_history">History</span>
                 <span class="nav-badge is-empty" id="mobile-nav-history-badge">0</span>
-            </button>
-            <button class="mobile-nav-item" data-page="original">
-                <span class="material-symbols-rounded" aria-hidden="true" translate="no">menu_book</span>
-                <span data-i18n="nav_original">Original Guide</span>
             </button>
             <button class="mobile-nav-item" data-page="about">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
@@ -186,43 +178,44 @@
                         </span>
                     </button>
                 </div>
+            </div>
 
-                <section class="explore-more" aria-labelledby="explore-more-title">
+            <section class="explore-more" aria-labelledby="explore-more-title">
+                <div class="explore-more-decor" aria-hidden="true">
+                    <span class="explore-more-blob explore-more-blob-1"></span>
+                    <span class="explore-more-blob explore-more-blob-2"></span>
+                    <span class="explore-more-blob explore-more-blob-3"></span>
+                </div>
+                <div class="explore-more-inner">
                     <div class="explore-more-head">
                         <span class="explore-more-eyebrow" data-i18n="explore_eyebrow">Go deeper</span>
                         <h3 class="explore-more-title" id="explore-more-title" data-i18n="explore_title">Reference &amp; Resources</h3>
                         <p class="explore-more-sub" data-i18n="explore_subtitle">Background reading and division documents to support your literacy work.</p>
                     </div>
                     <div class="explore-more-list">
-                        <button class="explore-tile" onclick="navigateToPage('scores')" aria-label="Open Understanding Scores &amp; Percentiles">
-                            <span class="explore-tile-icon" aria-hidden="true"><span class="material-symbols-rounded" translate="no">bar_chart</span></span>
-                            <span class="explore-tile-text">
-                                <span class="explore-tile-title" data-i18n="cta_scores_title">Understanding Scores &amp; Percentiles</span>
-                                <span class="explore-tile-desc" data-i18n="cta_scores_desc">Learn how standard scores, percentile ranks, and DIBELS risk categories are used to understand student performance.</span>
-                            </span>
-                            <span class="material-symbols-rounded explore-tile-arrow" aria-hidden="true" translate="no">arrow_forward</span>
+                        <button class="explore-card" onclick="navigateToPage('scores')" aria-label="Open Understanding Scores &amp; Percentiles">
+                            <span class="explore-card-icon" aria-hidden="true"><span class="material-symbols-rounded" translate="no">bar_chart</span></span>
+                            <span class="explore-card-title" data-i18n="cta_scores_title">Understanding Scores &amp; Percentiles</span>
+                            <span class="explore-card-desc" data-i18n="cta_scores_desc">Learn how standard scores, percentile ranks, and DIBELS risk categories are used to understand student performance.</span>
+                            <span class="explore-card-arrow" aria-hidden="true"><span class="material-symbols-rounded" translate="no">arrow_forward</span></span>
                         </button>
 
-                        <button class="explore-tile" onclick="navigateToPage('resources')" aria-label="Open Resources">
-                            <span class="explore-tile-icon" aria-hidden="true"><span class="material-symbols-rounded" translate="no">folder_open</span></span>
-                            <span class="explore-tile-text">
-                                <span class="explore-tile-title" data-i18n="cta_resources_title">Resources</span>
-                                <span class="explore-tile-desc" data-i18n="cta_resources_desc">Scope and sequence documents, learning progressions, and the division literacy screening summary.</span>
-                            </span>
-                            <span class="material-symbols-rounded explore-tile-arrow" aria-hidden="true" translate="no">arrow_forward</span>
+                        <button class="explore-card" onclick="navigateToPage('resources')" aria-label="Open Resources">
+                            <span class="explore-card-icon" aria-hidden="true"><span class="material-symbols-rounded" translate="no">folder_open</span></span>
+                            <span class="explore-card-title" data-i18n="cta_resources_title">Resources</span>
+                            <span class="explore-card-desc" data-i18n="cta_resources_desc">Scope and sequence documents, learning progressions, and the division literacy screening summary.</span>
+                            <span class="explore-card-arrow" aria-hidden="true"><span class="material-symbols-rounded" translate="no">arrow_forward</span></span>
                         </button>
 
-                        <button class="explore-tile" onclick="navigateToPage('original')" aria-label="View Original Literacy Interventions Guide">
-                            <span class="explore-tile-icon" aria-hidden="true"><span class="material-symbols-rounded" translate="no">menu_book</span></span>
-                            <span class="explore-tile-text">
-                                <span class="explore-tile-title" data-i18n="cta_original_title">Original Literacy Interventions</span>
-                                <span class="explore-tile-desc" data-i18n="cta_original_desc">View the original LRSD Literacy Interventions guide document in its published format.</span>
-                            </span>
-                            <span class="material-symbols-rounded explore-tile-arrow" aria-hidden="true" translate="no">arrow_forward</span>
+                        <button class="explore-card" onclick="navigateToPage('about')" aria-label="Open About">
+                            <span class="explore-card-icon" aria-hidden="true"><span class="material-symbols-rounded" translate="no">info</span></span>
+                            <span class="explore-card-title" data-i18n="cta_about_title">About This Guide</span>
+                            <span class="explore-card-desc" data-i18n="cta_about_desc">Learn about the purpose of this guide, the screening schedule, and the RTI/MTSS framework behind it.</span>
+                            <span class="explore-card-arrow" aria-hidden="true"><span class="material-symbols-rounded" translate="no">arrow_forward</span></span>
                         </button>
                     </div>
-                </section>
-            </div>
+                </div>
+            </section>
         </section>
 
         <!-- ── FLOWCHART ─────────────────────────────────────── -->
@@ -479,25 +472,6 @@
                     </div>
                 </div><!-- /.resources-page-body -->
             </div><!-- /.resources-page-wrapper -->
-        </section>
-
-        <!-- ── ORIGINAL GUIDE ─────────────────────────────── -->
-        <section id="original-section" class="content-section" data-page="original">
-            <div class="original-guide-wrapper">
-                <div class="hero-area">
-                    <h2 class="section-title" data-i18n="original_section_title">Original Literacy Interventions</h2>
-                    <p class="section-subtitle" data-i18n="original_section_subtitle">View the original LRSD Literacy Interventions guide document</p>
-                </div>
-                <div class="original-guide-body">
-                    <iframe
-                        src="https://indd.adobe.com/view/f95e967b-1f8c-436e-bf79-a22fb4b1df74"
-                        class="original-guide-iframe"
-                        title="Original Literacy Interventions Guide"
-                        allowfullscreen
-                        loading="lazy"
-                    ></iframe>
-                </div>
-            </div>
         </section>
 
         <!-- ── ABOUT ──────────────────────────────────────────── -->
