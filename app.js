@@ -143,11 +143,10 @@ function rerenderForLanguage() {
     // Intervention wizard dropdowns: refresh placeholder/select text that was
     // set programmatically and is not covered by data-i18n-opt.
     refreshWizardSelectPlaceholders();
-    // Assessment schedule: re-render calendar/table content so static labels
-    // (column headers, legend titles, etc.) pick up the new language.
+    // Assessment schedule: re-render calendar content so static labels
+    // (month headers, legend titles, etc.) pick up the new language.
     if (schedulesData) {
         renderScheduleCalendar(schedulesData);
-        renderScheduleTable(schedulesData);
     }
 }
 
@@ -7503,101 +7502,147 @@ async function fetchSchedules() {
     }
 }
 
-// Render the calendar view - COMPLETELY REDESIGNED
+// School-year months shown as calendar columns, in chronological order.
+const SCHEDULE_MONTHS = [
+    { id: 'before', i18nKey: 'schedule_month_before' },
+    { id: 'sep', i18nKey: 'schedule_month_sep' },
+    { id: 'oct', i18nKey: 'schedule_month_oct' },
+    { id: 'nov', i18nKey: 'schedule_month_nov' },
+    { id: 'dec', i18nKey: 'schedule_month_dec' },
+    { id: 'jan', i18nKey: 'schedule_month_jan' },
+    { id: 'feb', i18nKey: 'schedule_month_feb' },
+    { id: 'mar', i18nKey: 'schedule_month_mar' },
+    { id: 'apr', i18nKey: 'schedule_month_apr' },
+    { id: 'may', i18nKey: 'schedule_month_may' },
+    { id: 'jun', i18nKey: 'schedule_month_jun' }
+];
+
+// Map a free-text period/month string (e.g. "Fall (Sep-Oct)", "Winter (Jan)",
+// "Nov") to the calendar month id(s) it covers.
+function getScheduleMonthIds(text) {
+    const value = (text || '').toLowerCase();
+    if (value.includes('before')) return ['before'];
+    if (value.includes('sep') && value.includes('oct')) return ['sep', 'oct'];
+    if (value.includes('fall')) return ['sep', 'oct'];
+    if (value.includes('sep')) return ['sep'];
+    if (value.includes('oct')) return ['oct'];
+    if (value.includes('nov')) return ['nov'];
+    if (value.includes('dec')) return ['dec'];
+    if (value.includes('winter') || value.includes('jan')) return ['jan'];
+    if (value.includes('feb')) return ['feb'];
+    if (value.includes('mar')) return ['mar'];
+    if (value.includes('spring') || value.includes('apr')) return ['apr'];
+    if (value.includes('may')) return ['may'];
+    if (value.includes('jun')) return ['jun'];
+    return [];
+}
+
+// Render the calendar view as a simple, month-by-month yearly calendar grid.
 function renderScheduleCalendar(data) {
     const container = document.getElementById('calendar-container');
     if (!container || !data) return;
-    
+
     let html = '';
-    
-    // Render each program
+
     data.programs.forEach(program => {
         html += `
             <div class="schedule-program">
                 <h3 class="program-title">
                     <svg class="program-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        ${program.id === 'english' 
+                        ${program.id === 'english'
                             ? '<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'
                             : '<path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01M16 17h.01"/>'
                         }
                     </svg>
                     ${safeText(program.name)}
                 </h3>
-                <div class="grade-cards">
+                <div class="calendar-grid">
+                    <div class="calendar-row calendar-row-header">
+                        <div class="calendar-row-label"></div>
+                        ${SCHEDULE_MONTHS.map(m => `<div class="month-col-header">${t(m.i18nKey)}</div>`).join('')}
+                    </div>
         `;
-        
-        // Render each grade as a card
+
         program.grades.forEach(grade => {
             const assessments = grade.events.filter(e => e.type === 'assessment');
             const reports = grade.events.find(e => e.type === 'report');
             const intervention = grade.events.find(e => e.type === 'intervention');
-            
-            html += `
-                <div class="grade-card">
-                    <div class="grade-header">${safeText(grade.label)}</div>
-                    <div class="timeline">
-            `;
-            
-            // Render assessments
+
+            // Work out which months each event touches so it can be placed
+            // in the matching column(s) of the calendar row.
+            const monthContent = SCHEDULE_MONTHS.map(() => ({ assessments: [], hasReport: false, inIntervention: false }));
+            const monthIndex = id => SCHEDULE_MONTHS.findIndex(m => m.id === id);
+
             assessments.forEach(assessment => {
                 const color = data.legend.assessmentColors[assessment.label] || 'gray';
-                html += `
-                    <div class="timeline-item">
-                        <div class="assessment-badge ${color}">
-                            ${safeText(assessment.label)}
-                        </div>
-                        <div class="period-label">${safeText(assessment.period)}</div>
-                        ${assessment.note ? `<div class="note">${safeText(assessment.note)}</div>` : ''}
-                    </div>
-                `;
+                getScheduleMonthIds(assessment.period).forEach(id => {
+                    const idx = monthIndex(id);
+                    if (idx !== -1) monthContent[idx].assessments.push({ ...assessment, color });
+                });
             });
-            
-            // Render intervention period
-            if (intervention) {
-                html += `
-                    <div class="timeline-item intervention">
-                        <div class="intervention-label">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <rect x="0" y="7" width="16" height="2" rx="1"/>
-                            </svg>
-                            ${t('schedule_intervention_period')}
-                        </div>
-                        <div class="period-label">${intervention.start} - ${intervention.end}</div>
-                    </div>
-                `;
-            }
-            
-            // Render report cards
+
             if (reports && reports.periods) {
-                html += `
-                    <div class="timeline-item reports">
-                        <div class="report-label">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="8" cy="8" r="6"/>
-                                <path d="M6 8l2 2 4-4"/>
-                            </svg>
-                            ${t('schedule_report_cards')}
-                        </div>
-                        <div class="period-label">${reports.periods.join(', ')}</div>
-                    </div>
-                `;
+                reports.periods.forEach(period => {
+                    getScheduleMonthIds(period).forEach(id => {
+                        const idx = monthIndex(id);
+                        if (idx !== -1) monthContent[idx].hasReport = true;
+                    });
+                });
             }
-            
+
+            if (intervention) {
+                const startIds = getScheduleMonthIds(intervention.start);
+                const endIds = getScheduleMonthIds(intervention.end);
+                const startIdx = startIds.length ? monthIndex(startIds[0]) : -1;
+                const endIdx = endIds.length ? monthIndex(endIds[0]) : -1;
+                if (startIdx !== -1 && endIdx !== -1) {
+                    for (let i = startIdx; i <= endIdx; i++) monthContent[i].inIntervention = true;
+                }
+            }
+
             html += `
-                    </div>
+                <div class="calendar-row">
+                    <div class="calendar-row-label">${safeText(grade.label)}</div>
+                    ${monthContent.map((cell, idx) => {
+                        const prevActive = idx > 0 && monthContent[idx - 1].inIntervention;
+                        const nextActive = idx < monthContent.length - 1 && monthContent[idx + 1].inIntervention;
+                        const barClasses = [
+                            'intervention-bar',
+                            cell.inIntervention ? 'active' : '',
+                            cell.inIntervention && prevActive ? 'joined-prev' : '',
+                            cell.inIntervention && nextActive ? 'joined-next' : ''
+                        ].filter(Boolean).join(' ');
+                        return `
+                        <div class="month-cell">
+                            <div class="month-cell-events">
+                                ${cell.assessments.map(a => `
+                                    <span class="assessment-badge ${a.color}" title="${safeText(a.label)} \u2013 ${safeText(a.period)}${a.note ? ' \u2013 ' + safeText(a.note) : ''}">${safeText(a.label)}</span>
+                                `).join('')}
+                                ${cell.hasReport ? `
+                                    <span class="event-icon report-icon" title="${t('schedule_report_cards')}">
+                                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <circle cx="8" cy="8" r="6"/>
+                                            <path d="M6 8l2 2 4-4"/>
+                                        </svg>
+                                    </span>
+                                ` : ''}
+                            </div>
+                            <div class="${barClasses}" ${cell.inIntervention ? `title="${t('schedule_intervention_period')}: ${safeText(intervention.start)} - ${safeText(intervention.end)}"` : ''}></div>
+                        </div>
+                    `;
+                    }).join('')}
                 </div>
             `;
         });
-        
+
         html += `
                 </div>
             </div>
         `;
     });
-    
+
     container.innerHTML = html;
-    
-    // Render legend
+
     renderLegend(data);
 }
 
@@ -7605,19 +7650,19 @@ function renderScheduleCalendar(data) {
 function renderLegend(data) {
     const container = document.getElementById('calendar-legend');
     if (!container || !data) return;
-    
+
     // Get unique assessment types
     const assessmentTypes = new Set();
     Object.keys(data.legend.assessmentColors).forEach(key => {
         assessmentTypes.add(key.replace('*', ''));
     });
-    
+
     let html = `
         <div class="legend-section">
             <h4 class="legend-title">${t('schedule_legend_assessment_types')}</h4>
             <div class="legend-items">
     `;
-    
+
     Array.from(assessmentTypes).forEach(label => {
         const color = data.legend.assessmentColors[label] || 'gray';
         html += `
@@ -7626,145 +7671,47 @@ function renderLegend(data) {
             </div>
         `;
     });
-    
+
     html += `
             </div>
         </div>
+        <div class="legend-section">
+            <div class="legend-items">
+                <div class="legend-item">
+                    <span class="intervention-bar active legend-swatch"></span>
+                    <span>${t('schedule_intervention_period')}</span>
+                </div>
+                <div class="legend-item">
+                    <span class="event-icon report-icon">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="8" cy="8" r="6"/>
+                            <path d="M6 8l2 2 4-4"/>
+                        </svg>
+                    </span>
+                    <span>${t('schedule_report_cards')}</span>
+                </div>
+            </div>
+        </div>
     `;
-    
+
     if (data.notes && data.notes.length > 0) {
         html += `
             <div class="legend-section notes-section">
                 <h4 class="legend-title">${t('schedule_legend_notes')}</h4>
         `;
-        
+
         data.notes.forEach(note => {
             html += `<p class="note-text">${safeText(note)}</p>`;
         });
-        
+
         html += `
             </div>
         `;
     }
-    
+
     container.innerHTML = html;
 }
 
-// Render the table view
-function renderScheduleTable(data) {
-    const container = document.getElementById('table-container');
-    if (!container || !data) return;
-    
-    let html = '';
-    
-    // Render each program
-    data.programs.forEach(program => {
-        html += `
-            <div class="program-block">
-                <div class="program-header">
-                    <svg class="program-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        ${program.id === 'english' 
-                            ? '<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'
-                            : '<path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01M16 17h.01"/>'
-                        }
-                    </svg>
-                    <h3>${safeText(program.name)}</h3>
-                </div>
-                <div class="schedule-table">
-                    <div class="schedule-row header">
-                        <div class="schedule-cell">${t('schedule_col_grade')}</div>
-                        <div class="schedule-cell">${t('schedule_col_assessments')}</div>
-                        <div class="schedule-cell">${t('schedule_col_timing')}</div>
-                    </div>
-        `;
-        
-        program.grades.forEach(grade => {
-            const assessments = grade.events.filter(e => e.type === 'assessment');
-            const assessmentsList = assessments.map(a => a.label).join(', ');
-            const timingList = [...new Set(assessments.map(a => a.period))].join(', ');
-            
-            html += `
-                <div class="schedule-row">
-                    <div class="schedule-cell"><strong>${safeText(grade.label)}</strong></div>
-                    <div class="schedule-cell">${safeText(assessmentsList)}</div>
-                    <div class="schedule-cell">${safeText(timingList)}</div>
-                </div>
-            `;
-        });
-        
-        html += `
-                </div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
-
-// Setup schedule toggle
-function applyScheduleToggle() {
-    const toggleButtons = document.querySelectorAll('.toggle-segment');
-    const calendarView = document.getElementById('schedule-calendar-view');
-    const tableView = document.getElementById('schedule-table-view');
-    
-    if (!toggleButtons.length || !calendarView || !tableView) return;
-    
-    // Restore saved preference or default to calendar
-    const savedView = localStorage.getItem('schedule_view_preference') || 'calendar';
-    
-    toggleButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const view = button.dataset.view;
-            
-            // Update active state
-            toggleButtons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.setAttribute('aria-selected', 'false');
-            });
-            button.classList.add('active');
-            button.setAttribute('aria-selected', 'true');
-            
-            // Show/hide views
-            if (view === 'calendar') {
-                calendarView.classList.add('active');
-                tableView.classList.remove('active');
-                calendarView.removeAttribute('hidden');
-                tableView.setAttribute('hidden', '');
-            } else {
-                calendarView.classList.remove('active');
-                tableView.classList.add('active');
-                calendarView.setAttribute('hidden', '');
-                tableView.removeAttribute('hidden');
-            }
-            
-            // Save preference
-            localStorage.setItem('schedule_view_preference', view);
-        });
-        
-        // Set initial state
-        if (button.dataset.view === savedView) {
-            button.click();
-        }
-    });
-    
-    // Add keyboard navigation for toggle
-    const toggleContainer = document.querySelector('.schedule-toggle');
-    if (toggleContainer) {
-        toggleContainer.addEventListener('keydown', (e) => {
-            const buttons = Array.from(toggleButtons);
-            const currentIndex = buttons.findIndex(btn => btn.classList.contains('active'));
-            
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                e.preventDefault();
-                const nextIndex = e.key === 'ArrowLeft' 
-                    ? (currentIndex - 1 + buttons.length) % buttons.length
-                    : (currentIndex + 1) % buttons.length;
-                buttons[nextIndex].click();
-                buttons[nextIndex].focus();
-            }
-        });
-    }
-}
 
 // Safe text helper to prevent XSS
 function safeText(text) {
@@ -7778,8 +7725,6 @@ async function initializeAssessmentSchedules() {
     const data = await fetchSchedules();
     if (data) {
         renderScheduleCalendar(data);
-        renderScheduleTable(data);
-        applyScheduleToggle();
     }
 }
 
