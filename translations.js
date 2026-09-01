@@ -17,6 +17,7 @@ const TRANSLATIONS = {
         nav_flowchart: 'Flowchart',
         nav_interventions: 'Interventions',
         nav_scores: 'Understanding Scores & Percentiles',
+        nav_resources: 'Resources',
         nav_original: 'Original Guide',
         nav_about: 'About',
         nav_interventions_mobile: 'Interventions Menu',
@@ -37,12 +38,23 @@ const TRANSLATIONS = {
         cta_interventions_title: 'Interventions Menu',
         cta_interventions_desc: 'Browse interventions and assessments filtered by screener, subtest, and literacy pillar.',
         cta_interventions_btn: 'Find Interventions',
+        cta_schedule_title: 'Assessment Schedule',
+        cta_schedule_desc: 'See when universal screening and progress monitoring happen across the school year.',
+        cta_schedule_btn: 'View Schedule',
         cta_scores_title: 'Understanding Scores & Percentiles',
         cta_scores_desc: 'Learn how standard scores, percentile ranks, and DIBELS risk categories are used to understand student performance.',
         cta_scores_btn: 'Learn More',
+        cta_resources_title: 'Resources',
+        cta_resources_desc: 'Scope and sequence documents, learning progressions, and the division literacy screening summary.',
+        cta_resources_btn: 'Browse Resources',
         cta_original_title: 'Original Literacy Interventions',
         cta_original_desc: 'View the original LRSD Literacy Interventions guide document in its published format.',
         cta_original_btn: 'View Guide',
+
+        // ── Home explore-more section ──
+        explore_eyebrow: 'Go deeper',
+        explore_title: 'Reference & Resources',
+        explore_subtitle: 'Background reading and division documents to support your literacy work.',
 
         // ── Flowchart section ──
         flowchart_section_title: 'Intervention Flowchart',
@@ -125,6 +137,21 @@ const TRANSLATIONS = {
         scores_dibels_red: 'Red — At Risk',
         scores_dibels_red_desc: 'Intensive support with close progress monitoring.',
 
+
+        // ── Resources section ──
+        resources_section_title: 'Resources',
+        resources_section_subtitle: 'Division documents supporting structured literacy instruction, screening, and progress monitoring',
+        resources_note: 'Documents open in a new tab. Some links are hosted on the LRSD staff SharePoint and require a division sign-in.',
+        resources_group_division: 'Division overview',
+        resources_group_english: 'English program',
+        resources_group_french: 'Français et immersion française',
+        resources_link_screening: 'Literacy Screening and Progress Monitoring in Louis Riel School Division',
+        resources_link_en_k2: 'English Program: K–2 Scope & Sequence for Structured Literacy',
+        resources_link_en_36: 'English Program: Grades 3–6 Scope & Sequence for Structured Literacy',
+        resources_link_fr_m3: 'Progression des apprentissages M-3 année',
+        resources_link_fr_46: 'Progression des apprentissages 4-6 année',
+        resources_link_fi_24: 'French Immersion: Grades 2-4 Scope and Sequence for Structured Literacy',
+        resources_link_fi_56: 'French Immersion: Grades 5-6 Scope and Sequence for Structured Literacy',
         // ── Original guide section ──
         original_section_title: 'Original Literacy Interventions',
         original_section_subtitle: 'View the original LRSD Literacy Interventions guide document',
@@ -259,6 +286,7 @@ const TRANSLATIONS = {
         nav_flowchart: 'Organigramme',
         nav_interventions: 'Interventions',
         nav_scores: 'Comprendre les scores et les percentiles',
+        nav_resources: 'Ressources',
         nav_original: 'Guide original',
         nav_about: 'À propos',
         nav_interventions_mobile: 'Menu des interventions',
@@ -279,12 +307,23 @@ const TRANSLATIONS = {
         cta_interventions_title: 'Menu des interventions',
         cta_interventions_desc: 'Parcourir les interventions et les évaluations filtrées par outil de dépistage, sous-test et pilier de la littératie.',
         cta_interventions_btn: 'Trouver des interventions',
+        cta_schedule_title: 'Calendrier d\'évaluation',
+        cta_schedule_desc: 'Voir à quel moment le dépistage universel et le suivi des progrès ont lieu au cours de l\'année scolaire.',
+        cta_schedule_btn: 'Voir le calendrier',
         cta_scores_title: 'Comprendre les scores et les percentiles',
         cta_scores_desc: 'Découvrir comment les scores standards, les rangs percentiles et les catégories de risque DIBELS sont utilisés pour comprendre les résultats des élèves.',
         cta_scores_btn: 'En savoir plus',
+        cta_resources_title: 'Ressources',
+        cta_resources_desc: 'Documents de portée et de séquence, progressions des apprentissages et sommaire du dépistage en littératie de la division.',
+        cta_resources_btn: 'Parcourir les ressources',
         cta_original_title: 'Interventions en littératie — guide original',
         cta_original_desc: 'Consulter le document original du guide d\'interventions en littératie de la DSLR dans son format publié.',
         cta_original_btn: 'Voir le guide',
+
+        // ── Home explore-more section ──
+        explore_eyebrow: 'Pour aller plus loin',
+        explore_title: 'Références et ressources',
+        explore_subtitle: 'Lectures complémentaires et documents de la division pour soutenir votre travail en littératie.',
 
         // ── Flowchart section ──
         flowchart_section_title: 'Organigramme d\'intervention',
@@ -367,6 +406,21 @@ const TRANSLATIONS = {
         scores_dibels_red: 'Rouge — À risque',
         scores_dibels_red_desc: 'Soutien intensif avec suivi étroit des progrès.',
 
+
+        // ── Resources section ──
+        resources_section_title: 'Ressources',
+        resources_section_subtitle: 'Documents de la division soutenant l\'enseignement en littératie structurée, le dépistage et le suivi des progrès',
+        resources_note: 'Les documents s\'ouvrent dans un nouvel onglet. Certains liens sont hébergés sur le SharePoint du personnel de la DSLR et nécessitent une connexion.',
+        resources_group_division: 'Aperçu de la division',
+        resources_group_english: 'Programme anglais',
+        resources_group_french: 'Français et immersion française',
+        resources_link_screening: 'Dépistage en littératie et suivi des progrès à la Division scolaire Louis Riel',
+        resources_link_en_k2: 'Programme anglais : portée et séquence M-2 pour la littératie structurée',
+        resources_link_en_36: 'Programme anglais : portée et séquence 3e-6e année pour la littératie structurée',
+        resources_link_fr_m3: 'Progression des apprentissages M-3 année',
+        resources_link_fr_46: 'Progression des apprentissages 4-6 année',
+        resources_link_fi_24: 'Immersion française : portée et séquence 2e-4e année pour la littératie structurée',
+        resources_link_fi_56: 'Immersion française : portée et séquence 5e-6e année pour la littératie structurée',
         // ── Original guide section ──
         original_section_title: 'Interventions en littératie — guide original',
         original_section_subtitle: 'Consulter le document original du guide d\'interventions en littératie de la DSLR',
