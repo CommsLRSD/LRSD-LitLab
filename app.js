@@ -7503,6 +7503,10 @@ async function fetchSchedules() {
 }
 
 // School-year months shown as calendar columns, in chronological order.
+// Each month is split into two half-month slots so an assessment that starts
+// mid-month is drawn in proportion to one that runs a whole month.  Every
+// month is built from the same two slots, so the underlying calendar looks
+// identical for each month whether or not an event starts halfway through it.
 const SCHEDULE_MONTHS = [
     { id: 'before', i18nKey: 'schedule_month_before' },
     { id: 'sep', i18nKey: 'schedule_month_sep' },
@@ -7516,6 +7520,12 @@ const SCHEDULE_MONTHS = [
     { id: 'may', i18nKey: 'schedule_month_may' },
     { id: 'jun', i18nKey: 'schedule_month_jun' }
 ];
+
+const SCHEDULE_HALVES_PER_MONTH = 2;
+const SCHEDULE_SLOT_COUNT = SCHEDULE_MONTHS.length * SCHEDULE_HALVES_PER_MONTH;
+
+// Program the single calendar is currently filtered to (null = first program).
+let activeScheduleProgramId = null;
 
 // Map a free-text period/month string (e.g. "Fall (Sep-Oct)", "Winter (Jan)",
 // "Nov") to the calendar month id(s) it covers.
@@ -7537,131 +7547,322 @@ function getScheduleMonthIds(text) {
     return [];
 }
 
-// Render the calendar view as a simple, month-by-month yearly calendar grid.
-function renderScheduleCalendar(data) {
-    const container = document.getElementById('calendar-container');
-    if (!container || !data) return;
-
-    let html = '';
-
-    data.programs.forEach(program => {
-        html += `
-            <div class="schedule-program">
-                <h3 class="program-title">
-                    <svg class="program-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        ${program.id === 'english'
-                            ? '<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'
-                            : '<path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01M16 17h.01"/>'
-                        }
-                    </svg>
-                    ${safeText(program.name)}
-                </h3>
-                <div class="calendar-grid">
-                    <div class="calendar-row calendar-row-header">
-                        <div class="calendar-row-label"></div>
-                        ${SCHEDULE_MONTHS.map(m => `<div class="month-col-header">${t(m.i18nKey)}</div>`).join('')}
-                    </div>
-        `;
-
-        program.grades.forEach(grade => {
-            const assessments = grade.events.filter(e => e.type === 'assessment');
-            const reports = grade.events.find(e => e.type === 'report');
-            // Grades can have more than one intervention window (e.g. one
-            // between the Fall and Winter assessments, another between the
-            // Winter and Spring assessments), so collect them all rather
-            // than assuming a single continuous block.
-            const interventions = grade.events.filter(e => e.type === 'intervention');
-
-            // Work out which months each event touches so it can be placed
-            // in the matching column(s) of the calendar row.
-            const monthContent = SCHEDULE_MONTHS.map(() => ({ assessments: [], hasReport: false, inIntervention: false, intervention: null }));
-            const monthIndex = id => SCHEDULE_MONTHS.findIndex(m => m.id === id);
-
-            assessments.forEach(assessment => {
-                const color = data.legend.assessmentColors[assessment.label] || 'gray';
-                getScheduleMonthIds(assessment.period).forEach(id => {
-                    const idx = monthIndex(id);
-                    if (idx !== -1) monthContent[idx].assessments.push({ ...assessment, color });
-                });
-            });
-
-            if (reports && reports.periods) {
-                reports.periods.forEach(period => {
-                    getScheduleMonthIds(period).forEach(id => {
-                        const idx = monthIndex(id);
-                        if (idx !== -1) monthContent[idx].hasReport = true;
-                    });
-                });
-            }
-
-            interventions.forEach(intervention => {
-                const startIds = getScheduleMonthIds(intervention.start);
-                const endIds = getScheduleMonthIds(intervention.end);
-                const startIdx = startIds.length ? monthIndex(startIds[0]) : -1;
-                const endIdx = endIds.length ? monthIndex(endIds[0]) : -1;
-                if (startIdx !== -1 && endIdx !== -1) {
-                    for (let i = startIdx; i <= endIdx; i++) {
-                        monthContent[i].inIntervention = true;
-                        monthContent[i].intervention = intervention;
-                    }
-                }
-            });
-
-            html += `
-                <div class="calendar-row">
-                    <div class="calendar-row-label">${safeText(grade.label)}</div>
-                    ${monthContent.map((cell, idx) => {
-                        const prevActive = idx > 0 && monthContent[idx - 1].inIntervention;
-                        const nextActive = idx < monthContent.length - 1 && monthContent[idx + 1].inIntervention;
-                        const barClasses = [
-                            'intervention-bar',
-                            cell.inIntervention ? 'active' : '',
-                            cell.inIntervention && prevActive ? 'joined-prev' : '',
-                            cell.inIntervention && nextActive ? 'joined-next' : ''
-                        ].filter(Boolean).join(' ');
-                        return `
-                        <div class="month-cell">
-                            <div class="month-cell-events">
-                                ${cell.assessments.map(a => `
-                                    <span class="assessment-badge ${a.color}" title="${safeText(a.label)} \u2013 ${safeText(a.period)}${a.note ? ' \u2013 ' + safeText(a.note) : ''}">${safeText(a.label)}</span>
-                                `).join('')}
-                                ${cell.hasReport ? `
-                                    <span class="event-icon report-icon" title="${t('schedule_report_cards')}">
-                                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                                            <circle cx="8" cy="8" r="6"/>
-                                            <path d="M6 8l2 2 4-4"/>
-                                        </svg>
-                                    </span>
-                                ` : ''}
-                            </div>
-                            <div class="${barClasses}" ${cell.inIntervention ? `title="${t('schedule_intervention_period')}: ${safeText(cell.intervention.start)} - ${safeText(cell.intervention.end)}"` : ''}></div>
-                        </div>
-                    `;
-                    }).join('')}
-                </div>
-            `;
-        });
-
-        html += `
-                </div>
-            </div>
-        `;
-    });
-
-    container.innerHTML = html;
-
-    renderLegend(data);
+function scheduleMonthIndex(id) {
+    return SCHEDULE_MONTHS.findIndex(m => m.id === id);
 }
 
-// Render the legend
-function renderLegend(data) {
+// Convert a period description into a half-month slot span, where `end` is
+// exclusive.  A description that mentions a mid-month start (for example
+// "Mid-September to end of October") begins on the second half of its first
+// month instead of the first.
+function getScheduleSpan(text, note) {
+    const ids = getScheduleMonthIds(text);
+    if (!ids.length) return null;
+    const startIdx = scheduleMonthIndex(ids[0]);
+    const endIdx = scheduleMonthIndex(ids[ids.length - 1]);
+    if (startIdx === -1 || endIdx === -1) return null;
+    const combined = `${text || ''} ${note || ''}`.toLowerCase();
+    const startsMidMonth = new RegExp(`mid[-\\s]*${ids[0]}`).test(combined);
+    return {
+        start: startIdx * SCHEDULE_HALVES_PER_MONTH + (startsMidMonth ? 1 : 0),
+        end: (endIdx + 1) * SCHEDULE_HALVES_PER_MONTH
+    };
+}
+
+// Span running from the start of one period to the end of another (used for
+// intervention windows described by a separate start and end month).
+function getScheduleRangeSpan(startText, endText) {
+    const startSpan = getScheduleSpan(startText);
+    const endSpan = getScheduleSpan(endText);
+    if (!startSpan || !endSpan) return null;
+    return { start: startSpan.start, end: Math.max(endSpan.end, startSpan.end) };
+}
+
+// Program names live in the data file in English only, so prefer a
+// translation when one exists for the program id.
+function getScheduleProgramName(program) {
+    const key = `schedule_program_${program.id}`;
+    const label = t(key);
+    return label === key ? program.name : label;
+}
+
+// Pack bars into lanes so overlapping items never sit on top of each other.
+function assignScheduleLanes(items) {
+    const laneEnds = [];
+    items
+        .slice()
+        .sort((a, b) => a.span.start - b.span.start || a.span.end - b.span.end)
+        .forEach(item => {
+            let lane = laneEnds.findIndex(end => end <= item.span.start);
+            if (lane === -1) {
+                lane = laneEnds.length;
+                laneEnds.push(item.span.end);
+            } else {
+                laneEnds[lane] = item.span.end;
+            }
+            item.lane = lane;
+        });
+    return laneEnds.length;
+}
+
+// Build the tooltip data attributes shared by every calendar item.
+function scheduleTipAttrs(title, meta, note) {
+    return [
+        `data-tip-title="${safeText(title || '')}"`,
+        meta ? `data-tip-meta="${safeText(meta)}"` : '',
+        note ? `data-tip-note="${safeText(note)}"` : ''
+    ].filter(Boolean).join(' ');
+}
+
+// Render one grade row: a label plus a track of half-month slots holding the
+// grade's assessment, intervention and report-card items.
+function renderScheduleGradeRow(grade, data) {
+    const assessments = [];
+    const interventions = [];
+    const reports = [];
+
+    grade.events.forEach(event => {
+        if (event.type === 'assessment') {
+            const span = getScheduleSpan(event.period, event.note);
+            if (span) {
+                assessments.push({
+                    span,
+                    color: data.legend.assessmentColors[event.label] || 'gray',
+                    label: event.label,
+                    meta: event.period,
+                    note: event.note
+                });
+            }
+        } else if (event.type === 'intervention') {
+            const span = getScheduleRangeSpan(event.start, event.end);
+            if (span) {
+                interventions.push({
+                    span,
+                    label: t('schedule_intervention_period'),
+                    meta: `${event.start} \u2013 ${event.end}`,
+                    note: t('schedule_intervention_note')
+                });
+            }
+        } else if (event.type === 'report' && Array.isArray(event.periods)) {
+            event.periods.forEach(period => {
+                const span = getScheduleSpan(period);
+                if (span) {
+                    reports.push({
+                        span,
+                        label: t('schedule_report_cards'),
+                        meta: period
+                    });
+                }
+            });
+        }
+    });
+
+    const assessmentLanes = assignScheduleLanes(assessments);
+    const interventionLane = assessmentLanes;
+    const reportLane = interventionLane + (interventions.length ? 1 : 0);
+    const laneCount = Math.max(1, reportLane + (reports.length ? 1 : 0));
+
+    const itemStyle = item => `grid-column: ${item.span.start + 1} / ${item.span.end + 1}; grid-row: ${item.lane + 1};`;
+
+    const slots = Array.from({ length: SCHEDULE_SLOT_COUNT }, (_, i) => {
+        const half = i % SCHEDULE_HALVES_PER_MONTH === 0 ? 'first' : 'second';
+        return `<div class="cal-slot cal-slot-${half}"></div>`;
+    }).join('');
+
+    const assessmentHtml = assessments.map(item => `
+        <div class="cal-item cal-item-assessment ${item.color}" style="${itemStyle(item)}" tabindex="0"
+            ${scheduleTipAttrs(item.label, item.meta, item.note)}>
+            <span class="cal-item-label">${safeText(item.label)}</span>
+        </div>
+    `).join('');
+
+    const interventionHtml = interventions.map(item => `
+        <div class="cal-item cal-item-intervention" style="${itemStyle({ span: item.span, lane: interventionLane })}" tabindex="0"
+            ${scheduleTipAttrs(item.label, item.meta, item.note)}>
+            <span class="cal-item-label">${safeText(item.label)}</span>
+        </div>
+    `).join('');
+
+    const reportHtml = reports.map(item => `
+        <div class="cal-item cal-item-report" style="${itemStyle({ span: item.span, lane: reportLane })}" tabindex="0"
+            ${scheduleTipAttrs(item.label, item.meta)}>
+            <span class="cal-item-dot"></span>
+            <span class="cal-item-label">${safeText(item.label)}</span>
+        </div>
+    `).join('');
+
+    return `
+        <div class="cal-row">
+            <div class="cal-row-label">${safeText(grade.label)}</div>
+            <div class="cal-track">
+                <div class="cal-slots" aria-hidden="true">${slots}</div>
+                <div class="cal-lanes" style="grid-template-rows: repeat(${laneCount}, var(--cal-lane-height));">
+                    ${assessmentHtml}${interventionHtml}${reportHtml}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Render the calendar: one month-by-month grid, filtered to a single program.
+function renderScheduleCalendar(data) {
+    const container = document.getElementById('calendar-container');
+    if (!container || !data || !data.programs || !data.programs.length) return;
+
+    const program = data.programs.find(p => p.id === activeScheduleProgramId) || data.programs[0];
+    activeScheduleProgramId = program.id;
+
+    const filterHtml = data.programs.map(p => `
+        <button type="button" class="cal-filter-btn${p.id === program.id ? ' active' : ''}"
+            role="tab" aria-selected="${p.id === program.id}" data-program="${safeText(p.id)}">
+            ${safeText(getScheduleProgramName(p))}
+        </button>
+    `).join('');
+
+    const monthsHtml = SCHEDULE_MONTHS.map(m => `
+        <div class="cal-month-head" style="grid-column: span ${SCHEDULE_HALVES_PER_MONTH};">
+            ${t(m.i18nKey)}
+        </div>
+    `).join('');
+
+    container.innerHTML = `
+        <div class="cal-app">
+            <div class="cal-toolbar">
+                <div class="cal-toolbar-title">
+                    <span class="cal-toolbar-label">${t('schedule_school_year')}</span>
+                    <span class="cal-toolbar-program">${safeText(getScheduleProgramName(program))}</span>
+                </div>
+                <div class="cal-filter" role="tablist" aria-label="${t('schedule_filter_label')}">
+                    ${filterHtml}
+                </div>
+            </div>
+            <div class="cal-scroll">
+                <div class="cal-sheet">
+                    <div class="cal-head">
+                        <div class="cal-corner">${t('schedule_grade_column')}</div>
+                        <div class="cal-months">${monthsHtml}</div>
+                    </div>
+                    ${program.grades.map(grade => renderScheduleGradeRow(grade, data)).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.querySelectorAll('.cal-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            activeScheduleProgramId = btn.dataset.program;
+            hideScheduleTooltip();
+            renderScheduleCalendar(data);
+        });
+    });
+
+    setupScheduleTooltips(container);
+    renderLegend(data, program);
+}
+
+// ---- Hover / focus tooltips ------------------------------------------------
+
+let scheduleTooltipEl = null;
+
+function getScheduleTooltip() {
+    if (!scheduleTooltipEl || !document.body.contains(scheduleTooltipEl)) {
+        scheduleTooltipEl = document.createElement('div');
+        scheduleTooltipEl.className = 'cal-tooltip';
+        scheduleTooltipEl.setAttribute('role', 'tooltip');
+        scheduleTooltipEl.hidden = true;
+        document.body.appendChild(scheduleTooltipEl);
+    }
+    return scheduleTooltipEl;
+}
+
+function hideScheduleTooltip() {
+    if (scheduleTooltipEl) {
+        scheduleTooltipEl.hidden = true;
+        scheduleTooltipEl.classList.remove('visible');
+    }
+}
+
+function showScheduleTooltip(target) {
+    const tooltip = getScheduleTooltip();
+    const title = target.dataset.tipTitle || '';
+    const meta = target.dataset.tipMeta || '';
+    const note = target.dataset.tipNote || '';
+
+    tooltip.innerHTML = '';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'cal-tooltip-title';
+    titleEl.textContent = title;
+    tooltip.appendChild(titleEl);
+    if (meta) {
+        const metaEl = document.createElement('div');
+        metaEl.className = 'cal-tooltip-meta';
+        metaEl.textContent = meta;
+        tooltip.appendChild(metaEl);
+    }
+    if (note) {
+        const noteEl = document.createElement('div');
+        noteEl.className = 'cal-tooltip-note';
+        noteEl.textContent = note;
+        tooltip.appendChild(noteEl);
+    }
+
+    tooltip.hidden = false;
+    tooltip.classList.add('visible');
+
+    const rect = target.getBoundingClientRect();
+    const box = tooltip.getBoundingClientRect();
+    const margin = 8;
+    let left = rect.left + (rect.width - box.width) / 2;
+    left = Math.max(margin, Math.min(left, window.innerWidth - box.width - margin));
+    let top = rect.top - box.height - margin;
+    if (top < margin) top = rect.bottom + margin;
+    tooltip.style.left = `${Math.round(left)}px`;
+    tooltip.style.top = `${Math.round(top)}px`;
+}
+
+function setupScheduleTooltips(container) {
+    if (container.dataset.tooltipsBound === 'true') return;
+    container.dataset.tooltipsBound = 'true';
+
+    const findItem = event => (event.target.closest ? event.target.closest('.cal-item') : null);
+
+    container.addEventListener('mouseover', event => {
+        const item = findItem(event);
+        if (item) showScheduleTooltip(item);
+    });
+    container.addEventListener('mouseout', event => {
+        if (findItem(event)) hideScheduleTooltip();
+    });
+    container.addEventListener('focusin', event => {
+        const item = findItem(event);
+        if (item) showScheduleTooltip(item);
+    });
+    container.addEventListener('focusout', hideScheduleTooltip);
+    container.addEventListener('scroll', hideScheduleTooltip, true);
+    window.addEventListener('scroll', hideScheduleTooltip, true);
+    window.addEventListener('resize', hideScheduleTooltip);
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') hideScheduleTooltip();
+    });
+}
+
+// Render the legend for the program currently shown in the calendar.
+function renderLegend(data, program) {
     const container = document.getElementById('calendar-legend');
     if (!container || !data) return;
 
-    // Get unique assessment types
-    const assessmentTypes = new Set();
-    Object.keys(data.legend.assessmentColors).forEach(key => {
-        assessmentTypes.add(key.replace('*', ''));
+    const activeProgram = program
+        || data.programs.find(p => p.id === activeScheduleProgramId)
+        || data.programs[0];
+
+    // Only list the assessment types that appear in the visible program.
+    const assessmentTypes = [];
+    (activeProgram ? activeProgram.grades : []).forEach(grade => {
+        grade.events.forEach(event => {
+            if (event.type !== 'assessment') return;
+            const label = event.label.replace('*', '');
+            if (!assessmentTypes.includes(label)) assessmentTypes.push(label);
+        });
     });
 
     let html = `
@@ -7670,7 +7871,7 @@ function renderLegend(data) {
             <div class="legend-items">
     `;
 
-    Array.from(assessmentTypes).forEach(label => {
+    assessmentTypes.forEach(label => {
         const color = data.legend.assessmentColors[label] || 'gray';
         html += `
             <div class="legend-item">
@@ -7685,17 +7886,16 @@ function renderLegend(data) {
         <div class="legend-section">
             <div class="legend-items">
                 <div class="legend-item">
-                    <span class="intervention-bar active legend-swatch"></span>
+                    <span class="legend-swatch legend-swatch-intervention"></span>
                     <span>${t('schedule_intervention_period')}</span>
                 </div>
                 <div class="legend-item">
-                    <span class="event-icon report-icon">
-                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <circle cx="8" cy="8" r="6"/>
-                            <path d="M6 8l2 2 4-4"/>
-                        </svg>
-                    </span>
+                    <span class="legend-swatch legend-swatch-report"></span>
                     <span>${t('schedule_report_cards')}</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-swatch legend-swatch-half" aria-hidden="true"></span>
+                    <span>${t('schedule_legend_midmonth')}</span>
                 </div>
             </div>
         </div>
@@ -7718,7 +7918,6 @@ function renderLegend(data) {
 
     container.innerHTML = html;
 }
-
 
 // Safe text helper to prevent XSS
 function safeText(text) {
