@@ -7702,7 +7702,6 @@ function renderScheduleGradeRow(grade, data) {
         </div>
     `).join('');
     const interventionHtml = interventions.map(item => `
-    const interventionHtml = interventions.map(item => `
         <div class="cal-item cal-item-intervention" style="${itemStyle({ span: item.span, lane: interventionLane })}">
             <span class="cal-item-label">${safeText(item.label)}</span>
         </div>
