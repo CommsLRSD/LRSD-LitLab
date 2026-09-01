@@ -1427,12 +1427,23 @@ details > p {
 
 .month-cell:last-child { border-right: none; }
 
+/* The "Before School" column only ever holds the K Questionnaire badge,
+   whose label is longer than the other assessment labels; give it a
+   little extra room so the text wraps cleanly instead of overflowing
+   into neighbouring columns. */
+.calendar-row-header .month-col-header:nth-child(2),
+.calendar-row .month-cell:nth-child(2) {
+  flex: 1.4 1 0;
+  min-width: 64px;
+}
+
 .month-cell-events {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
   min-height: 20px;
+  width: 100%;
 }
 
 /* Intervention bar — a thin strip along the bottom of each active month
@@ -1523,12 +1534,16 @@ details > p {
 /* Assessment badges */
 .assessment-badge {
   display: inline-block;
+  max-width: 100%;
   padding: 1px 6px;
   border-radius: var(--radius-pill);
   font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-align: center;
+  line-height: 1.25;
   cursor: default;
 }
 
