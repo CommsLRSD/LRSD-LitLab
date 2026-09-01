@@ -20,6 +20,7 @@ const TRANSLATIONS = {
         nav_original: 'Original Guide',
         nav_about: 'About',
         nav_interventions_mobile: 'Interventions Menu',
+        nav_schedule: 'Assessment Schedule',
         nav_lang_toggle_label: 'Switch to French',
         nav_lang_code: 'FR',
 
@@ -68,6 +69,19 @@ const TRANSLATIONS = {
         wizard_validation_type: 'Please select a Type (Assessment or Intervention) before searching.',
         wizard_evidence_info_label: 'Show evidence and research based definitions',
         wizard_evidence_info_text: 'Evidence and research based definitions',
+
+        // ── Assessment schedule section ──
+        schedule_section_title: 'Assessment Schedule',
+        schedule_section_subtitle: 'Universal screening and progress monitoring timeline for the English and French Immersion programs',
+        schedule_toggle_calendar: 'Calendar View',
+        schedule_toggle_table: 'Table View',
+        schedule_col_grade: 'Grade Level',
+        schedule_col_assessments: 'Assessments',
+        schedule_col_timing: 'Timing',
+        schedule_intervention_period: 'Intervention Period',
+        schedule_report_cards: 'Report Cards',
+        schedule_legend_assessment_types: 'Assessment Types',
+        schedule_legend_notes: 'Notes',
 
         // ── Scores section ──
         scores_section_title: 'Understanding Scores & Percentiles',
@@ -230,6 +244,7 @@ const TRANSLATIONS = {
         nav_original: 'Guide original',
         nav_about: 'À propos',
         nav_interventions_mobile: 'Menu des interventions',
+        nav_schedule: 'Calendrier d\'évaluation',
         nav_lang_toggle_label: 'Passer à l\'anglais',
         nav_lang_code: 'EN',
 
@@ -278,6 +293,19 @@ const TRANSLATIONS = {
         wizard_validation_type: 'Veuillez sélectionner un type (évaluation ou intervention) avant de rechercher.',
         wizard_evidence_info_label: 'Afficher les définitions fondées sur des données probantes et la recherche',
         wizard_evidence_info_text: 'Définitions fondées sur des données probantes et la recherche',
+
+        // ── Assessment schedule section ──
+        schedule_section_title: 'Calendrier d\'évaluation',
+        schedule_section_subtitle: 'Calendrier de dépistage universel et de suivi des progrès pour les programmes anglais et d\'immersion française',
+        schedule_toggle_calendar: 'Vue calendrier',
+        schedule_toggle_table: 'Vue tableau',
+        schedule_col_grade: 'Niveau scolaire',
+        schedule_col_assessments: 'Évaluations',
+        schedule_col_timing: 'Échéancier',
+        schedule_intervention_period: 'Période d\'intervention',
+        schedule_report_cards: 'Bulletins',
+        schedule_legend_assessment_types: 'Types d\'évaluation',
+        schedule_legend_notes: 'Remarques',
 
         // ── Scores section ──
         scores_section_title: 'Comprendre les scores et les percentiles',

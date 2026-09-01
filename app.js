@@ -143,6 +143,12 @@ function rerenderForLanguage() {
     // Intervention wizard dropdowns: refresh placeholder/select text that was
     // set programmatically and is not covered by data-i18n-opt.
     refreshWizardSelectPlaceholders();
+    // Assessment schedule: re-render calendar/table content so static labels
+    // (column headers, legend titles, etc.) pick up the new language.
+    if (schedulesData) {
+        renderScheduleCalendar(schedulesData);
+        renderScheduleTable(schedulesData);
+    }
 }
 
 // Refresh the programmatically-set placeholder options in the wizard selects.
@@ -7554,7 +7560,7 @@ function renderScheduleCalendar(data) {
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                 <rect x="0" y="7" width="16" height="2" rx="1"/>
                             </svg>
-                            Intervention Period
+                            ${t('schedule_intervention_period')}
                         </div>
                         <div class="period-label">${intervention.start} - ${intervention.end}</div>
                     </div>
@@ -7570,7 +7576,7 @@ function renderScheduleCalendar(data) {
                                 <circle cx="8" cy="8" r="6"/>
                                 <path d="M6 8l2 2 4-4"/>
                             </svg>
-                            Report Cards
+                            ${t('schedule_report_cards')}
                         </div>
                         <div class="period-label">${reports.periods.join(', ')}</div>
                     </div>
@@ -7608,7 +7614,7 @@ function renderLegend(data) {
     
     let html = `
         <div class="legend-section">
-            <h4 class="legend-title">Assessment Types</h4>
+            <h4 class="legend-title">${t('schedule_legend_assessment_types')}</h4>
             <div class="legend-items">
     `;
     
@@ -7629,7 +7635,7 @@ function renderLegend(data) {
     if (data.notes && data.notes.length > 0) {
         html += `
             <div class="legend-section notes-section">
-                <h4 class="legend-title">Notes</h4>
+                <h4 class="legend-title">${t('schedule_legend_notes')}</h4>
         `;
         
         data.notes.forEach(note => {
@@ -7666,9 +7672,9 @@ function renderScheduleTable(data) {
                 </div>
                 <div class="schedule-table">
                     <div class="schedule-row header">
-                        <div class="schedule-cell">Grade Level</div>
-                        <div class="schedule-cell">Assessments</div>
-                        <div class="schedule-cell">Timing</div>
+                        <div class="schedule-cell">${t('schedule_col_grade')}</div>
+                        <div class="schedule-cell">${t('schedule_col_assessments')}</div>
+                        <div class="schedule-cell">${t('schedule_col_timing')}</div>
                     </div>
         `;
         
