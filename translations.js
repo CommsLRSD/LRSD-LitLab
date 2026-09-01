@@ -21,6 +21,7 @@ const TRANSLATIONS = {
         nav_about: 'About',
         nav_interventions_mobile: 'Interventions Menu',
         nav_schedule: 'Assessment Schedule',
+        nav_history: 'History',
         nav_lang_toggle_label: 'Switch to French',
         nav_lang_code: 'FR',
 
@@ -262,6 +263,7 @@ const TRANSLATIONS = {
         nav_about: 'À propos',
         nav_interventions_mobile: 'Menu des interventions',
         nav_schedule: 'Calendrier d\'évaluation',
+        nav_history: 'Historique',
         nav_lang_toggle_label: 'Passer à l\'anglais',
         nav_lang_code: 'EN',
 

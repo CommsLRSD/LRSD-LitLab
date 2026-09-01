@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Setup mobile menu
     setupMobileMenu();
+    setupSidebarToggle();
     
     // Setup sub-tab navigation
     setupSubTabs();
@@ -323,6 +324,9 @@ function navigateToPage(pageName) {
             // picked one elsewhere (e.g. in the flowchart) since the last visit.
             applyRememberedScreenerToMenu();
         }
+    } else if (pageName === 'history') {
+        // Visiting the History page counts as "checking" any new entries.
+        clearHistoryUnseen();
     }
     
     // Smooth scroll to top
@@ -385,6 +389,35 @@ function closeMobileMenu() {
     appState.mobileMenuOpen = false;
     document.querySelector('.mobile-menu-btn')?.classList.remove('active');
     document.querySelector('.mobile-nav-overlay')?.classList.remove('active');
+}
+
+// ============================================
+// Collapsible Side Navigation (desktop)
+// ============================================
+const SIDE_NAV_COLLAPSED_KEY = 'litlab-side-nav-collapsed';
+
+function setupSidebarToggle() {
+    const toggleBtn = document.getElementById('sidebar-toggle-btn');
+    const sideNav = document.getElementById('side-nav');
+    if (!toggleBtn || !sideNav) return;
+
+    const collapsed = localStorage.getItem(SIDE_NAV_COLLAPSED_KEY) === 'true';
+    setSidebarCollapsed(collapsed);
+
+    toggleBtn.addEventListener('click', () => {
+        setSidebarCollapsed(!sideNav.classList.contains('collapsed'));
+    });
+}
+
+function setSidebarCollapsed(collapsed) {
+    const sideNav = document.getElementById('side-nav');
+    const toggleBtn = document.getElementById('sidebar-toggle-btn');
+    if (!sideNav || !toggleBtn) return;
+    sideNav.classList.toggle('collapsed', collapsed);
+    document.body.classList.toggle('side-nav-collapsed', collapsed);
+    toggleBtn.setAttribute('aria-expanded', String(!collapsed));
+    toggleBtn.setAttribute('aria-label', collapsed ? 'Expand navigation' : 'Collapse navigation');
+    localStorage.setItem(SIDE_NAV_COLLAPSED_KEY, String(collapsed));
 }
 
 // ============================================
@@ -8303,121 +8336,27 @@ function exportHistoryCsv() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// Open/close the side panel.
-function toggleHistoryPanel(forceOpen) {
-    const tracker = document.getElementById('selection-tracker');
-    if (!tracker) return;
-    const willOpen = typeof forceOpen === 'boolean' ? forceOpen : !tracker.classList.contains('open');
-    tracker.classList.toggle('open', willOpen);
-    const toggle = tracker.querySelector('.selection-tracker-toggle');
-    if (toggle) toggle.setAttribute('aria-expanded', String(willOpen));
-    // Opening the panel counts as "checking" the new entries, so clear the glow.
-    if (willOpen) clearHistoryUnseen();
-}
-
-// Add a persistent glow to the history tab to signal unchecked new entries.
+// Add a badge to the "History" nav links (sidebar + mobile) to signal
+// unchecked new entries, unless the History page is already open.
 function markHistoryUnseen() {
-    const tracker = document.getElementById('selection-tracker');
-    const toggle = document.querySelector('.selection-tracker-toggle');
-    if (!toggle) return;
-    // If the panel is already open, the user is already looking at it.
-    if (tracker && tracker.classList.contains('open')) return;
-    toggle.classList.add('has-unseen');
+    if (appState.currentPage === 'history') return;
+    document.querySelectorAll('[data-page="history"] .nav-badge').forEach(badge => {
+        badge.classList.remove('is-empty');
+        badge.classList.add('has-unseen');
+    });
 }
 
-// Remove the glow once the user has opened (checked) the history panel.
+// Remove the badge once the user has opened (checked) the History page.
 function clearHistoryUnseen() {
-    const toggle = document.querySelector('.selection-tracker-toggle');
-    if (toggle) toggle.classList.remove('has-unseen');
+    document.querySelectorAll('[data-page="history"] .nav-badge').forEach(badge => {
+        badge.classList.remove('has-unseen');
+    });
 }
 
 // Initialize the panel on load.
 document.addEventListener('DOMContentLoaded', () => {
     renderHistoryPanel();
-    initHistoryTrackerDrag();
 });
-
-// Make the floating History tab draggable along the vertical axis so users can
-// reposition it out of the way. The chosen position is remembered per browser.
-function initHistoryTrackerDrag() {
-    const tracker = document.getElementById('selection-tracker');
-    if (!tracker) return;
-    const toggle = tracker.querySelector('.selection-tracker-toggle');
-    if (!toggle) return;
-
-    const STORAGE_KEY = 'litlab-history-tab-top';
-    const EDGE_MARGIN = 8;
-    const DRAG_THRESHOLD = 4;
-
-    function clampTop(top) {
-        const h = toggle.offsetHeight || 80;
-        const max = Math.max(EDGE_MARGIN, window.innerHeight - h - EDGE_MARGIN);
-        return Math.min(Math.max(top, EDGE_MARGIN), max);
-    }
-
-    function applyTop(top) {
-        toggle.classList.add('is-positioned');
-        toggle.style.top = clampTop(top) + 'px';
-    }
-
-    // Restore any previously saved position.
-    const saved = parseFloat(localStorage.getItem(STORAGE_KEY));
-    if (!Number.isNaN(saved)) applyTop(saved);
-
-    let dragging = false;
-    let moved = false;
-    let startY = 0;
-    let startTop = 0;
-
-    function onPointerMove(e) {
-        if (!dragging) return;
-        const dy = e.clientY - startY;
-        if (!moved && Math.abs(dy) > DRAG_THRESHOLD) {
-            moved = true;
-            toggle.classList.add('is-dragging');
-        }
-        if (moved) {
-            e.preventDefault();
-            applyTop(startTop + dy);
-        }
-    }
-
-    function onPointerUp() {
-        if (!dragging) return;
-        dragging = false;
-        document.removeEventListener('pointermove', onPointerMove);
-        document.removeEventListener('pointerup', onPointerUp);
-        toggle.classList.remove('is-dragging');
-        if (moved) {
-            localStorage.setItem(STORAGE_KEY, String(parseFloat(toggle.style.top)));
-        }
-    }
-
-    toggle.addEventListener('pointerdown', (e) => {
-        if (e.button != null && e.button !== 0) return;
-        dragging = true;
-        moved = false;
-        startY = e.clientY;
-        startTop = toggle.getBoundingClientRect().top;
-        document.addEventListener('pointermove', onPointerMove);
-        document.addEventListener('pointerup', onPointerUp);
-    });
-
-    toggle.addEventListener('click', () => {
-        // A click that concludes a drag should not toggle the panel. `moved`
-        // stays set until the next pointerdown, so a genuine click (no drag)
-        // is never suppressed even if the post-drag click never fires.
-        if (moved) return;
-        toggleHistoryPanel();
-    });
-
-    // Keep the tab on-screen if the viewport is resized.
-    window.addEventListener('resize', () => {
-        if (toggle.classList.contains('is-positioned')) {
-            applyTop(parseFloat(toggle.style.top));
-        }
-    });
-}
 
 // Selection history exports
 window.recordSelection = recordSelection;
@@ -8426,7 +8365,6 @@ window.updateHistoryNote = updateHistoryNote;
 window.deleteHistoryEntry = deleteHistoryEntry;
 window.clearSelectionHistory = clearSelectionHistory;
 window.exportHistoryCsv = exportHistoryCsv;
-window.toggleHistoryPanel = toggleHistoryPanel;
 window.showGoToTierStep = showGoToTierStep;
 window.applyTierTheme = applyTierTheme;
 
