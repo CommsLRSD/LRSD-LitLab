@@ -7860,7 +7860,7 @@ function renderLegend(data, program) {
     (activeProgram ? activeProgram.grades : []).forEach(grade => {
         grade.events.forEach(event => {
             if (event.type !== 'assessment') return;
-            const label = event.label.replace('*', '');
+            const label = event.label.replace(/\*/g, '');
             if (!assessmentTypes.includes(label)) assessmentTypes.push(label);
         });
     });
