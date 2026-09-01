@@ -7526,6 +7526,7 @@ const SCHEDULE_SLOT_COUNT = SCHEDULE_MONTHS.length * SCHEDULE_HALVES_PER_MONTH;
 
 // Program the single calendar is currently filtered to (null = first program).
 let activeScheduleProgramId = null;
+let activeScheduleGradeId = 'all';
 
 // Map a free-text period/month string (e.g. "Fall (Sep-Oct)", "Winter (Jan)",
 // "Nov") to the calendar month id(s) it covers.
@@ -7586,6 +7587,25 @@ function getScheduleProgramName(program) {
     return label === key ? program.name : label;
 }
 
+function getScheduleMonthLabel(id) {
+    const month = SCHEDULE_MONTHS.find(m => m.id === id);
+    return month ? t(month.i18nKey) : id;
+}
+
+function getScheduleSpanLabel(span) {
+    const startMonth = SCHEDULE_MONTHS[Math.floor(span.start / SCHEDULE_HALVES_PER_MONTH)];
+    const endMonth = SCHEDULE_MONTHS[Math.ceil(span.end / SCHEDULE_HALVES_PER_MONTH) - 1];
+    const startLabel = startMonth ? getScheduleMonthLabel(startMonth.id) : '';
+    const endLabel = endMonth ? getScheduleMonthLabel(endMonth.id) : startLabel;
+    return startLabel === endLabel ? startLabel : `${startLabel} \u2013 ${endLabel}`;
+}
+
+function getActiveScheduleGrades(program) {
+    const grades = Array.isArray(program.grades) ? program.grades : [];
+    if (activeScheduleGradeId === 'all') return grades;
+    return grades.filter(grade => grade.id === activeScheduleGradeId);
+}
+
 // Pack bars into lanes so overlapping items never sit on top of each other.
 function assignScheduleLanes(items) {
     const laneEnds = [];
@@ -7614,9 +7634,7 @@ function scheduleTipAttrs(title, meta, note) {
     ].filter(Boolean).join(' ');
 }
 
-// Render one grade row: a label plus a track of half-month slots holding the
-// grade's assessment, intervention and report-card items.
-function renderScheduleGradeRow(grade, data) {
+function getScheduleGradeItems(grade, data) {
     const assessments = [];
     const interventions = [];
     const reports = [];
@@ -7662,6 +7680,14 @@ function renderScheduleGradeRow(grade, data) {
     const reportLane = interventionLane + (interventions.length ? 1 : 0);
     const laneCount = Math.max(1, reportLane + (reports.length ? 1 : 0));
 
+    return { assessments, interventions, reports, interventionLane, reportLane, laneCount };
+}
+
+// Render one grade row: a label plus a track of half-month slots holding the
+// grade's assessment, intervention and report-card items.
+function renderScheduleGradeRow(grade, data) {
+    const { assessments, interventions, reports, interventionLane, reportLane, laneCount } = getScheduleGradeItems(grade, data);
+
     const itemStyle = item => `grid-column: ${item.span.start + 1} / ${item.span.end + 1}; grid-row: ${item.lane + 1};`;
 
     const slots = Array.from({ length: SCHEDULE_SLOT_COUNT }, (_, i) => {
@@ -7675,10 +7701,9 @@ function renderScheduleGradeRow(grade, data) {
             <span class="cal-item-label">${safeText(item.label)}</span>
         </div>
     `).join('');
-
     const interventionHtml = interventions.map(item => `
-        <div class="cal-item cal-item-intervention" style="${itemStyle({ span: item.span, lane: interventionLane })}" tabindex="0"
-            ${scheduleTipAttrs(item.label, item.meta, item.note)}>
+    const interventionHtml = interventions.map(item => `
+        <div class="cal-item cal-item-intervention" style="${itemStyle({ span: item.span, lane: interventionLane })}">
             <span class="cal-item-label">${safeText(item.label)}</span>
         </div>
     `).join('');
@@ -7704,6 +7729,39 @@ function renderScheduleGradeRow(grade, data) {
     `;
 }
 
+function renderScheduleMobileGrade(grade, data) {
+    const { assessments, interventions, reports } = getScheduleGradeItems(grade, data);
+    const itemOrder = { assessment: 0, intervention: 1, report: 2 };
+    const items = [
+        ...assessments.map(item => ({ ...item, type: 'assessment' })),
+        ...interventions.map(item => ({ ...item, type: 'intervention' })),
+        ...reports.map(item => ({ ...item, type: 'report' }))
+    ].sort((a, b) => a.span.start - b.span.start || itemOrder[a.type] - itemOrder[b.type]);
+
+    const itemsHtml = items.map(item => {
+        const typeClass = item.type === 'assessment'
+            ? `cal-mobile-item-assessment ${item.color}`
+            : `cal-mobile-item-${item.type}`;
+        return `
+            <div class="cal-mobile-item ${typeClass}">
+                <div class="cal-mobile-item-main">
+                    <span class="cal-mobile-item-label">${safeText(item.label)}</span>
+                    <span class="cal-mobile-item-months">${safeText(getScheduleSpanLabel(item.span))}</span>
+                </div>
+                ${item.meta ? `<div class="cal-mobile-item-meta">${safeText(item.meta)}</div>` : ''}
+                ${item.note ? `<div class="cal-mobile-item-note">${safeText(item.note)}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+
+    return `
+        <section class="cal-mobile-grade">
+            <h3 class="cal-mobile-grade-title">${safeText(grade.label)}</h3>
+            <div class="cal-mobile-events">${itemsHtml}</div>
+        </section>
+    `;
+}
+
 // Render the calendar: one month-by-month grid, filtered to a single program.
 function renderScheduleCalendar(data) {
     const container = document.getElementById('calendar-container');
@@ -7711,11 +7769,25 @@ function renderScheduleCalendar(data) {
 
     const program = data.programs.find(p => p.id === activeScheduleProgramId) || data.programs[0];
     activeScheduleProgramId = program.id;
+    if (activeScheduleGradeId !== 'all' && !program.grades.some(grade => grade.id === activeScheduleGradeId)) {
+        activeScheduleGradeId = 'all';
+    }
+    const activeGrades = getActiveScheduleGrades(program);
 
     const filterHtml = data.programs.map(p => `
         <button type="button" class="cal-filter-btn${p.id === program.id ? ' active' : ''}"
             role="tab" aria-selected="${p.id === program.id}" data-program="${safeText(p.id)}">
             ${safeText(getScheduleProgramName(p))}
+        </button>
+    `).join('');
+
+    const gradeFilterHtml = [
+        { id: 'all', label: t('schedule_grade_all') },
+        ...program.grades.map(grade => ({ id: grade.id, label: grade.label }))
+    ].map(grade => `
+        <button type="button" class="cal-filter-btn${grade.id === activeScheduleGradeId ? ' active' : ''}"
+            aria-pressed="${grade.id === activeScheduleGradeId}" data-grade="${safeText(grade.id)}">
+            ${safeText(grade.label)}
         </button>
     `).join('');
 
@@ -7729,11 +7801,21 @@ function renderScheduleCalendar(data) {
         <div class="cal-app">
             <div class="cal-toolbar">
                 <div class="cal-toolbar-title">
-                    <span class="cal-toolbar-label">${t('schedule_school_year')}</span>
                     <span class="cal-toolbar-program">${safeText(getScheduleProgramName(program))}</span>
                 </div>
-                <div class="cal-filter" role="tablist" aria-label="${t('schedule_filter_label')}">
-                    ${filterHtml}
+                <div class="cal-filters-wrap">
+                    <div class="cal-filter-group">
+                        <span class="cal-filter-label">${t('schedule_filter_label')}</span>
+                        <div class="cal-filter" role="tablist" aria-label="${t('schedule_filter_label')}">
+                            ${filterHtml}
+                        </div>
+                    </div>
+                    <div class="cal-filter-group">
+                        <span class="cal-filter-label">${t('schedule_grade_filter_label')}</span>
+                        <div class="cal-filter" aria-label="${t('schedule_grade_filter_label')}">
+                            ${gradeFilterHtml}
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="cal-scroll">
@@ -7742,8 +7824,11 @@ function renderScheduleCalendar(data) {
                         <div class="cal-corner">${t('schedule_grade_column')}</div>
                         <div class="cal-months">${monthsHtml}</div>
                     </div>
-                    ${program.grades.map(grade => renderScheduleGradeRow(grade, data)).join('')}
+                    ${activeGrades.map(grade => renderScheduleGradeRow(grade, data)).join('')}
                 </div>
+            </div>
+            <div class="cal-mobile-list">
+                ${activeGrades.map(grade => renderScheduleMobileGrade(grade, data)).join('')}
             </div>
         </div>
     `;
@@ -7751,6 +7836,14 @@ function renderScheduleCalendar(data) {
     container.querySelectorAll('.cal-filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             activeScheduleProgramId = btn.dataset.program;
+            hideScheduleTooltip();
+            renderScheduleCalendar(data);
+        });
+    });
+
+    container.querySelectorAll('[data-grade]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            activeScheduleGradeId = btn.dataset.grade || 'all';
             hideScheduleTooltip();
             renderScheduleCalendar(data);
         });
@@ -7824,7 +7917,7 @@ function setupScheduleTooltips(container) {
     if (container.dataset.tooltipsBound === 'true') return;
     container.dataset.tooltipsBound = 'true';
 
-    const findItem = event => (event.target.closest ? event.target.closest('.cal-item') : null);
+    const findItem = event => (event.target.closest ? event.target.closest('.cal-item[data-tip-title]') : null);
 
     container.addEventListener('mouseover', event => {
         const item = findItem(event);
