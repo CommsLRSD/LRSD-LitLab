@@ -7784,10 +7784,9 @@ function renderScheduleCalendar(data) {
         { id: 'all', label: t('schedule_grade_all') },
         ...program.grades.map(grade => ({ id: grade.id, label: grade.label }))
     ].map(grade => `
-        <button type="button" class="cal-filter-btn${grade.id === activeScheduleGradeId ? ' active' : ''}"
-            aria-pressed="${grade.id === activeScheduleGradeId}" data-grade="${safeText(grade.id)}">
+        <option value="${safeText(grade.id)}"${grade.id === activeScheduleGradeId ? ' selected' : ''}>
             ${safeText(grade.label)}
-        </button>
+        </option>
     `).join('');
 
     const monthsHtml = SCHEDULE_MONTHS.map(m => `
@@ -7810,10 +7809,10 @@ function renderScheduleCalendar(data) {
                         </div>
                     </div>
                     <div class="cal-filter-group">
-                        <span class="cal-filter-label">${t('schedule_grade_filter_label')}</span>
-                        <div class="cal-filter" aria-label="${t('schedule_grade_filter_label')}">
+                        <label class="cal-filter-label" for="schedule-grade-filter">${t('schedule_grade_filter_label')}</label>
+                        <select id="schedule-grade-filter" class="cal-grade-filter">
                             ${gradeFilterHtml}
-                        </div>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -7840,12 +7839,10 @@ function renderScheduleCalendar(data) {
         });
     });
 
-    container.querySelectorAll('[data-grade]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            activeScheduleGradeId = btn.dataset.grade || 'all';
+    container.querySelector('#schedule-grade-filter')?.addEventListener('change', event => {
+            activeScheduleGradeId = event.target.value || 'all';
             hideScheduleTooltip();
             renderScheduleCalendar(data);
-        });
     });
 
     setupScheduleTooltips(container);

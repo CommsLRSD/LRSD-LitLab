@@ -1430,6 +1430,25 @@ details > p {
   outline-offset: 2px;
 }
 
+.cal-grade-filter {
+  min-height: 32px;
+  padding: 6px 30px 6px 12px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+}
+
+.cal-grade-filter:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 2px;
+}
+
 /* Sheet: a fixed grade-label column + 11 month columns, each month split
    into two identical half-month slots. */
 .cal-scroll {
@@ -1488,7 +1507,7 @@ details > p {
 
 .cal-head + .cal-row { border-top: none; }
 
-.cal-row:hover { background: rgba(27, 45, 107, 0.035); }
+.cal-row:hover { background: rgba(27, 45, 107, 0.02); }
 
 .cal-row-label {
   flex: 0 0 var(--cal-label-width);
