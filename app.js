@@ -1338,19 +1338,17 @@ function initIntegratedFlowchart(tierId) {
                                 <svg class="journey-map-head-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
                                 <span class="journey-map-title" id="journey-map-title">${escapeHtml(getTierGateLabel(tierId))}</span>
                             </div>
-                            <button class="layout-toggle-btn" id="layout-toggle-btn" type="button" onclick="toggleLayoutMode()" aria-pressed="false" aria-label="${escapeHtml(t('fc_switch_summary'))}" title="${escapeHtml(t('fc_switch_summary'))}">
-                                <span class="layout-toggle-option layout-toggle-option-standard" aria-hidden="true">
-                                    <svg class="layout-toggle-icon layout-toggle-icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
-                                </span>
-                                <span class="layout-toggle-option layout-toggle-option-summary" aria-hidden="true">
-                                    <svg class="layout-toggle-icon layout-toggle-icon-summary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="2" y="7" width="5" height="10" rx="1"/><rect x="9.5" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="5" height="10" rx="1"/></svg>
-                                </span>
-                                <span class="layout-toggle-label">${escapeHtml(t('fc_standard_view'))}</span>
-                            </button>
-                            <button class="visual-flowchart-open-btn" type="button" onclick="openVisualFlowchartModal()" aria-label="${escapeHtml(t('fc_visual_open'))}" title="${escapeHtml(t('fc_visual_open'))}">
-                                <span class="material-symbols-rounded" aria-hidden="true" translate="no">account_tree</span>
-                                <span>${escapeHtml(t('fc_visual_view'))}</span>
-                            </button>
+                            <div class="layout-toggle-group" id="layout-toggle-group" role="group" aria-label="${escapeHtml(t('fc_view_switcher'))}">
+                                <button class="layout-toggle-btn layout-toggle-btn-standard" id="layout-toggle-standard-btn" type="button" onclick="setJourneyLayoutMode('standard')" aria-pressed="true" aria-label="${escapeHtml(t('fc_standard_view'))}" title="${escapeHtml(t('fc_standard_view'))}">
+                                    <svg class="layout-toggle-icon layout-toggle-icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
+                                </button>
+                                <button class="layout-toggle-btn layout-toggle-btn-summary" id="layout-toggle-summary-btn" type="button" onclick="setJourneyLayoutMode('horizontal')" aria-pressed="false" aria-label="${escapeHtml(t('fc_summary_view'))}" title="${escapeHtml(t('fc_summary_view'))}">
+                                    <svg class="layout-toggle-icon layout-toggle-icon-summary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><rect x="2" y="7" width="5" height="10" rx="1"/><rect x="9.5" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="5" height="10" rx="1"/></svg>
+                                </button>
+                                <button class="layout-toggle-btn layout-toggle-btn-visual" id="visual-flowchart-open-btn" type="button" onclick="openVisualFlowchartModal()" aria-label="${escapeHtml(t('fc_visual_open'))}" title="${escapeHtml(t('fc_visual_open'))}">
+                                    <span class="material-symbols-rounded layout-toggle-icon-visual" aria-hidden="true" translate="no">account_tree</span>
+                                </button>
+                            </div>
                             <span class="journey-map-count" id="journey-map-count">${escapeHtml(t('fc_step_label'))} 1</span>
                         </div>
                         <div class="journey-map-bar"><span class="journey-map-bar-fill" id="journey-map-bar-fill"></span></div>
@@ -1846,26 +1844,24 @@ function renderJourneyHorizontal(direction = 'forward') {
     scrollToActiveStep();
 }
 
-// Toggle between 'standard' (vertical list) and 'horizontal' (bubble track) layout modes
-function toggleLayoutMode() {
+// Switch between 'standard' (vertical list) and 'horizontal' (bubble track) layout modes.
+// Part of the three-way "Your Decisions" view switcher (standard / summary / visual pathway).
+function setJourneyLayoutMode(mode) {
     const vf = appState.visualFlowchart;
-    if (!vf) return;
-    vf.layoutMode = (vf.layoutMode === 'horizontal') ? 'standard' : 'horizontal';
+    if (!vf || (mode !== 'standard' && mode !== 'horizontal')) return;
+    vf.layoutMode = mode;
     updateLayoutToggleBtn();
     renderJourney();
 }
 
-// Sync the layout toggle switch to the current layout mode
+// Sync the layout toggle buttons to the current layout mode
 function updateLayoutToggleBtn() {
-    const btn = document.getElementById('layout-toggle-btn');
-    if (!btn) return;
+    const standardBtn = document.getElementById('layout-toggle-standard-btn');
+    const summaryBtn = document.getElementById('layout-toggle-summary-btn');
+    if (!standardBtn || !summaryBtn) return;
     const isHoriz = appState.visualFlowchart?.layoutMode === 'horizontal';
-    btn.setAttribute('aria-pressed', isHoriz ? 'true' : 'false');
-    const labelText = isHoriz ? t('fc_switch_standard') : t('fc_switch_summary');
-    btn.setAttribute('aria-label', labelText);
-    btn.title = labelText;
-    const label = btn.querySelector('.layout-toggle-label');
-    if (label) label.textContent = isHoriz ? t('fc_summary_view') : t('fc_standard_view');
+    standardBtn.setAttribute('aria-pressed', isHoriz ? 'false' : 'true');
+    summaryBtn.setAttribute('aria-pressed', isHoriz ? 'true' : 'false');
 }
 
 function getVisualFlowchartSnapshots() {
@@ -1914,7 +1910,10 @@ function getVisualFlowchartEntries() {
                 tierLabel: tierDef.title.split(':')[0].trim(),
                 isCurrent,
                 canRevisit: snapshot.tierId === currentTierId && !isCurrent,
-                variant
+                variant,
+                // Step 1 of every tier tends to be the most text-heavy card
+                // (principles/definitions), so it gets extra width for readability.
+                isTierFirstStep: index === 0
             });
         });
     });
@@ -2033,7 +2032,6 @@ function openVisualFlowchartModal() {
     refreshVisualFlowchartModal();
     requestAnimationFrame(() => {
         modal.classList.add('visual-flowchart-modal-visible');
-        fitVisualFlowchart();
         modal.querySelector('.visual-flowchart-close')?.focus();
     });
 }
@@ -2130,16 +2128,31 @@ function refreshVisualFlowchartModal() {
     const entries = getVisualFlowchartEntries();
     const items = buildVisualFlowchartDisplayItems(entries);
     const cardWidth = 260;
+    // Step 1 of each tier (and the live/interactive card) carries the most text,
+    // so it gets extra width for readability instead of the standard card width.
+    const wideCardWidth = 340;
+    const interactiveCardWidth = 360;
+    const getItemCardWidth = item => {
+        if (item.type === 'entry') {
+            if (item.entry.isCurrent && item.entry.node.type !== 'endpoint') return interactiveCardWidth;
+            if (item.entry.isTierFirstStep) return wideCardWidth;
+        }
+        return cardWidth;
+    };
     const columnGap = 90;
     const rowGap = 180;
     let routeRow = 0;
+    let cursorX = 90;
     const positions = items.map((item, index) => {
         if (index > 0) {
             const priorVariant = items[index - 1].variant;
             if (priorVariant === 'effective') routeRow -= 1;
             if (priorVariant === 'ineffective') routeRow += 1;
         }
-        return { x: 90 + index * (cardWidth + columnGap), routeRow };
+        const width = getItemCardWidth(item);
+        const position = { x: cursorX, routeRow, width };
+        cursorX += width + columnGap;
+        return position;
     });
     const rows = positions.map(position => position.routeRow);
     const minRow = Math.min(0, ...rows);
@@ -2147,13 +2160,13 @@ function refreshVisualFlowchartModal() {
     const cardMidY = 90;
     const topPadding = cardMidY - minRow * rowGap;
     positions.forEach(position => { position.y = topPadding + position.routeRow * rowGap; });
-    const stageWidth = Math.max(900, 180 + items.length * (cardWidth + columnGap));
+    const stageWidth = Math.max(900, cursorX - columnGap + 90);
     const stageHeight = Math.max(560, topPadding + maxRow * rowGap + 460);
 
     const connectorHtml = items.slice(1).map((item, index) => {
         const from = positions[index];
         const to = positions[index + 1];
-        const startX = from.x + cardWidth;
+        const startX = from.x + from.width;
         const startY = from.y + cardMidY;
         const endX = to.x;
         const endY = to.y + cardMidY;
@@ -2171,7 +2184,7 @@ function refreshVisualFlowchartModal() {
                 ? t('fc_visual_tier_collapsed')(tierNum, item.entries.length)
                 : `${item.tierLabel} · ${item.entries.length} steps`;
             return `<button type="button" class="visual-flowchart-card visual-flowchart-card-collapsed visual-flowchart-card-${escapeAttr(variant)}"
-                        style="left:${position.x}px;top:${position.y}px" onclick="toggleVisualFlowchartTier('${escapeAttr(item.tierId)}')" aria-label="${escapeHtml(collapsedLabel)}">
+                        style="left:${position.x}px;top:${position.y}px;width:${position.width}px" onclick="toggleVisualFlowchartTier('${escapeAttr(item.tierId)}')" aria-label="${escapeHtml(collapsedLabel)}">
                     <span class="visual-flowchart-tier-chip">${escapeHtml(item.tierLabel)}</span>
                     <span class="visual-flowchart-card-icon"><span class="material-symbols-rounded" aria-hidden="true" translate="no">unfold_more</span></span>
                     <span class="visual-flowchart-card-copy">
@@ -2188,8 +2201,8 @@ function refreshVisualFlowchartModal() {
         const revisit = tag === 'button'
             ? ` type="button" data-visual-revisit="${escapeAttr(entry.node.id)}" aria-label="${escapeHtml(t('fc_revisit'))}: ${escapeAttr(getStepShortTitle(entry.node))}"`
             : '';
-        return `<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}"
-                    style="left:${position.x}px;top:${position.y}px" ${revisit}>
+        return `<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}${!isInteractive && entry.isTierFirstStep ? ' visual-flowchart-card-wide' : ''}"
+                    style="left:${position.x}px;top:${position.y}px;width:${position.width}px" ${revisit}>
                 <span class="visual-flowchart-tier-chip">${escapeHtml(entry.tierLabel)}</span>
                 <span class="visual-flowchart-card-icon">${getStepTypeIcon(entry.node.type)}</span>
                 <span class="visual-flowchart-card-copy">
@@ -2224,14 +2237,24 @@ function refreshVisualFlowchartModal() {
     if (sourceStep && activeHost) activeHost.appendChild(sourceStep);
 
     wireVisualFlowchartPanZoom(viewport);
+    const state = appState.visualFlowchartModal;
     const activeIndex = items.findIndex(item => item.type === 'entry' && item.entry.isCurrent);
     const activePosition = activeIndex !== -1 ? positions[activeIndex] : null;
-    if (activePosition) {
+    const firstPosition = positions[0];
+    if (!state.hasPositioned && firstPosition) {
+        // First time the modal opens, anchor step 1 fully on-screen at the left
+        // edge (rather than centring/fitting the whole stage) so the pathway
+        // reads left-to-right from a stable, fully-visible starting point.
+        const edgePadding = 40;
+        state.scale = 1;
+        state.x = edgePadding - firstPosition.x * state.scale;
+        state.y = viewport.clientHeight / 2 - (firstPosition.y + cardMidY) * state.scale;
+        state.hasPositioned = true;
+    } else if (activePosition) {
         // Bring the in-progress card into view near the trailing edge rather than
         // forcing it to the dead centre, so more of the completed pathway stays visible.
-        const state = appState.visualFlowchartModal;
         const edgePadding = 70;
-        state.x = viewport.clientWidth - edgePadding - (activePosition.x + cardWidth) * state.scale;
+        state.x = viewport.clientWidth - edgePadding - (activePosition.x + activePosition.width) * state.scale;
         state.y = viewport.clientHeight / 2 - (activePosition.y + cardMidY) * state.scale;
     }
     applyVisualFlowchartTransform();
