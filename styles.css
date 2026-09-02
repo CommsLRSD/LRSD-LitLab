@@ -24,13 +24,13 @@
   --accent-dark: #c47c00;
   --accent-light: #fff3c7;
 
-  /* Fun pastel card palette */
-  --card-yellow-bg: #fff8c5;
-  --card-yellow-border: #f5c518;
-  --card-pink-bg: #fce4ec;
-  --card-pink-border: #f06292;
-  --card-blue-bg: #e3f2fd;
-  --card-blue-border: #64b5f6;
+  /* Fun pastel card palette – aligned with the logo's teal / yellow / red-orange */
+  --card-yellow-bg: #fef2da;
+  --card-yellow-border: #faad0a;
+  --card-pink-bg: #fce7e3;
+  --card-pink-border: #ee5f48;
+  --card-blue-bg: #daf1f3;
+  --card-blue-border: #0ea8b1;
   --card-mint-bg: #e8f5e9;
   --card-mint-border: #66bb6a;
 
@@ -432,10 +432,47 @@ strong { font-weight: 600; }
   50% { transform: scale(1.12); }
 }
 
-/* Collapsed: icon-only, labels and badges hidden, tooltip on hover via title attr */
+/* Collapsed: icon-only, labels and badges hidden, stylized tooltip on hover (see .side-nav-tooltip) */
 .side-nav.collapsed .nav-link { justify-content: center; padding: 0.65rem; }
 .side-nav.collapsed .nav-link-label,
 .side-nav.collapsed .nav-badge { display: none; }
+
+/* Tooltip shown to the right of the cursor for collapsed side-nav items (positioned via JS) */
+.side-nav-tooltip {
+  position: fixed;
+  z-index: 1300;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(0, -50%) translateX(-6px);
+  transition: opacity var(--duration) var(--ease),
+              transform var(--duration) var(--ease),
+              visibility var(--duration) var(--ease);
+}
+
+.side-nav-tooltip::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: var(--primary);
+}
+
+.side-nav-tooltip.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -50%) translateX(0);
+}
 
 /* Push page content over to make room for the fixed side nav (desktop only) */
 .main-content { margin-left: var(--side-nav-width); transition: margin-left var(--duration-slow) var(--ease); }
@@ -644,6 +681,17 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
   text-align: left;
 }
 
+.hero-logo {
+  display: block;
+  height: 52px;
+  width: auto;
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 0.35rem 0.6rem;
+  margin-bottom: var(--space-md);
+  box-shadow: var(--shadow-md);
+}
+
 .hero-eyebrow {
   display: inline-block;
   font-size: 0.8rem;
@@ -721,11 +769,14 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
     grid-template-columns: 1fr;
   }
   .hero-content {
-    text-align: center;
+    text-align: left;
+  }
+  .hero-logo {
+    margin-left: 0;
   }
   .hero-subtitle {
     max-width: 100%;
-    margin: 0 auto;
+    margin: 0;
   }
   .hero-photo-wrap {
     display: none;

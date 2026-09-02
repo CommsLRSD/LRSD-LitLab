@@ -94,6 +94,11 @@ function applyTranslations() {
         const val = t(key);
         if (typeof val === 'string') el.textContent = val;
     });
+    // Keep the collapsed side-nav hover tooltips in sync with the current language
+    document.querySelectorAll('.side-nav .nav-link').forEach(link => {
+        const label = link.querySelector('.nav-link-label');
+        if (label) link.dataset.tooltip = label.textContent;
+    });
     // Update the <html lang> attribute
     document.documentElement.lang = appState.language;
     // Update the page <title>
@@ -388,6 +393,46 @@ function setupSidebarToggle() {
     toggleBtn.addEventListener('click', () => {
         setSidebarCollapsed(!sideNav.classList.contains('collapsed'));
     });
+
+    setupSideNavTooltips(sideNav);
+}
+
+// Stylized hover tooltip for the collapsed (icon-only) side nav, shown to the
+// right of the pointer/link so users can still tell what each icon means.
+function setupSideNavTooltips(sideNav) {
+    let tooltipEl = document.getElementById('side-nav-tooltip');
+    if (!tooltipEl) {
+        tooltipEl = document.createElement('div');
+        tooltipEl.id = 'side-nav-tooltip';
+        tooltipEl.className = 'side-nav-tooltip';
+        tooltipEl.setAttribute('role', 'tooltip');
+        document.body.appendChild(tooltipEl);
+    }
+
+    const showTooltip = (link) => {
+        if (!sideNav.classList.contains('collapsed')) return;
+        const label = link.dataset.tooltip || link.querySelector('.nav-link-label')?.textContent;
+        if (!label) return;
+        const rect = link.getBoundingClientRect();
+        tooltipEl.textContent = label;
+        tooltipEl.style.left = `${rect.right + 12}px`;
+        tooltipEl.style.top = `${rect.top + rect.height / 2}px`;
+        tooltipEl.classList.add('is-visible');
+    };
+
+    const hideTooltip = () => {
+        tooltipEl.classList.remove('is-visible');
+    };
+
+    sideNav.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('mouseenter', () => showTooltip(link));
+        link.addEventListener('mouseleave', hideTooltip);
+        link.addEventListener('focus', () => showTooltip(link));
+        link.addEventListener('blur', hideTooltip);
+    });
+
+    // Hide immediately if the sidebar expands again or is scrolled.
+    sideNav.addEventListener('scroll', hideTooltip);
 }
 
 function setSidebarCollapsed(collapsed) {
@@ -398,6 +443,7 @@ function setSidebarCollapsed(collapsed) {
     document.body.classList.toggle('side-nav-collapsed', collapsed);
     toggleBtn.setAttribute('aria-expanded', String(!collapsed));
     toggleBtn.setAttribute('aria-label', collapsed ? 'Expand navigation' : 'Collapse navigation');
+    document.getElementById('side-nav-tooltip')?.classList.remove('is-visible');
     localStorage.setItem(SIDE_NAV_COLLAPSED_KEY, String(collapsed));
 }
 
