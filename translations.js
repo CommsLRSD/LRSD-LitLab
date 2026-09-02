@@ -25,6 +25,23 @@ const TRANSLATIONS = {
         nav_lang_toggle_label: 'Switch to French',
         nav_lang_code: 'FR',
 
+        // ── PWA install (button, banner, instructions modal) ──
+        install_btn: 'Install App',
+        install_btn_label: 'Install app',
+        install_banner_region: 'Install LitLab',
+        install_banner_title: 'Install LitLab',
+        install_banner_desc: 'Add LitLab to your device for quick, full-screen access.',
+        install_banner_install: 'Install',
+        install_banner_dismiss: 'Not now',
+        install_banner_dismiss_label: 'Dismiss install suggestion',
+        install_modal_title: 'Install LitLab',
+        install_modal_close_label: 'Close',
+        install_modal_desc: 'Your browser does not offer a one-tap install. Follow these steps to add LitLab to your home screen:',
+        install_modal_step1: 'Tap the Share button.',
+        install_modal_step2: 'Select \u201cAdd to Home Screen.\u201d',
+        install_modal_step3: 'Tap \u201cAdd.\u201d',
+        install_modal_done: 'Got it',
+
         // ── Home hero ──
         hero_eyebrow: 'LRSD Literacy Resource',
         hero_title_html: 'Building <span class="accent-word">Lifelong</span><br>Literacy Together',
@@ -288,6 +305,23 @@ const TRANSLATIONS = {
         nav_history: 'Historique',
         nav_lang_toggle_label: 'Passer à l\'anglais',
         nav_lang_code: 'EN',
+
+        // ── PWA install (button, banner, instructions modal) ──
+        install_btn: 'Installer l\'application',
+        install_btn_label: 'Installer l\'application',
+        install_banner_region: 'Installer LitLab',
+        install_banner_title: 'Installer LitLab',
+        install_banner_desc: 'Ajoutez LitLab à votre appareil pour un accès rapide en plein écran.',
+        install_banner_install: 'Installer',
+        install_banner_dismiss: 'Plus tard',
+        install_banner_dismiss_label: 'Masquer la suggestion d\'installation',
+        install_modal_title: 'Installer LitLab',
+        install_modal_close_label: 'Fermer',
+        install_modal_desc: 'Votre navigateur n\'offre pas d\'installation en un seul geste. Suivez ces étapes pour ajouter LitLab à votre écran d\'accueil :',
+        install_modal_step1: 'Touchez le bouton Partager.',
+        install_modal_step2: 'Sélectionnez \u00ab\u00a0Sur l\'écran d\'accueil\u00a0\u00bb.',
+        install_modal_step3: 'Touchez \u00ab\u00a0Ajouter\u00a0\u00bb.',
+        install_modal_done: 'Compris',
 
         // ── Home hero ──
         hero_eyebrow: 'Ressource en littératie de la DSLR',
