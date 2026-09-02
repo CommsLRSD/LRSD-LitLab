@@ -681,17 +681,6 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
   text-align: left;
 }
 
-.hero-logo {
-  display: block;
-  height: 52px;
-  width: auto;
-  background: #fff;
-  border-radius: var(--radius-lg);
-  padding: 0.35rem 0.6rem;
-  margin-bottom: var(--space-md);
-  box-shadow: var(--shadow-md);
-}
-
 .hero-eyebrow {
   display: inline-block;
   font-size: 0.8rem;
@@ -770,9 +759,6 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
   }
   .hero-content {
     text-align: left;
-  }
-  .hero-logo {
-    margin-left: 0;
   }
   .hero-subtitle {
     max-width: 100%;
@@ -1067,9 +1053,9 @@ body.side-nav-collapsed .site-footer { margin-left: var(--side-nav-collapsed-wid
   margin-top: var(--space-2xl);
   padding: var(--space-2xl) 0;
   overflow: hidden;
-  background-color: #ffd88a;
+  background-color: #e2f2eb;
   background-image:
-    linear-gradient(135deg, #ffe9b0 0%, #ffcf7a 40%, #ff9f7a 75%, #ff7aa2 100%),
+    linear-gradient(135deg, #fef2da 0%, #daf1f3 42%, #e8f5e9 70%, #fce7e3 100%),
     radial-gradient(circle, rgba(27, 45, 107, 0.12) 1.5px, transparent 1.5px);
   background-size: 100% 100%, 26px 26px;
   background-position: center, center;
@@ -9035,6 +9021,12 @@ body.install-modal-open { overflow: hidden; }
   color: var(--text-on-primary);
   font-size: 0.8rem;
   font-weight: 700;
+  flex-shrink: 0;
+}
+
+.install-step-icon {
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
 }
 
