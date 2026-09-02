@@ -8685,10 +8685,14 @@ button.horiz-bubble-done:focus-visible {
   outline-offset: 2px;
 }
 
-/* Active (in-progress) bubble */
+/* Active (in-progress) bubble.
+   The outline uses the same colour the step will keep once it is completed
+   (its step-type colour) rather than the Tier colour; the background stays
+   white until the step is done, when the type/variant shading fills in. */
 .horiz-bubble-active {
-  border-color: var(--tier-color, var(--step));
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tier-color, var(--step)) 14%, transparent);
+  background: var(--bg);
+  border-color: var(--bubble-outline, var(--step));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bubble-outline, var(--step)) 14%, transparent);
 }
 
 /* Small checkmark badge on completed bubbles (top-right corner) */
@@ -8748,6 +8752,13 @@ button.horiz-bubble-done:focus-visible {
    (.journey-map-item.journey-map-type-* / journey-map-variant-*) and the
    final journey summary bubbles (.anim-step-bubble / .anim-bubble-*), so a
    step is styled the same way in every view. */
+/* Outline colour per step type — shared by the in-progress bubble and the
+   completed bubble so the outline colour does not change on completion. */
+.horiz-bubble-type-checklist { --bubble-outline: var(--step-checklist); }
+.horiz-bubble-type-selection { --bubble-outline: var(--step-selection); }
+.horiz-bubble-type-decision  { --bubble-outline: var(--step-decision); }
+.horiz-bubble-type-info      { --bubble-outline: var(--step-info); }
+
 .horiz-bubble-done.horiz-bubble-type-checklist {
   background: var(--step-checklist-bg);
   border-color: var(--step-checklist);
