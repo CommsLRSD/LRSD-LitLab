@@ -3579,9 +3579,12 @@ body.evidence-modal-open { overflow: hidden; }
   background: color-mix(in srgb, var(--tier-color, var(--step)) 4%, var(--bg));
 }
 
+/* Ticked points keep the exact same text size and weight; the selection is shown
+   with colour and a solid accent bar down the left edge instead. */
 .checklist-line.checked {
   border-color: var(--tier-color, var(--step));
   background: color-mix(in srgb, var(--tier-color, var(--step)) 8%, var(--bg));
+  box-shadow: inset 4px 0 0 var(--tier-color, var(--step));
 }
 
 .checklist-line input[type="checkbox"] {
@@ -3621,16 +3624,18 @@ body.evidence-modal-open { overflow: hidden; }
   font-weight: 500;
   line-height: 1.45;
   color: var(--text);
-  transition: font-size var(--duration) var(--ease),
-              font-weight var(--duration) var(--ease),
-              color var(--duration) var(--ease);
+  transition: color var(--duration) var(--ease);
 }
 
-/* Ticked points read slightly bigger and bolder */
+/* Ticked points read exactly the same as unticked ones – no size or weight jump */
 .checklist-line.checked .checklist-line-text {
-  font-size: 0.94rem;
-  font-weight: 700;
   color: var(--text);
+}
+
+.checklist-line-link {
+  color: var(--tier-color, var(--step));
+  font-weight: inherit;
+  text-decoration: underline;
 }
 
 .checklist-line input[type="checkbox"]:focus-visible + .checklist-line-box {
@@ -7017,6 +7022,37 @@ body.step-review-modal-open { overflow: hidden; }
 
   .visual-flowchart-card-collapsed:hover {
     opacity: 1;
+  }
+
+  /* One-click pill that folds an expanded (completed) tier back into its
+     single summary card, sitting just above the tier's first step. */
+  .visual-flowchart-collapse-tier {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    background: var(--bg);
+    color: var(--text-light);
+    font: inherit;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(12, 49, 90, 0.12);
+    z-index: 2;
+  }
+
+  .visual-flowchart-collapse-tier:hover {
+    color: var(--text);
+    border-color: var(--step);
+  }
+
+  .visual-flowchart-collapse-tier .material-symbols-rounded {
+    font-size: 16px;
   }
 
   .visual-flowchart-tier-chip {
