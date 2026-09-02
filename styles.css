@@ -4158,7 +4158,7 @@ body.evidence-modal-open { overflow: hidden; }
 
 /* Endpoint */
 .endpoint-card {
-  text-align: center;
+  text-align: left;
   padding: var(--space-lg);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
@@ -4182,8 +4182,8 @@ body.evidence-modal-open { overflow: hidden; }
 .endpoint-actions {
   display: flex;
   gap: var(--space-xs);
-  justify-content: center;
-  margin-top: var(--space-xs);
+  justify-content: flex-end;
+  margin-top: var(--space-md);
   flex-wrap: wrap;
 }
 
