@@ -8725,3 +8725,299 @@ button.horiz-bubble-done:focus-visible .horiz-bubble-revisit {
     padding: var(--space-sm) var(--space-md);
   }
 }
+
+/* ------------------------------------------------------------
+   PWA INSTALL — top-nav button, first-visit banner, iOS modal
+   ------------------------------------------------------------ */
+
+/* Install App button in the top navigation. It is rendered with the `hidden`
+   attribute and only revealed by app.js when installation is possible. */
+.install-app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: var(--radius-pill);
+  color: var(--text-on-primary);
+  cursor: pointer;
+  padding: 5px 14px;
+  font-family: "Nunito", var(--font-ui, inherit);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  flex-shrink: 0;
+  transition: background var(--duration) var(--ease),
+              border-color var(--duration) var(--ease),
+              transform var(--duration) var(--ease),
+              box-shadow var(--duration) var(--ease);
+}
+
+.install-app-btn[hidden] { display: none; }
+
+.install-app-btn:hover,
+.install-app-btn:focus-visible {
+  background: var(--primary-light);
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.install-app-btn .material-symbols-rounded { font-size: 18px; }
+
+@media (max-width: 560px) {
+  /* Icon-only on very small screens to protect the nav layout. */
+  .install-app-btn { padding: 6px 9px; }
+  .install-app-btn-label { display: none; }
+}
+
+/* ── First-visit install banner ──────────────────────────────── */
+.install-banner {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-md);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: min(560px, calc(100% - 2 * var(--space-md)));
+  padding: var(--space-md);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  /* Start slightly below and transparent; app.js adds the visible class. */
+  opacity: 0;
+  transform: translate(-50%, 16px);
+  transition: opacity var(--duration-slow) var(--ease),
+              transform var(--duration-slow) var(--ease);
+}
+
+.install-banner[hidden] { display: none; }
+
+.install-banner.install-banner-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.install-banner-icon {
+  font-size: 26px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.install-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.install-banner-text strong {
+  font-family: "Nunito", inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.install-banner-text span {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.install-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.install-banner-btn {
+  border-radius: var(--radius-pill);
+  padding: 7px 15px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background var(--duration) var(--ease),
+              color var(--duration) var(--ease),
+              border-color var(--duration) var(--ease);
+}
+
+.install-banner-btn-primary {
+  background: var(--primary);
+  border: 1.5px solid var(--primary);
+  color: var(--text-on-primary);
+}
+
+.install-banner-btn-primary:hover,
+.install-banner-btn-primary:focus-visible {
+  background: var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+.install-banner-btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.install-banner-btn-ghost:hover,
+.install-banner-btn-ghost:focus-visible {
+  background: var(--bg-muted);
+  color: var(--text);
+}
+
+@media (max-width: 560px) {
+  .install-banner {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+  .install-banner-actions { width: 100%; justify-content: flex-end; }
+}
+
+/* ── Install instructions modal (iOS / unsupported browsers) ─── */
+.install-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgba(15, 26, 40, 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease);
+}
+
+.install-modal-overlay[hidden] { display: none; }
+
+.install-modal-overlay.install-modal-visible { opacity: 1; }
+
+/* Prevent the page behind the dialog from scrolling. */
+body.install-modal-open { overflow: hidden; }
+
+.install-modal {
+  width: min(440px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(12px) scale(0.98);
+  transition: transform var(--duration-slow) var(--ease);
+}
+
+.install-modal-overlay.install-modal-visible .install-modal {
+  transform: translateY(0) scale(1);
+}
+
+.install-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-lg) var(--space-sm);
+}
+
+.install-modal-title {
+  font-family: "Nunito", inherit;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.install-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  background: var(--bg-muted);
+  flex-shrink: 0;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+
+.install-modal-close:hover,
+.install-modal-close:focus-visible {
+  background: var(--border);
+  color: var(--text);
+}
+
+.install-modal-body { padding: 0 var(--space-lg); }
+
+.install-modal-desc {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.install-modal-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.install-modal-steps li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--step-bg);
+  border-radius: var(--radius);
+}
+
+.install-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.install-step-text {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.install-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+}
+
+.install-modal-btn {
+  background: var(--primary);
+  border-radius: var(--radius-pill);
+  color: var(--text-on-primary);
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: background var(--duration) var(--ease);
+}
+
+.install-modal-btn:hover,
+.install-modal-btn:focus-visible { background: var(--primary-light); }
+
+/* Respect users who prefer reduced motion: show/hide without movement. */
+@media (prefers-reduced-motion: reduce) {
+  .install-banner,
+  .install-modal-overlay,
+  .install-modal,
+  .install-app-btn {
+    transition: none;
+  }
+  .install-banner { transform: translate(-50%, 0); }
+  .install-modal { transform: none; }
+}

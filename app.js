@@ -8453,3 +8453,269 @@ function initBubbles(section) {
         });
     }, { passive: true });
 }
+
+// ============================================
+// PWA Installation (Install App button, banner, iOS instructions)
+// ============================================
+// Three browser situations are handled:
+//   1. Chrome / Edge / Android browsers  → the browser fires the
+//      `beforeinstallprompt` event, which we store and replay when the user
+//      clicks "Install App" so the native install dialog appears.
+//   2. iPhone / iPad Safari              → no native prompt exists, so the
+//      button opens a modal explaining the Share → "Add to Home Screen" flow.
+//   3. Already installed / unsupported   → the button stays hidden.
+
+// localStorage key remembering that the user dismissed the install banner.
+const INSTALL_BANNER_DISMISSED_KEY = 'litlab-install-banner-dismissed';
+
+// Holds the deferred `beforeinstallprompt` event until the user asks to install.
+let deferredInstallPrompt = null;
+// Element that had focus before the modal opened, so focus can be restored.
+let installModalLastFocus = null;
+
+// True on iPhone / iPad / iPod (including iPadOS, which reports itself as a Mac
+// but exposes a touch screen). These devices can only install via Safari's
+// Share → "Add to Home Screen" flow.
+function isIosDevice() {
+    const ua = navigator.userAgent || '';
+    const iOsUa = /iPad|iPhone|iPod/.test(ua);
+    const iPadOs = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+    return iOsUa || iPadOs;
+}
+
+// True when the page is already running as an installed app: either in a
+// standalone display mode (Chrome/Edge/Android) or via Safari's legacy
+// `navigator.standalone` flag (iOS).
+function isAppInstalled() {
+    const standaloneDisplay = window.matchMedia &&
+        (window.matchMedia('(display-mode: standalone)').matches ||
+         window.matchMedia('(display-mode: window-controls-overlay)').matches ||
+         window.matchMedia('(display-mode: minimal-ui)').matches);
+    return Boolean(standaloneDisplay || window.navigator.standalone === true);
+}
+
+// Whether the install banner should still be offered (not dismissed before).
+function isInstallBannerDismissed() {
+    try {
+        return localStorage.getItem(INSTALL_BANNER_DISMISSED_KEY) === 'true';
+    } catch (e) {
+        // Private browsing modes can throw on localStorage access.
+        return false;
+    }
+}
+
+// Remember the user's choice so the banner is not shown again.
+function rememberInstallBannerDismissed() {
+    try {
+        localStorage.setItem(INSTALL_BANNER_DISMISSED_KEY, 'true');
+    } catch (e) {
+        /* Ignore storage failures — the banner simply reappears next visit. */
+    }
+}
+
+// Reveal (or hide) the Install App button in the top navigation.
+function setInstallButtonVisible(visible) {
+    const btn = document.getElementById('install-app-btn');
+    if (!btn) return;
+    btn.hidden = !visible;
+}
+
+// Show the first-visit banner, unless it was dismissed or the app is installed.
+function showInstallBanner() {
+    if (isAppInstalled() || isInstallBannerDismissed()) return;
+    const banner = document.getElementById('install-banner');
+    if (!banner || !banner.hidden) return;
+    banner.hidden = false;
+    // Next frame so the browser can transition from the hidden start state.
+    requestAnimationFrame(() => banner.classList.add('install-banner-visible'));
+}
+
+// Hide the banner. `remember` persists the dismissal in localStorage.
+function hideInstallBanner(remember) {
+    const banner = document.getElementById('install-banner');
+    if (remember) rememberInstallBannerDismissed();
+    if (!banner || banner.hidden) return;
+    banner.classList.remove('install-banner-visible');
+    // Wait for the slide-out transition before removing it from the a11y tree.
+    setTimeout(() => { banner.hidden = true; }, 260);
+}
+
+// Hide every install affordance (used once the app has been installed).
+function hideAllInstallUi() {
+    setInstallButtonVisible(false);
+    hideInstallBanner(false);
+    closeInstallModal();
+}
+
+// Trigger the install flow: native prompt when available, instructions modal
+// otherwise (iOS Safari and any browser without `beforeinstallprompt`).
+async function triggerInstall() {
+    if (deferredInstallPrompt) {
+        const promptEvent = deferredInstallPrompt;
+        // A deferred prompt can only be used once.
+        deferredInstallPrompt = null;
+        promptEvent.prompt();
+        try {
+            const choice = await promptEvent.userChoice;
+            if (choice && choice.outcome === 'accepted') {
+                hideAllInstallUi();
+            } else {
+                // Declined: keep the button so they can try again later.
+                hideInstallBanner(true);
+            }
+        } catch (e) {
+            console.warn('Install prompt failed:', e);
+        }
+        return;
+    }
+    // No native prompt — explain the manual steps instead.
+    openInstallModal();
+}
+
+// ── Install instructions modal ──────────────────────────────────────
+// Opens the modal, moves focus inside it and traps focus until it closes.
+function openInstallModal() {
+    const overlay = document.getElementById('install-modal');
+    if (!overlay || !overlay.hidden) return;
+    installModalLastFocus = document.activeElement;
+    overlay.hidden = false;
+    document.body.classList.add('install-modal-open');
+    requestAnimationFrame(() => overlay.classList.add('install-modal-visible'));
+
+    // Move focus to the close button so keyboard and screen-reader users start
+    // inside the dialog.
+    const closeBtn = document.getElementById('install-modal-close');
+    if (closeBtn) closeBtn.focus();
+
+    overlay.addEventListener('click', handleInstallModalOverlayClick);
+    document.addEventListener('keydown', handleInstallModalKeydown);
+}
+
+function closeInstallModal() {
+    const overlay = document.getElementById('install-modal');
+    if (!overlay || overlay.hidden) return;
+    overlay.classList.remove('install-modal-visible');
+    document.body.classList.remove('install-modal-open');
+    overlay.removeEventListener('click', handleInstallModalOverlayClick);
+    document.removeEventListener('keydown', handleInstallModalKeydown);
+    setTimeout(() => { overlay.hidden = true; }, 220);
+    // Restore focus to whatever opened the dialog.
+    if (installModalLastFocus && typeof installModalLastFocus.focus === 'function') {
+        installModalLastFocus.focus();
+    }
+    installModalLastFocus = null;
+}
+
+// Clicking the dimmed backdrop (but not the dialog itself) closes the modal.
+function handleInstallModalOverlayClick(event) {
+    if (event.target === event.currentTarget) closeInstallModal();
+}
+
+// Escape closes the modal; Tab / Shift+Tab cycle within it (focus trap).
+function handleInstallModalKeydown(event) {
+    if (event.key === 'Escape') {
+        event.preventDefault();
+        closeInstallModal();
+        return;
+    }
+    if (event.key !== 'Tab') return;
+
+    const overlay = document.getElementById('install-modal');
+    const dialog = overlay ? overlay.querySelector('.install-modal') : null;
+    if (!dialog) return;
+    const focusable = Array.from(dialog.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )).filter(el => !el.disabled && el.getClientRects().length > 0);
+    if (!focusable.length) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    }
+}
+
+// ── Wiring ──────────────────────────────────────────────────────────
+function setupPwaInstall() {
+    const installBtn = document.getElementById('install-app-btn');
+    const bannerInstallBtn = document.getElementById('install-banner-install');
+    const bannerDismissBtn = document.getElementById('install-banner-dismiss');
+    const modalCloseBtn = document.getElementById('install-modal-close');
+    const modalDoneBtn = document.getElementById('install-modal-done');
+
+    if (installBtn) installBtn.addEventListener('click', triggerInstall);
+    if (bannerInstallBtn) {
+        bannerInstallBtn.addEventListener('click', () => {
+            hideInstallBanner(true);
+            triggerInstall();
+        });
+    }
+    if (bannerDismissBtn) bannerDismissBtn.addEventListener('click', () => hideInstallBanner(true));
+    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeInstallModal);
+    if (modalDoneBtn) modalDoneBtn.addEventListener('click', closeInstallModal);
+
+    // Already installed → never offer installation.
+    if (isAppInstalled()) {
+        hideAllInstallUi();
+        return;
+    }
+
+    // iOS: no `beforeinstallprompt` will ever fire, so show the button (and the
+    // first-visit banner) immediately; both lead to the instructions modal.
+    if (isIosDevice()) {
+        setInstallButtonVisible(true);
+        showInstallBanner();
+    }
+
+    // Chrome / Edge / Android: the browser tells us the app is installable.
+    window.addEventListener('beforeinstallprompt', event => {
+        // Prevent the browser's own mini-infobar so we can use our own UI.
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        setInstallButtonVisible(true);
+        showInstallBanner();
+    });
+
+    // Fired after a successful installation (native prompt or browser menu).
+    window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        hideAllInstallUi();
+    });
+
+    // The display mode can change without a reload (e.g. launching the
+    // installed app), so keep the UI in sync.
+    if (window.matchMedia) {
+        const standaloneQuery = window.matchMedia('(display-mode: standalone)');
+        const onDisplayModeChange = e => { if (e.matches) hideAllInstallUi(); };
+        if (typeof standaloneQuery.addEventListener === 'function') {
+            standaloneQuery.addEventListener('change', onDisplayModeChange);
+        } else if (typeof standaloneQuery.addListener === 'function') {
+            standaloneQuery.addListener(onDisplayModeChange);
+        }
+    }
+}
+
+// Register the service worker. A service worker is required before browsers
+// consider the site installable (and it provides an offline fallback).
+function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(error => {
+            console.warn('Service worker registration failed:', error);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupPwaInstall();
+    registerServiceWorker();
+});
+
+// PWA install exports (used by inline handlers / debugging)
+window.triggerInstall = triggerInstall;
+window.openInstallModal = openInstallModal;
+window.closeInstallModal = closeInstallModal;
