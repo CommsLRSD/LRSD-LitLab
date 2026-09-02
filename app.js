@@ -1413,29 +1413,12 @@ function updateJourneyMapTierLabel(tierId) {
     if (titleEl) titleEl.textContent = getTierGateLabel(tierId);
 }
 
-// Show an explicit "Go to Tier #" transition step so the user is clearly aware
-// they are moving from one tier to another before the next tier's flow begins.
-function showGoToTierStep(tierId) {
-    if (document.getElementById('visual-flowchart-modal')) {
-        // Don't silently collapse the finishing tier in the visual pathway —
-        // append a review-and-continue card instead, and only switch tiers
-        // (which is what makes the finished tier collapse) once the user
-        // explicitly clicks Continue on it.
-        if (appState.visualFlowchart) appState.visualFlowchart.pendingTierTransition = tierId;
-        refreshVisualFlowchartModal();
-        return;
-    }
-    const stepsContainer = getActiveStepTarget();
-    const flowchartDef = getFlowchartDefs()[tierId];
-    if (!stepsContainer || !flowchartDef) {
-        switchToTier(tierId);
-        return;
-    }
-
+// Build the "Go to Tier #" confirmation markup so every view (standard list,
+// horizontal summary, visual pathway) can render the exact same screen.
+function buildGoToTierStepHtml(tierId, flowchartDef) {
     const num = String(tierId).replace('tier', '');
     const subtitle = flowchartDef.title.split(':').slice(1).join(':').trim();
-
-    stepsContainer.innerHTML = `
+    return `
         <div class="go-to-tier-step go-to-tier-${num}">
             <div class="go-to-tier-badge">${escapeHtml(t('fc_tier_label'))} ${num}</div>
             <h2 class="go-to-tier-heading">${escapeHtml(t('go_to_tier'))} ${num}</h2>
@@ -1447,11 +1430,41 @@ function showGoToTierStep(tierId) {
             </button>
         </div>
     `;
+}
+
+// Show an explicit "Go to Tier #" transition step so the user is clearly aware
+// they are moving from one tier to another before the next tier's flow begins.
+// The pending state is always recorded on appState.visualFlowchart (not just
+// while the visual pathway modal happens to be open) so that switching to any
+// other view afterwards renders this exact same confirmation screen instead
+// of reverting to the raw endpoint card or leaving the user with no way to
+// continue.
+function showGoToTierStep(tierId) {
+    if (appState.visualFlowchart) {
+        appState.visualFlowchart.pendingTierTransition = tierId;
+        appState.visualFlowchart.pendingTierChoice = null;
+    }
 
     const prevBtn = document.getElementById('carousel-prev-btn');
     if (prevBtn) prevBtn.style.display = 'none';
+    completeJourneyMap(`${t('moving_to_tier')} ${String(tierId).replace('tier', '')}`);
 
-    completeJourneyMap(`${t('moving_to_tier')} ${num}`);
+    if (document.getElementById('visual-flowchart-modal')) {
+        // Don't silently collapse the finishing tier in the visual pathway —
+        // append a review-and-continue card instead, and only switch tiers
+        // (which is what makes the finished tier collapse) once the user
+        // explicitly clicks Continue on it.
+        refreshVisualFlowchartModal();
+        return;
+    }
+    const stepsContainer = getActiveStepTarget();
+    const flowchartDef = getFlowchartDefs()[tierId];
+    if (!stepsContainer || !flowchartDef) {
+        switchToTier(tierId);
+        return;
+    }
+
+    stepsContainer.innerHTML = buildGoToTierStepHtml(tierId, flowchartDef);
 
     requestAnimationFrame(() => {
         const step = stepsContainer.querySelector('.go-to-tier-step');
