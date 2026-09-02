@@ -232,6 +232,7 @@ const TRANSLATIONS = {
         fc_visual_zoom_out: 'Zoom out',
         fc_visual_zoom_in: 'Zoom in',
         fc_visual_fit: 'Fit pathway to screen',
+        fc_visual_canvas: 'Pathway canvas. Use arrow keys to move around.',
 
         // ── Flowchart program / language mini selector (shown beside the flowchart) ──
         fc_program_mini_label: 'Program',
@@ -534,6 +535,7 @@ const TRANSLATIONS = {
         fc_visual_zoom_out: 'Réduire',
         fc_visual_zoom_in: 'Agrandir',
         fc_visual_fit: 'Ajuster le parcours à l’écran',
+        fc_visual_canvas: 'Toile du parcours. Utilisez les touches fléchées pour vous déplacer.',
 
         // ── Flowchart program / language mini selector (shown beside the flowchart) ──
         fc_program_mini_label: 'Programme',

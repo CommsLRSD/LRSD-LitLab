@@ -6873,6 +6873,11 @@ body.step-review-modal-open { overflow: hidden; }
     cursor: grabbing;
   }
 
+  .visual-flowchart-viewport:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: -3px;
+  }
+
   .visual-flowchart-stage {
     position: absolute;
     top: 0;
@@ -7062,11 +7067,10 @@ body.step-review-modal-open { overflow: hidden; }
   }
 
   @media (max-width: 768px) {
-    .visual-flowchart-open-btn,
-    .visual-flowchart-modal {
-      display: none !important;
+      .visual-flowchart-open-btn {
+        display: none !important;
+      }
     }
-  }
 
   @media (prefers-reduced-motion: reduce) {
     .visual-flowchart-modal,
@@ -7583,7 +7587,7 @@ body.step-review-modal-open { overflow: hidden; }
 
 .journey-map-head {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr auto auto 1fr;
   align-items: center;
   padding: 1rem var(--space-lg);
   background: var(--bg);

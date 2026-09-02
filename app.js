@@ -1913,6 +1913,7 @@ function getVisualFlowchartEntries() {
                 tierId: snapshot.tierId,
                 tierLabel: tierDef.title.split(':')[0].trim(),
                 isCurrent,
+                canRevisit: snapshot.tierId === currentTierId && !isCurrent,
                 variant
             });
         });
@@ -1954,7 +1955,7 @@ function openVisualFlowchartModal() {
                     <span class="material-symbols-rounded" aria-hidden="true" translate="no">fit_screen</span>
                 </button>
             </div>
-            <div class="visual-flowchart-viewport" id="visual-flowchart-viewport">
+            <div class="visual-flowchart-viewport" id="visual-flowchart-viewport" tabindex="0" aria-label="${escapeHtml(t('fc_visual_canvas'))}">
                 <div class="visual-flowchart-stage" id="visual-flowchart-stage"></div>
             </div>
         </div>`;
@@ -1969,15 +1970,56 @@ function openVisualFlowchartModal() {
         previousFocus: document.activeElement
     };
     document.body.appendChild(modal);
+    const viewport = modal.querySelector('#visual-flowchart-viewport');
+    appState.visualFlowchartModal.inertElements = Array.from(document.body.children)
+        .filter(element => element !== modal && element instanceof HTMLElement)
+        .map(element => ({ element, wasInert: element.inert }));
+    appState.visualFlowchartModal.inertElements.forEach(({ element }) => { element.inert = true; });
     document.body.classList.add('visual-flowchart-modal-open');
     modal.addEventListener('click', event => {
         if (event.target === modal) closeVisualFlowchartModal();
     });
     const keyHandler = event => {
-        if (event.key === 'Escape') closeVisualFlowchartModal();
+        if (event.key === 'Escape') {
+            closeVisualFlowchartModal();
+            return;
+        }
+        if (event.key === 'Tab') {
+            const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (!modal.contains(document.activeElement)) {
+                event.preventDefault();
+                first.focus();
+            } else if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+        if (document.activeElement === viewport && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+            event.preventDefault();
+            const state = appState.visualFlowchartModal;
+            const panAmount = 60;
+            if (event.key === 'ArrowLeft') state.x += panAmount;
+            if (event.key === 'ArrowRight') state.x -= panAmount;
+            if (event.key === 'ArrowUp') state.y += panAmount;
+            if (event.key === 'ArrowDown') state.y -= panAmount;
+            applyVisualFlowchartTransform();
+        }
     };
     appState.visualFlowchartModal.keyHandler = keyHandler;
     document.addEventListener('keydown', keyHandler);
+    const desktopQuery = window.matchMedia('(min-width: 769px)');
+    const breakpointHandler = event => {
+        if (!event.matches) closeVisualFlowchartModal();
+    };
+    appState.visualFlowchartModal.desktopQuery = desktopQuery;
+    appState.visualFlowchartModal.breakpointHandler = breakpointHandler;
+    desktopQuery.addEventListener('change', breakpointHandler);
 
     refreshVisualFlowchartModal();
     requestAnimationFrame(() => {
@@ -1995,6 +2037,10 @@ function closeVisualFlowchartModal(options = {}) {
     const activeSlot = document.getElementById('journey-step-slot');
     if (activeStep && activeSlot) activeSlot.appendChild(activeStep);
     if (modalState?.keyHandler) document.removeEventListener('keydown', modalState.keyHandler);
+    if (modalState?.desktopQuery && modalState?.breakpointHandler) {
+        modalState.desktopQuery.removeEventListener('change', modalState.breakpointHandler);
+    }
+    modalState?.inertElements?.forEach(({ element, wasInert }) => { element.inert = wasInert; });
     document.body.classList.remove('visual-flowchart-modal-open');
     modal.classList.remove('visual-flowchart-modal-visible');
     const remove = () => {
@@ -2049,9 +2095,9 @@ function refreshVisualFlowchartModal() {
         const answer = entry.choice?.name || (entry.node.type === 'checklist' ? t('step_type_reviewed') : '');
         const variant = entry.variant || 'step1';
         const isInteractive = entry.isCurrent && entry.node.type !== 'endpoint';
-        const tag = !entry.isCurrent && entry.node.type !== 'endpoint' ? 'button' : 'article';
+        const tag = entry.canRevisit && entry.node.type !== 'endpoint' ? 'button' : 'article';
         const revisit = tag === 'button'
-            ? ` type="button" onclick="undoToStep('${escapeAttr(entry.node.id)}')" aria-label="${escapeHtml(t('fc_revisit'))}: ${escapeAttr(getStepShortTitle(entry.node))}"`
+            ? ` type="button" data-visual-revisit="${escapeAttr(entry.node.id)}" aria-label="${escapeHtml(t('fc_revisit'))}: ${escapeAttr(getStepShortTitle(entry.node))}"`
             : '';
         return `<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}"
                     style="left:${position.x}px;top:${position.y}px" ${revisit}>
@@ -2089,12 +2135,22 @@ function refreshVisualFlowchartModal() {
     if (sourceStep && activeHost) activeHost.appendChild(sourceStep);
 
     wireVisualFlowchartPanZoom(viewport);
+    const activePosition = positions[positions.length - 1];
+    if (activePosition && entries[entries.length - 1]?.isCurrent) {
+        const state = appState.visualFlowchartModal;
+        state.x = viewport.clientWidth / 2 - (activePosition.x + cardWidth / 2) * state.scale;
+        state.y = viewport.clientHeight / 2 - (activePosition.y + 100) * state.scale;
+    }
     applyVisualFlowchartTransform();
 }
 
 function wireVisualFlowchartPanZoom(viewport) {
     if (viewport.dataset.panZoomWired === 'true') return;
     viewport.dataset.panZoomWired = 'true';
+    viewport.addEventListener('click', event => {
+        const revisit = event.target.closest('[data-visual-revisit]');
+        if (revisit) undoToStep(revisit.dataset.visualRevisit);
+    });
     viewport.addEventListener('pointerdown', event => {
         if (event.target.closest('button, input, select, textarea, a, label')) return;
         const state = appState.visualFlowchartModal;
