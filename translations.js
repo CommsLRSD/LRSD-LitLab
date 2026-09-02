@@ -221,18 +221,14 @@ const TRANSLATIONS = {
         fc_coming_up: 'Coming up next',
         fc_revisit: 'Revisit',
 
-        // ── Flowchart program gate (asked before Tier 1 starts) ──
-        fc_program_gate_title: 'Which program is this student in?',
-        fc_program_gate_subtitle: 'This determines which screeners, assessments, and interventions are shown throughout the flowchart.',
-        fc_program_english: 'English Program',
-        fc_program_english_desc: 'DIBELS and CTOPP-2 screeners',
-        fc_program_french_immersion: 'French Immersion Program',
-        fc_program_french_immersion_desc: 'THaFoL and IDAPEL screeners',
-        fc_lang_gate_title: 'View this flowchart in which language?',
-        fc_lang_gate_subtitle: 'French Immersion students can be screened and supported using French or English content.',
-        fc_lang_gate_english: 'English',
-        fc_lang_gate_french: 'French',
-        fc_program_gate_back: 'Back',
+        // ── Flowchart program / language mini selector (shown beside the flowchart) ──
+        fc_program_mini_label: 'Program',
+        fc_language_mini_label: 'Language',
+        fc_program_english: 'English',
+        fc_program_french_immersion: 'French Immersion',
+        fc_language_english: 'English',
+        fc_language_french: 'French',
+        fc_program_change_confirm: 'Switching the program will reset the flowchart to the beginning and erase your current progress. Continue?',
 
         // ── Step type labels ──
         step_type_check: 'Check',
@@ -515,18 +511,14 @@ const TRANSLATIONS = {
         fc_coming_up: 'Prochainement',
         fc_revisit: 'Revoir',
 
-        // ── Flowchart program gate (asked before Tier 1 starts) ──
-        fc_program_gate_title: 'Dans quel programme cet élève est-il inscrit\u00a0?',
-        fc_program_gate_subtitle: 'Ce choix détermine les dépistages, évaluations et interventions offerts tout au long de l\u2019organigramme.',
-        fc_program_english: 'Programme anglais',
-        fc_program_english_desc: 'Dépistages DIBELS et CTOPP-2',
-        fc_program_french_immersion: 'Programme d\u2019immersion française',
-        fc_program_french_immersion_desc: 'Dépistages THaFoL et IDAPEL',
-        fc_lang_gate_title: 'Dans quelle langue voulez-vous consulter cet organigramme\u00a0?',
-        fc_lang_gate_subtitle: 'Les élèves en immersion française peuvent être évalués et soutenus en français ou en anglais.',
-        fc_lang_gate_english: 'Anglais',
-        fc_lang_gate_french: 'Français',
-        fc_program_gate_back: 'Retour',
+        // ── Flowchart program / language mini selector (shown beside the flowchart) ──
+        fc_program_mini_label: 'Programme',
+        fc_language_mini_label: 'Langue',
+        fc_program_english: 'Anglais',
+        fc_program_french_immersion: 'Immersion française',
+        fc_language_english: 'Anglais',
+        fc_language_french: 'Français',
+        fc_program_change_confirm: 'Changer de programme réinitialisera l\u2019organigramme depuis le début et effacera votre progression actuelle. Continuer\u00a0?',
 
         // ── Step type labels ──
         step_type_check: 'Vérifier',

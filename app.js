@@ -20,11 +20,11 @@ const appState = {
     // are never forced to re-choose it). Stored as the intervention-menu
     // screener_id, e.g. "DIBELS".
     selectedScreener: null,
-    // Program chosen at the start of the flowchart: 'English' or 'French Immersion'.
+    // Program chosen for the flowchart: 'English' or 'French Immersion'.
     // Gates which screeners/assessments/interventions are offered throughout
-    // the whole flowchart. Reset to null whenever the flowchart is (re)opened
-    // from outside so the user is asked again.
-    selectedProgram: null,
+    // the whole flowchart. Defaults to English; the user can switch it at
+    // any time via the small program/language selector beside the flowchart.
+    selectedProgram: 'English',
     // Visual flowchart state
     visualFlowchart: {
         nodes: [],
@@ -1178,7 +1178,7 @@ const FLOWCHART_DEFINITIONS = {
                     }
                 ],
                 nextNode: 'tier3-assessment',
-                buttonText: 'I have reviewed this information'
+                buttonText: 'Reviewed'
             },
             'tier3-assessment': {
                 id: 'tier3-assessment',
@@ -1296,38 +1296,41 @@ function initIntegratedFlowchart(tierId) {
             
             <div class="flowchart-content-area" id="flowchart-content">
                 <div class="journey-shell${showTier1SuccessSidebar ? ' journey-shell-tier1' : ''}">
-                    ${showTier1SuccessSidebar ? `
-                    <aside class="tier1-success-sidebar" aria-label="Tier 1 instruction success guidance">
-                        <div class="tier1-success-sidebar-head">
-                            <span class="material-symbols-rounded tier1-success-sidebar-icon" aria-hidden="true" translate="no">help</span>
-                            <h3>${escapeHtml(t('tier1_sidebar_heading'))}</h3>
-                        </div>
-                        <div class="tier1-success-sidebar-block">
-                            <p class="tier1-success-sidebar-label">
-                                <span class="tier1-success-sidebar-indicators" aria-hidden="true">
-                                    <span class="tier1-indicator-dot tier1-indicator-blue"></span>
-                                    <span class="tier1-indicator-dot tier1-indicator-green"></span>
-                                </span>
-                                <span>${escapeHtml(t('tier1_blue_green_label'))}</span>
-                            </p>
-                            <p>${escapeHtml(t('tier1_blue_green_desc'))}</p>
-                        </div>
-                        <div class="tier1-success-sidebar-block">
-                            <p class="tier1-success-sidebar-label">
-                                <span class="tier1-success-sidebar-indicators" aria-hidden="true">
-                                    <span class="tier1-indicator-dot tier1-indicator-yellow"></span>
-                                    <span class="tier1-indicator-dot tier1-indicator-red"></span>
-                                </span>
-                                <span>${escapeHtml(t('tier1_yellow_red_label'))}</span>
-                            </p>
-                            <p>${escapeHtml(t('tier1_yellow_red_desc'))}</p>
-                            <p class="tier1-success-sidebar-note">${escapeHtml(t('tier1_monitoring_note'))}</p>
-                            <button class="scores-ref-btn" onclick="navigateToPage('scores')" type="button">
-                                <span class="material-symbols-rounded" aria-hidden="true" translate="no">bar_chart</span>
-                                ${escapeHtml(t('tier1_see_scores'))}
-                            </button>
-                        </div>
-                    </aside>` : ''}
+                    <div class="fc-sidebar-col">
+                        ${renderProgramLangMiniHtml()}
+                        ${showTier1SuccessSidebar ? `
+                        <aside class="tier1-success-sidebar" aria-label="Tier 1 instruction success guidance">
+                            <div class="tier1-success-sidebar-head">
+                                <span class="material-symbols-rounded tier1-success-sidebar-icon" aria-hidden="true" translate="no">help</span>
+                                <h3>${escapeHtml(t('tier1_sidebar_heading'))}</h3>
+                            </div>
+                            <div class="tier1-success-sidebar-block">
+                                <p class="tier1-success-sidebar-label">
+                                    <span class="tier1-success-sidebar-indicators" aria-hidden="true">
+                                        <span class="tier1-indicator-dot tier1-indicator-blue"></span>
+                                        <span class="tier1-indicator-dot tier1-indicator-green"></span>
+                                    </span>
+                                    <span>${escapeHtml(t('tier1_blue_green_label'))}</span>
+                                </p>
+                                <p>${escapeHtml(t('tier1_blue_green_desc'))}</p>
+                            </div>
+                            <div class="tier1-success-sidebar-block">
+                                <p class="tier1-success-sidebar-label">
+                                    <span class="tier1-success-sidebar-indicators" aria-hidden="true">
+                                        <span class="tier1-indicator-dot tier1-indicator-yellow"></span>
+                                        <span class="tier1-indicator-dot tier1-indicator-red"></span>
+                                    </span>
+                                    <span>${escapeHtml(t('tier1_yellow_red_label'))}</span>
+                                </p>
+                                <p>${escapeHtml(t('tier1_yellow_red_desc'))}</p>
+                                <p class="tier1-success-sidebar-note">${escapeHtml(t('tier1_monitoring_note'))}</p>
+                                <button class="scores-ref-btn" onclick="navigateToPage('scores')" type="button">
+                                    <span class="material-symbols-rounded" aria-hidden="true" translate="no">bar_chart</span>
+                                    ${escapeHtml(t('tier1_see_scores'))}
+                                </button>
+                            </div>
+                        </aside>` : ''}
+                    </div>
                     <aside class="journey-map" id="journey-map" aria-label="Decision summary">
                         <div class="journey-map-head">
                             <div class="journey-map-head-left">
@@ -6220,14 +6223,13 @@ function openInteractiveFlowchart() {
         flowchartContainer.style.display = 'block';
     }
     
-    // The flowchart always begins by asking which program the student is in
-    // (English or French Immersion) before Tier 1 starts, since that gates
-    // which screeners/assessments/interventions are offered throughout.
+    // The flowchart defaults to the English program and starts immediately;
+    // the program/language choice is a small selector beside the flowchart
+    // (see renderProgramLangMiniHtml) rather than a blocking start screen.
     if (!appState.selectedProgram) {
-        renderProgramGate();
-    } else {
-        initIntegratedFlowchart('tier1');
+        appState.selectedProgram = 'English';
     }
+    initIntegratedFlowchart('tier1');
     
     // Scroll to the top of the flowchart
     if (flowchartContainer) {
@@ -6235,100 +6237,103 @@ function openInteractiveFlowchart() {
     }
 }
 
-// Screener ids (as used in data/tier-flowcharts.json) that belong to the
-// French Immersion program; everything else is treated as English.
-const FRENCH_PROGRAM_SCREENER_IDS = ['thafol', 'idapel'];
+// Screener ids (as used in data/tier-flowcharts.json) that are only offered
+// to the French Immersion program; everything else (DIBELS, CTOPP-2) is
+// shared between both programs.
+const FRENCH_ONLY_SCREENER_IDS = ['thafol', 'idapel'];
 
 function isScreenerIdForCurrentProgram(screenerId) {
-    const isFrenchScreener = FRENCH_PROGRAM_SCREENER_IDS.includes(String(screenerId).toLowerCase());
-    return appState.selectedProgram === 'French Immersion' ? isFrenchScreener : !isFrenchScreener;
+    const isFrenchOnlyScreener = FRENCH_ONLY_SCREENER_IDS.includes(String(screenerId).toLowerCase());
+    // French Immersion gets the French-specific screeners (THaFoL, IDAPEL) as
+    // well as the shared English ones (DIBELS, CTOPP-2), so nothing is
+    // filtered out. English only gets the shared ones.
+    return appState.selectedProgram === 'French Immersion' ? true : !isFrenchOnlyScreener;
 }
 
 // The wizard's screener dropdown groups by "English" / "French" language;
-// map the chosen program to that same filter value.
+// map the chosen program to that same filter value. French Immersion sees
+// both groups (DIBELS/CTOPP-2 plus THaFoL/IDAPEL); English only sees English.
 function getProgramLanguageFilter() {
-    return appState.selectedProgram === 'French Immersion' ? 'French' : 'English';
+    return appState.selectedProgram === 'French Immersion' ? '' : 'English';
 }
 
-// First screen the flowchart shows: choose the student's program. French
-// Immersion students are then asked whether they want the flowchart content
-// in French or English before Tier 1 begins.
-function renderProgramGate() {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
+// Small, sleek program/language selector rendered beside the flowchart
+// (above the Tier 1 success sidebar, or above the decision-summary panel on
+// other tiers) so switching programs never requires a full takeover screen.
+function renderProgramLangMiniHtml() {
+    const program = appState.selectedProgram || 'English';
+    const isFrench = program === 'French Immersion';
+    const lang = appState.language === 'fr' ? 'fr' : 'en';
 
-    container.classList.remove('flowchart-hidden');
-    container.innerHTML = `
-        <div class="program-gate">
-            <div class="program-gate-card">
-                <h2 class="program-gate-title">${escapeHtml(t('fc_program_gate_title'))}</h2>
-                <p class="program-gate-subtitle">${escapeHtml(t('fc_program_gate_subtitle'))}</p>
-                <div class="program-gate-options">
-                    <button type="button" class="program-gate-option" onclick="chooseFlowchartProgram('English')">
-                        <span class="program-gate-option-name">${escapeHtml(t('fc_program_english'))}</span>
-                        <span class="program-gate-option-desc">${escapeHtml(t('fc_program_english_desc'))}</span>
-                    </button>
-                    <button type="button" class="program-gate-option" onclick="chooseFlowchartProgram('French Immersion')">
-                        <span class="program-gate-option-name">${escapeHtml(t('fc_program_french_immersion'))}</span>
-                        <span class="program-gate-option-desc">${escapeHtml(t('fc_program_french_immersion_desc'))}</span>
-                    </button>
-                </div>
+    return `
+        <div class="program-lang-mini" id="program-lang-mini">
+            <div class="program-lang-mini-field">
+                <span class="program-lang-mini-label">${escapeHtml(t('fc_program_mini_label'))}</span>
+                <select class="program-lang-mini-select" aria-label="${escapeAttr(t('fc_program_mini_label'))}" onchange="requestFlowchartProgramChange(this.value)">
+                    <option value="English"${!isFrench ? ' selected' : ''}>${escapeHtml(t('fc_program_english'))}</option>
+                    <option value="French Immersion"${isFrench ? ' selected' : ''}>${escapeHtml(t('fc_program_french_immersion'))}</option>
+                </select>
             </div>
+            ${isFrench ? `
+            <div class="program-lang-mini-field">
+                <span class="program-lang-mini-label">${escapeHtml(t('fc_language_mini_label'))}</span>
+                <select class="program-lang-mini-select" aria-label="${escapeAttr(t('fc_language_mini_label'))}" onchange="requestFlowchartLanguageChange(this.value)">
+                    <option value="en"${lang === 'en' ? ' selected' : ''}>${escapeHtml(t('fc_language_english'))}</option>
+                    <option value="fr"${lang === 'fr' ? ' selected' : ''}>${escapeHtml(t('fc_language_french'))}</option>
+                </select>
+            </div>` : ''}
         </div>
     `;
 }
 
-// Second screen (French Immersion only): choose the display language.
-function renderFlowchartLanguageGate() {
-    const container = document.getElementById('flowchart-container');
-    if (!container) return;
-
-    container.classList.remove('flowchart-hidden');
-    container.innerHTML = `
-        <div class="program-gate">
-            <div class="program-gate-card">
-                <button type="button" class="program-gate-back" onclick="chooseFlowchartProgram(null)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    ${escapeHtml(t('fc_program_gate_back'))}
-                </button>
-                <h2 class="program-gate-title">${escapeHtml(t('fc_lang_gate_title'))}</h2>
-                <p class="program-gate-subtitle">${escapeHtml(t('fc_lang_gate_subtitle'))}</p>
-                <div class="program-gate-options">
-                    <button type="button" class="program-gate-option" onclick="chooseFlowchartLanguage('en')">
-                        <span class="program-gate-option-name">${escapeHtml(t('fc_lang_gate_english'))}</span>
-                    </button>
-                    <button type="button" class="program-gate-option" onclick="chooseFlowchartLanguage('fr')">
-                        <span class="program-gate-option-name">${escapeHtml(t('fc_lang_gate_french'))}</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
+// True once the user has made at least one choice in the current flowchart
+// session (as opposed to simply sitting on the very first step).
+function hasFlowchartProgress() {
+    const vf = appState.visualFlowchart;
+    if (!vf) return false;
+    return (vf.selectedPath && vf.selectedPath.length > 1) ||
+        (vf.choices && Object.keys(vf.choices).length > 0);
 }
 
-// Handle the program choice: English starts the flowchart right away, while
-// French Immersion asks for a display language first. Passing null re-shows
-// the program gate (used by the "back" control on the language gate).
-function chooseFlowchartProgram(program) {
-    if (!program) {
-        appState.selectedProgram = null;
-        renderProgramGate();
-        return;
+// Re-render just the mini selector in place (used to reset a <select> back to
+// its previous value when the user cancels the reset-confirmation dialog).
+function refreshProgramLangMiniUI() {
+    const mini = document.getElementById('program-lang-mini');
+    if (!mini) return;
+    mini.outerHTML = renderProgramLangMiniHtml();
+}
+
+// Called when the user picks a different program in the mini selector. If
+// they have already made choices in the flowchart, confirm first since
+// switching programs resets everything back to the beginning.
+function requestFlowchartProgramChange(program) {
+    if (program === appState.selectedProgram) return;
+    if (hasFlowchartProgress()) {
+        const ok = window.confirm(t('fc_program_change_confirm'));
+        if (!ok) {
+            refreshProgramLangMiniUI();
+            return;
+        }
     }
     appState.selectedProgram = program;
-    if (program === 'French Immersion') {
-        renderFlowchartLanguageGate();
-    } else {
-        initIntegratedFlowchart('tier1');
-    }
+    initIntegratedFlowchart('tier1');
 }
 
-function chooseFlowchartLanguage(lang) {
-    if (lang === 'en' || lang === 'fr') {
-        appState.language = lang;
-        applyTranslations();
-        updateLanguageToggleBtn();
+// Called when the user picks a different display language (French Immersion
+// only). Same reset-confirmation behaviour as the program switch.
+function requestFlowchartLanguageChange(lang) {
+    if (lang !== 'en' && lang !== 'fr') return;
+    if (lang === appState.language) return;
+    if (hasFlowchartProgress()) {
+        const ok = window.confirm(t('fc_program_change_confirm'));
+        if (!ok) {
+            refreshProgramLangMiniUI();
+            return;
+        }
     }
+    appState.language = lang;
+    applyTranslations();
+    updateLanguageToggleBtn();
     initIntegratedFlowchart('tier1');
 }
 
