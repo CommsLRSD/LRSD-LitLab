@@ -957,13 +957,17 @@ const FLOWCHART_DEFINITIONS = {
             'tier1-percentage': {
                 id: 'tier1-percentage',
                 type: 'decision',
-                title: 'Route B: Instruction Ineffective',
+                title: 'Step 4: Instruction Ineffective',
                 subtitle: 'What percentage of students are unsuccessful?',
                 description: 'Based on screener results, how many students are below benchmark?',
                 choices: [
                     { id: 'more-20', label: 'Instruction unsuccessful for 20% or more of students.', sublabel: '', type: 'warning', nextNode: 'tier1-move-tier2' },
                     { id: 'less-20', label: 'Instruction unsuccessful for fewer than 20% of students.', sublabel: '', type: 'warning', nextNode: 'tier1-reteach' }
-                ]
+                ],
+                // Once a choice is made, the completed card should show only the
+                // chosen option's own text as its title — no separate generic
+                // title/subtitle/answer line is needed alongside it.
+                titleFromChoiceWhenAnswered: true
             },
             'tier1-move-tier2': {
                 id: 'tier1-move-tier2',
@@ -1413,7 +1417,12 @@ function updateJourneyMapTierLabel(tierId) {
 // they are moving from one tier to another before the next tier's flow begins.
 function showGoToTierStep(tierId) {
     if (document.getElementById('visual-flowchart-modal')) {
-        switchToTier(tierId);
+        // Don't silently collapse the finishing tier in the visual pathway —
+        // append a review-and-continue card instead, and only switch tiers
+        // (which is what makes the finished tier collapse) once the user
+        // explicitly clicks Continue on it.
+        if (appState.visualFlowchart) appState.visualFlowchart.pendingTierTransition = tierId;
+        refreshVisualFlowchartModal();
         return;
     }
     const stepsContainer = getActiveStepTarget();
@@ -1544,6 +1553,16 @@ function escapeAttr(value) {
 // Strip the "Step 3: " prefix so numbering is owned by the trail itself
 function getStepShortTitle(nodeDef) {
     return String(nodeDef?.title || '').replace(/^Step\s*\d+\s*[:.\-–]\s*/i, '').trim() || 'Step';
+}
+
+// The title to show for a completed step. Nodes flagged with
+// titleFromChoiceWhenAnswered (currently just Tier 1's "% unsuccessful"
+// decision) already have a choice label that reads as a complete sentence,
+// so once answered it replaces the generic node title instead of being
+// repeated alongside it as a separate answer line.
+function getStepDisplayTitle(nodeDef, choice) {
+    if (nodeDef?.titleFromChoiceWhenAnswered && choice?.name) return choice.name;
+    return getStepShortTitle(nodeDef);
 }
 
 // Human label for a step type, used on the trail markers and map
@@ -1920,6 +1939,36 @@ function getVisualFlowchartEntries() {
     return entries;
 }
 
+// The visual pathway modal's header carries its own copy of the "Your
+// Decisions" view switcher (standard / summary / visual) plus the program
+// and language mini selector, since the underlying panel is made inert while
+// the modal is open and would otherwise be unreachable.
+function renderVisualFlowchartHeaderControlsHtml() {
+    const isHoriz = appState.visualFlowchart?.layoutMode === 'horizontal';
+    return `
+        <div class="visual-flowchart-header-controls">
+            <div class="layout-toggle-group" role="group" aria-label="${escapeHtml(t('fc_view_switcher'))}">
+                <button class="layout-toggle-btn layout-toggle-btn-standard" type="button" onclick="switchVisualFlowchartToLayout('standard')" aria-pressed="${isHoriz ? 'false' : 'true'}" aria-label="${escapeHtml(t('fc_standard_view'))}" title="${escapeHtml(t('fc_standard_view'))}">
+                    <svg class="layout-toggle-icon layout-toggle-icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
+                </button>
+                <button class="layout-toggle-btn layout-toggle-btn-summary" type="button" onclick="switchVisualFlowchartToLayout('horizontal')" aria-pressed="${isHoriz ? 'true' : 'false'}" aria-label="${escapeHtml(t('fc_summary_view'))}" title="${escapeHtml(t('fc_summary_view'))}">
+                    <svg class="layout-toggle-icon layout-toggle-icon-summary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><rect x="2" y="7" width="5" height="10" rx="1"/><rect x="9.5" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="5" height="10" rx="1"/></svg>
+                </button>
+                <button class="layout-toggle-btn layout-toggle-btn-visual" type="button" aria-pressed="true" aria-label="${escapeHtml(t('fc_visual_view'))}" title="${escapeHtml(t('fc_visual_view'))}">
+                    <span class="material-symbols-rounded layout-toggle-icon-visual" aria-hidden="true" translate="no">account_tree</span>
+                </button>
+            </div>
+            ${renderProgramLangMiniHtml('visual-flowchart-program-lang-mini')}
+        </div>`;
+}
+
+// Leave the visual pathway and switch the "Your Decisions" panel to the
+// requested layout mode (called from the modal header's view switcher).
+function switchVisualFlowchartToLayout(mode) {
+    closeVisualFlowchartModal();
+    setJourneyLayoutMode(mode);
+}
+
 function openVisualFlowchartModal() {
     if (!window.matchMedia('(min-width: 769px)').matches) return;
     closeVisualFlowchartModal({ immediate: true });
@@ -1938,6 +1987,7 @@ function openVisualFlowchartModal() {
                     <h2 id="visual-flowchart-modal-title">${escapeHtml(t('fc_visual_title'))}</h2>
                     <p>${escapeHtml(t('fc_visual_desc'))}</p>
                 </div>
+                ${renderVisualFlowchartHeaderControlsHtml()}
                 <div class="visual-flowchart-header-actions">
                     <button class="visual-flowchart-fullscreen-btn" id="visual-flowchart-fullscreen-btn" type="button" onclick="toggleVisualFlowchartFullscreen()" aria-label="${escapeHtml(t('fc_visual_fullscreen'))}" title="${escapeHtml(t('fc_visual_fullscreen'))}">
                         <span class="material-symbols-rounded" aria-hidden="true" translate="no">fullscreen</span>
@@ -2170,6 +2220,15 @@ function buildVisualFlowchartDisplayItems(entries) {
             i += 1;
         }
     }
+    // A tier that just finished and is about to hand off to the next one gets
+    // one extra "review this tier, then continue" card appended after its
+    // last step. The tier only actually switches (and collapses to save
+    // space) once the user clicks Continue on it — see
+    // confirmVisualFlowchartTierTransition().
+    const pendingTierTransition = appState.visualFlowchart?.pendingTierTransition;
+    if (pendingTierTransition) {
+        items.push({ type: 'tier-review', targetTierId: pendingTierTransition, variant: 'step1' });
+    }
     return items;
 }
 
@@ -2206,6 +2265,7 @@ function refreshVisualFlowchartModal() {
     const activeFirstStepWidth = Math.round(cardWidth * 1.5);
     const activeLongStepWidth = Math.round(cardWidth * 1.9);
     const getItemCardWidth = item => {
+        if (item.type === 'tier-review') return wideCardWidth;
         if (item.type === 'entry') {
             if (item.entry.isCurrent && item.entry.node.type !== 'endpoint') {
                 if (item.entry.isTierFirstStep) return activeFirstStepWidth;
@@ -2254,6 +2314,22 @@ function refreshVisualFlowchartModal() {
 
     const cardsHtml = items.map((item, index) => {
         const position = positions[index];
+        if (item.type === 'tier-review') {
+            const targetNum = String(item.targetTierId).replace(/\D/g, '');
+            return `<div class="visual-flowchart-card visual-flowchart-card-tier-review visual-flowchart-card-current"
+                        style="left:${position.x}px;top:${position.y}px;width:${position.width}px" role="group" aria-label="${escapeHtml(t('fc_visual_tier_review_label'))}">
+                    <span class="visual-flowchart-tier-chip">${escapeHtml(t('fc_tier_label'))} ${escapeHtml(targetNum)}</span>
+                    <span class="visual-flowchart-card-icon"><span class="material-symbols-rounded" aria-hidden="true" translate="no">fact_check</span></span>
+                    <span class="visual-flowchart-card-copy">
+                        <span class="visual-flowchart-card-meta">${escapeHtml(t('fc_visual_tier_review_label'))}</span>
+                        <strong>${escapeHtml(t('go_to_tier'))} ${escapeHtml(targetNum)}</strong>
+                        <span class="visual-flowchart-card-answer">${escapeHtml(t('go_to_tier_note'))}</span>
+                        <button type="button" class="visual-flowchart-tier-review-btn" onclick="confirmVisualFlowchartTierTransition()">
+                            ${escapeHtml(t('continue_to_tier'))} ${escapeHtml(targetNum)}
+                        </button>
+                    </span>
+                </div>`;
+        }
         if (item.type === 'collapsed') {
             const variant = item.variant || 'step1';
             const tierNum = item.tierLabel.replace(/\D/g, '');
@@ -2272,6 +2348,8 @@ function refreshVisualFlowchartModal() {
         }
         const entry = item.entry;
         const answer = entry.choice?.name || (entry.node.type === 'checklist' ? t('step_type_reviewed') : '');
+        const usesChoiceAsTitle = !entry.isCurrent && entry.node.titleFromChoiceWhenAnswered && entry.choice?.name;
+        const displayTitle = usesChoiceAsTitle ? entry.choice.name : getStepShortTitle(entry.node);
         const variant = entry.variant || 'step1';
         const isInteractive = entry.isCurrent && entry.node.type !== 'endpoint';
         const tag = entry.canRevisit && entry.node.type !== 'endpoint' ? 'button' : 'article';
@@ -2296,8 +2374,8 @@ function refreshVisualFlowchartModal() {
                 <span class="visual-flowchart-card-icon">${getStepTypeIcon(entry.node.type)}</span>
                 <span class="visual-flowchart-card-copy">
                     <span class="visual-flowchart-card-meta">${escapeHtml(getStepTypeLabel(entry.node.type))}${entry.isCurrent ? ` · ${escapeHtml(t('fc_in_progress'))}` : ''}</span>
-                    <strong>${escapeHtml(getStepShortTitle(entry.node))}</strong>
-                    ${answer ? `<span class="visual-flowchart-card-answer">${escapeHtml(answer)}</span>` : ''}
+                    <strong>${escapeHtml(displayTitle)}</strong>
+                    ${!usesChoiceAsTitle && answer ? `<span class="visual-flowchart-card-answer">${escapeHtml(answer)}</span>` : ''}
                     ${entry.node.type === 'endpoint' && entry.node.description ? `<span class="visual-flowchart-card-answer">${escapeHtml(entry.node.description)}</span>` : ''}
                 </span>
                 ${isInteractive ? '<div class="visual-flowchart-active-host"></div>' : ''}
@@ -2325,6 +2403,27 @@ function refreshVisualFlowchartModal() {
     const activeHost = stage.querySelector('.visual-flowchart-active-host');
     if (sourceStep && activeHost) activeHost.appendChild(sourceStep);
 
+    // Every card is capped to the natural height of Tier 1, Step 1 (the
+    // reference card, measured live whenever it happens to be the active
+    // step) so nothing towers above it; taller content gets wider and/or
+    // scrollable instead. Measured with the cap lifted so it reflects the
+    // card's true, unclipped height.
+    const tier1Def = getFlowchartDefs().tier1;
+    if (activeNodeId && tier1Def && activeNodeId === tier1Def.startNode) {
+        const referenceCard = stage.querySelector('.visual-flowchart-card-current');
+        if (referenceCard) {
+            requestAnimationFrame(() => {
+                const previousMaxHeight = referenceCard.style.maxHeight;
+                referenceCard.style.maxHeight = 'none';
+                const naturalHeight = referenceCard.scrollHeight;
+                referenceCard.style.maxHeight = previousMaxHeight;
+                if (naturalHeight > 0) {
+                    document.documentElement.style.setProperty('--visual-card-max-height', `${naturalHeight}px`);
+                }
+            });
+        }
+    }
+
     wireVisualFlowchartPanZoom(viewport);
     updateVisualFlowchartTierBar();
     const state = appState.visualFlowchartModal;
@@ -2332,7 +2431,8 @@ function refreshVisualFlowchartModal() {
     state.contentBounds = bounds;
     const pad = VISUAL_FLOWCHART_EDGE_PADDING;
     const cards = Array.from(stage.querySelectorAll('.visual-flowchart-card'));
-    const activeIndex = items.findIndex(item => item.type === 'entry' && item.entry.isCurrent);
+    let activeIndex = items.findIndex(item => item.type === 'tier-review');
+    if (activeIndex === -1) activeIndex = items.findIndex(item => item.type === 'entry' && item.entry.isCurrent);
     const activeCard = activeIndex !== -1 ? cards[activeIndex] : cards[0];
     // Once a step is completed and the pathway moves on, drop any manual zoom so
     // the canvas automatically zooms back in around the (now smaller) live card.
@@ -2356,14 +2456,22 @@ function refreshVisualFlowchartModal() {
             - (activeCard.offsetLeft + activeCard.offsetWidth) * state.scale;
         state.x = Math.min(leftAnchor, revealActive);
         const activeHeight = activeCard.offsetHeight * state.scale;
+        // Vertically, the card prefers to sit in the upper part of the viewport
+        // rather than dead centre: true centring (0.5) reads as too low once the
+        // header/tier-bar/toolbar above the viewport are accounted for.
         state.y = activeHeight + pad * 2 <= viewport.clientHeight
-            ? (viewport.clientHeight - activeHeight) / 2 - activeCard.offsetTop * state.scale
+            ? (viewport.clientHeight - activeHeight) * VISUAL_FLOWCHART_VERTICAL_BIAS - activeCard.offsetTop * state.scale
             : pad - activeCard.offsetTop * state.scale;
     }
     applyVisualFlowchartTransform();
 }
 
 const VISUAL_FLOWCHART_EDGE_PADDING = 40;
+// How far down the viewport the active card's vertical anchor sits when it
+// fits without scaling: 0 = flush with the top, 0.5 = true centre. A low
+// fraction keeps it feeling anchored near the top, since true centring
+// reads as too low with the header/tier-bar/toolbar stacked above the canvas.
+const VISUAL_FLOWCHART_VERTICAL_BIAS = 0.22;
 
 // Measure the real bounding box of the rendered cards (in unscaled stage
 // coordinates) so panning and fitting are driven by actual content, not by the
@@ -2416,6 +2524,10 @@ function wireVisualFlowchartPanZoom(viewport) {
     });
     viewport.addEventListener('pointerdown', event => {
         if (event.target.closest('button, input, select, textarea, a, label')) return;
+        // Let a card that has overflowed its max height be dragged/scrolled
+        // internally instead of starting a canvas pan.
+        const overflowingCard = event.target.closest('.visual-flowchart-card');
+        if (overflowingCard && overflowingCard.scrollHeight > overflowingCard.clientHeight) return;
         const state = appState.visualFlowchartModal;
         if (!state) return;
         // The live card can grow/shrink between renders, so re-measure before panning.
@@ -2443,6 +2555,10 @@ function wireVisualFlowchartPanZoom(viewport) {
     viewport.addEventListener('pointerup', stopPan);
     viewport.addEventListener('pointercancel', stopPan);
     viewport.addEventListener('wheel', event => {
+        // A card that has overflowed its max height scrolls internally instead
+        // of the wheel always zooming the whole canvas.
+        const card = event.target.closest('.visual-flowchart-card');
+        if (card && card.scrollHeight > card.clientHeight) return;
         event.preventDefault();
         zoomVisualFlowchart(event.deltaY < 0 ? 0.1 : -0.1);
     }, { passive: false });
@@ -2517,13 +2633,15 @@ function renderJourneyMap(activeNumber) {
         const isActive = index === path.length - 1;
         if (nodeDef.type === 'endpoint' && !isActive) return;
         number += 1;
+        const doneChoice = isActive ? null : vf.choices[nodeDef.id];
+        const usesChoiceAsTitle = !isActive && nodeDef.titleFromChoiceWhenAnswered && doneChoice?.name;
         entries.push({
             id: nodeDef.id,
             number,
-            title: getStepShortTitle(nodeDef),
+            title: usesChoiceAsTitle ? doneChoice.name : getStepShortTitle(nodeDef),
             type: nodeDef.type,
             variant: isActive ? '' : getStepSummaryVariant(nodeDef, vf.choices[nodeDef.id]),
-            answer: isActive ? '' : getStepAnswerText(nodeDef.id, nodeDef),
+            answer: usesChoiceAsTitle ? '' : (isActive ? '' : getStepAnswerText(nodeDef.id, nodeDef)),
             state: isActive ? 'current' : 'done'
         });
     });
@@ -4437,6 +4555,17 @@ function restartTier1VisualIntegrated() {
 
 function restartTier2VisualIntegrated() {
     switchToTier('tier2');
+}
+
+// Called from the visual pathway's "review before continuing" card. Only at
+// this point does the finishing tier actually switch (and collapse) — until
+// then the user can keep reviewing the whole tier they just completed.
+function confirmVisualFlowchartTierTransition() {
+    const vf = appState.visualFlowchart;
+    const tierId = vf?.pendingTierTransition;
+    if (!tierId) return;
+    vf.pendingTierTransition = null;
+    switchToTier(tierId);
 }
 
 // Handler functions for integrated tier 1
@@ -6919,13 +7048,13 @@ function getProgramLanguageFilter() {
 // Small, sleek program/language selector rendered beside the flowchart
 // (above the Tier 1 success sidebar, or above the decision-summary panel on
 // other tiers) so switching programs never requires a full takeover screen.
-function renderProgramLangMiniHtml() {
+function renderProgramLangMiniHtml(id = 'program-lang-mini') {
     const program = appState.selectedProgram || 'English';
     const isFrench = program === 'French Immersion';
     const lang = appState.language === 'fr' ? 'fr' : 'en';
 
     return `
-        <div class="program-lang-mini" id="program-lang-mini">
+        <div class="program-lang-mini" id="${escapeAttr(id)}">
             <div class="program-lang-mini-field">
                 <span class="program-lang-mini-label">${escapeHtml(t('fc_program_mini_label'))}</span>
                 <select class="program-lang-mini-select" aria-label="${escapeAttr(t('fc_program_mini_label'))}" onchange="requestFlowchartProgramChange(this.value)">
@@ -6954,12 +7083,13 @@ function hasFlowchartProgress() {
         (vf.choices && Object.keys(vf.choices).length > 0);
 }
 
-// Re-render just the mini selector in place (used to reset a <select> back to
-// its previous value when the user cancels the reset-confirmation dialog).
+// Re-render every mini selector instance in place (the panel copy and, when
+// open, the visual pathway header copy) — used to reset a <select> back to
+// its previous value when the user cancels the reset-confirmation dialog.
 function refreshProgramLangMiniUI() {
-    const mini = document.getElementById('program-lang-mini');
-    if (!mini) return;
-    mini.outerHTML = renderProgramLangMiniHtml();
+    document.querySelectorAll('.program-lang-mini').forEach(mini => {
+        mini.outerHTML = renderProgramLangMiniHtml(mini.id);
+    });
 }
 
 // Called when the user picks a different program in the mini selector. If
@@ -8035,6 +8165,8 @@ window.startTier2VisualIntegrated = startTier2VisualIntegrated;
 window.startTier3VisualIntegrated = startTier3VisualIntegrated;
 window.restartTier1VisualIntegrated = restartTier1VisualIntegrated;
 window.restartTier2VisualIntegrated = restartTier2VisualIntegrated;
+window.confirmVisualFlowchartTierTransition = confirmVisualFlowchartTierTransition;
+window.switchVisualFlowchartToLayout = switchVisualFlowchartToLayout;
 
 // New step-based intervention menu exports
 window.initializeStepBasedMenu = initializeStepBasedMenu;
