@@ -238,6 +238,7 @@ const TRANSLATIONS = {
         fc_visual_fullscreen_exit: 'Exit full screen',
         fc_visual_tier_collapsed: (n, count) => `Tier ${n} · ${count} step${count !== 1 ? 's' : ''} · Tap to expand`,
         fc_visual_tier_collapse: 'Collapse this tier',
+        fc_visual_tier_review_label: 'Review before continuing',
 
         // ── Flowchart program / language mini selector (shown beside the flowchart) ──
         fc_program_mini_label: 'Program',
@@ -546,6 +547,7 @@ const TRANSLATIONS = {
         fc_visual_fullscreen_exit: 'Quitter le plein écran',
         fc_visual_tier_collapsed: (n, count) => `Palier ${n} · ${count} étape${count !== 1 ? 's' : ''} · Toucher pour développer`,
         fc_visual_tier_collapse: 'Réduire ce palier',
+        fc_visual_tier_review_label: 'Révisez avant de continuer',
 
         // ── Flowchart program / language mini selector (shown beside the flowchart) ──
         fc_program_mini_label: 'Programme',

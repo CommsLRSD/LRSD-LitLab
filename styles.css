@@ -6726,7 +6726,8 @@ body.step-review-modal-open { overflow: hidden; }
 
   .visual-flowchart-header {
     display: flex;
-    align-items: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-lg);
     padding: 18px 22px 14px;
@@ -6760,6 +6761,24 @@ body.step-review-modal-open { overflow: hidden; }
     flex: 0 0 auto;
     align-items: center;
     gap: 8px;
+  }
+
+  /* Houses the standard/summary/visual view switcher plus the program and
+     language mini selector, so both stay reachable from inside the modal
+     (the "Your Decisions" panel underneath is made inert while it's open). */
+  .visual-flowchart-header-controls {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 220px;
+  }
+
+  .visual-flowchart-header-controls .program-lang-mini {
+    padding: 0.4rem 0.7rem;
+    box-shadow: none;
   }
 
   .visual-flowchart-close,
@@ -6958,6 +6977,7 @@ body.step-review-modal-open { overflow: hidden; }
     gap: 10px;
     width: 260px;
     min-height: 180px;
+    max-height: var(--visual-card-max-height, 480px);
     padding: 14px;
     border: 2px solid var(--step);
     border-radius: 18px;
@@ -6968,11 +6988,24 @@ body.step-review-modal-open { overflow: hidden; }
     box-shadow: 0 12px 30px rgba(12, 49, 90, 0.12);
     opacity: 0;
     transform: translateY(15px);
+    overflow-y: auto;
+    touch-action: pan-y;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
     animation: visual-card-reveal 0.38s var(--ease) forwards;
   }
 
   button.visual-flowchart-card {
     cursor: pointer;
+  }
+
+  .visual-flowchart-card::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .visual-flowchart-card::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
   }
 
   button.visual-flowchart-card:hover {
@@ -6999,6 +7032,31 @@ body.step-review-modal-open { overflow: hidden; }
     border-width: 3px;
     background: var(--bg);
     box-shadow: 0 0 0 5px var(--step-soft), 0 18px 45px rgba(12, 49, 90, 0.2);
+  }
+
+  /* Interstitial "review this tier, then continue" card shown in the visual
+     pathway after a tier's last step, before it collapses into the next tier. */
+  .visual-flowchart-card-tier-review {
+    align-items: start;
+  }
+
+  .visual-flowchart-tier-review-btn {
+    align-self: start;
+    margin-top: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: var(--step);
+    color: #fff;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(12, 49, 90, 0.18);
+  }
+
+  .visual-flowchart-tier-review-btn:hover {
+    filter: brightness(1.05);
   }
 
   .visual-flowchart-card-interactive {
