@@ -1334,10 +1334,14 @@ function initIntegratedFlowchart(tierId) {
                                 <svg class="journey-map-head-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
                                 <span class="journey-map-title" id="journey-map-title">${escapeHtml(getTierGateLabel(tierId))}</span>
                             </div>
-                            <button class="layout-toggle-btn" id="layout-toggle-btn" type="button" onclick="toggleLayoutMode()" aria-pressed="false" title="${escapeHtml(t('fc_switch_summary'))}">
-                                <svg class="layout-toggle-icon layout-toggle-icon-summary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><rect x="2" y="7" width="5" height="10" rx="1"/><rect x="9.5" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="5" height="10" rx="1"/></svg>
-                                <svg class="layout-toggle-icon layout-toggle-icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
-                                <span class="layout-toggle-label">${escapeHtml(t('fc_summary_view'))}</span>
+                            <button class="layout-toggle-btn" id="layout-toggle-btn" type="button" onclick="toggleLayoutMode()" aria-pressed="false" aria-label="${escapeHtml(t('fc_switch_summary'))}" title="${escapeHtml(t('fc_switch_summary'))}">
+                                <span class="layout-toggle-option layout-toggle-option-standard" aria-hidden="true">
+                                    <svg class="layout-toggle-icon layout-toggle-icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
+                                </span>
+                                <span class="layout-toggle-option layout-toggle-option-summary" aria-hidden="true">
+                                    <svg class="layout-toggle-icon layout-toggle-icon-summary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="2" y="7" width="5" height="10" rx="1"/><rect x="9.5" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="5" height="10" rx="1"/></svg>
+                                </span>
+                                <span class="layout-toggle-label">${escapeHtml(t('fc_standard_view'))}</span>
                             </button>
                             <span class="journey-map-count" id="journey-map-count">${escapeHtml(t('fc_step_label'))} 1</span>
                         </div>
@@ -1460,9 +1464,6 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
     
     // If this is an endpoint, route based on whether it's a tier transition or terminal
     if (nodeData.type === 'endpoint') {
-        // Refresh the panel first so the step just answered stays open and
-        // the outcome opens in its own row.
-        renderJourneyMap(getActiveStepNumber());
         saveCurrentTierToFullJourney();
         const tierTransitionActions = new Set(['startTier2Visual', 'startTier3Visual', 'restartTier2Visual']);
         const primaryAction = nodeData.actionButton?.action;
@@ -1482,8 +1483,9 @@ function showIntegratedNode(nodeId, fromNodeId, choiceId = null, direction = 'fo
             // Multiple tier-transition options → show choice card (no journey review)
             showTierTransitionChoice(nodeData);
         } else {
-            // True terminal endpoint — show the route completion gate, then animation summary.
-            showRouteCompleteGate(nodeData);
+            // True terminal endpoint — keep the user's chosen layout and render
+            // the outcome as the final step with the journey summary action.
+            showTerminalEndpoint(nodeData, direction);
         }
         return;
     }
@@ -1839,15 +1841,17 @@ function toggleLayoutMode() {
     renderJourney();
 }
 
-// Sync the layout toggle button's label and icon to the current layout mode
+// Sync the layout toggle switch to the current layout mode
 function updateLayoutToggleBtn() {
     const btn = document.getElementById('layout-toggle-btn');
     if (!btn) return;
     const isHoriz = appState.visualFlowchart?.layoutMode === 'horizontal';
     btn.setAttribute('aria-pressed', isHoriz ? 'true' : 'false');
-    btn.title = isHoriz ? t('fc_switch_standard') : t('fc_switch_summary');
+    const labelText = isHoriz ? t('fc_switch_standard') : t('fc_switch_summary');
+    btn.setAttribute('aria-label', labelText);
+    btn.title = labelText;
     const label = btn.querySelector('.layout-toggle-label');
-    if (label) label.textContent = isHoriz ? t('fc_standard_view') : t('fc_summary_view');
+    if (label) label.textContent = isHoriz ? t('fc_summary_view') : t('fc_standard_view');
 }
 
 // Decision Summary panel: every completed step becomes a rich card; the current
@@ -2657,6 +2661,19 @@ function createIntegratedEndpointNode(nodeData) {
         </div>
     ` : '';
     
+    const tierTransitionActions = new Set(['startTier2Visual', 'startTier3Visual', 'restartTier2Visual']);
+    const isTerminalEndpoint = !tierTransitionActions.has(nodeData.actionButton?.action) &&
+        !tierTransitionActions.has(nodeData.secondaryAction?.action);
+
+    const summaryButtonHTML = isTerminalEndpoint ? `
+        <button class="action-btn action-primary gate-summary-btn" onclick="showCurrentJourneySummary()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><polyline points="10 8 16 12 10 16"/>
+            </svg>
+            ${escapeHtml(t('gate_view_summary'))}
+        </button>
+    ` : '';
+
     // Whitelist of allowed action names for security
     const allowedActions = ['startTier2Visual', 'startTier3Visual', 'restartTier1Visual', 'restartTier2Visual'];
     
@@ -2697,6 +2714,7 @@ function createIntegratedEndpointNode(nodeData) {
             ${warningBoxHTML}
             ${recommendationsHTML}
             <div class="endpoint-actions">
+                ${summaryButtonHTML}
                 ${actionButtonHTML}
                 ${secondaryActionHTML}
                 ${defaultActionsHTML}
@@ -3515,6 +3533,19 @@ function closeFinalSummaryDialog(options = {}) {
     const review = modal.querySelector('.journey-review');
     if (review) review.classList.remove('journey-review-visible');
     setTimeout(() => modal.remove(), 220);
+}
+
+function showTerminalEndpoint(endpointNodeData, direction = 'forward') {
+    appState.visualFlowchart.summaryEndpointNodeData = endpointNodeData;
+    renderJourney(direction);
+    completeJourneyMap();
+    const prevBtn = document.getElementById('carousel-prev-btn');
+    if (prevBtn) prevBtn.style.display = 'none';
+}
+
+function showCurrentJourneySummary() {
+    const endpointNodeData = appState.visualFlowchart?.summaryEndpointNodeData;
+    if (endpointNodeData) showFinalSummary(endpointNodeData);
 }
 
 // Show the route completion gate — a simple "well done" screen that the user
@@ -7326,6 +7357,7 @@ window.fwOnSubtestChange = fwOnSubtestChange;
 window.fwOnPillarChange = fwOnPillarChange;
 window.fwSelectItem = fwSelectItem;
 window.showFinalSummary = showFinalSummary;
+window.showCurrentJourneySummary = showCurrentJourneySummary;
 window.showRouteCompleteGate = showRouteCompleteGate;
 window.openStepReviewModal = openStepReviewModal;
 window.closeStepReviewModal = closeStepReviewModal;

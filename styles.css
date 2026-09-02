@@ -8573,18 +8573,16 @@ body.step-review-modal-open { overflow: hidden; }
    ==================================================================== */
 
 .layout-toggle-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 0.28rem 0.62rem;
-  background: var(--bg);
+  gap: 0;
+  padding: 3px;
+  background: var(--bg-muted);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   color: var(--text-secondary);
   font-family: inherit;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
   cursor: pointer;
   transition: background var(--duration) var(--ease), color var(--duration) var(--ease), border-color var(--duration) var(--ease);
   white-space: nowrap;
@@ -8592,8 +8590,6 @@ body.step-review-modal-open { overflow: hidden; }
 }
 
 .layout-toggle-btn:hover {
-  background: var(--step-bg);
-  color: var(--step-text);
   border-color: var(--step-soft);
 }
 
@@ -8602,21 +8598,46 @@ body.step-review-modal-open { overflow: hidden; }
   outline-offset: 2px;
 }
 
-/* When aria-pressed="true" (horizontal / summary mode is active) */
-.layout-toggle-btn[aria-pressed="true"] {
-  background: var(--step-bg);
-  color: var(--step-text);
-  border-color: var(--step-soft);
+.layout-toggle-option {
+  width: 28px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
 }
 
-/* Show/hide the right icon based on the active mode */
-/* Default: standard mode → show "3 columns" icon, hide list icon */
-.layout-toggle-icon-list { display: none; }
-.layout-toggle-icon-summary { display: block; }
+.layout-toggle-option-standard {
+  background: var(--bg);
+  color: var(--step-text);
+  box-shadow: var(--shadow-sm);
+}
 
-/* Horizontal mode active → show list icon, hide columns icon */
-.layout-toggle-btn[aria-pressed="true"] .layout-toggle-icon-list { display: block; }
-.layout-toggle-btn[aria-pressed="true"] .layout-toggle-icon-summary { display: none; }
+.layout-toggle-btn[aria-pressed="true"] .layout-toggle-option-standard {
+  background: transparent;
+  color: var(--text-light);
+  box-shadow: none;
+}
+
+.layout-toggle-btn[aria-pressed="true"] .layout-toggle-option-summary {
+  background: var(--bg);
+  color: var(--step-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.layout-toggle-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ====================================================================
    HORIZONTAL / SUMMARY-VIEW LAYOUT MODE
