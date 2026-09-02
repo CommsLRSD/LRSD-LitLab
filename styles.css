@@ -6648,6 +6648,100 @@ body.step-review-modal-open { overflow: hidden; }
 }
 
 /* ============================================
+   FLOWCHART PROGRAM GATE (English / French Immersion)
+   ============================================ */
+.program-gate {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+.program-gate-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  position: relative;
+}
+
+.program-gate-back {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius);
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+.program-gate-back:hover { background: var(--bg-muted); color: var(--text); }
+.program-gate-back svg { width: 16px; height: 16px; }
+
+.program-gate-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 var(--space-sm);
+}
+
+.program-gate-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin: 0 0 var(--space-lg);
+}
+
+.program-gate-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.program-gate-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-muted);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color var(--duration) var(--ease), background var(--duration) var(--ease), transform var(--duration) var(--ease);
+}
+.program-gate-option:hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg));
+  transform: translateY(-1px);
+}
+.program-gate-option:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.program-gate-option-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.program-gate-option-desc {
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+/* ============================================
    GO TO TIER TRANSITION STEP
    ============================================ */
 .go-to-tier-step {
@@ -7089,9 +7183,9 @@ body.step-review-modal-open { overflow: hidden; }
 }
 
 .journey-map-head {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: 1rem var(--space-lg);
   background: var(--bg);
   border-bottom: 1px solid var(--border);
@@ -7103,6 +7197,12 @@ body.step-review-modal-open { overflow: hidden; }
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  justify-self: start;
+  min-width: 0;
+}
+
+.layout-toggle-btn {
+  justify-self: center;
 }
 
 .journey-map-head-icon {
@@ -7126,6 +7226,7 @@ body.step-review-modal-open { overflow: hidden; }
   color: var(--text-light);
   white-space: nowrap;
   flex-shrink: 0;
+  justify-self: end;
 }
 
 .journey-map-bar {
@@ -8644,6 +8745,45 @@ button.horiz-bubble-done:focus-visible {
 .horiz-bubble-type-info .horiz-bubble-icon {
   background: var(--step-info-bg);
   color: var(--step-info);
+}
+
+/* ---- Colour coding for completed bubbles in Summary View ----
+   Mirrors the completed step colouring in the Standard View journey list
+   (.journey-map-item.journey-map-type-* / journey-map-variant-*) and the
+   final journey summary bubbles (.anim-step-bubble / .anim-bubble-*), so a
+   step is styled the same way in every view. */
+.horiz-bubble-done.horiz-bubble-type-checklist {
+  background: var(--step-checklist-bg);
+  border-color: var(--step-checklist);
+}
+.horiz-bubble-done.horiz-bubble-type-selection {
+  background: var(--step-selection-bg);
+  border-color: var(--step-selection);
+}
+.horiz-bubble-done.horiz-bubble-type-decision {
+  background: var(--step-decision-bg);
+  border-color: var(--step-decision);
+}
+.horiz-bubble-done.horiz-bubble-type-info {
+  background: var(--step-info-bg);
+  border-color: var(--step-info);
+}
+
+.horiz-bubble-done.horiz-bubble-variant-step1 {
+  background: var(--step-bg);
+  border-color: var(--step);
+}
+.horiz-bubble-done.horiz-bubble-variant-selection {
+  background: var(--info-light);
+  border-color: var(--info);
+}
+.horiz-bubble-done.horiz-bubble-variant-effective {
+  background: var(--effective-bg);
+  border-color: var(--effective);
+}
+.horiz-bubble-done.horiz-bubble-variant-ineffective {
+  background: var(--ineffective-bg);
+  border-color: var(--ineffective);
 }
 
 /* ── Bubble text area ── */

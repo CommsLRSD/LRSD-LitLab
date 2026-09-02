@@ -20,6 +20,11 @@ const appState = {
     // are never forced to re-choose it). Stored as the intervention-menu
     // screener_id, e.g. "DIBELS".
     selectedScreener: null,
+    // Program chosen at the start of the flowchart: 'English' or 'French Immersion'.
+    // Gates which screeners/assessments/interventions are offered throughout
+    // the whole flowchart. Reset to null whenever the flowchart is (re)opened
+    // from outside so the user is asked again.
+    selectedProgram: null,
     // Visual flowchart state
     visualFlowchart: {
         nodes: [],
@@ -1327,7 +1332,7 @@ function initIntegratedFlowchart(tierId) {
                         <div class="journey-map-head">
                             <div class="journey-map-head-left">
                                 <svg class="journey-map-head-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-                                <span class="journey-map-title">${escapeHtml(t('fc_your_decisions'))}</span>
+                                <span class="journey-map-title" id="journey-map-title">${escapeHtml(getTierGateLabel(tierId))}</span>
                             </div>
                             <button class="layout-toggle-btn" id="layout-toggle-btn" type="button" onclick="toggleLayoutMode()" aria-pressed="false" title="${escapeHtml(t('fc_switch_summary'))}">
                                 <svg class="layout-toggle-icon layout-toggle-icon-summary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><rect x="2" y="7" width="5" height="10" rx="1"/><rect x="9.5" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="5" height="10" rx="1"/></svg>
@@ -1379,6 +1384,19 @@ function applyTierTheme(tierId) {
     if (num === '1' || num === '2' || num === '3') {
         fc.classList.add(`flowchart-tier-${num}`);
     }
+}
+
+// Label shown at the top of the "Your Decisions" panel: just the tier
+// number the user is currently working through (e.g. "Tier 1").
+function getTierGateLabel(tierId) {
+    const num = String(tierId).replace('tier', '');
+    return `${t('fc_tier_label')} ${num}`;
+}
+
+// Keep the panel's tier-number heading in sync whenever the active tier changes.
+function updateJourneyMapTierLabel(tierId) {
+    const titleEl = document.getElementById('journey-map-title');
+    if (titleEl) titleEl.textContent = getTierGateLabel(tierId);
 }
 
 // Show an explicit "Go to Tier #" transition step so the user is clearly aware
@@ -1762,7 +1780,8 @@ function renderJourneyHorizontal(direction = 'forward') {
             </div>`;
         } else {
             const answer = getStepAnswerText(step.nodeId, nodeDef);
-            bubblesHTML += `<button type="button" class="horiz-bubble horiz-bubble-done horiz-bubble-type-${nodeDef.type}" data-revisit-node="${escapeAttr(nodeDef.id)}" title="Revisit step ${stepNum}">
+            const variant = getStepSummaryVariant(nodeDef, vf.choices[nodeDef.id]);
+            bubblesHTML += `<button type="button" class="horiz-bubble horiz-bubble-done horiz-bubble-type-${nodeDef.type}${variant ? ` horiz-bubble-variant-${variant}` : ''}" data-revisit-node="${escapeAttr(nodeDef.id)}" title="Revisit step ${stepNum}">
                 <div class="horiz-bubble-check" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><path d="M20 6L9 17l-5-5"/></svg>
                 </div>
@@ -1936,7 +1955,7 @@ function createCompletedStepElement(nodeData) {
         if (nodeData.options === 'screeners') {
             // Show all screener options: chosen highlighted, others greyed out
             const tierData = appState.tierFlowchartData?.[vf.tierId];
-            const options = tierData?.screeners || [];
+            const options = (tierData?.screeners || []).filter(opt => isScreenerIdForCurrentProgram(opt.id));
             const buttonsHtml = options.map(opt => {
                 const taken = opt.id === choice.id || opt.name === choice.name;
                 return `<div class="completed-screener-option${taken ? ' completed-screener-taken' : ' completed-screener-other'}" aria-selected="${taken}" role="option">
@@ -2224,7 +2243,7 @@ function createIntegratedSelectionNode(nodeData) {
             itemType: itemType
         };
 
-        const screenerOptionsHtml = buildScreenerDropdownHtml('', rememberedScreener);
+        const screenerOptionsHtml = buildScreenerDropdownHtml(getProgramLanguageFilter(), rememberedScreener);
 
         return `
             <div class="step-header">
@@ -2274,8 +2293,11 @@ function createIntegratedSelectionNode(nodeData) {
     }
 
     // Default: flat list of options (used for screener selection in Tier 1)
-    const options = tierData?.[nodeData.options] || [];
     const isScreenerNode = nodeData.options === 'screeners';
+    const rawOptions = tierData?.[nodeData.options] || [];
+    const options = isScreenerNode
+        ? rawOptions.filter(opt => isScreenerIdForCurrentProgram(opt.id))
+        : rawOptions;
 
     const optionsHTML = isScreenerNode
         ? options.map(option => `
@@ -2952,6 +2974,9 @@ function switchToTier(tierId) {
     if (tierNameEl) {
         tierNameEl.textContent = getTierName(flowchartDef.title);
     }
+
+    // Keep the "Your Decisions" panel heading showing the current tier number
+    updateJourneyMapTierLabel(tierId);
     
     // Reset carousel navigation
     const prevBtn = document.getElementById('carousel-prev-btn');
@@ -6164,13 +6189,116 @@ function openInteractiveFlowchart() {
         flowchartContainer.style.display = 'block';
     }
     
-    // Start with Tier 1 by default
-    initIntegratedFlowchart('tier1');
+    // The flowchart always begins by asking which program the student is in
+    // (English or French Immersion) before Tier 1 starts, since that gates
+    // which screeners/assessments/interventions are offered throughout.
+    if (!appState.selectedProgram) {
+        renderProgramGate();
+    } else {
+        initIntegratedFlowchart('tier1');
+    }
     
     // Scroll to the top of the flowchart
     if (flowchartContainer) {
         flowchartContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+}
+
+// Screener ids (as used in data/tier-flowcharts.json) that belong to the
+// French Immersion program; everything else is treated as English.
+const FRENCH_PROGRAM_SCREENER_IDS = ['thafol', 'idapel'];
+
+function isScreenerIdForCurrentProgram(screenerId) {
+    const isFrenchScreener = FRENCH_PROGRAM_SCREENER_IDS.includes(String(screenerId).toLowerCase());
+    return appState.selectedProgram === 'French Immersion' ? isFrenchScreener : !isFrenchScreener;
+}
+
+// The wizard's screener dropdown groups by "English" / "French" language;
+// map the chosen program to that same filter value.
+function getProgramLanguageFilter() {
+    return appState.selectedProgram === 'French Immersion' ? 'French' : 'English';
+}
+
+// First screen the flowchart shows: choose the student's program. French
+// Immersion students are then asked whether they want the flowchart content
+// in French or English before Tier 1 begins.
+function renderProgramGate() {
+    const container = document.getElementById('flowchart-container');
+    if (!container) return;
+
+    container.classList.remove('flowchart-hidden');
+    container.innerHTML = `
+        <div class="program-gate">
+            <div class="program-gate-card">
+                <h2 class="program-gate-title">${escapeHtml(t('fc_program_gate_title'))}</h2>
+                <p class="program-gate-subtitle">${escapeHtml(t('fc_program_gate_subtitle'))}</p>
+                <div class="program-gate-options">
+                    <button type="button" class="program-gate-option" onclick="chooseFlowchartProgram('English')">
+                        <span class="program-gate-option-name">${escapeHtml(t('fc_program_english'))}</span>
+                        <span class="program-gate-option-desc">${escapeHtml(t('fc_program_english_desc'))}</span>
+                    </button>
+                    <button type="button" class="program-gate-option" onclick="chooseFlowchartProgram('French Immersion')">
+                        <span class="program-gate-option-name">${escapeHtml(t('fc_program_french_immersion'))}</span>
+                        <span class="program-gate-option-desc">${escapeHtml(t('fc_program_french_immersion_desc'))}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Second screen (French Immersion only): choose the display language.
+function renderFlowchartLanguageGate() {
+    const container = document.getElementById('flowchart-container');
+    if (!container) return;
+
+    container.classList.remove('flowchart-hidden');
+    container.innerHTML = `
+        <div class="program-gate">
+            <div class="program-gate-card">
+                <button type="button" class="program-gate-back" onclick="chooseFlowchartProgram(null)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    ${escapeHtml(t('fc_program_gate_back'))}
+                </button>
+                <h2 class="program-gate-title">${escapeHtml(t('fc_lang_gate_title'))}</h2>
+                <p class="program-gate-subtitle">${escapeHtml(t('fc_lang_gate_subtitle'))}</p>
+                <div class="program-gate-options">
+                    <button type="button" class="program-gate-option" onclick="chooseFlowchartLanguage('en')">
+                        <span class="program-gate-option-name">${escapeHtml(t('fc_lang_gate_english'))}</span>
+                    </button>
+                    <button type="button" class="program-gate-option" onclick="chooseFlowchartLanguage('fr')">
+                        <span class="program-gate-option-name">${escapeHtml(t('fc_lang_gate_french'))}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Handle the program choice: English starts the flowchart right away, while
+// French Immersion asks for a display language first. Passing null re-shows
+// the program gate (used by the "back" control on the language gate).
+function chooseFlowchartProgram(program) {
+    if (!program) {
+        appState.selectedProgram = null;
+        renderProgramGate();
+        return;
+    }
+    appState.selectedProgram = program;
+    if (program === 'French Immersion') {
+        renderFlowchartLanguageGate();
+    } else {
+        initIntegratedFlowchart('tier1');
+    }
+}
+
+function chooseFlowchartLanguage(lang) {
+    if (lang === 'en' || lang === 'fr') {
+        appState.language = lang;
+        applyTranslations();
+        updateLanguageToggleBtn();
+    }
+    initIntegratedFlowchart('tier1');
 }
 
 function openTierFlowchart(tierName) {
