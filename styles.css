@@ -7113,10 +7113,12 @@ body.step-review-modal-open { overflow: hidden; }
     font-size: 16px;
   }
 
+  /* Sits in flow on its own row: the card scrolls (overflow-y: auto), so an
+     overhanging absolutely positioned chip would be clipped at the card's top. */
   .visual-flowchart-tier-chip {
-    position: absolute;
-    top: -13px;
-    left: 18px;
+    grid-column: 1 / -1;
+    justify-self: start;
+    align-self: start;
     padding: 4px 10px;
     border-radius: var(--radius-pill);
     background: var(--step);
