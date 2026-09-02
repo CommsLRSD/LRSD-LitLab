@@ -32,6 +32,7 @@ const appState = {
         currentNodeId: null,
         selectedPath: []
     },
+    visualFlowchartModal: null,
     // Intervention menu state
     interventionMenu: {
         language: 'English',
@@ -1346,6 +1347,10 @@ function initIntegratedFlowchart(tierId) {
                                 </span>
                                 <span class="layout-toggle-label">${escapeHtml(t('fc_standard_view'))}</span>
                             </button>
+                            <button class="visual-flowchart-open-btn" type="button" onclick="openVisualFlowchartModal()" aria-label="${escapeHtml(t('fc_visual_open'))}" title="${escapeHtml(t('fc_visual_open'))}">
+                                <span class="material-symbols-rounded" aria-hidden="true" translate="no">account_tree</span>
+                                <span>${escapeHtml(t('fc_visual_view'))}</span>
+                            </button>
                             <span class="journey-map-count" id="journey-map-count">${escapeHtml(t('fc_step_label'))} 1</span>
                         </div>
                         <div class="journey-map-bar"><span class="journey-map-bar-fill" id="journey-map-bar-fill"></span></div>
@@ -1409,6 +1414,10 @@ function updateJourneyMapTierLabel(tierId) {
 // Show an explicit "Go to Tier #" transition step so the user is clearly aware
 // they are moving from one tier to another before the next tier's flow begins.
 function showGoToTierStep(tierId) {
+    if (document.getElementById('visual-flowchart-modal')) {
+        switchToTier(tierId);
+        return;
+    }
     const stepsContainer = getActiveStepTarget();
     const flowchartDef = getFlowchartDefs()[tierId];
     if (!stepsContainer || !flowchartDef) {
@@ -1727,6 +1736,7 @@ function renderJourneyStandard(direction = 'forward') {
         createIntegratedNodeElement(activeNode, slot, direction);
     }
 
+    refreshVisualFlowchartModal();
     scrollToActiveStep();
 }
 
@@ -1824,6 +1834,7 @@ function renderJourneyHorizontal(direction = 'forward') {
         createIntegratedNodeElement(activeNode, slot, direction);
     }
 
+    refreshVisualFlowchartModal();
     // Scroll the active bubble into view inside the track
     requestAnimationFrame(() => {
         const activeBubble = document.getElementById('horiz-active-bubble');
@@ -1855,6 +1866,350 @@ function updateLayoutToggleBtn() {
     btn.title = labelText;
     const label = btn.querySelector('.layout-toggle-label');
     if (label) label.textContent = isHoriz ? t('fc_summary_view') : t('fc_standard_view');
+}
+
+function getVisualFlowchartSnapshots() {
+    const vf = appState.visualFlowchart;
+    if (!vf?.tierId) return [];
+
+    const snapshots = (appState.fullJourney || []).map(snapshot => ({
+        tierId: snapshot.tierId,
+        selectedPath: snapshot.selectedPath.slice(),
+        choices: Object.assign({}, snapshot.choices)
+    }));
+    const current = {
+        tierId: vf.tierId,
+        selectedPath: vf.selectedPath.slice(),
+        choices: Object.assign({}, vf.choices)
+    };
+    const currentIndex = snapshots.findIndex(snapshot => snapshot.tierId === vf.tierId);
+    if (currentIndex === -1) snapshots.push(current);
+    else snapshots.splice(currentIndex, snapshots.length - currentIndex, current);
+    return snapshots;
+}
+
+function getVisualFlowchartEntries() {
+    const snapshots = getVisualFlowchartSnapshots();
+    const currentTierId = appState.visualFlowchart?.tierId;
+    const entries = [];
+
+    snapshots.forEach(snapshot => {
+        const tierDef = getFlowchartDefs()[snapshot.tierId];
+        if (!tierDef) return;
+        snapshot.selectedPath.forEach((step, index) => {
+            const node = tierDef.nodes[step.nodeId];
+            if (!node) return;
+            const isCurrent = snapshot.tierId === currentTierId
+                && index === snapshot.selectedPath.length - 1;
+            const choice = snapshot.choices[node.id];
+            let variant = getStepSummaryVariant(node, choice);
+            if (node.type === 'endpoint') {
+                variant = node.status === 'success' ? 'effective'
+                    : (node.status === 'warning' || node.status === 'danger') ? 'ineffective' : 'step1';
+            }
+            entries.push({
+                node,
+                choice,
+                tierId: snapshot.tierId,
+                tierLabel: tierDef.title.split(':')[0].trim(),
+                isCurrent,
+                canRevisit: snapshot.tierId === currentTierId && !isCurrent,
+                variant
+            });
+        });
+    });
+    return entries;
+}
+
+function openVisualFlowchartModal() {
+    if (!window.matchMedia('(min-width: 769px)').matches) return;
+    closeVisualFlowchartModal({ immediate: true });
+
+    const modal = document.createElement('div');
+    modal.id = 'visual-flowchart-modal';
+    modal.className = 'visual-flowchart-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'visual-flowchart-modal-title');
+    modal.innerHTML = `
+        <div class="visual-flowchart-dialog">
+            <header class="visual-flowchart-header">
+                <div>
+                    <p class="visual-flowchart-eyebrow">${escapeHtml(t('fc_visual_eyebrow'))}</p>
+                    <h2 id="visual-flowchart-modal-title">${escapeHtml(t('fc_visual_title'))}</h2>
+                    <p>${escapeHtml(t('fc_visual_desc'))}</p>
+                </div>
+                <button class="visual-flowchart-close" type="button" onclick="closeVisualFlowchartModal()" aria-label="${escapeHtml(t('fc_visual_close'))}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </header>
+            <div class="visual-flowchart-toolbar" aria-label="${escapeHtml(t('fc_visual_zoom_controls'))}">
+                <span class="visual-flowchart-legend visual-flowchart-legend-step">${escapeHtml(t('step_type_step'))}</span>
+                <span class="visual-flowchart-legend visual-flowchart-legend-effective">${escapeHtml(t('fc_visual_effective'))}</span>
+                <span class="visual-flowchart-legend visual-flowchart-legend-ineffective">${escapeHtml(t('fc_visual_ineffective'))}</span>
+                <span class="visual-flowchart-toolbar-spacer"></span>
+                <button type="button" onclick="zoomVisualFlowchart(-0.15)" aria-label="${escapeHtml(t('fc_visual_zoom_out'))}">−</button>
+                <output id="visual-flowchart-zoom-value">100%</output>
+                <button type="button" onclick="zoomVisualFlowchart(0.15)" aria-label="${escapeHtml(t('fc_visual_zoom_in'))}">+</button>
+                <button type="button" class="visual-flowchart-fit-btn" onclick="fitVisualFlowchart()" aria-label="${escapeHtml(t('fc_visual_fit'))}">
+                    <span class="material-symbols-rounded" aria-hidden="true" translate="no">fit_screen</span>
+                </button>
+            </div>
+            <div class="visual-flowchart-viewport" id="visual-flowchart-viewport" tabindex="0" aria-label="${escapeHtml(t('fc_visual_canvas'))}">
+                <div class="visual-flowchart-stage" id="visual-flowchart-stage"></div>
+            </div>
+        </div>`;
+
+    appState.visualFlowchartModal = {
+        scale: 1,
+        x: 0,
+        y: 0,
+        dragging: false,
+        lastX: 0,
+        lastY: 0,
+        previousFocus: document.activeElement
+    };
+    document.body.appendChild(modal);
+    const viewport = modal.querySelector('#visual-flowchart-viewport');
+    appState.visualFlowchartModal.inertElements = Array.from(document.body.children)
+        .filter(element => element !== modal && element instanceof HTMLElement)
+        .map(element => ({ element, wasInert: element.inert }));
+    appState.visualFlowchartModal.inertElements.forEach(({ element }) => { element.inert = true; });
+    document.body.classList.add('visual-flowchart-modal-open');
+    modal.addEventListener('click', event => {
+        if (event.target === modal) closeVisualFlowchartModal();
+    });
+    const keyHandler = event => {
+        if (event.key === 'Escape') {
+            closeVisualFlowchartModal();
+            return;
+        }
+        if (event.key === 'Tab') {
+            const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (!modal.contains(document.activeElement)) {
+                event.preventDefault();
+                first.focus();
+            } else if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+        if (document.activeElement === viewport && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+            event.preventDefault();
+            const state = appState.visualFlowchartModal;
+            const panAmount = 60;
+            if (event.key === 'ArrowLeft') state.x += panAmount;
+            if (event.key === 'ArrowRight') state.x -= panAmount;
+            if (event.key === 'ArrowUp') state.y += panAmount;
+            if (event.key === 'ArrowDown') state.y -= panAmount;
+            applyVisualFlowchartTransform();
+        }
+    };
+    appState.visualFlowchartModal.keyHandler = keyHandler;
+    document.addEventListener('keydown', keyHandler);
+    const desktopQuery = window.matchMedia('(min-width: 769px)');
+    const breakpointHandler = event => {
+        if (!event.matches) closeVisualFlowchartModal();
+    };
+    appState.visualFlowchartModal.desktopQuery = desktopQuery;
+    appState.visualFlowchartModal.breakpointHandler = breakpointHandler;
+    desktopQuery.addEventListener('change', breakpointHandler);
+
+    refreshVisualFlowchartModal();
+    requestAnimationFrame(() => {
+        modal.classList.add('visual-flowchart-modal-visible');
+        fitVisualFlowchart();
+        modal.querySelector('.visual-flowchart-close')?.focus();
+    });
+}
+
+function closeVisualFlowchartModal(options = {}) {
+    const modal = document.getElementById('visual-flowchart-modal');
+    if (!modal) return;
+    const modalState = appState.visualFlowchartModal;
+    const activeStep = modal.querySelector('.flowchart-step');
+    const activeSlot = document.getElementById('journey-step-slot');
+    if (activeStep && activeSlot) activeSlot.appendChild(activeStep);
+    if (modalState?.keyHandler) document.removeEventListener('keydown', modalState.keyHandler);
+    if (modalState?.desktopQuery && modalState?.breakpointHandler) {
+        modalState.desktopQuery.removeEventListener('change', modalState.breakpointHandler);
+    }
+    modalState?.inertElements?.forEach(({ element, wasInert }) => { element.inert = wasInert; });
+    document.body.classList.remove('visual-flowchart-modal-open');
+    modal.classList.remove('visual-flowchart-modal-visible');
+    const remove = () => {
+        modal.remove();
+        modalState?.previousFocus?.focus?.();
+        appState.visualFlowchartModal = null;
+    };
+    if (options.immediate) remove();
+    else setTimeout(remove, 180);
+}
+
+function refreshVisualFlowchartModal() {
+    const stage = document.getElementById('visual-flowchart-stage');
+    const viewport = document.getElementById('visual-flowchart-viewport');
+    if (!stage || !viewport || !appState.visualFlowchartModal) return;
+
+    const entries = getVisualFlowchartEntries();
+    const cardWidth = 380;
+    const columnGap = 150;
+    const rowGap = 230;
+    let routeRow = 0;
+    const positions = entries.map((entry, index) => {
+        if (index > 0) {
+            const priorVariant = entries[index - 1].variant;
+            if (priorVariant === 'effective') routeRow -= 1;
+            if (priorVariant === 'ineffective') routeRow += 1;
+        }
+        return { x: 90 + index * (cardWidth + columnGap), routeRow };
+    });
+    const rows = positions.map(position => position.routeRow);
+    const minRow = Math.min(0, ...rows);
+    const maxRow = Math.max(0, ...rows);
+    const topPadding = 100 - minRow * rowGap;
+    positions.forEach(position => { position.y = topPadding + position.routeRow * rowGap; });
+    const stageWidth = Math.max(900, 180 + entries.length * (cardWidth + columnGap));
+    const stageHeight = Math.max(620, topPadding + maxRow * rowGap + 520);
+
+    const connectorHtml = entries.slice(1).map((entry, index) => {
+        const from = positions[index];
+        const to = positions[index + 1];
+        const startX = from.x + cardWidth;
+        const startY = from.y + 78;
+        const endX = to.x;
+        const endY = to.y + 78;
+        const bend = Math.max(55, (endX - startX) * 0.5);
+        const variant = entries[index].variant || 'step1';
+        return `<path class="visual-flowchart-connector visual-flowchart-connector-${escapeAttr(variant)}" d="M ${startX} ${startY} C ${startX + bend} ${startY}, ${endX - bend} ${endY}, ${endX} ${endY}" marker-end="url(#visual-arrow-${escapeAttr(variant)})"/>`;
+    }).join('');
+
+    const cardsHtml = entries.map((entry, index) => {
+        const position = positions[index];
+        const answer = entry.choice?.name || (entry.node.type === 'checklist' ? t('step_type_reviewed') : '');
+        const variant = entry.variant || 'step1';
+        const isInteractive = entry.isCurrent && entry.node.type !== 'endpoint';
+        const tag = entry.canRevisit && entry.node.type !== 'endpoint' ? 'button' : 'article';
+        const revisit = tag === 'button'
+            ? ` type="button" data-visual-revisit="${escapeAttr(entry.node.id)}" aria-label="${escapeHtml(t('fc_revisit'))}: ${escapeAttr(getStepShortTitle(entry.node))}"`
+            : '';
+        return `<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}"
+                    style="left:${position.x}px;top:${position.y}px" ${revisit}>
+                <span class="visual-flowchart-tier-chip">${escapeHtml(entry.tierLabel)}</span>
+                <span class="visual-flowchart-card-icon">${getStepTypeIcon(entry.node.type)}</span>
+                <span class="visual-flowchart-card-copy">
+                    <span class="visual-flowchart-card-meta">${escapeHtml(getStepTypeLabel(entry.node.type))}${entry.isCurrent ? ` · ${escapeHtml(t('fc_in_progress'))}` : ''}</span>
+                    <strong>${escapeHtml(getStepShortTitle(entry.node))}</strong>
+                    ${answer ? `<span class="visual-flowchart-card-answer">${escapeHtml(answer)}</span>` : ''}
+                    ${entry.node.type === 'endpoint' && entry.node.description ? `<span class="visual-flowchart-card-answer">${escapeHtml(entry.node.description)}</span>` : ''}
+                </span>
+                ${isInteractive ? '<div class="visual-flowchart-active-host"></div>' : ''}
+            </${tag}>`;
+    }).join('');
+
+    stage.style.width = `${stageWidth}px`;
+    stage.style.height = `${stageHeight}px`;
+    stage.innerHTML = `
+        <svg class="visual-flowchart-lines" width="${stageWidth}" height="${stageHeight}" aria-hidden="true">
+            <defs>
+                <marker id="visual-arrow-step1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker>
+                <marker id="visual-arrow-selection" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker>
+                <marker id="visual-arrow-effective" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker>
+                <marker id="visual-arrow-ineffective" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker>
+            </defs>
+            ${connectorHtml}
+        </svg>
+        ${cardsHtml}`;
+
+    const activeNodeId = appState.visualFlowchart?.currentNodeId;
+    const sourceStep = activeNodeId
+        ? document.querySelector(`#journey-step-slot .flowchart-step[data-node-id="${CSS.escape(activeNodeId)}"]`)
+        : null;
+    const activeHost = stage.querySelector('.visual-flowchart-active-host');
+    if (sourceStep && activeHost) activeHost.appendChild(sourceStep);
+
+    wireVisualFlowchartPanZoom(viewport);
+    const activePosition = positions[positions.length - 1];
+    if (activePosition && entries[entries.length - 1]?.isCurrent) {
+        const state = appState.visualFlowchartModal;
+        state.x = viewport.clientWidth / 2 - (activePosition.x + cardWidth / 2) * state.scale;
+        state.y = viewport.clientHeight / 2 - (activePosition.y + 100) * state.scale;
+    }
+    applyVisualFlowchartTransform();
+}
+
+function wireVisualFlowchartPanZoom(viewport) {
+    if (viewport.dataset.panZoomWired === 'true') return;
+    viewport.dataset.panZoomWired = 'true';
+    viewport.addEventListener('click', event => {
+        const revisit = event.target.closest('[data-visual-revisit]');
+        if (revisit) undoToStep(revisit.dataset.visualRevisit);
+    });
+    viewport.addEventListener('pointerdown', event => {
+        if (event.target.closest('button, input, select, textarea, a, label')) return;
+        const state = appState.visualFlowchartModal;
+        if (!state) return;
+        state.dragging = true;
+        state.lastX = event.clientX;
+        state.lastY = event.clientY;
+        viewport.setPointerCapture(event.pointerId);
+        viewport.classList.add('is-panning');
+    });
+    viewport.addEventListener('pointermove', event => {
+        const state = appState.visualFlowchartModal;
+        if (!state?.dragging) return;
+        state.x += event.clientX - state.lastX;
+        state.y += event.clientY - state.lastY;
+        state.lastX = event.clientX;
+        state.lastY = event.clientY;
+        applyVisualFlowchartTransform();
+    });
+    const stopPan = () => {
+        if (appState.visualFlowchartModal) appState.visualFlowchartModal.dragging = false;
+        viewport.classList.remove('is-panning');
+    };
+    viewport.addEventListener('pointerup', stopPan);
+    viewport.addEventListener('pointercancel', stopPan);
+    viewport.addEventListener('wheel', event => {
+        event.preventDefault();
+        zoomVisualFlowchart(event.deltaY < 0 ? 0.1 : -0.1);
+    }, { passive: false });
+}
+
+function applyVisualFlowchartTransform() {
+    const stage = document.getElementById('visual-flowchart-stage');
+    const state = appState.visualFlowchartModal;
+    if (!stage || !state) return;
+    stage.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+    const output = document.getElementById('visual-flowchart-zoom-value');
+    if (output) output.value = `${Math.round(state.scale * 100)}%`;
+}
+
+function zoomVisualFlowchart(delta) {
+    const state = appState.visualFlowchartModal;
+    if (!state) return;
+    state.scale = Math.min(1.6, Math.max(0.35, state.scale + delta));
+    applyVisualFlowchartTransform();
+}
+
+function fitVisualFlowchart() {
+    const viewport = document.getElementById('visual-flowchart-viewport');
+    const stage = document.getElementById('visual-flowchart-stage');
+    const state = appState.visualFlowchartModal;
+    if (!viewport || !stage || !state) return;
+    const padding = 36;
+    state.scale = Math.min(1, Math.max(0.35,
+        Math.min((viewport.clientWidth - padding * 2) / stage.offsetWidth,
+            (viewport.clientHeight - padding * 2) / stage.offsetHeight)));
+    state.x = Math.max(padding, (viewport.clientWidth - stage.offsetWidth * state.scale) / 2);
+    state.y = Math.max(padding, (viewport.clientHeight - stage.offsetHeight * state.scale) / 2);
+    applyVisualFlowchartTransform();
 }
 
 // Decision Summary panel: every completed step becomes a rich card; the current
@@ -3089,6 +3444,7 @@ function showTierTransitionChoice(nodeData) {
         const review = stepsContainer.querySelector('.journey-review');
         if (review) review.classList.add('journey-review-visible');
     });
+    refreshVisualFlowchartModal();
     scrollToActiveStep();
 }
 
