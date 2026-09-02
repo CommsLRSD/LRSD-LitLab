@@ -6682,7 +6682,7 @@ body.step-review-modal-open { overflow: hidden; }
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(12px, 2vw, 28px);
+    padding: 0;
     background: rgba(8, 23, 40, 0.62);
     opacity: 0;
     transition: opacity 0.18s ease;
@@ -6692,14 +6692,16 @@ body.step-review-modal-open { overflow: hidden; }
     opacity: 1;
   }
 
+  /* Full screen is the default view: the dialog fills the viewport even when the
+     browser refuses the Fullscreen API request. */
   .visual-flowchart-dialog {
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr);
-    width: min(1720px, 97vw);
-    height: min(94vh, 980px);
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    border-radius: var(--radius-xl);
+    border: 0;
+    border-radius: 0;
     background: var(--bg);
     box-shadow: 0 28px 80px rgba(5, 20, 37, 0.32);
     transform: translateY(10px) scale(0.99);
@@ -6778,6 +6780,37 @@ body.step-review-modal-open { overflow: hidden; }
   .visual-flowchart-close svg {
     width: 17px;
     height: 17px;
+  }
+
+  /* Tier context bar directly under the header, e.g. "Tier ONE · Universal Classroom". */
+  .visual-flowchart-tier-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--step-bg);
+  }
+
+  .visual-flowchart-tier-bar[hidden] {
+    display: none;
+  }
+
+  .visual-flowchart-tier-bar-chip {
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--step);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .visual-flowchart-tier-bar-name {
+    color: var(--step-text);
+    font-size: 0.95rem;
+    font-weight: 800;
   }
 
   .visual-flowchart-toolbar {

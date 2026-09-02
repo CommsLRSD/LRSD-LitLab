@@ -1947,6 +1947,7 @@ function openVisualFlowchartModal() {
                     </button>
                 </div>
             </header>
+            <div class="visual-flowchart-tier-bar" id="visual-flowchart-tier-bar"></div>
             <div class="visual-flowchart-toolbar" aria-label="${escapeHtml(t('fc_visual_zoom_controls'))}">
                 <span class="visual-flowchart-legend visual-flowchart-legend-step">${escapeHtml(t('step_type_step'))}</span>
                 <span class="visual-flowchart-legend visual-flowchart-legend-effective">${escapeHtml(t('fc_visual_effective'))}</span>
@@ -2030,6 +2031,14 @@ function openVisualFlowchartModal() {
     document.addEventListener('fullscreenchange', fullscreenHandler);
 
     refreshVisualFlowchartModal();
+    // Full screen is the default view for the visual pathway: the modal opens from
+    // a user gesture, so the browser allows the request here. If it is refused the
+    // dialog still fills the viewport via CSS.
+    requestAnimationFrame(() => {
+        if (!document.fullscreenElement) {
+            document.querySelector('.visual-flowchart-dialog')?.requestFullscreen?.().catch(() => {});
+        }
+    });
     requestAnimationFrame(() => {
         modal.classList.add('visual-flowchart-modal-visible');
         modal.querySelector('.visual-flowchart-close')?.focus();
@@ -2083,7 +2092,28 @@ function updateVisualFlowchartFullscreenBtn() {
     const label = isFullscreen ? t('fc_visual_fullscreen_exit') : t('fc_visual_fullscreen');
     btn.setAttribute('aria-label', label);
     btn.title = label;
-    requestAnimationFrame(() => fitVisualFlowchart());
+    // The viewport size changes with full screen, so re-run the layout/positioning
+    // pass to keep the active step fully visible and left-anchored.
+    requestAnimationFrame(() => refreshVisualFlowchartModal());
+}
+
+// Show the current tier ("Tier ONE: Universal Classroom") in a bar at the top of
+// the visual pathway so the tier context is always visible.
+function updateVisualFlowchartTierBar() {
+    const bar = document.getElementById('visual-flowchart-tier-bar');
+    if (!bar) return;
+    const tierDef = getFlowchartDefs()[appState.visualFlowchart?.tierId];
+    if (!tierDef || !tierDef.title) {
+        bar.hidden = true;
+        bar.innerHTML = '';
+        return;
+    }
+    bar.hidden = false;
+    const tierLabel = tierDef.title.split(':')[0].trim();
+    const tierName = getTierName(tierDef.title);
+    bar.innerHTML = `
+        <span class="visual-flowchart-tier-bar-chip">${escapeHtml(tierLabel)}</span>
+        <span class="visual-flowchart-tier-bar-name">${escapeHtml(tierName)}</span>`;
 }
 
 // Collapse every finished tier's steps into a single expandable summary card
@@ -2124,6 +2154,12 @@ function refreshVisualFlowchartModal() {
     const stage = document.getElementById('visual-flowchart-stage');
     const viewport = document.getElementById('visual-flowchart-viewport');
     if (!stage || !viewport || !appState.visualFlowchartModal) return;
+
+    // The live step element is moved into the stage, so park it back in its slot
+    // before the stage is re-rendered; otherwise re-rendering destroys it.
+    const hostedStep = stage.querySelector('.visual-flowchart-active-host .flowchart-step');
+    const parkingSlot = document.getElementById('journey-step-slot');
+    if (hostedStep && parkingSlot) parkingSlot.appendChild(hostedStep);
 
     const entries = getVisualFlowchartEntries();
     const items = buildVisualFlowchartDisplayItems(entries);
@@ -2237,27 +2273,79 @@ function refreshVisualFlowchartModal() {
     if (sourceStep && activeHost) activeHost.appendChild(sourceStep);
 
     wireVisualFlowchartPanZoom(viewport);
+    updateVisualFlowchartTierBar();
     const state = appState.visualFlowchartModal;
+    const bounds = measureVisualFlowchartContent(stage);
+    state.contentBounds = bounds;
+    const pad = VISUAL_FLOWCHART_EDGE_PADDING;
+    const cards = Array.from(stage.querySelectorAll('.visual-flowchart-card'));
     const activeIndex = items.findIndex(item => item.type === 'entry' && item.entry.isCurrent);
-    const activePosition = activeIndex !== -1 ? positions[activeIndex] : null;
-    const firstPosition = positions[0];
-    if (!state.hasPositioned && firstPosition) {
-        // First time the modal opens, anchor step 1 fully on-screen at the left
-        // edge (rather than centring/fitting the whole stage) so the pathway
-        // reads left-to-right from a stable, fully-visible starting point.
-        const edgePadding = 40;
-        state.scale = 1;
-        state.x = edgePadding - firstPosition.x * state.scale;
-        state.y = viewport.clientHeight / 2 - (firstPosition.y + cardMidY) * state.scale;
-        state.hasPositioned = true;
-    } else if (activePosition) {
-        // Bring the in-progress card into view near the trailing edge rather than
-        // forcing it to the dead centre, so more of the completed pathway stays visible.
-        const edgePadding = 70;
-        state.x = viewport.clientWidth - edgePadding - (activePosition.x + activePosition.width) * state.scale;
-        state.y = viewport.clientHeight / 2 - (activePosition.y + cardMidY) * state.scale;
+    const activeCard = activeIndex !== -1 ? cards[activeIndex] : cards[0];
+    if (activeCard && activeCard.offsetWidth && activeCard.offsetHeight) {
+        // The live step card (checklists, option grids) is by far the tallest piece
+        // of the pathway, so scale the canvas down until it fits entirely on screen.
+        const fitScale = Math.max(0.35, Math.min(1,
+            (viewport.clientWidth - pad * 2) / activeCard.offsetWidth,
+            (viewport.clientHeight - pad * 2) / activeCard.offsetHeight));
+        // Auto-fit unless the user has taken manual control of the zoom, in which
+        // case only shrink further when their zoom would cut the active card off.
+        state.scale = state.userZoom ? Math.min(state.scale, fitScale) : fitScale;
+        // Keep the pathway reading left to right: stay anchored to the left edge of
+        // the content and only shift left far enough to reveal the active card.
+        const leftAnchor = pad - bounds.minX * state.scale;
+        const revealActive = viewport.clientWidth - pad
+            - (activeCard.offsetLeft + activeCard.offsetWidth) * state.scale;
+        state.x = Math.min(leftAnchor, revealActive);
+        const activeHeight = activeCard.offsetHeight * state.scale;
+        state.y = activeHeight + pad * 2 <= viewport.clientHeight
+            ? (viewport.clientHeight - activeHeight) / 2 - activeCard.offsetTop * state.scale
+            : pad - activeCard.offsetTop * state.scale;
     }
     applyVisualFlowchartTransform();
+}
+
+const VISUAL_FLOWCHART_EDGE_PADDING = 40;
+
+// Measure the real bounding box of the rendered cards (in unscaled stage
+// coordinates) so panning and fitting are driven by actual content, not by the
+// stage element's padded size.
+function measureVisualFlowchartContent(stage) {
+    const cards = Array.from(stage.querySelectorAll('.visual-flowchart-card'));
+    if (!cards.length) {
+        return { minX: 0, minY: 0, maxX: stage.offsetWidth, maxY: stage.offsetHeight };
+    }
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    cards.forEach(card => {
+        minX = Math.min(minX, card.offsetLeft);
+        minY = Math.min(minY, card.offsetTop);
+        maxX = Math.max(maxX, card.offsetLeft + card.offsetWidth);
+        maxY = Math.max(maxY, card.offsetTop + card.offsetHeight);
+    });
+    return { minX, minY, maxX, maxY };
+}
+
+// Restrict panning to the content: you can only move the canvas far enough to
+// reach the other end of the flowchart, never into empty space beyond it.
+function clampVisualFlowchartPan(state, viewport) {
+    const bounds = state.contentBounds;
+    if (!bounds || !viewport) return;
+    const pad = VISUAL_FLOWCHART_EDGE_PADDING;
+    const scale = state.scale;
+    const contentWidth = (bounds.maxX - bounds.minX) * scale;
+    const contentHeight = (bounds.maxY - bounds.minY) * scale;
+    const maxX = pad - bounds.minX * scale;
+    const minX = viewport.clientWidth - pad - bounds.maxX * scale;
+    state.x = contentWidth + pad * 2 <= viewport.clientWidth
+        ? maxX
+        : Math.min(maxX, Math.max(minX, state.x));
+    const maxY = pad - bounds.minY * scale;
+    const minY = viewport.clientHeight - pad - bounds.maxY * scale;
+    state.y = contentHeight + pad * 2 <= viewport.clientHeight
+        ? (viewport.clientHeight - contentHeight) / 2 - bounds.minY * scale
+        : Math.min(maxY, Math.max(minY, state.y));
 }
 
 function wireVisualFlowchartPanZoom(viewport) {
@@ -2271,6 +2359,9 @@ function wireVisualFlowchartPanZoom(viewport) {
         if (event.target.closest('button, input, select, textarea, a, label')) return;
         const state = appState.visualFlowchartModal;
         if (!state) return;
+        // The live card can grow/shrink between renders, so re-measure before panning.
+        const stage = document.getElementById('visual-flowchart-stage');
+        if (stage) state.contentBounds = measureVisualFlowchartContent(stage);
         state.dragging = true;
         state.lastX = event.clientX;
         state.lastY = event.clientY;
@@ -2300,8 +2391,11 @@ function wireVisualFlowchartPanZoom(viewport) {
 
 function applyVisualFlowchartTransform() {
     const stage = document.getElementById('visual-flowchart-stage');
+    const viewport = document.getElementById('visual-flowchart-viewport');
     const state = appState.visualFlowchartModal;
     if (!stage || !state) return;
+    if (!state.contentBounds) state.contentBounds = measureVisualFlowchartContent(stage);
+    clampVisualFlowchartPan(state, viewport);
     stage.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
     const output = document.getElementById('visual-flowchart-zoom-value');
     if (output) output.value = `${Math.round(state.scale * 100)}%`;
@@ -2309,8 +2403,18 @@ function applyVisualFlowchartTransform() {
 
 function zoomVisualFlowchart(delta) {
     const state = appState.visualFlowchartModal;
+    const viewport = document.getElementById('visual-flowchart-viewport');
     if (!state) return;
+    const previousScale = state.scale;
+    state.userZoom = true;
     state.scale = Math.min(1.6, Math.max(0.35, state.scale + delta));
+    if (viewport && previousScale) {
+        // Zoom around the centre of the viewport so the visible content stays put.
+        const centreX = viewport.clientWidth / 2;
+        const centreY = viewport.clientHeight / 2;
+        state.x = centreX - ((centreX - state.x) / previousScale) * state.scale;
+        state.y = centreY - ((centreY - state.y) / previousScale) * state.scale;
+    }
     applyVisualFlowchartTransform();
 }
 
@@ -2319,12 +2423,17 @@ function fitVisualFlowchart() {
     const stage = document.getElementById('visual-flowchart-stage');
     const state = appState.visualFlowchartModal;
     if (!viewport || !stage || !state) return;
-    const padding = 36;
+    const padding = VISUAL_FLOWCHART_EDGE_PADDING;
+    state.userZoom = true;
+    const bounds = measureVisualFlowchartContent(stage);
+    state.contentBounds = bounds;
+    const contentWidth = Math.max(1, bounds.maxX - bounds.minX);
+    const contentHeight = Math.max(1, bounds.maxY - bounds.minY);
     state.scale = Math.min(1, Math.max(0.35,
-        Math.min((viewport.clientWidth - padding * 2) / stage.offsetWidth,
-            (viewport.clientHeight - padding * 2) / stage.offsetHeight)));
-    state.x = Math.max(padding, (viewport.clientWidth - stage.offsetWidth * state.scale) / 2);
-    state.y = Math.max(padding, (viewport.clientHeight - stage.offsetHeight * state.scale) / 2);
+        Math.min((viewport.clientWidth - padding * 2) / contentWidth,
+            (viewport.clientHeight - padding * 2) / contentHeight)));
+    state.x = (viewport.clientWidth - contentWidth * state.scale) / 2 - bounds.minX * state.scale;
+    state.y = (viewport.clientHeight - contentHeight * state.scale) / 2 - bounds.minY * state.scale;
     applyVisualFlowchartTransform();
 }
 
