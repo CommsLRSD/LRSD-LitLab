@@ -1939,9 +1939,14 @@ function openVisualFlowchartModal() {
                     <h2 id="visual-flowchart-modal-title">${escapeHtml(t('fc_visual_title'))}</h2>
                     <p>${escapeHtml(t('fc_visual_desc'))}</p>
                 </div>
-                <button class="visual-flowchart-close" type="button" onclick="closeVisualFlowchartModal()" aria-label="${escapeHtml(t('fc_visual_close'))}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                </button>
+                <div class="visual-flowchart-header-actions">
+                    <button class="visual-flowchart-fullscreen-btn" id="visual-flowchart-fullscreen-btn" type="button" onclick="toggleVisualFlowchartFullscreen()" aria-label="${escapeHtml(t('fc_visual_fullscreen'))}" title="${escapeHtml(t('fc_visual_fullscreen'))}">
+                        <span class="material-symbols-rounded" aria-hidden="true" translate="no">fullscreen</span>
+                    </button>
+                    <button class="visual-flowchart-close" type="button" onclick="closeVisualFlowchartModal()" aria-label="${escapeHtml(t('fc_visual_close'))}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                </div>
             </header>
             <div class="visual-flowchart-toolbar" aria-label="${escapeHtml(t('fc_visual_zoom_controls'))}">
                 <span class="visual-flowchart-legend visual-flowchart-legend-step">${escapeHtml(t('step_type_step'))}</span>
@@ -1967,7 +1972,8 @@ function openVisualFlowchartModal() {
         dragging: false,
         lastX: 0,
         lastY: 0,
-        previousFocus: document.activeElement
+        previousFocus: document.activeElement,
+        expandedTiers: new Set()
     };
     document.body.appendChild(modal);
     const viewport = modal.querySelector('#visual-flowchart-viewport');
@@ -2020,6 +2026,9 @@ function openVisualFlowchartModal() {
     appState.visualFlowchartModal.desktopQuery = desktopQuery;
     appState.visualFlowchartModal.breakpointHandler = breakpointHandler;
     desktopQuery.addEventListener('change', breakpointHandler);
+    const fullscreenHandler = () => updateVisualFlowchartFullscreenBtn();
+    appState.visualFlowchartModal.fullscreenHandler = fullscreenHandler;
+    document.addEventListener('fullscreenchange', fullscreenHandler);
 
     refreshVisualFlowchartModal();
     requestAnimationFrame(() => {
@@ -2040,6 +2049,8 @@ function closeVisualFlowchartModal(options = {}) {
     if (modalState?.desktopQuery && modalState?.breakpointHandler) {
         modalState.desktopQuery.removeEventListener('change', modalState.breakpointHandler);
     }
+    if (modalState?.fullscreenHandler) document.removeEventListener('fullscreenchange', modalState.fullscreenHandler);
+    if (document.fullscreenElement && modal.contains(document.fullscreenElement)) document.exitFullscreen?.();
     modalState?.inertElements?.forEach(({ element, wasInert }) => { element.inert = wasInert; });
     document.body.classList.remove('visual-flowchart-modal-open');
     modal.classList.remove('visual-flowchart-modal-visible');
@@ -2052,19 +2063,79 @@ function closeVisualFlowchartModal(options = {}) {
     else setTimeout(remove, 180);
 }
 
+// Toggle true browser full screen for the visual flowchart dialog so the
+// pathway can use the entire display, not just the modal's normal viewport size.
+function toggleVisualFlowchartFullscreen() {
+    const dialog = document.querySelector('.visual-flowchart-dialog');
+    if (!dialog) return;
+    if (!document.fullscreenElement) {
+        dialog.requestFullscreen?.().catch(() => {});
+    } else {
+        document.exitFullscreen?.();
+    }
+}
+
+// Keep the full screen toggle button's icon/label in sync with actual full screen state.
+function updateVisualFlowchartFullscreenBtn() {
+    const btn = document.getElementById('visual-flowchart-fullscreen-btn');
+    if (!btn) return;
+    const isFullscreen = !!document.fullscreenElement;
+    const icon = btn.querySelector('.material-symbols-rounded');
+    if (icon) icon.textContent = isFullscreen ? 'fullscreen_exit' : 'fullscreen';
+    const label = isFullscreen ? t('fc_visual_fullscreen_exit') : t('fc_visual_fullscreen');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+    requestAnimationFrame(() => fitVisualFlowchart());
+}
+
+// Collapse every finished tier's steps into a single expandable summary card
+// so the pathway takes up far less horizontal space once a tier is complete.
+function toggleVisualFlowchartTier(tierId) {
+    const state = appState.visualFlowchartModal;
+    if (!state) return;
+    if (state.expandedTiers.has(tierId)) state.expandedTiers.delete(tierId);
+    else state.expandedTiers.add(tierId);
+    refreshVisualFlowchartModal();
+}
+
+// Group raw entries into display items: entries for the active tier are shown
+// individually, while completed tiers collapse into one card unless expanded.
+function buildVisualFlowchartDisplayItems(entries) {
+    const currentTierId = appState.visualFlowchart?.tierId;
+    const expandedTiers = appState.visualFlowchartModal?.expandedTiers || new Set();
+    const items = [];
+    let i = 0;
+    while (i < entries.length) {
+        const entry = entries[i];
+        if (entry.tierId !== currentTierId && !expandedTiers.has(entry.tierId)) {
+            const group = [];
+            while (i < entries.length && entries[i].tierId === entry.tierId) {
+                group.push(entries[i]);
+                i += 1;
+            }
+            items.push({ type: 'collapsed', tierId: entry.tierId, tierLabel: entry.tierLabel, entries: group, variant: group[group.length - 1].variant });
+        } else {
+            items.push({ type: 'entry', entry, variant: entry.variant });
+            i += 1;
+        }
+    }
+    return items;
+}
+
 function refreshVisualFlowchartModal() {
     const stage = document.getElementById('visual-flowchart-stage');
     const viewport = document.getElementById('visual-flowchart-viewport');
     if (!stage || !viewport || !appState.visualFlowchartModal) return;
 
     const entries = getVisualFlowchartEntries();
-    const cardWidth = 380;
-    const columnGap = 150;
-    const rowGap = 230;
+    const items = buildVisualFlowchartDisplayItems(entries);
+    const cardWidth = 260;
+    const columnGap = 90;
+    const rowGap = 180;
     let routeRow = 0;
-    const positions = entries.map((entry, index) => {
+    const positions = items.map((item, index) => {
         if (index > 0) {
-            const priorVariant = entries[index - 1].variant;
+            const priorVariant = items[index - 1].variant;
             if (priorVariant === 'effective') routeRow -= 1;
             if (priorVariant === 'ineffective') routeRow += 1;
         }
@@ -2073,25 +2144,43 @@ function refreshVisualFlowchartModal() {
     const rows = positions.map(position => position.routeRow);
     const minRow = Math.min(0, ...rows);
     const maxRow = Math.max(0, ...rows);
-    const topPadding = 100 - minRow * rowGap;
+    const cardMidY = 90;
+    const topPadding = cardMidY - minRow * rowGap;
     positions.forEach(position => { position.y = topPadding + position.routeRow * rowGap; });
-    const stageWidth = Math.max(900, 180 + entries.length * (cardWidth + columnGap));
-    const stageHeight = Math.max(620, topPadding + maxRow * rowGap + 520);
+    const stageWidth = Math.max(900, 180 + items.length * (cardWidth + columnGap));
+    const stageHeight = Math.max(560, topPadding + maxRow * rowGap + 460);
 
-    const connectorHtml = entries.slice(1).map((entry, index) => {
+    const connectorHtml = items.slice(1).map((item, index) => {
         const from = positions[index];
         const to = positions[index + 1];
         const startX = from.x + cardWidth;
-        const startY = from.y + 78;
+        const startY = from.y + cardMidY;
         const endX = to.x;
-        const endY = to.y + 78;
-        const bend = Math.max(55, (endX - startX) * 0.5);
-        const variant = entries[index].variant || 'step1';
+        const endY = to.y + cardMidY;
+        const bend = Math.max(45, (endX - startX) * 0.5);
+        const variant = items[index].variant || 'step1';
         return `<path class="visual-flowchart-connector visual-flowchart-connector-${escapeAttr(variant)}" d="M ${startX} ${startY} C ${startX + bend} ${startY}, ${endX - bend} ${endY}, ${endX} ${endY}" marker-end="url(#visual-arrow-${escapeAttr(variant)})"/>`;
     }).join('');
 
-    const cardsHtml = entries.map((entry, index) => {
+    const cardsHtml = items.map((item, index) => {
         const position = positions[index];
+        if (item.type === 'collapsed') {
+            const variant = item.variant || 'step1';
+            const tierNum = item.tierLabel.replace(/\D/g, '');
+            const collapsedLabel = typeof t('fc_visual_tier_collapsed') === 'function'
+                ? t('fc_visual_tier_collapsed')(tierNum, item.entries.length)
+                : `${item.tierLabel} · ${item.entries.length} steps`;
+            return `<button type="button" class="visual-flowchart-card visual-flowchart-card-collapsed visual-flowchart-card-${escapeAttr(variant)}"
+                        style="left:${position.x}px;top:${position.y}px" onclick="toggleVisualFlowchartTier('${escapeAttr(item.tierId)}')" aria-label="${escapeHtml(collapsedLabel)}">
+                    <span class="visual-flowchart-tier-chip">${escapeHtml(item.tierLabel)}</span>
+                    <span class="visual-flowchart-card-icon"><span class="material-symbols-rounded" aria-hidden="true" translate="no">unfold_more</span></span>
+                    <span class="visual-flowchart-card-copy">
+                        <span class="visual-flowchart-card-meta">${escapeHtml(item.tierLabel)}</span>
+                        <strong>${escapeHtml(collapsedLabel)}</strong>
+                    </span>
+                </button>`;
+        }
+        const entry = item.entry;
         const answer = entry.choice?.name || (entry.node.type === 'checklist' ? t('step_type_reviewed') : '');
         const variant = entry.variant || 'step1';
         const isInteractive = entry.isCurrent && entry.node.type !== 'endpoint';
@@ -2135,11 +2224,15 @@ function refreshVisualFlowchartModal() {
     if (sourceStep && activeHost) activeHost.appendChild(sourceStep);
 
     wireVisualFlowchartPanZoom(viewport);
-    const activePosition = positions[positions.length - 1];
-    if (activePosition && entries[entries.length - 1]?.isCurrent) {
+    const activeIndex = items.findIndex(item => item.type === 'entry' && item.entry.isCurrent);
+    const activePosition = activeIndex !== -1 ? positions[activeIndex] : null;
+    if (activePosition) {
+        // Bring the in-progress card into view near the trailing edge rather than
+        // forcing it to the dead centre, so more of the completed pathway stays visible.
         const state = appState.visualFlowchartModal;
-        state.x = viewport.clientWidth / 2 - (activePosition.x + cardWidth / 2) * state.scale;
-        state.y = viewport.clientHeight / 2 - (activePosition.y + 100) * state.scale;
+        const edgePadding = 70;
+        state.x = viewport.clientWidth - edgePadding - (activePosition.x + cardWidth) * state.scale;
+        state.y = viewport.clientHeight / 2 - (activePosition.y + cardMidY) * state.scale;
     }
     applyVisualFlowchartTransform();
 }
