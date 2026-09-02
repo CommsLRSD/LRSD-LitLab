@@ -13,16 +13,16 @@
 }
 
 :root {
-  /* Brand – deep navy + bright yellow accent */
-  --primary: #1b2d6b;
-  --primary-light: #2d4a9e;
-  --primary-lighter: #5571cc;
-  --primary-faint: rgba(27, 45, 107, 0.07);
-  --secondary: #4c63a6;
-  --secondary-light: #7a91cb;
-  --accent: #ffd600;
-  --accent-dark: #e6c200;
-  --accent-light: #fff8c5;
+  /* Brand – colours sampled from the LitLab logo */
+  --primary: #0c315a;
+  --primary-light: #0a7f8a;
+  --primary-lighter: #0ea7b4;
+  --primary-faint: rgba(12, 49, 90, 0.07);
+  --secondary: #0ea7b4;
+  --secondary-light: #65cbd3;
+  --accent: #f6ae08;
+  --accent-dark: #c47c00;
+  --accent-light: #fff3c7;
 
   /* Fun pastel card palette */
   --card-yellow-bg: #fff8c5;
@@ -52,11 +52,11 @@
        1. STEP        – every step (checklist, selection, decision, info)
        2. EFFECTIVE   – effective / positive routes & outcomes
        3. INEFFECTIVE – ineffective / needs-improvement routes & outcomes */
-  --step: #1b2d6b;
-  --step-bg: #eef0f8;
-  --step-header: #dde2f2;
-  --step-text: #1b2d6b;
-  --step-soft: rgba(27, 45, 107, 0.18);
+  --step: #0c315a;
+  --step-bg: #edf5f8;
+  --step-header: #d6edf1;
+  --step-text: #0c315a;
+  --step-soft: rgba(12, 49, 90, 0.18);
 
   --effective: #2fa56f;
   --effective-bg: #e7f6ee;
@@ -292,9 +292,8 @@ strong { font-weight: 600; }
 }
 
 .logo-icon {
-  width: 26px;
-  height: 26px;
-  color: var(--primary);
+  width: auto;
+  height: 38px;
 }
 
 .logo-text {
