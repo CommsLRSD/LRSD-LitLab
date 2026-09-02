@@ -4232,6 +4232,16 @@ body.evidence-modal-open { overflow: hidden; }
 
 .action-btn:hover { background: var(--bg-muted); }
 
+/* Inline SVG icons (e.g. the arrow on "Continue" buttons) have no intrinsic
+   size once width/height attributes are omitted, so without an explicit rule
+   they fall back to the browser's oversized default replaced-element box.
+   Keep them the same compact scale as .continue-btn's icon. */
+.action-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .action-btn.action-primary,
 .btn-primary {
   background: var(--primary);
@@ -6648,100 +6658,6 @@ body.step-review-modal-open { overflow: hidden; }
 }
 
 /* ============================================
-   FLOWCHART PROGRAM GATE (English / French Immersion)
-   ============================================ */
-.program-gate {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-2xl) var(--space-lg);
-}
-
-.program-gate-card {
-  width: 100%;
-  max-width: 560px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: var(--space-xl) var(--space-lg);
-  text-align: center;
-  position: relative;
-}
-
-.program-gate-back {
-  position: absolute;
-  top: var(--space-md);
-  left: var(--space-md);
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: none;
-  border: none;
-  color: var(--text-light);
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  padding: 0.35rem 0.5rem;
-  border-radius: var(--radius);
-  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
-}
-.program-gate-back:hover { background: var(--bg-muted); color: var(--text); }
-.program-gate-back svg { width: 16px; height: 16px; }
-
-.program-gate-title {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--text);
-  margin: 0 0 var(--space-sm);
-}
-
-.program-gate-subtitle {
-  font-size: 0.95rem;
-  color: var(--text-light);
-  margin: 0 0 var(--space-lg);
-}
-
-.program-gate-options {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-}
-
-.program-gate-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  padding: var(--space-md) var(--space-lg);
-  background: var(--bg-muted);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  font-family: inherit;
-  transition: border-color var(--duration) var(--ease), background var(--duration) var(--ease), transform var(--duration) var(--ease);
-}
-.program-gate-option:hover {
-  border-color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 8%, var(--bg));
-  transform: translateY(-1px);
-}
-.program-gate-option:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.program-gate-option-name {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.program-gate-option-desc {
-  font-size: 0.85rem;
-  color: var(--text-light);
-}
-
-/* ============================================
    GO TO TIER TRANSITION STEP
    ============================================ */
 .go-to-tier-step {
@@ -7088,6 +7004,65 @@ body.step-review-modal-open { overflow: hidden; }
 /* Spacer pseudo-element balances the left sidebar so the main column is visually centred */
 .journey-shell-tier1::after {
   content: '';
+}
+
+/* Column holding the small program/language selector, stacked above the
+   Tier 1 "success" sidebar when present (or standing alone on other tiers). */
+.fc-sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Small, sleek program/language selector shown beside the flowchart. */
+.program-lang-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 0.6rem 0.85rem;
+}
+
+.program-lang-mini-field {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.program-lang-mini-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
+.program-lang-mini-select {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.program-lang-mini-select:hover,
+.program-lang-mini-select:focus-visible {
+  border-color: var(--primary);
+  outline: none;
 }
 
 .tier1-success-sidebar {
