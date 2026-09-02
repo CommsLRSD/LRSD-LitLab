@@ -947,7 +947,7 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier1-success',
                 type: 'endpoint',
                 status: 'success',
-                title: 'Step 3: Success!',
+                title: 'Instruction Effective!',
                 description: 'Continue and monitor with general curriculum.',
                 recommendations: [
                     'Continue and monitor with general curriculum'
@@ -979,7 +979,7 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier1-reteach',
                 type: 'endpoint',
                 status: 'warning',
-                title: 'Step 3: Reteach General Curriculum',
+                title: 'Reteach General Curriculum',
                 description: 'Consider areas of weakness discovered via Literacy Screener. Use the Interventions Menu below to find resources.\n\nThis route remains within Tier One.',
                 recommendations: [
                     'Consider areas of weakness discovered via Literacy Screener.',
@@ -1070,7 +1070,7 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier2-success',
                 type: 'endpoint',
                 status: 'success',
-                title: 'Step 5: Success!',
+                title: 'Instruction Effective!',
                 description: 'Consider fading supports to Tier 1 and monitor.',
                 recommendations: [
                     'Consider fading supports to Tier 1 and monitor.'
@@ -1111,7 +1111,7 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier2-cycle2-success',
                 type: 'endpoint',
                 status: 'success',
-                title: 'Step 8: Success!',
+                title: 'Instruction Effective!',
                 description: 'Consider fading supports to Tier 1 and monitor.',
                 recommendations: [
                     'Consider fading supports to Tier 1 and monitor.'
@@ -1121,7 +1121,7 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier2-move-tier3',
                 type: 'endpoint',
                 status: 'info',
-                title: 'Step 8: Move to Tier 3',
+                title: 'Move to Tier 3',
                 description: 'If student does not make expected progress in Tier 2 following two 8-week intervention cycles, they move into Tier 3. Fewer than 10% of students should need to be in Tier 3.\n\nThis route continues into the Tier Three flowchart.',
                 recommendations: [
                     'Continue into the Tier Three flowchart.'
@@ -1215,7 +1215,7 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier3-success',
                 type: 'endpoint',
                 status: 'success',
-                title: 'Step 4: Success!',
+                title: 'Instruction Effective!',
                 description: 'Consider fading supports to Tier 1 and monitor.',
                 recommendations: [
                     'Consider fading supports to Tier 1 and monitor.'
@@ -1225,7 +1225,7 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier3-specialist',
                 type: 'endpoint',
                 status: 'warning',
-                title: 'Step 4: Meet with Clinicians',
+                title: 'Meet with Clinicians',
                 description: 'Meet with the appropriate clinicians to discuss next steps.'
             }
         }
@@ -2693,14 +2693,8 @@ function createIntegratedEndpointNode(nodeData) {
     ` : '';
 
     // For pure terminal endpoints (no tier-transition actions), always provide
-    // Redo Tier 1 and Done so the user is never left without a next action.
+    // Done so the user is never left without a next action.
     const defaultActionsHTML = (!actionButtonHTML && !secondaryActionHTML) ? `
-        <button class="action-btn action-secondary" onclick="restartCurrentTier()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-                <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
-            </svg>
-            Redo Tier 1
-        </button>
         <button class="action-btn action-primary" onclick="closeIntegratedFlowchart()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M20 6L9 17l-5-5"/></svg>
             Done
@@ -6316,6 +6310,7 @@ function requestFlowchartProgramChange(program) {
         }
     }
     appState.selectedProgram = program;
+    appState.selectedScreener = null;
     initIntegratedFlowchart('tier1');
 }
 
