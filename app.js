@@ -2118,16 +2118,35 @@ function updateVisualFlowchartTierBar() {
 
 // Collapse every finished tier's steps into a single expandable summary card
 // so the pathway takes up far less horizontal space once a tier is complete.
+// Expanding remembers the current pan/zoom so collapsing again restores the view
+// exactly as it looked before the tier was opened.
 function toggleVisualFlowchartTier(tierId) {
     const state = appState.visualFlowchartModal;
     if (!state) return;
-    if (state.expandedTiers.has(tierId)) state.expandedTiers.delete(tierId);
-    else state.expandedTiers.add(tierId);
+    state.tierViewMemory = state.tierViewMemory || {};
+    let restore = null;
+    if (state.expandedTiers.has(tierId)) {
+        state.expandedTiers.delete(tierId);
+        restore = state.tierViewMemory[tierId] || null;
+        delete state.tierViewMemory[tierId];
+    } else {
+        state.expandedTiers.add(tierId);
+        state.tierViewMemory[tierId] = { x: state.x, y: state.y, scale: state.scale, userZoom: state.userZoom };
+    }
     refreshVisualFlowchartModal();
+    if (restore) {
+        state.x = restore.x;
+        state.y = restore.y;
+        state.scale = restore.scale;
+        state.userZoom = restore.userZoom;
+        applyVisualFlowchartTransform();
+    }
 }
 
 // Group raw entries into display items: entries for the active tier are shown
 // individually, while completed tiers collapse into one card unless expanded.
+// The first card of an expanded tier carries a flag so a one-click "collapse
+// tier" control can be rendered next to it.
 function buildVisualFlowchartDisplayItems(entries) {
     const currentTierId = appState.visualFlowchart?.tierId;
     const expandedTiers = appState.visualFlowchartModal?.expandedTiers || new Set();
@@ -2143,11 +2162,24 @@ function buildVisualFlowchartDisplayItems(entries) {
             }
             items.push({ type: 'collapsed', tierId: entry.tierId, tierLabel: entry.tierLabel, entries: group, variant: group[group.length - 1].variant });
         } else {
-            items.push({ type: 'entry', entry, variant: entry.variant });
+            const previous = items[items.length - 1];
+            const startsExpandedTier = entry.tierId !== currentTierId
+                && expandedTiers.has(entry.tierId)
+                && (!previous || previous.type !== 'entry' || previous.entry.tierId !== entry.tierId);
+            items.push({ type: 'entry', entry, variant: entry.variant, expandedTierId: startsExpandedTier ? entry.tierId : null });
             i += 1;
         }
     }
     return items;
+}
+
+// Steps whose live content is unusually tall (the wizard-style assessment and
+// intervention pickers, or long checklists) get a wider card while they are in
+// progress so the pathway does not have to zoom out to fit them.
+function isLongContentStep(node) {
+    if (!node) return false;
+    if (node.type === 'selection' && (node.options === 'drillDownAssessments' || node.options === 'interventions')) return true;
+    return node.type === 'checklist' && (node.items || []).length >= 6;
 }
 
 function refreshVisualFlowchartModal() {
@@ -2168,9 +2200,18 @@ function refreshVisualFlowchartModal() {
     // so it gets extra width for readability instead of the standard card width.
     const wideCardWidth = 340;
     const interactiveCardWidth = 360;
+    // While a text-heavy step is still in progress it is 50% wider than a normal
+    // card (and wider still for the assessment / intervention pickers) so the
+    // canvas rarely has to zoom out; once completed it shrinks back down.
+    const activeFirstStepWidth = Math.round(cardWidth * 1.5);
+    const activeLongStepWidth = Math.round(cardWidth * 1.9);
     const getItemCardWidth = item => {
         if (item.type === 'entry') {
-            if (item.entry.isCurrent && item.entry.node.type !== 'endpoint') return interactiveCardWidth;
+            if (item.entry.isCurrent && item.entry.node.type !== 'endpoint') {
+                if (item.entry.isTierFirstStep) return activeFirstStepWidth;
+                if (isLongContentStep(item.entry.node)) return activeLongStepWidth;
+                return interactiveCardWidth;
+            }
             if (item.entry.isTierFirstStep) return wideCardWidth;
         }
         return cardWidth;
@@ -2237,7 +2278,19 @@ function refreshVisualFlowchartModal() {
         const revisit = tag === 'button'
             ? ` type="button" data-visual-revisit="${escapeAttr(entry.node.id)}" aria-label="${escapeHtml(t('fc_revisit'))}: ${escapeAttr(getStepShortTitle(entry.node))}"`
             : '';
-        return `<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}${!isInteractive && entry.isTierFirstStep ? ' visual-flowchart-card-wide' : ''}"
+        // One-click control to fold an expanded (completed) tier back into its
+        // single summary card and restore the previous view.
+        const collapseLabel = t('fc_visual_tier_collapse');
+        const collapseBtn = item.expandedTierId
+            ? `<button type="button" class="visual-flowchart-collapse-tier"
+                        style="left:${position.x}px;top:${position.y - 46}px"
+                        onclick="toggleVisualFlowchartTier('${escapeAttr(item.expandedTierId)}')"
+                        title="${escapeHtml(collapseLabel)}" aria-label="${escapeHtml(`${collapseLabel}: ${entry.tierLabel}`)}">
+                    <span class="material-symbols-rounded" aria-hidden="true" translate="no">unfold_less</span>
+                    <span>${escapeHtml(collapseLabel)}</span>
+                </button>`
+            : '';
+        return `${collapseBtn}<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}${!isInteractive && entry.isTierFirstStep ? ' visual-flowchart-card-wide' : ''}"
                     style="left:${position.x}px;top:${position.y}px;width:${position.width}px" ${revisit}>
                 <span class="visual-flowchart-tier-chip">${escapeHtml(entry.tierLabel)}</span>
                 <span class="visual-flowchart-card-icon">${getStepTypeIcon(entry.node.type)}</span>
@@ -2281,6 +2334,12 @@ function refreshVisualFlowchartModal() {
     const cards = Array.from(stage.querySelectorAll('.visual-flowchart-card'));
     const activeIndex = items.findIndex(item => item.type === 'entry' && item.entry.isCurrent);
     const activeCard = activeIndex !== -1 ? cards[activeIndex] : cards[0];
+    // Once a step is completed and the pathway moves on, drop any manual zoom so
+    // the canvas automatically zooms back in around the (now smaller) live card.
+    if (state.fitNodeId !== activeNodeId) {
+        state.fitNodeId = activeNodeId;
+        state.userZoom = false;
+    }
     if (activeCard && activeCard.offsetWidth && activeCard.offsetHeight) {
         // The live step card (checklists, option grids) is by far the tallest piece
         // of the pathway, so scale the canvas down until it fits entirely on screen.
@@ -2570,7 +2629,7 @@ function createCompletedStepElement(nodeData) {
         const itemsHtml = items.map(item => `
             <li class="completed-checklist-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-                <span>${escapeHtml(item)}</span>
+                <span>${formatChecklistItemText(item)}</span>
             </li>`).join('');
         html = `<ul class="completed-checklist">${itemsHtml}</ul>`;
     }
@@ -2669,9 +2728,34 @@ function createIntegratedNodeElement(nodeData, container, direction = 'forward')
     }
 }
 
+// Reference links surfaced inside checklist points: the phrase is matched in the
+// escaped item text and turned into an external link so users can read up on the
+// concept without leaving their place in the flowchart.
+const CHECKLIST_REFERENCE_LINKS = [
+    {
+        phrase: 'simple view of reading',
+        url: 'https://www.readingrockets.org/topics/about-reading/articles/simple-view-reading'
+    },
+    {
+        phrase: 'conception simple de la lecture',
+        url: 'https://www.readingrockets.org/topics/about-reading/articles/simple-view-reading'
+    }
+];
+
+function formatChecklistItemText(item) {
+    let html = escapeHtml(item);
+    CHECKLIST_REFERENCE_LINKS.forEach(({ phrase, url }) => {
+        const needle = escapeHtml(phrase).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        html = html.replace(new RegExp(needle, 'i'), match =>
+            `<a class="checklist-line-link" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">${match}</a>`);
+    });
+    return html;
+}
+
 // Create integrated checklist node – every point is visible in one list.
 // The user must tick each point off before the step can be completed; ticked
-// points grow slightly larger and bolder so progress is obvious at a glance.
+// points keep their exact text size and weight and are marked with colour and
+// an accent bar so the selection is obvious without the layout shifting.
 function createIntegratedChecklistNode(nodeData) {
     const items = nodeData.items || [];
     const total = items.length;
@@ -2683,7 +2767,7 @@ function createIntegratedChecklistNode(nodeData) {
                 <span class="checklist-line-box">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                 </span>
-                <span class="checklist-line-text">${escapeHtml(item)}</span>
+                <span class="checklist-line-text">${formatChecklistItemText(item)}</span>
             </label>
         </li>
     `).join('');
@@ -4269,7 +4353,7 @@ function buildStepReviewContent(nodeDef, choice) {
         const itemsHTML = items.map(item => `
             <li class="completed-checklist-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-                <span>${escapeHtml(item)}</span>
+                <span>${formatChecklistItemText(item)}</span>
             </li>`).join('');
         html += `<ul class="completed-checklist">${itemsHTML}</ul>`;
         if (nodeDef.postSections) {

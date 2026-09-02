@@ -15,7 +15,7 @@ Display the following as checklist items:
 - [ ] Are the activities used to accomplish specific goals?
 - [ ] Is there a plan for reteaching when necessary?
 - [ ] Is progress being tracked?
-- [ ] Does Instruction incorporate the simple view of reading?
+- [ ] Does Instruction incorporate the [simple view of reading](https://www.readingrockets.org/topics/about-reading/articles/simple-view-reading)?
 
 After reviewing the checklist, proceed to Step 2.
 
