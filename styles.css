@@ -8676,7 +8676,7 @@ body.step-review-modal-open { overflow: hidden; }
   gap: 5px;
   padding: 0.4rem 0.65rem;
   border: 1.5px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
@@ -8788,7 +8788,7 @@ body.step-review-modal-open { overflow: hidden; }
 .journey-step-slot .go-to-tier-btn {
   font-size: 0.82rem;
   padding: 0.4rem 0.85rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius);
   margin-top: 0;
 }
 
