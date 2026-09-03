@@ -3179,7 +3179,9 @@ body.evidence-modal-open { overflow: hidden; }
 .node-number { font-size: 0.7rem; font-weight: 600; color: var(--text-light); }
 .node-title { font-weight: 500; font-size: 0.85rem; color: var(--text); }
 
-.step-content, .node-content { padding: var(--space-xl); }
+.step-content, .node-content {
+  padding: var(--space-md) var(--space-xl) var(--space-xl);
+}
 
 /* Stronger typographic hierarchy: bold title, lighter supporting copy.
    Font sizes are kept on a tight, consistent scale (1.2 / 0.9 / 0.85rem)
