@@ -267,14 +267,11 @@
                     <p class="section-subtitle" data-i18n="interventions_section_subtitle">Follow the steps below to find resources matched to your screening results</p>
                 </div>
 
-                <div class="interventions-page-body">
+                <div class="interventions-page-body interventions-page-body-grid">
                     <div class="dropdown-wizard" aria-label="Intervention menu dropdown workflow">
                         <div class="dropdown-wizard-header">
                             <div class="wizard-title-row">
                                 <h3 class="wizard-title"><span class="material-symbols-rounded" aria-hidden="true" translate="no">tune</span><span data-i18n="wizard_choose_steps">Choose each step in order</span></h3>
-                                <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation();">
-                                    <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
-                                </button>
                             </div>
                         </div>
 
@@ -321,7 +318,23 @@
                             <button class="reset-btn-minimal" onclick="restartMenu()"><span class="material-symbols-rounded" aria-hidden="true" translate="no">restart_alt</span><span data-i18n="wizard_start_over">Start Over</span></button>
                         </div>
                     </div><!-- /.dropdown-wizard -->
+
+                    <aside class="evidence-definitions-sidebar" aria-label="Evidence and research based definitions">
+                        <div class="evidence-definitions-sidebar-head">
+                            <span class="material-symbols-rounded evidence-definitions-sidebar-icon" aria-hidden="true" translate="no">info</span>
+                            <h3 data-i18n="evidence_sidebar_heading">Evidence and Research Based Definitions</h3>
+                        </div>
+                        <div class="evidence-definitions-sidebar-block">
+                            <p class="evidence-definitions-sidebar-label" data-i18n="evidence_eb_title">* Evidence Based: Most rigorous and trusted</p>
+                            <p data-i18n="evidence_eb_desc">Definition: The program or practice has been tested through high-quality peer reviewed research (often randomized controlled trials or quasi-experimental studies) and has demonstrated statistically significant positive outcomes.</p>
+                        </div>
+                        <div class="evidence-definitions-sidebar-block">
+                            <p class="evidence-definitions-sidebar-label" data-i18n="evidence_rb_title">** Research Based: Less rigorous than evidence-based</p>
+                            <p data-i18n="evidence_rb_desc">Definition: The program is based on sound theories or methods that have been validated by some research, but the program itself may not have been directly studied for evidence of its effectiveness.</p>
+                        </div>
+                    </aside>
                 </div><!-- /.interventions-page-body -->
+
             </div><!-- /.interventions-page-wrapper -->
         </section>
 

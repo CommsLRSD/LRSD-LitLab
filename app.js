@@ -2395,6 +2395,12 @@ function refreshVisualFlowchartModal() {
             ? (ICONS[entry.node.status] || ICONS.info)
             : getStepTypeIcon(entry.node.type);
         const isInteractive = entry.isCurrent && entry.node.type !== 'endpoint';
+        // Wizard-style assessment/intervention picker steps must always show their
+        // dropdowns and results in full — scrolling inside the card while actively
+        // choosing an option is confusing — so they opt out of the shared card
+        // height cap. Everything else (including the unusually long Tier 2 Step 1
+        // checklist) keeps the normal capped/scrollable behaviour.
+        const isNoScrollCard = isInteractive && isLongContentStep(entry.node);
         const tag = entry.canRevisit && entry.node.type !== 'endpoint' ? 'button' : 'article';
         const revisit = tag === 'button'
             ? ` type="button" data-visual-revisit="${escapeAttr(entry.node.id)}" aria-label="${escapeHtml(t('fc_revisit'))}: ${escapeAttr(getStepShortTitle(entry.node))}"`
@@ -2415,7 +2421,7 @@ function refreshVisualFlowchartModal() {
         const endpointAction = entry.node.id === 'tier1-reteach'
             ? `<button type="button" class="visual-flowchart-tier-review-btn" onclick="restartTier1VisualIntegrated()">${escapeHtml(entry.node.actionButton.text)}</button>`
             : '';
-        return `${collapseBtn}<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}${!isInteractive && entry.isTierFirstStep ? ' visual-flowchart-card-wide' : ''}"
+        return `${collapseBtn}<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}${!isInteractive && entry.isTierFirstStep ? ' visual-flowchart-card-wide' : ''}${isNoScrollCard ? ' visual-flowchart-card-no-scroll' : ''}"
                     style="left:${position.x}px;top:${position.y}px;width:${position.width}px" ${revisit}>
                 <span class="visual-flowchart-tier-chip">${escapeHtml(entry.tierLabel)}</span>
                 <span class="visual-flowchart-card-icon">${cardIcon}</span>
@@ -3108,12 +3114,6 @@ function createIntegratedSelectionNode(nodeData) {
             <div class="step-content">
                 ${nodeData.subtitle ? `<h3>${escapeHtml(nodeData.subtitle)}</h3>` : ''}
                 ${nodeData.description ? `<p>${escapeHtml(nodeData.description)}</p>` : ''}
-                <div class="evidence-popup-entry">
-                    <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation(); openEvidenceDefinitionsPopup();">
-                        <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
-                    </button>
-                    <span>Evidence and research based definitions</span>
-                </div>
                 ${infoBoxHTML}
                 ${warningBoxHTML}
                 <div class="fw-wizard">
@@ -3139,9 +3139,16 @@ function createIntegratedSelectionNode(nodeData) {
                     </div>
                     <div id="fw-results" class="fw-results"></div>
                 </div>
+                <div class="evidence-popup-entry evidence-popup-entry-bottom">
+                    <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation(); openEvidenceDefinitionsPopup();">
+                        <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
+                    </button>
+                    <span>Evidence and research based definitions</span>
+                </div>
             </div>
         `;
     }
+
 
     // Default: flat list of options (used for screener selection in Tier 1)
     const isScreenerNode = nodeData.options === 'screeners';

@@ -2728,6 +2728,11 @@ details > p {
   font-size: 0.8rem;
 }
 
+.evidence-popup-entry-bottom {
+  margin-top: var(--space-sm);
+  margin-bottom: 0;
+}
+
 .evidence-definitions-modal {
   position: fixed;
   inset: 0;
@@ -6577,6 +6582,72 @@ body.step-review-modal-open { overflow: hidden; }
   padding: var(--space-2xl) var(--space-lg);
 }
 
+/* Places the dropdown wizard alongside the always-visible evidence/research
+   definitions sidebar (mirrors the Tier 1 "How do we determine..." sidebar
+   pattern used in the flowchart) instead of a small popup-triggering icon. */
+.interventions-page-body-grid {
+  max-width: 1180px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: var(--space-xl);
+}
+
+.evidence-definitions-sidebar {
+  position: sticky;
+  top: 128px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-lg);
+}
+
+.evidence-definitions-sidebar-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+}
+
+.evidence-definitions-sidebar-icon {
+  font-size: 1.5rem;
+  color: #065f46;
+  line-height: 1;
+}
+
+.evidence-definitions-sidebar h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.evidence-definitions-sidebar-block + .evidence-definitions-sidebar-block {
+  margin-top: 0.85rem;
+}
+
+.evidence-definitions-sidebar-label {
+  margin: 0 0 0.3rem;
+  font-weight: 700;
+}
+
+.evidence-definitions-sidebar-block p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .interventions-page-body-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .evidence-definitions-sidebar {
+    position: static;
+  }
+}
+
 /* Flowchart page layout */
 .flowchart-page-wrapper {
   display: flex;
@@ -7067,6 +7138,13 @@ body.step-review-modal-open { overflow: hidden; }
 
   .visual-flowchart-card-interactive {
     width: 360px;
+  }
+
+  /* Wizard-style assessment/intervention picker cards must show their dropdowns
+     and results in full instead of scrolling internally while in progress. */
+  .visual-flowchart-card-no-scroll {
+    max-height: none;
+    overflow: visible;
   }
 
   /* Step 1 of each tier is usually the most text-heavy card (principles,
