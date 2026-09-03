@@ -1056,8 +1056,8 @@ const FLOWCHART_DEFINITIONS = {
                 subtitle: 'Was instruction effective?',
                 description: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).\n\nIf you chose the wrong option, simply choose the correct one and continue.',
                 choices: [
-                    { id: 'improved', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier2-success' },
-                    { id: 'no-improvement', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier2-cycle2-assessment' }
+                    { id: 'improved', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', indicators: ['blue', 'green'], type: 'success', nextNode: 'tier2-success' },
+                    { id: 'no-improvement', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', indicators: ['yellow', 'red'], type: 'warning', nextNode: 'tier2-cycle2-assessment' }
                 ]
             },
             'tier2-success': {
@@ -1097,8 +1097,8 @@ const FLOWCHART_DEFINITIONS = {
                 subtitle: 'Was instruction effective?',
                 description: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).\n\nIf you chose the wrong option, simply choose the correct one and continue.',
                 choices: [
-                    { id: 'improved', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier2-cycle2-success' },
-                    { id: 'no-improvement', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier2-move-tier3' }
+                    { id: 'improved', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', indicators: ['blue', 'green'], type: 'success', nextNode: 'tier2-cycle2-success' },
+                    { id: 'no-improvement', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', indicators: ['yellow', 'red'], type: 'warning', nextNode: 'tier2-move-tier3' }
                 ]
             },
             'tier2-cycle2-success': {
@@ -1201,8 +1201,8 @@ const FLOWCHART_DEFINITIONS = {
                 subtitle: 'Was instruction effective?',
                 description: 'After the 8-week period, administer the regularly scheduled progress monitoring literacy screener (DIBELS, CTOPP-2, THaFol, IDAPEL).\n\nIf you chose the wrong option, simply choose the correct one and continue.',
                 choices: [
-                    { id: 'improved', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier3-success' },
-                    { id: 'no-improvement', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier3-specialist' }
+                    { id: 'improved', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', indicators: ['blue', 'green'], type: 'success', nextNode: 'tier3-success' },
+                    { id: 'no-improvement', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', indicators: ['yellow', 'red'], type: 'warning', nextNode: 'tier3-specialist' }
                 ]
             },
             'tier3-success': {
