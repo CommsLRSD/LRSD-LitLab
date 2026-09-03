@@ -993,7 +993,7 @@ const FLOWCHART_DEFINITIONS = {
                 title: 'Step 1: Entry',
                 journeySummary: 'You ruled out impairments and other barriers as a cause of literacy challenges and confirmed Tier 2 supports were set up correctly.',
                 reviewHint: 'Use the process map to reopen this step and review the checklist anytime.',
-                leadText: 'Informed by data (See progress monitoring tools).',
+                leadTextHtml: 'Informed by data (See <a href="https://media.lrsd.net/media/Default/medialib/2024_11_29-literacy_screening_and_progress_monitoring_executive_summary-v07.5b52af52587.pdf" target="_blank" rel="noopener">progress monitoring tools</a>).',
                 subtitle: 'Rule out that challenges are not the result of:',
                 items: [
                     'Vision impairments',
@@ -2095,14 +2095,9 @@ function openVisualFlowchartModal() {
     document.addEventListener('fullscreenchange', fullscreenHandler);
 
     refreshVisualFlowchartModal();
-    // Full screen is the default view for the visual pathway: the modal opens from
-    // a user gesture, so the browser allows the request here. If it is refused the
-    // dialog still fills the viewport via CSS.
-    requestAnimationFrame(() => {
-        if (!document.fullscreenElement) {
-            document.querySelector('.visual-flowchart-dialog')?.requestFullscreen?.().catch(() => {});
-        }
-    });
+    // The full browser window (the modal filling the viewport via CSS) is the
+    // default view for the visual pathway; true full screen is opt-in via the
+    // fullscreen toggle button.
     requestAnimationFrame(() => {
         modal.classList.add('visual-flowchart-modal-visible');
         modal.querySelector('.visual-flowchart-close')?.focus();
@@ -2281,10 +2276,21 @@ function refreshVisualFlowchartModal() {
     if (!stage || !viewport || !appState.visualFlowchartModal) return;
 
     // The live step element is moved into the stage, so park it back in its slot
-    // before the stage is re-rendered; otherwise re-rendering destroys it.
+    // before the stage is re-rendered; otherwise re-rendering destroys it. If the
+    // hosted step is stale (a fresh step for the current node was already created
+    // elsewhere, e.g. by renderJourneyStandard/renderJourneyHorizontal ahead of
+    // this call), parking it would create duplicate ids (fw-screener-select,
+    // fw-pillar-select, etc.) alongside the fresh step's — and document.getElementById
+    // would then silently resolve to the stale, hidden copy, leaving controls like
+    // the pillars dropdown stuck disabled even after the user answers correctly on
+    // the fresh, visible step. Discard the stale step instead of parking it.
     const hostedStep = stage.querySelector('.visual-flowchart-active-host .flowchart-step');
     const parkingSlot = document.getElementById('journey-step-slot');
-    if (hostedStep && parkingSlot) parkingSlot.appendChild(hostedStep);
+    if (hostedStep) {
+        const isStillCurrent = hostedStep.dataset.nodeId === appState.visualFlowchart?.currentNodeId;
+        if (isStillCurrent && parkingSlot) parkingSlot.appendChild(hostedStep);
+        else if (!isStillCurrent) hostedStep.remove();
+    }
 
     const entries = getVisualFlowchartEntries();
     const items = buildVisualFlowchartDisplayItems(entries);
@@ -2944,9 +2950,11 @@ function createIntegratedChecklistNode(nodeData) {
         </li>
     `).join('');
 
-    const leadTextHTML = nodeData.leadText
-        ? `<p class="checklist-lead-text">${escapeHtml(nodeData.leadText)}</p>`
-        : '';
+    const leadTextHTML = nodeData.leadTextHtml
+        ? `<p class="checklist-lead-text">${nodeData.leadTextHtml}</p>`
+        : nodeData.leadText
+            ? `<p class="checklist-lead-text">${escapeHtml(nodeData.leadText)}</p>`
+            : '';
 
     const postSectionsHTML = nodeData.postSections
         ? nodeData.postSections.map(section => `
@@ -3101,7 +3109,7 @@ function createIntegratedSelectionNode(nodeData) {
                 ${nodeData.subtitle ? `<h3>${escapeHtml(nodeData.subtitle)}</h3>` : ''}
                 ${nodeData.description ? `<p>${escapeHtml(nodeData.description)}</p>` : ''}
                 <div class="evidence-popup-entry">
-                    <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation();">
+                    <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation(); openEvidenceDefinitionsPopup();">
                         <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
                     </button>
                     <span>Evidence and research based definitions</span>
@@ -4520,7 +4528,9 @@ function buildStepReviewContent(nodeDef, choice) {
         if (nodeDef.subtitle) {
             html += `<p class="checklist-intro review-checklist-intro">${escapeHtml(nodeDef.subtitle)}</p>`;
         }
-        if (nodeDef.leadText) {
+        if (nodeDef.leadTextHtml) {
+            html += `<p class="checklist-lead-text">${nodeDef.leadTextHtml}</p>`;
+        } else if (nodeDef.leadText) {
             html += `<p class="checklist-lead-text">${escapeHtml(nodeDef.leadText)}</p>`;
         }
         const items = nodeDef.items || [];
@@ -7653,7 +7663,7 @@ function getEvidenceBadgeHtml(evidenceLevel) {
     return `
         <span class="badge-evidence evidence-marker-group">
             <span class="evidence-marker-text">${escapeHtml(evidenceLevel)}</span>
-            <button type="button" class="evidence-info-trigger" aria-label="Show evidence and research based definitions" onclick="event.stopPropagation();">
+            <button type="button" class="evidence-info-trigger" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation(); openEvidenceDefinitionsPopup();">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
             </button>
         </span>
@@ -7713,6 +7723,19 @@ function closeEvidenceDefinitionsPopup() {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('evidence-modal-open');
+}
+
+// Opens the evidence/research definitions popup. Called directly from
+// evidence-info-trigger buttons since those buttons stop click propagation
+// (they usually sit inside clickable option cards), which would otherwise
+// prevent the document-level delegated click listener from ever seeing them.
+function openEvidenceDefinitionsPopup() {
+    setupEvidenceDefinitionsPopup();
+    const popup = document.getElementById('evidence-definitions-modal');
+    if (!popup) return;
+    popup.classList.add('active');
+    popup.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('evidence-modal-open');
 }
 
 // Toggle pillar checkbox selection
