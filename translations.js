@@ -263,11 +263,11 @@ const TRANSLATIONS = {
         go_to_tier_note: 'You are moving on to the next tier of support.',
         continue_to_tier: 'Continue to Tier',
         moving_to_tier: 'Moving to Tier',
-        tier1_sidebar_heading: 'How do we determine if instruction is Successful or Unsuccessful?',
+        tier1_sidebar_heading: 'How do we determine if instruction is Effective or Ineffective?',
         tier1_blue_green_label: 'Blue and Green Indicators',
-        tier1_blue_green_desc: 'If student screener results indicate Blue or Green in all areas, instruction is successful.',
+        tier1_blue_green_desc: 'If student screener results indicate Blue or Green in all areas, instruction is effective.',
         tier1_yellow_red_label: 'Yellow and Red Indicators',
-        tier1_yellow_red_desc: 'If student screener results indicate Yellow or Red in any one area, instruction is unsuccessful.',
+        tier1_yellow_red_desc: 'If student screener results indicate Yellow or Red in any one area, instruction is ineffective.',
         tier1_monitoring_note: 'Monitoring and interventions are needed.',
         tier1_see_scores: 'See Understanding Scores & Percentiles',
 
@@ -637,7 +637,6 @@ const FLOWCHART_DEFINITIONS_FR = {
                 id: 'tier1-principles',
                 type: 'checklist',
                 title: '\u00c9tape 1\u00a0: Principes de l\u2019enseignement explicite et syst\u00e9matique',
-                subtitle: 'Principes de l\u2019enseignement explicite et syst\u00e9matique',
                 description: 'Examinez les principes suivants avant de continuer.',
                 items: [
                     'Les objectifs de la le\u00e7on sont-ils clairement \u00e9nonc\u00e9s\u00a0?',
@@ -656,8 +655,8 @@ const FLOWCHART_DEFINITIONS_FR = {
                 id: 'tier1-screener',
                 type: 'selection',
                 title: '\u00c9tape 2\u00a0: D\u00e9pistage en litt\u00e9ratie',
-                subtitle: 'Administrer un outil de d\u00e9pistage en litt\u00e9ratie.',
-                description: 'Administrer un outil de d\u00e9pistage en litt\u00e9ratie.\n\n(DIBELS, CTOPP-2, THaFol, IDAPEL)',
+                subtitle: '',
+                description: '',
                 options: 'screeners',
                 nextNode: 'tier1-effectiveness',
                 nextHandler: 'selectTier1ScreenerVisual'
@@ -667,21 +666,18 @@ const FLOWCHART_DEFINITIONS_FR = {
                 type: 'decision',
                 title: '\u00c9tape 3\u00a0: R\u00e9sultat',
                 subtitle: 'L\u2019enseignement \u00e9tait-il efficace\u00a0?',
-                description: 'Administrer un outil de d\u00e9pistage en litt\u00e9ratie. (DIBELS, CTOPP-2, THaFol, IDAPEL)\n\nSi vous avez choisi la mauvaise option, choisissez simplement la bonne et continuez.',
+                description: '',
                 choices: [
-                    { id: 'effective', label: 'Enseignement efficace', sublabel: 'R\u00e9sultat du sous-test Bleu ou Vert', type: 'success', nextNode: 'tier1-success' },
-                    { id: 'ineffective', label: 'Enseignement inefficace', sublabel: 'R\u00e9sultat du sous-test Jaune ou Rouge', type: 'warning', nextNode: 'tier1-percentage' }
+                    { id: 'effective', label: 'Enseignement efficace', sublabel: 'R\u00e9sultat du sous-test Bleu ou Vert', indicators: ['blue', 'green'], type: 'success', nextNode: 'tier1-success' },
+                    { id: 'ineffective', label: 'Enseignement inefficace', sublabel: 'R\u00e9sultat du sous-test Jaune ou Rouge', indicators: ['yellow', 'red'], type: 'warning', nextNode: 'tier1-percentage' }
                 ]
             },
             'tier1-success': {
                 id: 'tier1-success',
                 type: 'endpoint',
                 status: 'success',
-                title: '\u00c9tape 3\u00a0: Succ\u00e8s\u00a0!',
-                description: 'Continuer et suivre avec le curriculum g\u00e9n\u00e9ral.',
-                recommendations: [
-                    'Continuer et suivre avec le curriculum g\u00e9n\u00e9ral'
-                ]
+                title: 'Enseignement efficace\u00a0!',
+                description: 'Continuer et suivre avec le curriculum g\u00e9n\u00e9ral.'
             },
             'tier1-percentage': {
                 id: 'tier1-percentage',
@@ -690,32 +686,25 @@ const FLOWCHART_DEFINITIONS_FR = {
                 subtitle: 'Quel pourcentage d\u2019\u00e9l\u00e8ves est en difficult\u00e9\u00a0?',
                 description: 'D\u2019apr\u00e8s les r\u00e9sultats du d\u00e9pistage, combien d\u2019\u00e9l\u00e8ves sont en dessous du niveau de r\u00e9f\u00e9rence\u00a0?',
                 choices: [
-                    { id: 'more-20', label: 'Enseignement inefficace pour 20\u00a0% ou plus des \u00e9l\u00e8ves.', sublabel: '', type: 'warning', nextNode: 'tier1-move-tier2' },
-                    { id: 'less-20', label: 'Enseignement inefficace pour moins de 20\u00a0% des \u00e9l\u00e8ves.', sublabel: '', type: 'warning', nextNode: 'tier1-reteach' }
+                    { id: 'more-20', label: '20\u00a0% ou plus', icon: '▲', sublabel: '', type: 'warning', nextNode: 'tier1-move-tier2' },
+                    { id: 'less-20', label: 'Moins de 20\u00a0%', icon: '▼', sublabel: '', type: 'warning', nextNode: 'tier1-reteach' }
                 ]
             },
             'tier1-move-tier2': {
                 id: 'tier1-move-tier2',
                 type: 'endpoint',
                 status: 'info',
-                title: 'Palier 2\u00a0: Interventions en petits groupes',
-                description: 'Enseignement inefficace pour 20\u00a0% ou plus des \u00e9l\u00e8ves. Ce parcours continue vers l\u2019organigramme du palier deux.',
-                recommendations: [
-                    'Continuer vers l\u2019organigramme du palier deux.'
-                ],
+                title: 'Continuer vers le palier 2\u00a0: Interventions en petits groupes',
+                description: '',
                 actionButton: { text: 'D\u00e9marrer l\u2019organigramme du palier 2', action: 'startTier2Visual' }
             },
             'tier1-reteach': {
                 id: 'tier1-reteach',
                 type: 'endpoint',
                 status: 'warning',
-                title: '\u00c9tape 3\u00a0: R\u00e9enseigner le curriculum g\u00e9n\u00e9ral',
-                description: 'Consid\u00e9rer les points faibles identifi\u00e9s par le d\u00e9pistage en litt\u00e9ratie. Utilisez le menu des interventions ci-dessous pour trouver des ressources.\n\nCe parcours reste dans le palier un.',
-                recommendations: [
-                    'Consid\u00e9rer les points faibles identifi\u00e9s par le d\u00e9pistage en litt\u00e9ratie.',
-                    'Utiliser le menu des interventions ci-dessous pour trouver des ressources.'
-                ],
-                actionButton: { text: 'Reprendre le palier 1', action: 'restartTier1Visual' }
+                title: 'Réenseigner le curriculum général',
+                descriptionHtml: 'Considérez les points faibles identifiés par le dépistage en littératie. Utilisez le <a href="#interventions" onclick="navigateToPage(\'interventions\'); return false;">menu des interventions</a> pour trouver des ressources.',
+                actionButton: { text: 'Recommencer le palier 1', action: 'restartTier1Visual' }
             }
         }
     },
