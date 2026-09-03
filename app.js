@@ -1767,6 +1767,7 @@ function renderJourneyStandard(direction = 'forward') {
     }
 
     refreshVisualFlowchartModal();
+    ensureActiveStepPresent(activeNode, direction);
     scrollToActiveStep();
 }
 
@@ -1865,6 +1866,7 @@ function renderJourneyHorizontal(direction = 'forward') {
     }
 
     refreshVisualFlowchartModal();
+    ensureActiveStepPresent(activeNode, direction);
     // Scroll the active bubble into view inside the track
     requestAnimationFrame(() => {
         const activeBubble = document.getElementById('horiz-active-bubble');
@@ -1874,6 +1876,17 @@ function renderJourneyHorizontal(direction = 'forward') {
     });
 
     scrollToActiveStep();
+}
+
+// The live step element is moved around between the panel slot and the visual
+// pathway stage, so after any re-render make sure it still exists somewhere in
+// the document; if a closing modal took it with it, rebuild it in the slot so
+// the current step's content is always visible and interactive.
+function ensureActiveStepPresent(activeNode, direction = 'forward') {
+    if (!activeNode) return;
+    if (document.querySelector(`.flowchart-step[data-node-id="${CSS.escape(activeNode.id)}"]`)) return;
+    const slot = getActiveStepTarget();
+    if (slot) createIntegratedNodeElement(activeNode, slot, direction);
 }
 
 // Switch between 'standard' (vertical list) and 'horizontal' (bubble track) layout modes.
@@ -1985,6 +1998,8 @@ function switchVisualFlowchartToLayout(mode) {
 function openVisualFlowchartModal() {
     if (!window.matchMedia('(min-width: 769px)').matches) return;
     closeVisualFlowchartModal({ immediate: true });
+    // Drop any earlier modal still fading out so it cannot overlap the new one.
+    document.querySelectorAll('.visual-flowchart-modal').forEach(element => element.remove());
 
     const modal = document.createElement('div');
     modal.id = 'visual-flowchart-modal';
@@ -2113,8 +2128,17 @@ function closeVisualFlowchartModal(options = {}) {
     if (!modal) return;
     const modalState = appState.visualFlowchartModal;
     const activeStep = modal.querySelector('.flowchart-step');
-    const activeSlot = document.getElementById('journey-step-slot');
+    const activeSlot = getActiveStepTarget();
     if (activeStep && activeSlot) activeSlot.appendChild(activeStep);
+    // The modal only fades out (it stays in the DOM for a moment), so drop the
+    // modal state and its element ids straight away. Otherwise a render that
+    // happens during the fade — e.g. switching from the visual pathway to the
+    // standard or summary view — would treat the dying modal as live and move
+    // the freshly created live step into it, destroying it moments later.
+    appState.visualFlowchartModal = null;
+    modal.removeAttribute('id');
+    modal.querySelector('#visual-flowchart-stage')?.removeAttribute('id');
+    modal.querySelector('#visual-flowchart-viewport')?.removeAttribute('id');
     if (modalState?.keyHandler) document.removeEventListener('keydown', modalState.keyHandler);
     if (modalState?.desktopQuery && modalState?.breakpointHandler) {
         modalState.desktopQuery.removeEventListener('change', modalState.breakpointHandler);
@@ -2127,7 +2151,6 @@ function closeVisualFlowchartModal(options = {}) {
     const remove = () => {
         modal.remove();
         modalState?.previousFocus?.focus?.();
-        appState.visualFlowchartModal = null;
     };
     if (options.immediate) remove();
     else setTimeout(remove, 180);
@@ -2410,11 +2433,21 @@ function refreshVisualFlowchartModal() {
         ${cardsHtml}`;
 
     const activeNodeId = appState.visualFlowchart?.currentNodeId;
+    // The live step may be parked in the panel slot or anywhere else it was
+    // last hosted; if it no longer exists at all it is rebuilt here so the
+    // interactive card is never left as an empty title-only shell.
     const sourceStep = activeNodeId
-        ? document.querySelector(`#journey-step-slot .flowchart-step[data-node-id="${CSS.escape(activeNodeId)}"]`)
+        ? document.querySelector(`.flowchart-step[data-node-id="${CSS.escape(activeNodeId)}"]`)
         : null;
     const activeHost = stage.querySelector('.visual-flowchart-active-host');
-    if (sourceStep && activeHost) activeHost.appendChild(sourceStep);
+    if (activeHost && activeNodeId) {
+        if (sourceStep) {
+            activeHost.appendChild(sourceStep);
+        } else {
+            const activeNodeDef = getFlowchartDefs()[appState.visualFlowchart?.tierId]?.nodes?.[activeNodeId];
+            if (activeNodeDef) createIntegratedNodeElement(activeNodeDef, activeHost);
+        }
+    }
 
     // Every card is capped to the natural height of Tier 1, Step 1 (the
     // reference card, measured live whenever it happens to be the active
