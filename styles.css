@@ -2683,7 +2683,20 @@ details > p {
   color: #065f46;
 }
 
-.evidence-marker-group { white-space: nowrap; }
+button.badge-evidence.evidence-info-trigger {
+  width: auto;
+  height: auto;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button.badge-evidence.evidence-info-trigger:hover,
+button.badge-evidence.evidence-info-trigger:focus-visible {
+  background: var(--success-light);
+  filter: brightness(0.96);
+  outline: none;
+}
 
 .evidence-info-trigger {
   display: inline-flex;
@@ -7138,13 +7151,6 @@ body.step-review-modal-open { overflow: hidden; }
 
   .visual-flowchart-card-interactive {
     width: 360px;
-  }
-
-  /* Wizard-style assessment/intervention picker cards must show their dropdowns
-     and results in full instead of scrolling internally while in progress. */
-  .visual-flowchart-card-no-scroll {
-    max-height: none;
-    overflow: visible;
   }
 
   /* Step 1 of each tier is usually the most text-heavy card (principles,

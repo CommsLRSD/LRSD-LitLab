@@ -303,6 +303,8 @@ const TRANSLATIONS = {
 
         // ── Evidence popup ──
         evidence_sidebar_heading: 'Evidence and Research Based Definitions',
+        evidence_badge_eb: '*Evidence Based',
+        evidence_badge_rb: '**Research Based',
         evidence_eb_title: '* Evidence Based: Most rigorous and trusted',
         evidence_eb_desc: 'Definition: The program or practice has been tested through high-quality peer reviewed research (often randomized controlled trials or quasi-experimental studies) and has demonstrated statistically significant positive outcomes.',
         evidence_rb_title: '** Research Based: Less rigorous than evidence-based',
@@ -613,6 +615,8 @@ const TRANSLATIONS = {
 
         // ── Evidence popup ──
         evidence_sidebar_heading: 'Définitions fondées sur des données probantes et la recherche',
+        evidence_badge_eb: '*Fondé sur des données probantes',
+        evidence_badge_rb: '**Fondé sur la recherche',
         evidence_eb_title: '* Fondé sur des données probantes : Le plus rigoureux et fiable',
         evidence_eb_desc: 'Définition : Le programme ou la pratique a été testé dans le cadre de recherches évaluées par des pairs de haute qualité (souvent des essais contrôlés randomisés ou des études quasi-expérimentales) et a démontré des résultats positifs statistiquement significatifs.',
         evidence_rb_title: '** Fondé sur la recherche : Moins rigoureux que fondé sur des données probantes',

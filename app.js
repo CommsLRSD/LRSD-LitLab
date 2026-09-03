@@ -2299,11 +2299,12 @@ function refreshVisualFlowchartModal() {
     // so it gets extra width for readability instead of the standard card width.
     const wideCardWidth = 340;
     const interactiveCardWidth = 360;
-    // While a text-heavy step is still in progress it is 50% wider than a normal
+    // While a text-heavy step is still in progress it is wider than a normal
     // card (and wider still for the assessment / intervention pickers) so the
-    // canvas rarely has to zoom out; once completed it shrinks back down.
-    const activeFirstStepWidth = Math.round(cardWidth * 1.5);
-    const activeLongStepWidth = Math.round(cardWidth * 1.9);
+    // content has more room to lay out horizontally and avoid scrolling;
+    // once completed it shrinks back down.
+    const activeFirstStepWidth = Math.round(cardWidth * 1.65);
+    const activeLongStepWidth = Math.round(cardWidth * 2.15);
     const getItemCardWidth = item => {
         if (item.type === 'tier-review') return wideCardWidth;
         if (item.type === 'entry') {
@@ -2395,12 +2396,6 @@ function refreshVisualFlowchartModal() {
             ? (ICONS[entry.node.status] || ICONS.info)
             : getStepTypeIcon(entry.node.type);
         const isInteractive = entry.isCurrent && entry.node.type !== 'endpoint';
-        // Wizard-style assessment/intervention picker steps must always show their
-        // dropdowns and results in full — scrolling inside the card while actively
-        // choosing an option is confusing — so they opt out of the shared card
-        // height cap. Everything else (including the unusually long Tier 2 Step 1
-        // checklist) keeps the normal capped/scrollable behaviour.
-        const isNoScrollCard = isInteractive && isLongContentStep(entry.node);
         const tag = entry.canRevisit && entry.node.type !== 'endpoint' ? 'button' : 'article';
         const revisit = tag === 'button'
             ? ` type="button" data-visual-revisit="${escapeAttr(entry.node.id)}" aria-label="${escapeHtml(t('fc_revisit'))}: ${escapeAttr(getStepShortTitle(entry.node))}"`
@@ -2421,7 +2416,7 @@ function refreshVisualFlowchartModal() {
         const endpointAction = entry.node.id === 'tier1-reteach'
             ? `<button type="button" class="visual-flowchart-tier-review-btn" onclick="restartTier1VisualIntegrated()">${escapeHtml(entry.node.actionButton.text)}</button>`
             : '';
-        return `${collapseBtn}<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}${!isInteractive && entry.isTierFirstStep ? ' visual-flowchart-card-wide' : ''}${isNoScrollCard ? ' visual-flowchart-card-no-scroll' : ''}"
+        return `${collapseBtn}<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}${!isInteractive && entry.isTierFirstStep ? ' visual-flowchart-card-wide' : ''}"
                     style="left:${position.x}px;top:${position.y}px;width:${position.width}px" ${revisit}>
                 <span class="visual-flowchart-tier-chip">${escapeHtml(entry.tierLabel)}</span>
                 <span class="visual-flowchart-card-icon">${cardIcon}</span>
@@ -2467,11 +2462,11 @@ function refreshVisualFlowchartModal() {
         }
     }
 
-    // Every card is capped to the natural height of Tier 1, Step 1 (the
+    // Every card is capped to 115% of the natural height of Tier 1, Step 1 (the
     // reference card, measured live whenever it happens to be the active
-    // step) so nothing towers above it; taller content gets wider and/or
-    // scrollable instead. Measured with the cap lifted so it reflects the
-    // card's true, unclipped height.
+    // step) so nothing towers above it; taller content gets wider instead, and
+    // only scrolls if it still exceeds that cap. Measured with the cap lifted
+    // so it reflects the card's true, unclipped height.
     const tier1Def = getFlowchartDefs().tier1;
     if (activeNodeId && tier1Def && activeNodeId === tier1Def.startNode) {
         const referenceCard = stage.querySelector('.visual-flowchart-card-current');
@@ -2482,7 +2477,8 @@ function refreshVisualFlowchartModal() {
                 const naturalHeight = referenceCard.scrollHeight;
                 referenceCard.style.maxHeight = previousMaxHeight;
                 if (naturalHeight > 0) {
-                    document.documentElement.style.setProperty('--visual-card-max-height', `${naturalHeight}px`);
+                    const cappedHeight = Math.round(naturalHeight * 1.15);
+                    document.documentElement.style.setProperty('--visual-card-max-height', `${cappedHeight}px`);
                 }
             });
         }
@@ -7667,14 +7663,24 @@ function escapeHtml(text) {
 
 function getEvidenceBadgeHtml(evidenceLevel) {
     if (evidenceLevel !== '*' && evidenceLevel !== '**') return '';
+    const label = evidenceLevel === '*' ? t('evidence_badge_eb') : t('evidence_badge_rb');
     return `
-        <span class="badge-evidence evidence-marker-group">
-            <span class="evidence-marker-text">${escapeHtml(evidenceLevel)}</span>
-            <button type="button" class="evidence-info-trigger" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation(); openEvidenceDefinitionsPopup();">
-                <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
-            </button>
-        </span>
+        <button type="button" class="badge-evidence evidence-info-trigger" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation(); openEvidenceDefinitionsPopup();">${escapeHtml(label)}</button>
     `;
+}
+
+// The evidence popup is normally appended to document.body, but native
+// Fullscreen (used by the visual pathway's fullscreen toggle) renders the
+// fullscreened element in the browser's top layer — anything outside that
+// element's subtree, like a body-level popup, is painted behind it and its
+// close button becomes unreachable. Keep the popup parented inside whichever
+// element is currently fullscreen (or back in body once fullscreen ends) so
+// it always renders above the flowchart and its close control stays clickable.
+function relocateEvidencePopupForFullscreen() {
+    const popup = document.getElementById('evidence-definitions-modal');
+    if (!popup) return;
+    const fullscreenHost = document.fullscreenElement || document.body;
+    if (popup.parentElement !== fullscreenHost) fullscreenHost.appendChild(popup);
 }
 
 function setupEvidenceDefinitionsPopup() {
@@ -7704,6 +7710,7 @@ function setupEvidenceDefinitionsPopup() {
     document.addEventListener('click', (event) => {
         const trigger = event.target.closest('.evidence-info-trigger');
         if (!trigger) return;
+        relocateEvidencePopupForFullscreen();
         const popup = document.getElementById('evidence-definitions-modal');
         if (!popup) return;
         popup.classList.add('active');
@@ -7722,6 +7729,10 @@ function setupEvidenceDefinitionsPopup() {
             closeEvidenceDefinitionsPopup();
         }
     });
+
+    document.addEventListener('fullscreenchange', () => {
+        if (modal.classList.contains('active')) relocateEvidencePopupForFullscreen();
+    });
 }
 
 function closeEvidenceDefinitionsPopup() {
@@ -7738,6 +7749,7 @@ function closeEvidenceDefinitionsPopup() {
 // prevent the document-level delegated click listener from ever seeing them.
 function openEvidenceDefinitionsPopup() {
     setupEvidenceDefinitionsPopup();
+    relocateEvidencePopupForFullscreen();
     const popup = document.getElementById('evidence-definitions-modal');
     if (!popup) return;
     popup.classList.add('active');
