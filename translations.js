@@ -306,6 +306,9 @@ const TRANSLATIONS = {
         evidence_eb_desc: 'Definition: The program or practice has been tested through high-quality peer reviewed research (often randomized controlled trials or quasi-experimental studies) and has demonstrated statistically significant positive outcomes.',
         evidence_rb_title: '** Research Based: Less rigorous than evidence-based',
         evidence_rb_desc: 'Definition: The program is based on sound theories or methods that have been validated by some research, but the program itself may not have been directly studied for evidence of its effectiveness.',
+        evidence_legend_label: '* Evidence Based / ** Research Based',
+        evidence_legend_aria: 'Evidence and research based definitions',
+        evidence_sidebar_title: 'Evidence & Research Definitions',
 
         // ── FW results ──
         fw_no_results: 'No matching items found for the selected criteria.',
@@ -615,6 +618,9 @@ const TRANSLATIONS = {
         evidence_eb_desc: 'Définition : Le programme ou la pratique a été testé dans le cadre de recherches évaluées par des pairs de haute qualité (souvent des essais contrôlés randomisés ou des études quasi-expérimentales) et a démontré des résultats positifs statistiquement significatifs.',
         evidence_rb_title: '** Fondé sur la recherche : Moins rigoureux que fondé sur des données probantes',
         evidence_rb_desc: 'Définition : Le programme est fondé sur des théories ou méthodes solides validées par certaines recherches, mais le programme lui-même n\'a peut-être pas été directement étudié pour des preuves de son efficacité.',
+        evidence_legend_label: '* Fondé sur des données probantes / ** Fondé sur la recherche',
+        evidence_legend_aria: 'Définitions fondées sur des données probantes et la recherche',
+        evidence_sidebar_title: 'Définitions : données probantes et recherche',
 
         // ── FW results ──
         fw_no_results: 'Aucun élément correspondant aux critères sélectionnés.',

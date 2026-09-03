@@ -2676,96 +2676,62 @@ details > p {
   align-items: center;
   gap: 4px;
   padding: 2px 6px;
+  border: none;
   border-radius: var(--radius-pill);
   font-size: 0.65rem;
+  font-family: inherit;
   font-weight: 600;
   background: var(--success-light);
   color: #065f46;
+  cursor: pointer;
 }
 
 .evidence-marker-group { white-space: nowrap; }
 
-.evidence-info-trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
+/* Shared hover/tap trigger that reveals the evidence & research based
+   definitions in a floating tooltip/dialog. Used both as the compact "*"/"**"
+   badge on intervention items and as the inline "* Evidence Based / **
+   Research Based" legend elsewhere. */
+.evidence-legend-trigger {
+  position: relative;
   border: none;
-  border-radius: 50%;
-  background: rgba(6, 95, 70, 0.16);
-  color: #065f46;
+  background: transparent;
   padding: 0;
+  font: inherit;
   cursor: pointer;
 }
 
-.evidence-info-trigger .material-symbols-rounded {
-  font-size: 12px;
-  line-height: 1;
-}
-
-.evidence-info-trigger:hover,
-.evidence-info-trigger:focus-visible {
-  background: rgba(6, 95, 70, 0.28);
-  outline: none;
-}
-
-.evidence-info-trigger-inline {
-  width: 22px;
-  height: 22px;
-}
-
-.evidence-info-trigger-inline .material-symbols-rounded {
-  font-size: 15px;
-}
-
-.evidence-popup-entry {
+.evidence-legend-label {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  margin-bottom: var(--space-sm);
   color: var(--text-secondary);
   font-size: 0.8rem;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
 }
 
-.evidence-definitions-modal {
+.evidence-legend-tooltip {
   position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
-  z-index: 2500;
-  padding: var(--space-md);
-}
-
-.evidence-definitions-modal.active { display: flex; }
-
-.evidence-definitions-dialog {
-  position: relative;
+  z-index: 3000;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
   background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  width: min(640px, 100%);
-  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  width: min(360px, 80vw);
+  padding: var(--space-md);
+  text-align: left;
+  pointer-events: none;
 }
 
-.evidence-definitions-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.evidence-definitions-close .material-symbols-rounded {
-  font-size: 20px;
+.evidence-legend-tooltip.evidence-legend-tooltip-visible {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .evidence-definition-block + .evidence-definition-block {
@@ -2782,8 +2748,6 @@ details > p {
   color: var(--text-secondary);
   line-height: 1.5;
 }
-
-body.evidence-modal-open { overflow: hidden; }
 
 .badge-tier {
   display: inline-block;
@@ -6571,10 +6535,53 @@ body.step-review-modal-open { overflow: hidden; }
 
 .interventions-page-body {
   flex: 1;
-  max-width: 860px;
+  max-width: 1180px;
   width: 100%;
   margin: 0 auto;
   padding: var(--space-2xl) var(--space-lg);
+}
+
+.interventions-page-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+}
+
+.interventions-page-layout .dropdown-wizard {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.evidence-sidebar {
+  flex: 0 0 280px;
+  width: 280px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-lg);
+  position: sticky;
+  top: var(--space-lg);
+}
+
+.evidence-sidebar-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 var(--space-md);
+}
+
+@media (max-width: 900px) {
+  .interventions-page-layout {
+    flex-direction: column;
+  }
+
+  .evidence-sidebar {
+    width: 100%;
+    flex: 1 1 auto;
+    position: static;
+  }
 }
 
 /* Flowchart page layout */
