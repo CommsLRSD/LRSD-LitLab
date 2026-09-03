@@ -2263,6 +2263,18 @@ function isLongContentStep(node) {
     return node.type === 'checklist' && (node.items || []).length >= 6;
 }
 
+function getVisualFlowchartRouteDirection(item) {
+    if (!item) return 'straight';
+    if (item.type === 'collapsed') return 'straight';
+    if (item.type === 'entry') {
+        const entry = item.entry;
+        if (entry?.node?.id === 'tier1-percentage' && entry.choice?.id === 'less-20') return 'straight';
+    }
+    if (item.variant === 'effective') return 'up';
+    if (item.variant === 'ineffective') return 'down';
+    return 'straight';
+}
+
 function refreshVisualFlowchartModal() {
     const stage = document.getElementById('visual-flowchart-stage');
     const viewport = document.getElementById('visual-flowchart-viewport');
@@ -2304,9 +2316,9 @@ function refreshVisualFlowchartModal() {
     let cursorX = 90;
     const positions = items.map((item, index) => {
         if (index > 0) {
-            const priorVariant = items[index - 1].variant;
-            if (priorVariant === 'effective') routeRow -= 1;
-            if (priorVariant === 'ineffective') routeRow += 1;
+            const priorDirection = getVisualFlowchartRouteDirection(items[index - 1]);
+            if (priorDirection === 'up') routeRow -= 1;
+            if (priorDirection === 'down') routeRow += 1;
         }
         const width = getItemCardWidth(item);
         const position = { x: cursorX, routeRow, width };
@@ -2373,6 +2385,9 @@ function refreshVisualFlowchartModal() {
         const usesChoiceAsTitle = !entry.isCurrent && entry.node.titleFromChoiceWhenAnswered && entry.choice?.name;
         const displayTitle = usesChoiceAsTitle ? entry.choice.name : getStepShortTitle(entry.node);
         const variant = entry.variant || 'step1';
+        const cardIcon = entry.node.type === 'endpoint'
+            ? (ICONS[entry.node.status] || ICONS.info)
+            : getStepTypeIcon(entry.node.type);
         const isInteractive = entry.isCurrent && entry.node.type !== 'endpoint';
         const tag = entry.canRevisit && entry.node.type !== 'endpoint' ? 'button' : 'article';
         const revisit = tag === 'button'
@@ -2397,7 +2412,7 @@ function refreshVisualFlowchartModal() {
         return `${collapseBtn}<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}${!isInteractive && entry.isTierFirstStep ? ' visual-flowchart-card-wide' : ''}"
                     style="left:${position.x}px;top:${position.y}px;width:${position.width}px" ${revisit}>
                 <span class="visual-flowchart-tier-chip">${escapeHtml(entry.tierLabel)}</span>
-                <span class="visual-flowchart-card-icon">${getStepTypeIcon(entry.node.type)}</span>
+                <span class="visual-flowchart-card-icon">${cardIcon}</span>
                 <span class="visual-flowchart-card-copy">
                     <span class="visual-flowchart-card-meta">${escapeHtml(getStepTypeLabel(entry.node.type))}${entry.isCurrent ? ` · ${escapeHtml(t('fc_in_progress'))}` : ''}</span>
                     <strong>${escapeHtml(displayTitle)}</strong>

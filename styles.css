@@ -6977,9 +6977,10 @@ body.step-review-modal-open { overflow: hidden; }
     position: absolute;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 10px;
+    column-gap: 10px;
+    row-gap: 5px;
     width: 260px;
-    min-height: 180px;
+    min-height: 150px;
     max-height: var(--visual-card-max-height, 480px);
     padding: 14px;
     border: 2px solid var(--step);
@@ -7122,8 +7123,8 @@ body.step-review-modal-open { overflow: hidden; }
     grid-column: 1 / -1;
     justify-self: start;
     align-self: start;
-    padding: 4px 10px;
-    border-radius: var(--radius-pill);
+    padding: 3px 9px;
+    border-radius: var(--radius);
     background: var(--step);
     color: #fff;
     font-size: 0.65rem;
@@ -7156,7 +7157,7 @@ body.step-review-modal-open { overflow: hidden; }
     display: flex;
     min-width: 0;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
   }
 
   .visual-flowchart-card-meta {
@@ -7183,7 +7184,7 @@ body.step-review-modal-open { overflow: hidden; }
   .visual-flowchart-active-host {
     grid-column: 1 / -1;
     min-width: 0;
-    margin: 4px -8px -8px;
+    margin: 2px -8px -8px;
     border-top: 1px solid var(--border);
   }
 
@@ -7204,6 +7205,19 @@ body.step-review-modal-open { overflow: hidden; }
   .visual-flowchart-active-host .decision-grid,
   .visual-flowchart-active-host .screener-selection-grid {
     grid-template-columns: 1fr;
+  }
+
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-grid {
+    flex-direction: column;
+  }
+
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-btn {
+    width: 100%;
+    padding-block: 0.75rem;
+  }
+
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-content span {
+    line-height: 1.2;
   }
 
   @keyframes visual-route-draw {
@@ -8120,7 +8134,7 @@ body.step-review-modal-open { overflow: hidden; }
 
 .journey-step-slot .decision-btn {
   padding: 0.45rem 0.85rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius);
   border-width: 1.5px;
   font-size: 0.84rem;
   gap: var(--space-xs);
@@ -8156,7 +8170,7 @@ body.step-review-modal-open { overflow: hidden; }
 .journey-step-slot .continue-btn {
   font-size: 0.8rem;
   padding: 0.4rem 0.85rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius);
   margin-top: var(--space-sm);
 }
 
@@ -8165,7 +8179,7 @@ body.step-review-modal-open { overflow: hidden; }
 .journey-step-slot .endpoint-actions .action-btn {
   font-size: 0.8rem;
   padding: 0.38rem 0.85rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius);
 }
 
 /* Go-to-Tier transition screen: compact, matching panel scale */
@@ -8192,7 +8206,7 @@ body.step-review-modal-open { overflow: hidden; }
 .journey-step-slot .go-to-tier-btn {
   font-size: 0.82rem;
   padding: 0.4rem 0.85rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius);
   margin-top: 0;
 }
 
@@ -8239,7 +8253,7 @@ body.step-review-modal-open { overflow: hidden; }
 
 .completed-grid .decision-btn {
   padding: 0.4rem 0.8rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius);
   border-width: 1.5px;
   font-size: 0.82rem;
   cursor: default;
