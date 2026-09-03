@@ -1699,6 +1699,32 @@ function getActiveStepTarget() {
     return document.getElementById('journey-step-slot') || document.getElementById('flowchart-steps');
 }
 
+// Move the active node's live, in-progress step element (e.g. a drill-down
+// assessment / intervention wizard with a screener and subtest already
+// chosen) into the given slot instead of building a brand-new one whenever
+// possible. Without this, any re-render that rebuilds the journey map's
+// markup around the active step (e.g. leaving the visual pathway view, or
+// toggling between the standard/summary layouts) would silently create a
+// fresh copy with every dropdown reset and disabled again, even though the
+// user had already progressed through it. Callers that are about to wipe out
+// the element's current parent (e.g. via innerHTML) should capture it with
+// findLiveStepElement() beforehand and pass it in as existingElement, since a
+// fresh DOM query afterwards would no longer find it.
+function findLiveStepElement(activeNode) {
+    if (!activeNode) return null;
+    return document.querySelector(`.flowchart-step[data-node-id="${CSS.escape(activeNode.id)}"]`);
+}
+
+function placeActiveStepInSlot(activeNode, slot, direction = 'forward', existingElement = null) {
+    if (!activeNode || !slot) return;
+    const existing = existingElement || findLiveStepElement(activeNode);
+    if (existing) {
+        if (existing.parentElement !== slot) slot.appendChild(existing);
+        return;
+    }
+    createIntegratedNodeElement(activeNode, slot, direction);
+}
+
 // Render the whole process inside the Your Decisions panel: answered steps
 // stay open and the current step opens in its own row below.
 // Dispatches to the correct layout mode (standard list or horizontal bubbles).
@@ -1721,6 +1747,12 @@ function renderJourneyStandard(direction = 'forward') {
     const activeStep = path[path.length - 1];
     const activeNode = activeStep ? tierDef.nodes[activeStep.nodeId] : null;
 
+    // Capture the active step's live element (if it already exists, e.g. a
+    // wizard mid-way through a screener/subtest/pillar selection) before the
+    // map below rebuilds its markup; the rebuild would otherwise detach and
+    // discard it, forcing a fresh, reset copy to be created further down.
+    const liveActiveStep = findLiveStepElement(activeNode);
+
     // The panel owns the whole process, so the old track stays empty.
     if (track) track.innerHTML = '';
 
@@ -1740,7 +1772,7 @@ function renderJourneyStandard(direction = 'forward') {
     // the steps already answered — never in a separate area below the list.
     const slot = document.getElementById('journey-step-slot');
     if (activeNode && slot) {
-        createIntegratedNodeElement(activeNode, slot, direction);
+        placeActiveStepInSlot(activeNode, slot, direction, liveActiveStep);
     }
 
     refreshVisualFlowchartModal();
@@ -1763,6 +1795,11 @@ function renderJourneyHorizontal(direction = 'forward') {
     const activeStep = path[path.length - 1];
     const activeNode = activeStep ? tierDef.nodes[activeStep.nodeId] : null;
     const activeNumber = getActiveStepNumber();
+
+    // Capture the active step's live element (if it already exists) before
+    // the bubble track below rebuilds its markup, so re-attaching it
+    // afterwards preserves any wizard selections already made.
+    const liveActiveStep = findLiveStepElement(activeNode);
 
     // Update progress count and bar
     const list = document.getElementById('journey-map-list');
@@ -1839,7 +1876,7 @@ function renderJourneyHorizontal(direction = 'forward') {
     // Render the active step question into the slot
     const slot = document.getElementById('journey-step-slot');
     if (activeNode && slot) {
-        createIntegratedNodeElement(activeNode, slot, direction);
+        placeActiveStepInSlot(activeNode, slot, direction, liveActiveStep);
     }
 
     refreshVisualFlowchartModal();

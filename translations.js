@@ -206,7 +206,7 @@ const TRANSLATIONS = {
         history_clear_all: 'Clear All',
 
         // ── Flowchart UI (dynamic) ──
-        fc_back: 'Back',
+        fc_back: 'Restart',
         fc_your_decisions: 'Your Decisions',
         fc_summary_view: 'Summary View',
         fc_standard_view: 'Standard View',
@@ -518,7 +518,7 @@ const TRANSLATIONS = {
         history_clear_all: 'Tout effacer',
 
         // ── Flowchart UI (dynamic) ──
-        fc_back: 'Retour',
+        fc_back: 'Recommencer',
         fc_your_decisions: 'Vos décisions',
         fc_summary_view: 'Vue sommaire',
         fc_standard_view: 'Vue standard',
