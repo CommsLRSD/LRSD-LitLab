@@ -2095,14 +2095,6 @@ function openVisualFlowchartModal() {
     document.addEventListener('fullscreenchange', fullscreenHandler);
 
     refreshVisualFlowchartModal();
-    // Full screen is the default view for the visual pathway: the modal opens from
-    // a user gesture, so the browser allows the request here. If it is refused the
-    // dialog still fills the viewport via CSS.
-    requestAnimationFrame(() => {
-        if (!document.fullscreenElement) {
-            document.querySelector('.visual-flowchart-dialog')?.requestFullscreen?.().catch(() => {});
-        }
-    });
     requestAnimationFrame(() => {
         modal.classList.add('visual-flowchart-modal-visible');
         modal.querySelector('.visual-flowchart-close')?.focus();
