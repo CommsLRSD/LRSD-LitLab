@@ -145,12 +145,6 @@ function rerenderForLanguage() {
             openInteractiveFlowchart();
         }
     }
-    // Evidence definitions popup: re-create with new language
-    const evidenceModal = document.getElementById('evidence-definitions-modal');
-    if (evidenceModal) {
-        evidenceModal.remove();
-        setupEvidenceDefinitionsPopup();
-    }
     // Intervention wizard dropdowns: refresh placeholder/select text that was
     // set programmatically and is not covered by data-i18n-opt.
     refreshWizardSelectPlaceholders();
@@ -185,9 +179,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     applyTranslations();
     updateLanguageToggleBtn();
 
-    // Setup reusable evidence marker popup
-    setupEvidenceDefinitionsPopup();
-    
     // Load intervention data
     await loadInterventionData();
     
@@ -3092,12 +3083,7 @@ function createIntegratedSelectionNode(nodeData) {
             <div class="step-content">
                 ${nodeData.subtitle ? `<h3>${escapeHtml(nodeData.subtitle)}</h3>` : ''}
                 ${nodeData.description ? `<p>${escapeHtml(nodeData.description)}</p>` : ''}
-                <div class="evidence-popup-entry">
-                    <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation();">
-                        <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
-                    </button>
-                    <span>Evidence and research based definitions</span>
-                </div>
+                ${getEvidenceLegendTriggerHtml()}
                 ${infoBoxHTML}
                 ${warningBoxHTML}
                 <div class="fw-wizard">
@@ -7640,72 +7626,136 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Shared markup for the two evidence/research definition blocks. Reused by
+// the hover-triggered legend tooltip (inline callouts, badges) and by the
+// static evidence sidebar next to the Interventions Menu (index.html).
+function getEvidenceDefinitionsBlocksHtml() {
+    return `
+        <div class="evidence-definition-block">
+            <strong>${escapeHtml(t('evidence_eb_title'))}</strong>
+            <p>${escapeHtml(t('evidence_eb_desc'))}</p>
+        </div>
+        <div class="evidence-definition-block">
+            <strong>${escapeHtml(t('evidence_rb_title'))}</strong>
+            <p>${escapeHtml(t('evidence_rb_desc'))}</p>
+        </div>
+    `;
+}
+
+// Inline "* Evidence Based / ** Research Based" legend. Shows the full
+// definitions in a floating tooltip on hover/focus (or tap, for touch
+// devices) via showEvidenceLegendTooltip()/toggleEvidenceLegendTooltip().
+function getEvidenceLegendTriggerHtml() {
+    return `
+        <button type="button" class="evidence-legend-trigger" aria-label="${escapeHtml(t('evidence_legend_aria'))}" onclick="event.stopPropagation(); toggleEvidenceLegendTooltip(this);">
+            <span class="evidence-legend-label">${escapeHtml(t('evidence_legend_label'))}</span>
+        </button>
+    `;
+}
+
 function getEvidenceBadgeHtml(evidenceLevel) {
     if (evidenceLevel !== '*' && evidenceLevel !== '**') return '';
     return `
-        <span class="badge-evidence evidence-marker-group">
+        <button type="button" class="badge-evidence evidence-legend-trigger" aria-label="${escapeHtml(t('evidence_legend_aria'))}" onclick="event.stopPropagation(); toggleEvidenceLegendTooltip(this);">
             <span class="evidence-marker-text">${escapeHtml(evidenceLevel)}</span>
-            <button type="button" class="evidence-info-trigger" aria-label="Show evidence and research based definitions" onclick="event.stopPropagation();">
-                <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
-            </button>
-        </span>
+        </button>
     `;
 }
 
-function setupEvidenceDefinitionsPopup() {
-    if (document.getElementById('evidence-definitions-modal')) return;
+// The tooltip is rendered once into <body> (rather than nested inside each
+// trigger) so it can never be clipped by scrollable/overflow:hidden
+// ancestors such as .result-card-compact or .visual-flowchart-card.
+let evidenceLegendTooltipEl = null;
+let evidenceLegendActiveTrigger = null;
 
-    const modal = document.createElement('div');
-    modal.id = 'evidence-definitions-modal';
-    modal.className = 'evidence-definitions-modal';
-    modal.setAttribute('aria-hidden', 'true');
-    modal.innerHTML = `
-        <div class="evidence-definitions-dialog" role="dialog" aria-modal="true" aria-label="Evidence definitions">
-            <button type="button" class="evidence-definitions-close" aria-label="Close">
-                <span class="material-symbols-rounded" aria-hidden="true" translate="no">close</span>
-            </button>
-            <div class="evidence-definition-block">
-                <strong>${escapeHtml(t('evidence_eb_title'))}</strong>
-                <p>${escapeHtml(t('evidence_eb_desc'))}</p>
-            </div>
-            <div class="evidence-definition-block">
-                <strong>${escapeHtml(t('evidence_rb_title'))}</strong>
-                <p>${escapeHtml(t('evidence_rb_desc'))}</p>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    document.addEventListener('click', (event) => {
-        const trigger = event.target.closest('.evidence-info-trigger');
-        if (!trigger) return;
-        const popup = document.getElementById('evidence-definitions-modal');
-        if (!popup) return;
-        popup.classList.add('active');
-        popup.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('evidence-modal-open');
-    });
-
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal || event.target.closest('.evidence-definitions-close')) {
-            closeEvidenceDefinitionsPopup();
-        }
-    });
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && modal.classList.contains('active')) {
-            closeEvidenceDefinitionsPopup();
-        }
-    });
+function getEvidenceLegendTooltipEl() {
+    if (!evidenceLegendTooltipEl || !document.body.contains(evidenceLegendTooltipEl)) {
+        evidenceLegendTooltipEl = document.createElement('div');
+        evidenceLegendTooltipEl.className = 'evidence-legend-tooltip';
+        evidenceLegendTooltipEl.setAttribute('role', 'tooltip');
+        document.body.appendChild(evidenceLegendTooltipEl);
+    }
+    return evidenceLegendTooltipEl;
 }
 
-function closeEvidenceDefinitionsPopup() {
-    const modal = document.getElementById('evidence-definitions-modal');
-    if (!modal) return;
-    modal.classList.remove('active');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('evidence-modal-open');
+function positionEvidenceLegendTooltip(trigger) {
+    const tooltip = getEvidenceLegendTooltipEl();
+    const rect = trigger.getBoundingClientRect();
+    const margin = 8;
+    const tooltipWidth = tooltip.offsetWidth || 320;
+    let left = rect.left;
+    if (left + tooltipWidth > window.innerWidth - margin) {
+        left = Math.max(margin, window.innerWidth - tooltipWidth - margin);
+    }
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${rect.bottom + margin}px`;
 }
+
+function showEvidenceLegendTooltip(trigger) {
+    const tooltip = getEvidenceLegendTooltipEl();
+    tooltip.innerHTML = getEvidenceDefinitionsBlocksHtml();
+    evidenceLegendActiveTrigger = trigger;
+    positionEvidenceLegendTooltip(trigger);
+    tooltip.classList.add('evidence-legend-tooltip-visible');
+}
+
+function hideEvidenceLegendTooltip() {
+    if (evidenceLegendActiveTrigger) evidenceLegendActiveTrigger.classList.remove('evidence-legend-open');
+    evidenceLegendActiveTrigger = null;
+    if (evidenceLegendTooltipEl) evidenceLegendTooltipEl.classList.remove('evidence-legend-tooltip-visible');
+}
+
+// Tap/click fallback for touch devices that can't hover. Only one legend
+// tooltip is kept open at a time.
+function toggleEvidenceLegendTooltip(trigger) {
+    const wasOpen = trigger.classList.contains('evidence-legend-open');
+    hideEvidenceLegendTooltip();
+    if (!wasOpen) {
+        trigger.classList.add('evidence-legend-open');
+        showEvidenceLegendTooltip(trigger);
+    }
+}
+
+document.addEventListener('mouseover', (event) => {
+    const trigger = event.target.closest('.evidence-legend-trigger');
+    if (trigger) showEvidenceLegendTooltip(trigger);
+});
+
+document.addEventListener('mouseout', (event) => {
+    const trigger = event.target.closest('.evidence-legend-trigger');
+    if (trigger && !trigger.classList.contains('evidence-legend-open') && !trigger.contains(event.relatedTarget)) {
+        hideEvidenceLegendTooltip();
+    }
+});
+
+document.addEventListener('focusin', (event) => {
+    const trigger = event.target.closest('.evidence-legend-trigger');
+    if (trigger) showEvidenceLegendTooltip(trigger);
+});
+
+document.addEventListener('focusout', (event) => {
+    const trigger = event.target.closest('.evidence-legend-trigger');
+    if (trigger && !trigger.classList.contains('evidence-legend-open')) hideEvidenceLegendTooltip();
+});
+
+document.addEventListener('click', (event) => {
+    if (event.target.closest('.evidence-legend-trigger')) return;
+    document.querySelectorAll('.evidence-legend-trigger.evidence-legend-open').forEach(el => {
+        el.classList.remove('evidence-legend-open');
+    });
+    hideEvidenceLegendTooltip();
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    document.querySelectorAll('.evidence-legend-trigger.evidence-legend-open').forEach(el => {
+        el.classList.remove('evidence-legend-open');
+    });
+    hideEvidenceLegendTooltip();
+});
+
+document.addEventListener('scroll', () => hideEvidenceLegendTooltip(), true);
+
 
 // Toggle pillar checkbox selection
 function togglePillarCheckbox(pillar, element, isChecked) {
