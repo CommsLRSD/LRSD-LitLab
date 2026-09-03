@@ -908,7 +908,6 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier1-principles',
                 type: 'checklist',
                 title: 'Step 1: Principles of Explicit and Systematic Instruction',
-                subtitle: 'Principles of Explicit and Systematic Instruction',
                 description: 'Review the following principles before proceeding.',
                 items: [
                     'Are the lesson goals clearly stated?',
@@ -927,8 +926,8 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier1-screener',
                 type: 'selection',
                 title: 'Step 2: Literacy Screener',
-                subtitle: 'Administer literacy screener.',
-                description: 'Administer literacy screener.\n\n(DIBELS, CTOPP-2, THaFol, IDAPEL)',
+                subtitle: '',
+                description: '',
                 options: 'screeners', // Will fetch from tierFlowchartData
                 nextNode: 'tier1-effectiveness',
                 nextHandler: 'selectTier1ScreenerVisual'
@@ -938,10 +937,10 @@ const FLOWCHART_DEFINITIONS = {
                 type: 'decision',
                 title: 'Step 3: Result',
                 subtitle: 'Was instruction effective?',
-                description: 'Administer literacy screener. (DIBELS, CTOPP-2, THaFol, IDAPEL)\n\nIf you chose the Successful or Unsuccessful mistakenly, simply chose the correct option and continue.',
+                description: '',
                 choices: [
-                    { id: 'effective', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', type: 'success', nextNode: 'tier1-success' },
-                    { id: 'ineffective', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', type: 'warning', nextNode: 'tier1-percentage' }
+                    { id: 'effective', label: 'Instruction Effective', sublabel: 'Subtest result Blue or Green', indicators: ['blue', 'green'], type: 'success', nextNode: 'tier1-success' },
+                    { id: 'ineffective', label: 'Instruction Ineffective', sublabel: 'Subtest result Yellow or Red', indicators: ['yellow', 'red'], type: 'warning', nextNode: 'tier1-percentage' }
                 ]
             },
             'tier1-success': {
@@ -949,10 +948,7 @@ const FLOWCHART_DEFINITIONS = {
                 type: 'endpoint',
                 status: 'success',
                 title: 'Instruction Effective!',
-                description: 'Continue and monitor with general curriculum.',
-                recommendations: [
-                    'Continue and monitor with general curriculum'
-                ]
+                description: 'Continue and monitor with general curriculum.'
             },
             'tier1-percentage': {
                 id: 'tier1-percentage',
@@ -961,8 +957,8 @@ const FLOWCHART_DEFINITIONS = {
                 subtitle: 'What percentage of students are unsuccessful?',
                 description: 'Based on screener results, how many students are below benchmark?',
                 choices: [
-                    { id: 'more-20', label: 'Instruction unsuccessful for 20% or more of students.', sublabel: '', type: 'warning', nextNode: 'tier1-move-tier2' },
-                    { id: 'less-20', label: 'Instruction unsuccessful for fewer than 20% of students.', sublabel: '', type: 'warning', nextNode: 'tier1-reteach' }
+                    { id: 'more-20', label: '20% or more', icon: '▲', sublabel: '', type: 'warning', nextNode: 'tier1-move-tier2' },
+                    { id: 'less-20', label: 'Fewer than 20%', icon: '▼', sublabel: '', type: 'warning', nextNode: 'tier1-reteach' }
                 ],
                 // Once a choice is made, the completed card should show only the
                 // chosen option's own text as its title — no separate generic
@@ -973,11 +969,8 @@ const FLOWCHART_DEFINITIONS = {
                 id: 'tier1-move-tier2',
                 type: 'endpoint',
                 status: 'info',
-                title: 'Tier 2: Small Group Interventions',
-                description: 'Instruction unsuccessful for 20% or more of students. This route continues into the Tier Two flowchart.',
-                recommendations: [
-                    'Continue into the Tier Two flowchart.'
-                ],
+                title: 'Continue to Tier 2: Small Group Interventions',
+                description: '',
                 actionButton: { text: 'Start Tier 2 Flowchart', action: 'startTier2Visual' }
             },
             'tier1-reteach': {
@@ -985,12 +978,8 @@ const FLOWCHART_DEFINITIONS = {
                 type: 'endpoint',
                 status: 'warning',
                 title: 'Reteach General Curriculum',
-                description: 'Consider areas of weakness discovered via Literacy Screener. Use the Interventions Menu below to find resources.\n\nThis route remains within Tier One.',
-                recommendations: [
-                    'Consider areas of weakness discovered via Literacy Screener.',
-                    'Use the Interventions Menu below to find resources.'
-                ],
-                actionButton: { text: 'Redo Tier 1', action: 'restartTier1Visual' }
+                descriptionHtml: 'Consider areas of weakness discovered via Literacy Screener. Use the <a href="#interventions" onclick="navigateToPage(\'interventions\'); return false;">Interventions Menu</a> to find resources.',
+                actionButton: { text: 'Restart Tier 1', action: 'restartTier1Visual' }
             }
         }
     },
@@ -1279,15 +1268,12 @@ function initIntegratedFlowchart(tierId) {
                 
                 <div class="tier-tabs">
                     <button class="tier-tab ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')" data-tier="tier1">
-                        <span class="tier-number">1</span>
                         <span class="tier-label">${escapeHtml(t('tier1_label'))}</span>
                     </button>
                     <button class="tier-tab ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')" data-tier="tier2">
-                        <span class="tier-number">2</span>
                         <span class="tier-label">${escapeHtml(t('tier2_label'))}</span>
                     </button>
                     <button class="tier-tab ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')" data-tier="tier3">
-                        <span class="tier-number">3</span>
                         <span class="tier-label">${escapeHtml(t('tier3_label'))}</span>
                     </button>
                 </div>
@@ -1304,7 +1290,7 @@ function initIntegratedFlowchart(tierId) {
                     <div class="fc-sidebar-col">
                         ${renderProgramLangMiniHtml()}
                         ${showTier1SuccessSidebar ? `
-                        <aside class="tier1-success-sidebar" aria-label="Tier 1 instruction success guidance">
+                        <aside class="tier1-success-sidebar" aria-label="Tier 1 instruction effectiveness guidance">
                             <div class="tier1-success-sidebar-head">
                                 <span class="material-symbols-rounded tier1-success-sidebar-icon" aria-hidden="true" translate="no">help</span>
                                 <h3>${escapeHtml(t('tier1_sidebar_heading'))}</h3>
@@ -2383,7 +2369,7 @@ function refreshVisualFlowchartModal() {
                 </button>`;
         }
         const entry = item.entry;
-        const answer = entry.choice?.name || (entry.node.type === 'checklist' ? t('step_type_reviewed') : '');
+        const answer = entry.choice?.name || '';
         const usesChoiceAsTitle = !entry.isCurrent && entry.node.titleFromChoiceWhenAnswered && entry.choice?.name;
         const displayTitle = usesChoiceAsTitle ? entry.choice.name : getStepShortTitle(entry.node);
         const variant = entry.variant || 'step1';
@@ -2404,6 +2390,10 @@ function refreshVisualFlowchartModal() {
                     <span>${escapeHtml(collapseLabel)}</span>
                 </button>`
             : '';
+        const endpointDescription = entry.node.descriptionHtml || escapeHtml(entry.node.description || '');
+        const endpointAction = entry.node.id === 'tier1-reteach'
+            ? `<button type="button" class="visual-flowchart-tier-review-btn" onclick="restartTier1VisualIntegrated()">${escapeHtml(entry.node.actionButton.text)}</button>`
+            : '';
         return `${collapseBtn}<${tag} class="visual-flowchart-card visual-flowchart-card-${escapeAttr(variant)}${entry.isCurrent ? ' visual-flowchart-card-current' : ''}${isInteractive ? ' visual-flowchart-card-interactive' : ''}${!isInteractive && entry.isTierFirstStep ? ' visual-flowchart-card-wide' : ''}"
                     style="left:${position.x}px;top:${position.y}px;width:${position.width}px" ${revisit}>
                 <span class="visual-flowchart-tier-chip">${escapeHtml(entry.tierLabel)}</span>
@@ -2412,7 +2402,8 @@ function refreshVisualFlowchartModal() {
                     <span class="visual-flowchart-card-meta">${escapeHtml(getStepTypeLabel(entry.node.type))}${entry.isCurrent ? ` · ${escapeHtml(t('fc_in_progress'))}` : ''}</span>
                     <strong>${escapeHtml(displayTitle)}</strong>
                     ${!usesChoiceAsTitle && answer ? `<span class="visual-flowchart-card-answer">${escapeHtml(answer)}</span>` : ''}
-                    ${entry.node.type === 'endpoint' && entry.node.description ? `<span class="visual-flowchart-card-answer">${escapeHtml(entry.node.description)}</span>` : ''}
+                    ${entry.node.type === 'endpoint' && endpointDescription ? `<span class="visual-flowchart-card-answer">${endpointDescription}</span>` : ''}
+                    ${entry.node.type === 'endpoint' ? endpointAction : ''}
                 </span>
                 ${isInteractive ? '<div class="visual-flowchart-active-host"></div>' : ''}
             </${tag}>`;
@@ -2754,8 +2745,10 @@ function createCompletedStepElement(nodeData) {
         const buttonsHtml = nodeData.choices.map(c => {
             const taken = choice && c.id === choice.id;
             return `<div class="decision-btn decision-${c.type}${taken ? '' : ' decision-not-taken'}" aria-disabled="true" role="presentation">
+                ${c.icon ? `<span class="decision-trend-icon" aria-hidden="true">${escapeHtml(c.icon)}</span>` : ''}
                 <div class="decision-content">
                     <strong>${escapeHtml(c.label)}</strong>
+                    ${c.indicators ? `<span class="decision-indicators" aria-hidden="true">${c.indicators.map(color => `<span class="tier1-indicator-dot tier1-indicator-${escapeAttr(color)}"></span>`).join('')}</span>` : ''}
                     ${c.sublabel ? `<span>${escapeHtml(c.sublabel)}</span>` : ''}
                 </div>
             </div>`;
@@ -3090,8 +3083,8 @@ function createIntegratedSelectionNode(nodeData) {
                 </button>
             </div>
             <div class="step-content">
-                <h3>${nodeData.subtitle}</h3>
-                <p>${nodeData.description}</p>
+                ${nodeData.subtitle ? `<h3>${escapeHtml(nodeData.subtitle)}</h3>` : ''}
+                ${nodeData.description ? `<p>${escapeHtml(nodeData.description)}</p>` : ''}
                 <div class="evidence-popup-entry">
                     <button type="button" class="evidence-info-trigger evidence-info-trigger-inline" aria-label="Show evidence and research based definitions" title="Evidence and research based definitions" onclick="event.stopPropagation();">
                         <span class="material-symbols-rounded" aria-hidden="true" translate="no">info</span>
@@ -3370,8 +3363,10 @@ function fwSelectItem(itemId, itemName) {
 function createIntegratedDecisionNode(nodeData) {
     const choicesHTML = nodeData.choices.map(choice => `
         <button class="decision-btn decision-${choice.type} ${choice.sublabel ? '' : 'decision-single-line'}" onclick="makeIntegratedDecision('${nodeData.id}', '${choice.id}', '${choice.nextNode}')">
+            ${choice.icon ? `<span class="decision-trend-icon" aria-hidden="true">${escapeHtml(choice.icon)}</span>` : ''}
             <div class="decision-content">
-                <strong>${choice.label}</strong>
+                <strong>${escapeHtml(choice.label)}</strong>
+                ${choice.indicators ? `<span class="decision-indicators" aria-hidden="true">${choice.indicators.map(color => `<span class="tier1-indicator-dot tier1-indicator-${escapeAttr(color)}"></span>`).join('')}</span>` : ''}
                 ${choice.sublabel ? `<span>${choice.sublabel}</span>` : ''}
             </div>
         </button>
@@ -3535,7 +3530,7 @@ function createIntegratedEndpointNode(nodeData) {
                 ${ICONS[nodeData.status] || ICONS.info}
             </div>
             <h2>${nodeData.title}</h2>
-            <p>${nodeData.description}</p>
+            ${nodeData.descriptionHtml ? `<p>${nodeData.descriptionHtml}</p>` : nodeData.description ? `<p>${escapeHtml(nodeData.description)}</p>` : ''}
             ${warningBoxHTML}
             ${recommendationsHTML}
             <div class="endpoint-actions">
