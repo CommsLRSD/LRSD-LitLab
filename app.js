@@ -2471,6 +2471,25 @@ function refreshVisualFlowchartModal() {
     wireVisualFlowchartPanZoom(viewport);
     updateVisualFlowchartTierBar();
     const state = appState.visualFlowchartModal;
+    autoFitVisualFlowchartActiveCard(stage, viewport, items, activeNodeId);
+    // Card heights are not final until the browser has laid the fresh markup
+    // out (and until the --visual-card-max-height cap above has been applied),
+    // so re-fit on the next frame: without this the first open of the pathway
+    // scales to a stale, shorter measurement and the live card runs off the
+    // bottom of the viewport.
+    requestAnimationFrame(() => {
+        if (appState.visualFlowchartModal !== state) return;
+        if (!document.getElementById('visual-flowchart-stage')) return;
+        autoFitVisualFlowchartActiveCard(stage, viewport, items, activeNodeId);
+    });
+}
+
+// Scale and position the canvas so the active (live) step card sits fully
+// inside the viewport. Re-measures the rendered cards on every call so it can
+// be run again once layout has settled.
+function autoFitVisualFlowchartActiveCard(stage, viewport, items, activeNodeId) {
+    const state = appState.visualFlowchartModal;
+    if (!state || !stage || !viewport) return;
     const bounds = measureVisualFlowchartContent(stage);
     state.contentBounds = bounds;
     const pad = VISUAL_FLOWCHART_EDGE_PADDING;
