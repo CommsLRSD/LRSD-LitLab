@@ -2659,6 +2659,13 @@ details > p {
   gap: 6px;
 }
 
+.results-prompt {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
 .results-panel { margin-top: var(--space-md); }
 
 .results-grid-compact {
