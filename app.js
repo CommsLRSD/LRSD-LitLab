@@ -768,11 +768,14 @@ function toggleFAQ(element) {
     // Close all FAQs
     document.querySelectorAll('.faq-item').forEach(item => {
         item.classList.remove('active');
+        const question = item.querySelector('.faq-question');
+        if (question) question.setAttribute('aria-expanded', 'false');
     });
     
     // Open clicked FAQ if it wasn't active
     if (!wasActive) {
         faqItem.classList.add('active');
+        element.setAttribute('aria-expanded', 'true');
     }
 }
 
@@ -6673,7 +6676,18 @@ function requestFlowchartProgramChange(program) {
     }
     appState.selectedProgram = program;
     appState.selectedScreener = null;
+    // French Immersion defaults to the French display language (the user can
+    // still switch back to English via the language mini selector).
+    if (program === 'French Immersion') {
+        appState.language = 'fr';
+        applyTranslations();
+        updateLanguageToggleBtn();
+    }
     initIntegratedFlowchart('tier1');
+    // Keep the visual pathway modal's own header controls (program +
+    // language mini selector) in sync when the switch happens while it's
+    // open, since it isn't rebuilt by initIntegratedFlowchart above.
+    refreshVisualFlowchartHeaderControls();
 }
 
 // Called when the user picks a different display language (French Immersion
@@ -6692,6 +6706,19 @@ function requestFlowchartLanguageChange(lang) {
     applyTranslations();
     updateLanguageToggleBtn();
     initIntegratedFlowchart('tier1');
+    refreshVisualFlowchartHeaderControls();
+}
+
+// Re-render just the visual pathway modal's header controls (program +
+// language mini selector, view switcher) in place, without touching the
+// canvas/steps below it. Needed because switching program/language re-renders
+// the underlying "Your Decisions" panel via initIntegratedFlowchart(), which
+// doesn't reach into the modal (it lives outside #flowchart-container).
+function refreshVisualFlowchartHeaderControls() {
+    if (!appState.visualFlowchartModal) return;
+    const controls = document.querySelector('.visual-flowchart-header-controls');
+    if (!controls) return;
+    controls.outerHTML = renderVisualFlowchartHeaderControlsHtml();
 }
 
 function openTierFlowchart(tierName) {
