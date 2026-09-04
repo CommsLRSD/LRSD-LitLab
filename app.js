@@ -2640,7 +2640,12 @@ function wireVisualFlowchartPanZoom(viewport) {
         if (revisit) undoToStep(revisit.dataset.visualRevisit);
     });
     viewport.addEventListener('pointerdown', event => {
-        if (event.target.closest('button, input, select, textarea, a, label')) return;
+        // Clickable non-<button> controls (e.g. the drill-down assessment /
+        // intervention result cards, which are role="button" divs so they can
+        // sit inside the card's scroll container) must also be excluded, or
+        // capturing the pointer here for panning hijacks their click event
+        // and the selection never registers.
+        if (event.target.closest('button, input, select, textarea, a, label, [role="button"]')) return;
         // Let a card that has overflowed its max height be dragged/scrolled
         // internally instead of starting a canvas pan.
         const overflowingCard = event.target.closest('.visual-flowchart-card');
