@@ -159,7 +159,7 @@ function rerenderForLanguage() {
 // Refresh the programmatically-set option/placeholder text in the
 // interventions filter menu so it picks up the new language immediately.
 function refreshWizardSelectPlaceholders() {
-    if (document.querySelector('.filter-menu')) {
+    if (document.querySelector('.filter-sidebar')) {
         renderMenuFilterOptions();
         renderMenuResults();
     }
@@ -6765,17 +6765,25 @@ function escapeHtml(text) {
 // Shared markup for the two evidence/research definition blocks. Reused by
 // the hover-triggered legend tooltip (inline callouts, badges) and by the
 // static evidence sidebar next to the Interventions Menu (index.html).
-function getEvidenceDefinitionsBlocksHtml() {
-    return `
+// `level` optionally narrows the output to a single definition ('*' for
+// evidence based, '**' for research based) so an asterisk marker beside a
+// resource name only explains its own rating.
+function getEvidenceDefinitionsBlocksHtml(level) {
+    const evidenceBased = `
         <div class="evidence-definition-block">
             <strong>${escapeHtml(t('evidence_eb_title'))}</strong>
             <p>${escapeHtml(t('evidence_eb_desc'))}</p>
         </div>
+    `;
+    const researchBased = `
         <div class="evidence-definition-block">
             <strong>${escapeHtml(t('evidence_rb_title'))}</strong>
             <p>${escapeHtml(t('evidence_rb_desc'))}</p>
         </div>
     `;
+    if (level === '*') return evidenceBased;
+    if (level === '**') return researchBased;
+    return evidenceBased + researchBased;
 }
 
 // Inline "* Evidence Based / ** Research Based" legend. Shows the full
@@ -6792,7 +6800,7 @@ function getEvidenceLegendTriggerHtml() {
 function getEvidenceBadgeHtml(evidenceLevel) {
     if (evidenceLevel !== '*' && evidenceLevel !== '**') return '';
     return `
-        <button type="button" class="badge-evidence evidence-legend-trigger" aria-label="${escapeHtml(t('evidence_legend_aria'))}" onclick="event.stopPropagation(); toggleEvidenceLegendTooltip(this);">
+        <button type="button" class="badge-evidence evidence-legend-trigger" data-evidence-level="${escapeAttr(evidenceLevel)}" aria-label="${escapeHtml(evidenceLevel === '*' ? t('evidence_eb_title') : t('evidence_rb_title'))}" onclick="event.stopPropagation(); toggleEvidenceLegendTooltip(this);">
             <span class="evidence-marker-text">${escapeHtml(evidenceLevel)}</span>
         </button>
     `;
@@ -6829,7 +6837,7 @@ function positionEvidenceLegendTooltip(trigger) {
 
 function showEvidenceLegendTooltip(trigger) {
     const tooltip = getEvidenceLegendTooltipEl();
-    tooltip.innerHTML = getEvidenceDefinitionsBlocksHtml();
+    tooltip.innerHTML = getEvidenceDefinitionsBlocksHtml(trigger.dataset.evidenceLevel);
     evidenceLegendActiveTrigger = trigger;
     positionEvidenceLegendTooltip(trigger);
     tooltip.classList.add('evidence-legend-tooltip-visible');
@@ -6907,6 +6915,7 @@ document.addEventListener('scroll', () => hideEvidenceLegendTooltip(), true);
 const menuState = {
     program: '',
     tier: '',
+    grade: '',
     pillar: '',
     resourceType: '',
     screener: '',
@@ -6945,6 +6954,7 @@ function getMatchingTags(item, state, excludeField) {
 function getFilteredResources(state, excludeField) {
     return getAllResources().filter(item => {
         if (excludeField !== 'program' && state.program && item.program !== state.program) return false;
+        if (excludeField !== 'grade' && state.grade && !(item.gradeFilter || []).includes(state.grade)) return false;
         if (state.search) {
             const needle = state.search.trim().toLowerCase();
             if (needle && !item.name.toLowerCase().includes(needle)) return false;
@@ -6960,6 +6970,7 @@ function distinctTagValues(state, field) {
     const values = new Set();
     getAllResources().forEach(item => {
         if (state.program && item.program !== state.program) return;
+        if (field !== 'grade' && state.grade && !(item.gradeFilter || []).includes(state.grade)) return;
         if (state.search) {
             const needle = state.search.trim().toLowerCase();
             if (needle && !item.name.toLowerCase().includes(needle)) return;
@@ -7001,6 +7012,58 @@ function buildFacetOptionsHtml(values, selected, translate) {
     return html;
 }
 
+// Grade values are stored on the resource itself (`gradeFilter`), not on its
+// tags, so they get their own "what's still available" helper. Sorted into
+// school order (Maternelle, Kindergarten, 1-12, then French Immersion years).
+const GRADE_SORT_ORDER = ['M', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+
+function distinctGradeValues(state) {
+    const values = new Set();
+    getFilteredResources(state, 'grade').forEach(item => {
+        (item.gradeFilter || []).forEach(g => values.add(g));
+    });
+    return Array.from(values).sort((a, b) => {
+        const ia = GRADE_SORT_ORDER.indexOf(a);
+        const ib = GRADE_SORT_ORDER.indexOf(b);
+        if (ia === -1 && ib === -1) return a.localeCompare(b);
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+    });
+}
+
+function translateGrade(grade) {
+    if (!grade) return '';
+    if (GRADE_SORT_ORDER.indexOf(grade) > 1) return `${t('fw_grade_prefix')} ${grade}`;
+    return grade;
+}
+
+// Evidence ratings shown beside a resource name. `*` = evidence based,
+// `**` = research based; the marker opens the matching definition on
+// hover/tap (same tooltip used by the flowchart legend).
+const RESOURCE_EVIDENCE_LEVELS = {
+    'abracadabra': '*',
+    'sra early interventions in reading': '*',
+    'lexia core 5': '*',
+    'lexia powerup': '*',
+    'sra corrective reading': '*',
+    'ufli manual': '**',
+    'orton-gillingham': '**',
+    'orton-gilingham': '**',
+    'heggerty': '**',
+    'kilpatrick – equipped for reading success': '**',
+    'heggerty – bridge the gap': '**',
+    'word origins': '**',
+    'word connections': '**',
+    'rewards': '**'
+};
+
+function getResourceEvidenceLevel(name) {
+    if (!name) return '';
+    const key = String(name).trim().toLowerCase().replace(/[\u2013\u2014]/g, '\u2013');
+    return RESOURCE_EVIDENCE_LEVELS[key] || '';
+}
+
 // Repopulate the Pillar / Resource Type / Screener selects in the standalone
 // Interventions Menu so their options always reflect the other filters
 // currently applied, then re-render the results.
@@ -7008,21 +7071,18 @@ function renderMenuFilterOptions() {
     const pillarSel = document.getElementById('filter-pillar');
     const typeSel = document.getElementById('filter-type');
     const screenerSel = document.getElementById('filter-screener');
+    const gradeSel = document.getElementById('filter-grade');
     if (!pillarSel || !typeSel || !screenerSel) return;
 
+    if (gradeSel) gradeSel.innerHTML = buildFacetOptionsHtml(distinctGradeValues(menuState), menuState.grade, translateGrade);
     pillarSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(menuState, 'pillar'), menuState.pillar, translatePillar);
     typeSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(menuState, 'resourceType'), menuState.resourceType, translateResourceType);
     screenerSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(menuState, 'screener'), menuState.screener);
 }
 
 function buildResourceCardHtml(item) {
-    const tags = getMatchingTags(item, menuState, null);
     const gradeText = item.gradeRangeText || (item.gradeFilter || []).join(', ');
-    const tiers = uniqueSorted(tags.map(tg => tg.tier)).sort((a, b) => a - b);
-    const pillars = uniqueSorted(tags.map(tg => tg.pillar));
-    const types = uniqueSorted(tags.map(tg => tg.resourceType));
-    const screeners = uniqueSorted(tags.flatMap(tg => tg.screeners || []));
-    const notes = uniqueSorted(tags.map(tg => tg.notes));
+    const evidenceLevel = getResourceEvidenceLevel(item.name);
     const linkHtml = item.url
         ? `<a class="resource-link-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('filter_view_resource'))}<span class="material-symbols-rounded" aria-hidden="true" translate="no">open_in_new</span></a>`
         : `<span class="resource-link-btn resource-link-btn-disabled">${escapeHtml(t('filter_no_link'))}</span>`;
@@ -7030,19 +7090,79 @@ function buildResourceCardHtml(item) {
     return `
         <div class="resource-card">
             <div class="resource-card-main">
-                <div class="resource-card-name">${escapeHtml(item.name)}</div>
-                <div class="result-badges">
-                    ${tiers.map(tier => `<span class="result-badge">${escapeHtml(t('filter_tier_option')(tier))}</span>`).join('')}
-                    ${pillars.map(p => `<span class="result-badge">${escapeHtml(translatePillar(p))}</span>`).join('')}
-                    ${types.map(rt => `<span class="result-badge">${escapeHtml(translateResourceType(rt))}</span>`).join('')}
-                    ${gradeText ? `<span class="result-badge">${escapeHtml(gradeText)}</span>` : ''}
+                <div class="resource-card-name">
+                    <span class="resource-card-name-text">${escapeHtml(item.name)}</span>
+                    ${getEvidenceBadgeHtml(evidenceLevel)}
+                    ${gradeText ? `<span class="result-badge resource-card-grade">${escapeHtml(gradeText)}</span>` : ''}
                 </div>
-                ${screeners.length ? `<div class="resource-card-meta">${escapeHtml(t('filter_screeners_label'))}: ${escapeHtml(screeners.join(', '))}</div>` : ''}
-                ${notes.length ? `<div class="resource-card-meta resource-card-notes">${escapeHtml(notes.join('; '))}</div>` : ''}
             </div>
             ${linkHtml}
         </div>
     `;
+}
+
+// The "running list" of filters the user has picked, shown above the
+// results so the current scope is always visible; each chip removes just
+// that one filter.
+const MENU_FILTER_CHIP_FIELDS = [
+    { field: 'program', labelKey: 'filter_program_label' },
+    { field: 'grade', labelKey: 'filter_grade_label', format: (v) => translateGrade(v) },
+    { field: 'tier', labelKey: 'filter_tier_label', format: (v) => t('filter_tier_option')(v) },
+    { field: 'pillar', labelKey: 'filter_pillar_label', format: (v) => translatePillar(v) },
+    { field: 'resourceType', labelKey: 'filter_type_label', format: (v) => translateResourceType(v) },
+    { field: 'screener', labelKey: 'filter_screener_label' },
+    { field: 'search', labelKey: 'filter_search_label' }
+];
+
+function renderActiveFilterChips() {
+    const el = document.getElementById('active-filters');
+    if (!el) return;
+
+    const chips = MENU_FILTER_CHIP_FIELDS
+        .filter(def => String(menuState[def.field] || '').trim() !== '')
+        .map(def => {
+            const raw = menuState[def.field];
+            const value = def.format ? def.format(raw) : raw;
+            return `
+                <button type="button" class="active-filter-chip" onclick="clearMenuFilter('${escapeAttr(def.field)}')" title="${escapeHtml(t('filter_remove_filter'))}">
+                    <span class="active-filter-chip-label">${escapeHtml(t(def.labelKey))}:</span>
+                    <span class="active-filter-chip-value">${escapeHtml(value)}</span>
+                    <span class="material-symbols-rounded" aria-hidden="true" translate="no">close</span>
+                </button>
+            `;
+        });
+
+    el.innerHTML = chips.length
+        ? `<span class="active-filters-label">${escapeHtml(t('filter_active_label'))}</span>${chips.join('')}
+           <button type="button" class="active-filter-clear" onclick="restartMenu()">${escapeHtml(t('wizard_start_over'))}</button>`
+        : `<span class="active-filters-empty">${escapeHtml(t('filter_active_none'))}</span>`;
+}
+
+// Remove one filter from the running chip list.
+function clearMenuFilter(field) {
+    if (!(field in menuState)) return;
+    menuState[field] = '';
+    setRememberedMenuFilters({ [field]: null });
+    syncMenuFilterControls();
+    renderMenuFilterOptions();
+    renderMenuResults();
+}
+
+// Push menuState back into the sidebar controls (used after a chip removal
+// or a reset, where the change didn't originate from the control itself).
+function syncMenuFilterControls() {
+    [
+        ['filter-program', 'program'],
+        ['filter-tier', 'tier'],
+        ['filter-grade', 'grade'],
+        ['filter-pillar', 'pillar'],
+        ['filter-type', 'resourceType'],
+        ['filter-screener', 'screener'],
+        ['filter-search', 'search']
+    ].forEach(([id, field]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = menuState[field] || '';
+    });
 }
 
 function renderMenuResults() {
@@ -7051,6 +7171,7 @@ function renderMenuResults() {
     if (!countEl || !listEl) return;
 
     const filtered = getFilteredResources(menuState, null);
+    renderActiveFilterChips();
     countEl.textContent = t('filter_results_label')(filtered.length);
     listEl.innerHTML = filtered.length
         ? filtered.map(buildResourceCardHtml).join('')
@@ -7068,18 +7189,14 @@ function onMenuFilterChange(field, value) {
 function resetMenuFilters() {
     menuState.program = '';
     menuState.tier = '';
+    menuState.grade = '';
     menuState.pillar = '';
     menuState.resourceType = '';
     menuState.screener = '';
     menuState.search = '';
     appState.rememberedMenuFilters = {};
 
-    const programSel = document.getElementById('filter-program');
-    const tierSel = document.getElementById('filter-tier');
-    const searchInput = document.getElementById('filter-search');
-    if (programSel) programSel.value = '';
-    if (tierSel) tierSel.value = '';
-    if (searchInput) searchInput.value = '';
+    syncMenuFilterControls();
 
     renderMenuFilterOptions();
     renderMenuResults();
@@ -7097,24 +7214,20 @@ function applyRememberedFiltersToMenu() {
     const remembered = appState.rememberedMenuFilters || {};
     menuState.program = remembered.program || appState.selectedProgram || '';
     menuState.tier = remembered.tier ? String(remembered.tier) : '';
+    menuState.grade = remembered.grade || '';
     menuState.pillar = remembered.pillar || '';
     menuState.resourceType = remembered.resourceType || '';
     menuState.screener = remembered.screener || '';
     menuState.search = '';
 
-    const programSel = document.getElementById('filter-program');
-    const tierSel = document.getElementById('filter-tier');
-    const searchInput = document.getElementById('filter-search');
-    if (programSel) programSel.value = menuState.program;
-    if (tierSel) tierSel.value = menuState.tier;
-    if (searchInput) searchInput.value = '';
+    syncMenuFilterControls();
 
     renderMenuFilterOptions();
     renderMenuResults();
 }
 
 function initializeInterventionsFilterMenu() {
-    if (!document.querySelector('.filter-menu')) return;
+    if (!document.querySelector('.filter-sidebar')) return;
     applyRememberedFiltersToMenu();
 }
 
