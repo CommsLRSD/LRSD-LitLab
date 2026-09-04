@@ -4029,6 +4029,24 @@ details > p {
   color: var(--text-secondary);
 }
 
+/* "Was instruction effective?" decisions in the visual pathway: stack the
+   effective / ineffective choices vertically as full-width rectangular rows
+   (instead of the default side-by-side layout) so the labels stay easy to read. */
+.visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-grid,
+.visual-flowchart-active-host .flowchart-step[data-node-id="tier2-progress"] .decision-grid,
+.visual-flowchart-active-host .flowchart-step[data-node-id="tier2-cycle2-progress"] .decision-grid,
+.visual-flowchart-active-host .flowchart-step[data-node-id="tier3-progress"] .decision-grid {
+  flex-direction: column;
+}
+
+.visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-btn,
+.visual-flowchart-active-host .flowchart-step[data-node-id="tier2-progress"] .decision-btn,
+.visual-flowchart-active-host .flowchart-step[data-node-id="tier2-cycle2-progress"] .decision-btn,
+.visual-flowchart-active-host .flowchart-step[data-node-id="tier3-progress"] .decision-btn {
+  width: 100%;
+  border-radius: var(--radius-sm);
+}
+
 .decision-icon { flex-shrink: 0; }
 .decision-icon svg { width: 20px; height: 20px; }
 .decision-trend-icon { font-size: 1.25rem; line-height: 1; }
@@ -7221,16 +7239,17 @@ body.step-review-modal-open { overflow: hidden; }
     grid-template-columns: 1fr;
   }
 
-  .visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-grid {
-    flex-direction: column;
-  }
-
-  .visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-btn {
-    width: 100%;
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-btn,
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier2-progress"] .decision-btn,
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier2-cycle2-progress"] .decision-btn,
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier3-progress"] .decision-btn {
     padding-block: 0.75rem;
   }
 
-  .visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-content span {
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier1-effectiveness"] .decision-content span,
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier2-progress"] .decision-content span,
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier2-cycle2-progress"] .decision-content span,
+  .visual-flowchart-active-host .flowchart-step[data-node-id="tier3-progress"] .decision-content span {
     line-height: 1.2;
   }
 
