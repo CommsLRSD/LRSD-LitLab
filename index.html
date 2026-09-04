@@ -269,25 +269,38 @@
 
                 <div class="interventions-page-body">
                     <div class="interventions-page-layout">
-                    <div class="dropdown-wizard filter-menu" aria-label="Intervention resource filters">
-                        <div class="dropdown-wizard-header">
-                            <div class="wizard-title-row">
-                                <h3 class="wizard-title"><span class="material-symbols-rounded" aria-hidden="true" translate="no">tune</span><span data-i18n="wizard_choose_steps">Filter to find resources</span></h3>
-                                <button class="reset-btn-minimal" onclick="restartMenu()"><span class="material-symbols-rounded" aria-hidden="true" translate="no">restart_alt</span><span data-i18n="wizard_start_over">Clear Filters</span></button>
-                            </div>
+                    <aside class="filter-sidebar" aria-label="Intervention resource filters">
+                        <div class="filter-sidebar-header">
+                            <h3 class="wizard-title"><span class="material-symbols-rounded" aria-hidden="true" translate="no">tune</span><span data-i18n="wizard_choose_steps">Filter to find resources</span></h3>
+                            <button class="reset-btn-minimal" onclick="restartMenu()"><span class="material-symbols-rounded" aria-hidden="true" translate="no">restart_alt</span><span data-i18n="wizard_start_over">Clear Filters</span></button>
                         </div>
 
-                        <div class="dropdown-row">
-                            <div class="dropdown-group">
-                                <label for="filter-program" data-i18n="filter_program_label">Program</label>
+                        <details class="filter-accordion-item" open>
+                            <summary><span data-i18n="filter_program_label">Program</span></summary>
+                            <div class="filter-accordion-content">
+                                <label class="sr-only" for="filter-program" data-i18n="filter_program_label">Program</label>
                                 <select id="filter-program" class="styled-select" onchange="onMenuFilterChange('program', this.value)">
                                     <option value="" data-i18n="wizard_select_placeholder">All</option>
                                     <option value="English">English</option>
                                     <option value="French Immersion">French Immersion</option>
                                 </select>
                             </div>
-                            <div class="dropdown-group">
-                                <label for="filter-tier" data-i18n="filter_tier_label">Tier</label>
+                        </details>
+
+                        <details class="filter-accordion-item" open>
+                            <summary><span data-i18n="filter_grade_label">Grade Level</span></summary>
+                            <div class="filter-accordion-content">
+                                <label class="sr-only" for="filter-grade" data-i18n="filter_grade_label">Grade Level</label>
+                                <select id="filter-grade" class="styled-select" onchange="onMenuFilterChange('grade', this.value)">
+                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
+                                </select>
+                            </div>
+                        </details>
+
+                        <details class="filter-accordion-item">
+                            <summary><span data-i18n="filter_tier_label">Tier</span></summary>
+                            <div class="filter-accordion-content">
+                                <label class="sr-only" for="filter-tier" data-i18n="filter_tier_label">Tier</label>
                                 <select id="filter-tier" class="styled-select" onchange="onMenuFilterChange('tier', this.value)">
                                     <option value="" data-i18n="wizard_select_placeholder">All</option>
                                     <option value="1">Tier 1</option>
@@ -295,45 +308,58 @@
                                     <option value="3">Tier 3</option>
                                 </select>
                             </div>
-                        </div>
+                        </details>
 
-                        <div class="dropdown-row">
-                            <div class="dropdown-group">
-                                <label for="filter-pillar" data-i18n="filter_pillar_label">Literacy Pillar</label>
+                        <details class="filter-accordion-item">
+                            <summary><span data-i18n="filter_pillar_label">Literacy Pillar</span></summary>
+                            <div class="filter-accordion-content">
+                                <label class="sr-only" for="filter-pillar" data-i18n="filter_pillar_label">Literacy Pillar</label>
                                 <select id="filter-pillar" class="styled-select" onchange="onMenuFilterChange('pillar', this.value)">
                                     <option value="" data-i18n="wizard_select_placeholder">All</option>
                                 </select>
                             </div>
-                            <div class="dropdown-group">
-                                <label for="filter-type" data-i18n="filter_type_label">Resource Type</label>
+                        </details>
+
+                        <details class="filter-accordion-item">
+                            <summary><span data-i18n="filter_type_label">Resource Type</span></summary>
+                            <div class="filter-accordion-content">
+                                <label class="sr-only" for="filter-type" data-i18n="filter_type_label">Resource Type</label>
                                 <select id="filter-type" class="styled-select" onchange="onMenuFilterChange('resourceType', this.value)">
                                     <option value="" data-i18n="wizard_select_placeholder">All</option>
                                 </select>
                             </div>
-                        </div>
+                        </details>
 
-                        <div class="dropdown-row">
-                            <div class="dropdown-group">
-                                <label for="filter-screener" data-i18n="filter_screener_label">Screener</label>
+                        <details class="filter-accordion-item">
+                            <summary><span data-i18n="filter_screener_label">Screener</span></summary>
+                            <div class="filter-accordion-content">
+                                <label class="sr-only" for="filter-screener" data-i18n="filter_screener_label">Screener</label>
                                 <select id="filter-screener" class="styled-select" onchange="onMenuFilterChange('screener', this.value)">
                                     <option value="" data-i18n="wizard_select_placeholder">All</option>
                                 </select>
                             </div>
-                            <div class="dropdown-group">
-                                <label for="filter-search" data-i18n="filter_search_label">Search</label>
+                        </details>
+
+                        <details class="filter-accordion-item">
+                            <summary><span data-i18n="filter_search_label">Search</span></summary>
+                            <div class="filter-accordion-content">
+                                <label class="sr-only" for="filter-search" data-i18n="filter_search_label">Search</label>
                                 <input type="search" id="filter-search" class="styled-select filter-search-input" data-i18n-placeholder="filter_search_placeholder" placeholder="Search by resource name…" oninput="onMenuFilterChange('search', this.value)">
                             </div>
-                        </div>
+                        </details>
+                    </aside><!-- /.filter-sidebar -->
 
-                        <div id="dropdown-results" class="dropdown-results">
-                            <div class="results-header-compact">
-                                <div id="results-count-compact" class="results-count-compact">0 results</div>
-                            </div>
-                            <div id="results-list-compact" class="results-list-compact"></div>
+                    <div id="dropdown-results" class="dropdown-results interventions-results-panel">
+                        <div id="active-filters" class="active-filters" aria-live="polite"></div>
+                        <div class="results-header-compact">
+                            <div id="results-count-compact" class="results-count-compact">0 results</div>
                         </div>
-                    </div><!-- /.dropdown-wizard -->
+                        <div id="results-list-compact" class="results-list-compact"></div>
+                    </div><!-- /.interventions-results-panel -->
 
-                    <aside class="evidence-sidebar" aria-label="Evidence and research based definitions">
+                    </div><!-- /.interventions-page-layout -->
+
+                    <aside class="evidence-sidebar evidence-footnotes" aria-label="Evidence and research based definitions">
                         <h3 class="evidence-sidebar-title" data-i18n="evidence_sidebar_title">Evidence &amp; Research Definitions</h3>
                         <div class="evidence-definition-block">
                             <strong data-i18n="evidence_eb_title">* Evidence Based: Most rigorous and trusted</strong>
@@ -344,7 +370,6 @@
                             <p data-i18n="evidence_rb_desc">Definition: The program is based on sound theories or methods that have been validated by some research, but the program itself may not have been directly studied for evidence of its effectiveness.</p>
                         </div>
                     </aside>
-                    </div><!-- /.interventions-page-layout -->
                 </div><!-- /.interventions-page-body -->
             </div><!-- /.interventions-page-wrapper -->
         </section>
