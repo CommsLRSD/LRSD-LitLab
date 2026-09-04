@@ -115,7 +115,7 @@ const TRANSLATIONS = {
         filter_notes_label: 'Notes',
         filter_screeners_label: 'Screeners',
         fw_choose_pillar_label: 'Literacy Pillar',
-        fw_choose_screener_label: 'Screener (optional)',
+        fw_choose_screener_label: 'Screener',
         fw_context_tier: (n) => `Tier ${n}`,
 
         // ── Assessment schedule section ──
@@ -310,6 +310,7 @@ const TRANSLATIONS = {
         tier1_label: 'Tier 1',
         tier2_label: 'Tier 2',
         tier3_label: 'Tier 3',
+        tier_toggle_group_label: 'Tier',
 
         // ── Check all ──
         check_all: 'Check All',
@@ -451,7 +452,7 @@ const TRANSLATIONS = {
         filter_notes_label: 'Remarques',
         filter_screeners_label: 'Outils de dépistage',
         fw_choose_pillar_label: 'Pilier de littératie',
-        fw_choose_screener_label: 'Outil de dépistage (facultatif)',
+        fw_choose_screener_label: 'Outil de dépistage',
         fw_context_tier: (n) => `Niveau ${n}`,
 
         // ── Assessment schedule section ──
@@ -646,6 +647,7 @@ const TRANSLATIONS = {
         tier1_label: 'Palier 1',
         tier2_label: 'Palier 2',
         tier3_label: 'Palier 3',
+        tier_toggle_group_label: 'Palier',
 
         // ── Check all ──
         check_all: 'Tout cocher',
