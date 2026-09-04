@@ -1243,14 +1243,14 @@ function initIntegratedFlowchart(tierId) {
                     <span>${escapeHtml(t('fc_back'))}</span>
                 </button>
                 
-                <div class="tier-tabs">
-                    <button class="tier-tab ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')" data-tier="tier1">
+                <div class="tier-tabs" role="group" aria-label="Tier">
+                    <button class="tier-tab ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')" data-tier="tier1" aria-pressed="${tierId === 'tier1' ? 'true' : 'false'}">
                         <span class="tier-label">${escapeHtml(t('tier1_label'))}</span>
                     </button>
-                    <button class="tier-tab ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')" data-tier="tier2">
+                    <button class="tier-tab ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')" data-tier="tier2" aria-pressed="${tierId === 'tier2' ? 'true' : 'false'}">
                         <span class="tier-label">${escapeHtml(t('tier2_label'))}</span>
                     </button>
-                    <button class="tier-tab ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')" data-tier="tier3">
+                    <button class="tier-tab ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')" data-tier="tier3" aria-pressed="${tierId === 'tier3' ? 'true' : 'false'}">
                         <span class="tier-label">${escapeHtml(t('tier3_label'))}</span>
                     </button>
                 </div>
@@ -2207,14 +2207,14 @@ function updateVisualFlowchartTierBar() {
     bar.innerHTML = `
         <span class="visual-flowchart-tier-bar-chip">${escapeHtml(tierLabel)}</span>
         <span class="visual-flowchart-tier-bar-name">${escapeHtml(tierName)}</span>
-        <div class="tier-tabs visual-flowchart-tier-tabs">
-            <button class="tier-tab ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')" data-tier="tier1">
+        <div class="tier-tabs visual-flowchart-tier-tabs" role="group" aria-label="${escapeHtml(t('fc_visual_eyebrow'))}">
+            <button class="tier-tab ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')" data-tier="tier1" aria-pressed="${tierId === 'tier1' ? 'true' : 'false'}">
                 <span class="tier-label">${escapeHtml(t('tier1_label'))}</span>
             </button>
-            <button class="tier-tab ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')" data-tier="tier2">
+            <button class="tier-tab ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')" data-tier="tier2" aria-pressed="${tierId === 'tier2' ? 'true' : 'false'}">
                 <span class="tier-label">${escapeHtml(t('tier2_label'))}</span>
             </button>
-            <button class="tier-tab ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')" data-tier="tier3">
+            <button class="tier-tab ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')" data-tier="tier3" aria-pressed="${tierId === 'tier3' ? 'true' : 'false'}">
                 <span class="tier-label">${escapeHtml(t('tier3_label'))}</span>
             </button>
         </div>`;
@@ -3779,7 +3779,9 @@ function undoToStep(nodeId) {
 function switchToTier(tierId) {
     // Update tab states
     document.querySelectorAll('.tier-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.tier === tierId);
+        const isActive = tab.dataset.tier === tierId;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
     
     // Clear current flowchart content
