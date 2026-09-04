@@ -2651,6 +2651,14 @@ details > p {
   cursor: default;
 }
 
+.resource-card-links {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
 .results-panel { margin-top: var(--space-md); }
 
 .results-grid-compact {
@@ -6705,6 +6713,56 @@ body.step-review-modal-open { overflow: hidden; }
   align-items: flex-start;
   gap: var(--space-sm);
   margin-bottom: var(--space-md);
+}
+
+/* Simple labelled filter fields (pillar / type / language and the optional
+   refinements inside "More filters") */
+.filter-group {
+  margin-bottom: var(--space-md);
+}
+
+.filter-group-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.filter-group .styled-select {
+  width: 100%;
+}
+
+/* "More filters" disclosure — stays hidden until the three required filters
+   are chosen (JS removes the hidden attribute). */
+.filter-more {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-sm);
+}
+
+.filter-more > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-sm) 0;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.filter-more > summary::-webkit-details-marker { display: none; }
+
+.filter-more > summary .material-symbols-rounded {
+  font-size: 18px;
+  transition: transform var(--duration) var(--ease);
+}
+
+.filter-more[open] > summary .material-symbols-rounded {
+  transform: rotate(180deg);
 }
 
 .filter-accordion-item {
