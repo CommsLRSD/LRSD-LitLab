@@ -18,6 +18,7 @@ const TRANSLATIONS = {
         nav_interventions: 'Interventions',
         nav_scores: 'Understanding Scores & Percentiles',
         nav_resources: 'Resources',
+        nav_faq: 'FAQs',
         nav_about: 'About',
         nav_interventions_mobile: 'Interventions Menu',
         nav_schedule: 'Assessment Schedule',
@@ -186,6 +187,11 @@ const TRANSLATIONS = {
         resources_link_fr_46: 'Progression des apprentissages 4-6 année',
         resources_link_fi_24: 'French Immersion: Grades 2-4 Scope and Sequence for Structured Literacy',
         resources_link_fi_56: 'French Immersion: Grades 5-6 Scope and Sequence for Structured Literacy',
+
+        // ── FAQ section ──
+        faq_section_title: 'FAQs',
+        faq_section_subtitle: 'Answers to common questions about CTOPP-2, DIBELS, THaFol, and the LRSD literacy data portal',
+
         // ── About section ──
         about_section_title: 'About',
         about_section_subtitle: 'Welcome to Literacy Interventions, an interactive teaching guide by the Louis Riel School Division.',
@@ -349,6 +355,7 @@ const TRANSLATIONS = {
         nav_interventions: 'Interventions',
         nav_scores: 'Comprendre les scores et les percentiles',
         nav_resources: 'Ressources',
+        nav_faq: 'FAQ',
         nav_about: 'À propos',
         nav_interventions_mobile: 'Menu des interventions',
         nav_schedule: 'Calendrier d\'évaluation',
@@ -517,6 +524,11 @@ const TRANSLATIONS = {
         resources_link_fr_46: 'Progression des apprentissages 4-6 année',
         resources_link_fi_24: 'Immersion française : portée et séquence 2e-4e année pour la littératie structurée',
         resources_link_fi_56: 'Immersion française : portée et séquence 5e-6e année pour la littératie structurée',
+
+        // ── FAQ section ──
+        faq_section_title: 'FAQ',
+        faq_section_subtitle: 'Réponses aux questions courantes sur le CTOPP-2, le DIBELS, le THaFol et le portail de données en littératie de la DSLR',
+
         // ── About section ──
         about_section_title: 'À propos',
         about_section_subtitle: 'Bienvenue dans Interventions en littératie, un guide d\'enseignement interactif de la Division scolaire Louis-Riel.',
