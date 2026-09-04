@@ -33,14 +33,9 @@ const appState = {
         selectedPath: []
     },
     visualFlowchartModal: null,
-    // Intervention menu state
-    interventionMenu: {
-        language: 'English',
-        screener: null,
-        subtest: null,
-        pillars: [],
-        itemType: null
-    }
+    // Filters last chosen in the Interventions Menu (or a flowchart drilldown),
+    // shared between both so context carries over between them.
+    rememberedMenuFilters: {}
 };
 
 // ============================================
@@ -100,6 +95,12 @@ function applyTranslations() {
         const val = t(key);
         if (typeof val === 'string') el.textContent = val;
     });
+    // placeholder attribute
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        const val = t(key);
+        if (typeof val === 'string') el.setAttribute('placeholder', val);
+    });
     // Keep the collapsed side-nav hover tooltips in sync with the current language
     document.querySelectorAll('.side-nav .nav-link').forEach(link => {
         const label = link.querySelector('.nav-link-label');
@@ -155,15 +156,12 @@ function rerenderForLanguage() {
     }
 }
 
-// Refresh the programmatically-set placeholder options in the wizard selects.
+// Refresh the programmatically-set option/placeholder text in the
+// interventions filter menu so it picks up the new language immediately.
 function refreshWizardSelectPlaceholders() {
-    const subtestSel = document.getElementById('subtest-select');
-    const pillarSel = document.getElementById('pillar-select');
-    if (subtestSel && subtestSel.options[0] && subtestSel.disabled) {
-        subtestSel.options[0].textContent = t('wizard_select_screener_first');
-    }
-    if (pillarSel && pillarSel.options[0] && pillarSel.disabled) {
-        pillarSel.options[0].textContent = t('wizard_select_subtest_first');
+    if (document.querySelector('.filter-menu')) {
+        renderMenuFilterOptions();
+        renderMenuResults();
     }
 }
 
@@ -197,9 +195,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Setup sub-tab navigation
     setupSubTabs();
-    
-    // Initialize intervention menu
-    initializeInterventionMenu();
     
     // Initialize assessment schedules
     await initializeAssessmentSchedules();
@@ -255,7 +250,7 @@ async function loadInterventionMenuData() {
         console.log('Intervention menu data loaded successfully');
     } catch (error) {
         console.error('Error loading intervention menu data:', error);
-        appState.interventionMenuData = { screeners: [], interventions: [], assessments: [], literacy_pillars: [] };
+        appState.interventionMenuData = { screeners: [], pillars: [], resourceTypes: [], resources: [] };
     }
 }
 
@@ -311,18 +306,9 @@ function navigateToPage(pageName) {
             openInteractiveFlowchart();
         }
     } else if (pageName === 'interventions') {
-        if (!appState.menuInitialized) {
-            appState.menuInitialized = true;
-            if (document.querySelector('.dropdown-wizard')) {
-                initializeDropdownWizard();
-            } else {
-                initializeStepBasedMenu();
-            }
-        } else if (document.querySelector('.dropdown-wizard')) {
-            // Already initialized: pre-select the remembered screener if the user
-            // picked one elsewhere (e.g. in the flowchart) since the last visit.
-            applyRememberedScreenerToMenu();
-        }
+        // Every visit re-syncs the filters to whatever was chosen last —
+        // here or during a flowchart drilldown — so context always carries over.
+        initializeInterventionsFilterMenu();
     } else if (pageName === 'history') {
         // Visiting the History page counts as "checking" any new entries.
         clearHistoryUnseen();
@@ -2946,18 +2932,13 @@ function createIntegratedNodeElement(nodeData, container, direction = 'forward')
         wireIntegratedChecklist(nodeElement, nodeData);
     }
 
-    // For drill-down / intervention wizard nodes, if a screener has already been
-    // chosen earlier in the journey, populate the dependent dropdowns so the user
-    // doesn't have to re-select it.
+    // For drill-down / intervention wizard nodes, render the initial set of
+    // results right away (the pillar/screener selects are already pre-filled
+    // server-side from the remembered filter context).
     if (nodeData.type === 'selection') {
-        const wizardItemTypes = { drillDownAssessments: 'Assessment', interventions: 'Intervention' };
+        const wizardItemTypes = { drillDownAssessments: 'Drill Down Assessment', interventions: 'Intervention' };
         if (wizardItemTypes[nodeData.options]) {
-            const remembered = getRememberedScreenerId();
-            const screenerSel = nodeElement.querySelector('#fw-screener-select');
-            if (remembered && screenerSel) {
-                screenerSel.value = remembered;
-                fwOnScreenerChange(remembered);
-            }
+            fwLoadResults();
         }
     }
 }
@@ -3131,24 +3112,32 @@ function createIntegratedSelectionNode(nodeData) {
     ` : '';
 
     // For drill-down assessments and interventions, use the embedded interventions menu wizard
-    const wizardItemTypes = { drillDownAssessments: 'Assessment', interventions: 'Intervention' };
+    const wizardItemTypes = { drillDownAssessments: 'Drill Down Assessment', interventions: 'Intervention' };
     const itemType = wizardItemTypes[nodeData.options];
 
     if (itemType) {
-        // Initialize wizard state for this node
-        const rememberedScreener = getRememberedScreenerId();
+        // Scope this wizard to the tier/program the user is currently in, and
+        // pre-fill pillar/screener from whatever was chosen last (here or in
+        // the standalone Interventions Menu) so context carries over.
+        const tierNum = parseInt(String(appState.visualFlowchart?.tierId || '').replace('tier', ''), 10) || 1;
+        const program = appState.selectedProgram || 'English';
+        const remembered = appState.rememberedMenuFilters || {};
         appState.fwState = {
-            screener: null,
-            screenerData: null,
-            subtest: null,
-            subtestData: null,
-            pillars: [],
+            tier: tierNum,
+            program: program,
+            resourceType: itemType,
+            pillar: remembered.pillar || '',
+            screener: remembered.screener || '',
             nodeId: nodeData.id,
-            handlerName: nodeData.nextHandler,
-            itemType: itemType
+            handlerName: nodeData.nextHandler
         };
+        // Remember tier/program too, so the standalone Interventions Menu
+        // opens scoped to this same drilldown if visited right afterwards.
+        setRememberedMenuFilters({ tier: tierNum, program: program });
 
-        const screenerOptionsHtml = buildScreenerDropdownHtml(getProgramLanguageFilter(), rememberedScreener);
+        const baseState = { tier: tierNum, program: program, resourceType: itemType };
+        const pillarOptionsHtml = buildFacetOptionsHtml(distinctTagValues(baseState, 'pillar'), appState.fwState.pillar, translatePillar);
+        const screenerOptionsHtml = buildFacetOptionsHtml(distinctTagValues({ ...baseState, pillar: appState.fwState.pillar }, 'screener'), appState.fwState.screener);
 
         return `
             <div class="step-header">
@@ -3166,23 +3155,22 @@ function createIntegratedSelectionNode(nodeData) {
                 ${infoBoxHTML}
                 ${warningBoxHTML}
                 <div class="fw-wizard">
+                    <div class="fw-context-chips">
+                        <span class="fw-context-chip">${escapeHtml(t('fw_context_tier')(tierNum))}</span>
+                        <span class="fw-context-chip">${escapeHtml(program)}</span>
+                        <span class="fw-context-chip">${escapeHtml(translateResourceType(itemType))}</span>
+                    </div>
                     <div class="fw-wizard-selects">
                         <div class="fw-select-group">
-                            <label for="fw-screener-select">${escapeHtml(t('wizard_step1_label'))}</label>
+                            <label for="fw-pillar-select">${escapeHtml(t('fw_choose_pillar_label'))}</label>
+                            <select id="fw-pillar-select" class="fw-select" onchange="fwOnPillarChange(this.value)">
+                                ${pillarOptionsHtml}
+                            </select>
+                        </div>
+                        <div class="fw-select-group">
+                            <label for="fw-screener-select">${escapeHtml(t('fw_choose_screener_label'))}</label>
                             <select id="fw-screener-select" class="fw-select" onchange="fwOnScreenerChange(this.value)">
                                 ${screenerOptionsHtml}
-                            </select>
-                        </div>
-                        <div class="fw-select-group">
-                            <label for="fw-subtest-select">${escapeHtml(t('wizard_step2_label'))}</label>
-                            <select id="fw-subtest-select" class="fw-select" onchange="fwOnSubtestChange(this.value)" disabled>
-                                <option value="">${escapeHtml(t('wizard_select_screener_first'))}</option>
-                            </select>
-                        </div>
-                        <div class="fw-select-group">
-                            <label for="fw-pillar-select">${escapeHtml(t('wizard_step3_label'))}</label>
-                            <select id="fw-pillar-select" class="fw-select" onchange="fwOnPillarChange(this.value)" disabled>
-                                <option value="">${escapeHtml(t('wizard_select_subtest_first'))}</option>
                             </select>
                         </div>
                     </div>
@@ -3252,129 +3240,42 @@ function createIntegratedSelectionNode(nodeData) {
 // Flowchart embedded intervention wizard: screener change handler
 function fwOnScreenerChange(value) {
     if (!appState.fwState) return;
-    const subtestSel = document.getElementById('fw-subtest-select');
-    const pillarSel = document.getElementById('fw-pillar-select');
-    const resultsEl = document.getElementById('fw-results');
-
-    appState.fwState.screener = value || null;
-    appState.fwState.screenerData = null;
-    appState.fwState.subtest = null;
-    appState.fwState.subtestData = null;
-    appState.fwState.pillars = [];
-
-    if (pillarSel) { pillarSel.innerHTML = `<option value="">${t('wizard_select_subtest_first')}</option>`; pillarSel.disabled = true; }
-    if (resultsEl) resultsEl.innerHTML = '';
-
-    if (!value) {
-        if (subtestSel) { subtestSel.innerHTML = `<option value="">${t('wizard_select_screener_first')}</option>`; subtestSel.disabled = true; }
-        return;
-    }
-
-    const screenerData = (appState.interventionMenuData?.screeners || []).find(s => s.screener_id === value);
-    if (!screenerData) return;
-    appState.fwState.screenerData = screenerData;
-
-    // Keep the remembered screener in sync so later steps stay pre-selected.
-    setRememberedScreener(value);
-
-    if (subtestSel) {
-        subtestSel.innerHTML = `<option value="">${t('wizard_select_placeholder')}</option>`;
-        (screenerData.subtests || []).forEach(st => {
-            const opt = document.createElement('option');
-            opt.value = st.subtest_code;
-            opt.textContent = `${st.subtest_code} – ${st.subtest_name}`;
-            subtestSel.appendChild(opt);
-        });
-        subtestSel.disabled = false;
-    }
-}
-
-// Flowchart embedded intervention wizard: subtest change handler
-function fwOnSubtestChange(value) {
-    if (!appState.fwState || !appState.fwState.screenerData) return;
-    const pillarSel = document.getElementById('fw-pillar-select');
-    const resultsEl = document.getElementById('fw-results');
-
-    appState.fwState.subtest = value || null;
-    appState.fwState.subtestData = null;
-    appState.fwState.pillars = [];
-    if (resultsEl) resultsEl.innerHTML = '';
-
-    if (!value) {
-        if (pillarSel) { pillarSel.innerHTML = `<option value="">${t('wizard_select_subtest_first')}</option>`; pillarSel.disabled = true; }
-        return;
-    }
-
-    const subtestData = (appState.fwState.screenerData.subtests || []).find(s => s.subtest_code === value);
-    if (!subtestData) return;
-    appState.fwState.subtestData = subtestData;
-
-    const pillars = subtestData.literacy_pillars || [];
-    if (pillarSel) {
-        pillarSel.innerHTML = `<option value="">${t('wizard_select_placeholder')}</option>`;
-        if (pillars.length > 1) {
-            const allOpt = document.createElement('option');
-            allOpt.value = 'ALL';
-            allOpt.textContent = t('wizard_all_pillars');
-            pillarSel.appendChild(allOpt);
-        }
-        pillars.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p;
-            opt.textContent = p;
-            pillarSel.appendChild(opt);
-        });
-        pillarSel.disabled = false;
-
-        // Auto-select if only one pillar
-        if (pillars.length === 1) {
-            pillarSel.value = pillars[0];
-            fwOnPillarChange(pillars[0]);
-        }
-    }
+    appState.fwState.screener = value || '';
+    setRememberedMenuFilters({ screener: value || null });
+    if (value) setRememberedScreener(value);
+    fwLoadResults();
 }
 
 // Flowchart embedded intervention wizard: pillar change handler
 function fwOnPillarChange(value) {
     if (!appState.fwState) return;
-    const resultsEl = document.getElementById('fw-results');
+    appState.fwState.pillar = value || '';
+    setRememberedMenuFilters({ pillar: value || null });
 
-    if (!value) {
-        appState.fwState.pillars = [];
-        if (resultsEl) resultsEl.innerHTML = '';
-        return;
+    // Re-narrow the screener options to whatever still matches this pillar.
+    const screenerSel = document.getElementById('fw-screener-select');
+    if (screenerSel) {
+        const context = {
+            tier: appState.fwState.tier,
+            program: appState.fwState.program,
+            resourceType: appState.fwState.resourceType,
+            pillar: appState.fwState.pillar
+        };
+        screenerSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(context, 'screener'), appState.fwState.screener);
     }
 
-    const allPillars = appState.fwState.subtestData?.literacy_pillars || [];
-    appState.fwState.pillars = value === 'ALL' ? [...allPillars] : [value];
     fwLoadResults();
 }
 
 // Flowchart embedded intervention wizard: load and display filtered results
 function fwLoadResults() {
-    if (!appState.fwState || !appState.fwState.subtestData) return;
+    if (!appState.fwState) return;
     const resultsEl = document.getElementById('fw-results');
     if (!resultsEl) return;
 
-    const { itemType, screenerData, subtestData, pillars } = appState.fwState;
-    const program = screenerData?.language === 'English' ? 'English' : 'French Immersion';
-    const subtestStart = subtestData.grade_range?.start;
-    const subtestEnd = subtestData.grade_range?.end;
-
-    let items = itemType === 'Assessment'
-        ? (appState.interventionMenuData?.assessments || [])
-        : (appState.interventionMenuData?.interventions || []);
-
-    let filtered = items.filter(item => item.program === program);
-    filtered = filtered.filter(item =>
-        gradeRangeOverlaps(subtestStart, subtestEnd, item.grade_range?.start, item.grade_range?.end)
-    );
-    if (pillars && pillars.length > 0) {
-        filtered = filtered.filter(item => {
-            const itemPillars = item.literacy_pillars || [item.literacy_pillar];
-            return pillars.some(p => itemPillars.includes(p));
-        });
-    }
+    const { tier, program, resourceType, pillar, screener } = appState.fwState;
+    const wizardState = { tier, program, resourceType, pillar, screener };
+    const filtered = getFilteredResources(wizardState, null);
 
     if (filtered.length === 0) {
         resultsEl.innerHTML = `<p class="fw-no-results">${escapeHtml(t('fw_no_results'))}</p>`;
@@ -3383,20 +3284,23 @@ function fwLoadResults() {
 
     const escapeJs = (s) => String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     resultsEl.innerHTML = `
-        <div class="fw-results-header">${typeof t('fw_results_label') === 'function' ? escapeHtml(t('fw_results_label')(filtered.length)) : `${filtered.length} results`}</div>
+        <div class="fw-results-header">${escapeHtml(t('fw_results_label')(filtered.length))}</div>
         <div class="fw-results-list">
             ${filtered.map(item => {
-                const gradeText = `${item.grade_range?.start || 'K'}–${item.grade_range?.end || '12'}`;
-                const detailText = item.duration
-                    ? `${item.duration} • ${item.frequency}`
-                    : item.administrationTime ? `${t('fw_time_prefix')} ${item.administrationTime}` : '';
-                return `<button class="fw-result-item" onclick="fwSelectItem('${escapeJs(item.item_id)}', '${escapeJs(item.name)}')">
+                const gradeText = item.gradeRangeText || (item.gradeFilter || []).join(', ');
+                const matchingPillars = uniqueSorted(getMatchingTags(item, wizardState, null).map(tg => tg.pillar));
+                const pillarText = matchingPillars.map(translatePillar).join(', ');
+                const linkHtml = item.url
+                    ? `<a class="fw-result-link" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" title="${escapeHtml(t('filter_view_resource'))}"><span class="material-symbols-rounded" aria-hidden="true" translate="no">open_in_new</span></a>`
+                    : '';
+                return `<div class="fw-result-item" role="button" tabindex="0" onclick="fwSelectItem('${escapeJs(item.id)}', '${escapeJs(item.name)}')" onkeydown="if(event.key==='Enter'||event.key===' '){fwSelectItem('${escapeJs(item.id)}', '${escapeJs(item.name)}')}">
                     <div class="fw-result-info">
                         <div class="fw-result-name">${escapeHtml(item.name)}</div>
-                        <div class="fw-result-meta">${detailText ? escapeHtml(detailText) + ' • ' : ''}${escapeHtml(t('fw_grade_prefix'))} ${gradeText}</div>
+                        <div class="fw-result-meta">${escapeHtml(pillarText)}${gradeText ? ` • ${escapeHtml(t('fw_grade_prefix'))} ${escapeHtml(gradeText)}` : ''}</div>
                     </div>
+                    ${linkHtml}
                     <svg class="fw-result-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M9 18l6-6-6-6"/></svg>
-                </button>`;
+                </div>`;
             }).join('')}
         </div>
     `;
@@ -3405,23 +3309,16 @@ function fwLoadResults() {
 // Flowchart embedded intervention wizard: select an item and advance the flowchart
 function fwSelectItem(itemId, itemName) {
     if (!appState.fwState) return;
-    const { nodeId, handlerName, itemType, screenerData, subtestData, pillars } = appState.fwState;
+    const { nodeId, handlerName, resourceType, pillar } = appState.fwState;
     if (nodeId && handlerName) {
         // Record the drill-down assessment / intervention selection so the teacher
         // can always keep track of what has been chosen (persisted to localStorage).
-        recordSelection(itemType, itemId, itemName, appState.visualFlowchart?.tierId);
+        recordSelection(resourceType, itemId, itemName, appState.visualFlowchart?.tierId);
 
         // Build a file-pathway breadcrumb for the completed view and pre-store it
         // so selectIntegratedOption can preserve it when it writes the choice.
         const pathway = [];
-        if (screenerData?.screener_name) pathway.push(screenerData.screener_name);
-        if (subtestData?.subtest_code) {
-            const subtestLabel = subtestData.subtest_name
-                ? `${subtestData.subtest_code} — ${subtestData.subtest_name}`
-                : subtestData.subtest_code;
-            pathway.push(subtestLabel);
-        }
-        if (pillars && pillars.length === 1) pathway.push(pillars[0]);
+        if (pillar) pathway.push(translatePillar(pillar));
         pathway.push(itemName);
 
         // Pre-populate so selectIntegratedOption can merge it in
@@ -3430,6 +3327,7 @@ function fwSelectItem(itemId, itemName) {
         appState.visualFlowchart._pendingPathway = null;
     }
 }
+
 
 // Create integrated decision node
 function createIntegratedDecisionNode(nodeData) {
@@ -6613,162 +6511,6 @@ function openInterventionsMenu(tier, mode = 'interventions') {
 // ============================================
 // Intervention Menu Functions
 // ============================================
-function initializeInterventionMenu() {
-    if (!appState.interventionMenuData) {
-        console.error('Intervention menu data not loaded');
-        return;
-    }
-
-    // Initialize all filter options
-    updateScreenerOptions();
-    updatePillarOptions();
-    
-    // Tier filter
-    const tierSelect = document.getElementById('tier-select');
-    if (tierSelect) {
-        tierSelect.addEventListener('change', () => {
-            // Don't auto-search anymore
-        });
-    }
-
-    // Language filter
-    const languageSelect = document.getElementById('language-select');
-    if (languageSelect) {
-        languageSelect.addEventListener('change', (e) => {
-            appState.interventionMenu.language = e.target.value;
-            updateScreenerOptions();
-            // Don't auto-search anymore
-        });
-    }
-
-    // Screener select
-    const screenerSelect = document.getElementById('screener-select');
-    if (screenerSelect) {
-        screenerSelect.addEventListener('change', (e) => {
-            updateSubtestOptions();
-            // Don't auto-search anymore
-        });
-    }
-
-    // Subtest select
-    const subtestSelect = document.getElementById('subtest-select');
-    if (subtestSelect) {
-        subtestSelect.addEventListener('change', () => {
-            // Don't auto-search anymore
-        });
-    }
-
-    // Pillar select
-    const pillarSelect = document.getElementById('pillar-select');
-    if (pillarSelect) {
-        pillarSelect.addEventListener('change', () => {
-            // Don't auto-search anymore
-        });
-    }
-
-    // Type select
-    const typeSelect = document.getElementById('type-select');
-    if (typeSelect) {
-        typeSelect.addEventListener('change', () => {
-            // Don't auto-search anymore
-        });
-    }
-
-    // Search button
-    const searchBtn = document.getElementById('search-btn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', performCompactSearch);
-    }
-
-    // Reset button
-    const resetBtn = document.getElementById('reset-btn');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', resetInterventionMenu);
-    }
-
-    // Don't perform initial search - let user make choices first
-}
-
-// ============================================
-// View Toggle for Interventions Section
-// ============================================
-function showInterventionView(view) {
-    const menuView = document.getElementById('intervention-menu-view');
-    const flowchartView = document.getElementById('flowchart-container');
-    const menuBtn = document.getElementById('menu-view-btn');
-    const flowchartBtn = document.getElementById('flowchart-view-btn');
-    
-    if (view === 'menu') {
-        if (menuView) menuView.classList.remove('flowchart-view-hidden');
-        if (flowchartView) flowchartView.classList.add('flowchart-view-hidden');
-        if (menuBtn) menuBtn.classList.add('active');
-        if (flowchartBtn) flowchartBtn.classList.remove('active');
-    } else if (view === 'flowchart') {
-        if (menuView) menuView.classList.add('flowchart-view-hidden');
-        if (flowchartView) flowchartView.classList.remove('flowchart-view-hidden');
-        if (menuBtn) menuBtn.classList.remove('active');
-        if (flowchartBtn) flowchartBtn.classList.add('active');
-        
-        // Initialize flowchart if not already initialized
-        if (flowchartView && !flowchartView.hasChildNodes()) {
-            renderFlowchartStart();
-        }
-    }
-}
-
-function updateScreenerOptions() {
-    const screenerSelect = document.getElementById('screener-select');
-    if (!screenerSelect || !appState.interventionMenuData) return;
-    
-    // Use shared helper to build dropdown with all screeners
-    screenerSelect.innerHTML = buildScreenerDropdownHtml('');
-}
-
-// Shared helper function to build screener dropdown HTML
-function buildScreenerDropdownHtml(languageFilter, selectedId) {
-    if (!appState.interventionMenuData) return `<option value="">${escapeHtml(t('wizard_select_placeholder'))}</option>`;
-    
-    let englishScreeners = [];
-    let frenchScreeners = [];
-    
-    if (!languageFilter || languageFilter === '') {
-        // Show all screeners
-        englishScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'English');
-        frenchScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'French');
-    } else if (languageFilter === 'English') {
-        englishScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'English');
-    } else if (languageFilter === 'French') {
-        frenchScreeners = appState.interventionMenuData.screeners.filter(s => s.language === 'French');
-    }
-    
-    const optionHtml = (s) => {
-        const isSelected = selectedId && s.screener_id === selectedId ? ' selected' : '';
-        return `<option value="${s.screener_id}"${isSelected}>${s.screener_name}</option>`;
-    };
-
-    let html = `<option value="">${escapeHtml(t('wizard_select_placeholder'))}</option>`;
-    
-    if (englishScreeners.length > 0) {
-        html += '<optgroup label="English">';
-        html += englishScreeners.map(optionHtml).join('');
-        html += '</optgroup>';
-    }
-    
-    if (frenchScreeners.length > 0) {
-        html += '<optgroup label="French Immersion">';
-        html += frenchScreeners.map(optionHtml).join('');
-        html += '</optgroup>';
-    }
-    
-    return html;
-}
-
-// ============================================
-// Remembered screener (shared across tiers + menu)
-// ============================================
-
-// Resolve any screener identifier (id or display name, any casing) to the
-// canonical intervention-menu screener_id. Returns null if it cannot be matched.
 function resolveScreenerId(idOrName) {
     if (!idOrName) return null;
     const screeners = appState.interventionMenuData?.screeners || [];
@@ -6823,297 +6565,6 @@ function updateScreenerIndicator() {
     }
 }
 
-function updateSubtestOptions() {
-    const subtestSelect = document.getElementById('subtest-select');
-    const screenerSelect = document.getElementById('screener-select');
-    
-    if (!subtestSelect || !screenerSelect || !appState.interventionMenuData) return;
-
-    const screenerId = screenerSelect.value;
-    
-    if (!screenerId) {
-        subtestSelect.innerHTML = `<option value="">${escapeHtml(t('wizard_all_subtests'))}</option>`;
-        return;
-    }
-
-    const screener = appState.interventionMenuData.screeners.find(
-        s => s.screener_id === screenerId
-    );
-
-    if (!screener) return;
-
-    subtestSelect.innerHTML = `<option value="">${escapeHtml(t('wizard_all_subtests'))}</option>` +
-        screener.subtests.map(st => 
-            `<option value="${st.subtest_code}">${st.subtest_code} - ${st.subtest_name}</option>`
-        ).join('');
-}
-
-function updatePillarOptions() {
-    const pillarSelect = document.getElementById('pillar-select');
-    if (!pillarSelect || !appState.interventionMenuData) return;
-
-    const pillars = appState.interventionMenuData.literacy_pillars.map(p => p.name);
-    
-    pillarSelect.innerHTML = `<option value="">${escapeHtml(t('wizard_all_pillars'))}</option>` +
-        pillars.map(p => `<option value="${p}">${p}</option>`).join('');
-}
-
-function performCompactSearch() {
-    if (!appState.interventionMenuData) return;
-
-    const tierSelect = document.getElementById('tier-select');
-    const languageSelect = document.getElementById('language-select');
-    const screenerSelect = document.getElementById('screener-select');
-    const subtestSelect = document.getElementById('subtest-select');
-    const pillarSelect = document.getElementById('pillar-select');
-    const typeSelect = document.getElementById('type-select');
-
-    const filters = {
-        tier: tierSelect ? tierSelect.value : '',
-        language: languageSelect ? languageSelect.value : 'English',
-        screener: screenerSelect ? screenerSelect.value : '',
-        subtest: subtestSelect ? subtestSelect.value : '',
-        pillar: pillarSelect ? pillarSelect.value : '',
-        type: typeSelect ? typeSelect.value : ''
-    };
-
-    // Validate that mandatory filters are selected
-    if (!filters.tier) {
-        displayValidationError(t('wizard_validation_tier'));
-        return;
-    }
-    if (!filters.pillar) {
-        displayValidationError(t('wizard_validation_pillar'));
-        return;
-    }
-    if (!filters.type) {
-        displayValidationError(t('wizard_validation_type'));
-        return;
-    }
-
-    let results = [];
-    
-    // Get pillars to search by
-    let pillarsToSearch = [];
-    if (filters.pillar) {
-        pillarsToSearch = [filters.pillar];
-    } else if (filters.subtest && filters.screener) {
-        // Get pillars from subtest
-        const screener = appState.interventionMenuData.screeners.find(
-            s => s.screener_id === filters.screener
-        );
-        if (screener) {
-            const subtest = screener.subtests.find(st => st.subtest_code === filters.subtest);
-            if (subtest) {
-                pillarsToSearch = subtest.literacy_pillars;
-            }
-        }
-    }
-
-    // Collect items based on type filter
-    // Language filter removed - show both English and French Immersion items
-    if (!filters.type || filters.type === 'Assessment') {
-        const assessments = appState.interventionMenuData.assessments.filter(item => {
-            // Program match - show all programs if no language filter
-            // (Language filter hidden, so always show all)
-
-            // Tier match
-            if (filters.tier) {
-                if (!item.tiers || !item.tiers.includes(parseInt(filters.tier))) return false;
-            }
-
-            // Pillar match - use literacy_pillars array if available, otherwise fall back to literacy_pillar
-            if (pillarsToSearch.length > 0) {
-                const itemPillars = item.literacy_pillars || [item.literacy_pillar];
-                if (!itemPillars.some(p => pillarsToSearch.includes(p))) return false;
-            }
-
-            return true;
-        });
-        results = results.concat(assessments.map(a => ({ ...a, itemType: 'Assessment' })));
-    }
-
-    if (!filters.type || filters.type === 'Intervention') {
-        const interventions = appState.interventionMenuData.interventions.filter(item => {
-            // Program match - show all programs if no language filter
-            // (Language filter hidden, so always show all)
-
-            // Tier match
-            if (filters.tier) {
-                if (!item.tiers || !item.tiers.includes(parseInt(filters.tier))) return false;
-            }
-
-            // Pillar match
-            if (pillarsToSearch.length > 0) {
-                const itemPillars = item.literacy_pillars || [];
-                if (!itemPillars.some(p => pillarsToSearch.includes(p))) return false;
-            }
-
-            return true;
-        });
-        results = results.concat(interventions.map(i => ({ ...i, itemType: 'Intervention' })));
-    }
-
-    // Sort results
-    results.sort((a, b) => {
-        // Sort by evidence level first
-        const evidenceOrder = { '**': 1, '*': 2, 'none': 3 };
-        const aEvidence = evidenceOrder[a.evidence_level] || 3;
-        const bEvidence = evidenceOrder[b.evidence_level] || 3;
-        if (aEvidence !== bEvidence) return aEvidence - bEvidence;
-        
-        // Then by name
-        return a.name.localeCompare(b.name);
-    });
-
-    displayCompactResults(results, filters);
-}
-
-function displayValidationError(message) {
-    const resultsPanel = document.querySelector('.results-panel');
-    if (!resultsPanel) return;
-
-    resultsPanel.innerHTML = `
-        <div class="results-header-compact">
-            <div class="results-count">Please select all required filters</div>
-        </div>
-        <div class="results-empty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 8v4M12 16h.01"/>
-            </svg>
-            <p>${message}</p>
-            <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Required filters: Tier, Literacy Pillar, and Type</p>
-        </div>
-    `;
-}
-
-function displayCompactResults(results, filters) {
-    const resultsPanel = document.querySelector('.results-panel');
-    if (!resultsPanel) return;
-
-    let filterSummary = [];
-    if (filters.tier) filterSummary.push(`Tier ${filters.tier}`);
-    // Language filter removed from summary
-    if (filters.pillar) filterSummary.push(filters.pillar);
-    if (filters.type) filterSummary.push(filters.type);
-
-    const summaryText = filterSummary.length > 0 
-        ? `Showing ${results.length} result${results.length !== 1 ? 's' : ''} for ${filterSummary.join(' • ')}`
-        : `Showing all ${results.length} result${results.length !== 1 ? 's' : ''}`;
-
-    if (results.length === 0) {
-        resultsPanel.innerHTML = `
-            <div class="results-header-compact">
-                <div class="results-count">${summaryText}</div>
-            </div>
-            <div class="results-empty">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 8v4M12 16h.01"/>
-                </svg>
-                <p>No results found matching your filters</p>
-            </div>
-        `;
-        return;
-    }
-
-    resultsPanel.innerHTML = `
-        <div class="results-header-compact">
-            <div class="results-count">${summaryText}</div>
-        </div>
-        <div class="results-grid-compact">
-            ${results.map((item, index) => `
-                <div class="result-card-compact" data-index="${index}">
-                    <div class="result-header-compact" onclick="toggleResultExpand(${index})">
-                        <div>
-                            <h4 class="result-name-compact">${item.name}</h4>
-                            <div class="result-meta-compact">
-                                <span class="badge-grade">${item.grade_range.start}-${item.grade_range.end}</span>
-                                <span class="badge-program">${item.program === 'English' ? 'EN' : 'FR'}</span>
-                                ${getEvidenceBadgeHtml(item.evidence_level)}
-                                ${item.tiers && item.tiers.length > 0
-                                    ? `<span class="badge-tier">T${item.tiers.join(',')}</span>`
-                                    : ''}
-                            </div>
-                        </div>
-                        <svg class="result-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
-                    <div class="result-details-compact">
-                        ${item.itemType === 'Intervention' ? `
-                            <div class="result-info"><strong>Addresses:</strong> ${item.literacy_pillars.join(', ')}</div>
-                        ` : `
-                            <div class="result-info"><strong>Pillar:</strong> ${(item.literacy_pillars || [item.literacy_pillar]).join(', ')}</div>
-                            <div class="result-info"><strong>Type:</strong> ${item.assessment_type}</div>
-                        `}
-                        ${item.url && item.url !== '' && item.url !== '(local resource)' && item.url !== '(SharePoint)' && item.url !== '(Nelson)' ? `
-                            <a href="${item.url}" target="_blank" class="result-link-compact" onclick="event.stopPropagation()">
-                                View Resource
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
-                                    <path d="M15 3h6v6"/>
-                                    <path d="M10 14L21 3"/>
-                                </svg>
-                            </a>
-                        ` : item.url && item.url !== '' ? `
-                            <div class="result-local-compact">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                Available on ${item.url}
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
-
-function resetInterventionMenu() {
-    // Reset all dropdowns
-    const tierSelect = document.getElementById('tier-select');
-    const languageSelect = document.getElementById('language-select');
-    const screenerSelect = document.getElementById('screener-select');
-    const subtestSelect = document.getElementById('subtest-select');
-    const pillarSelect = document.getElementById('pillar-select');
-    const typeSelect = document.getElementById('type-select');
-
-    if (tierSelect) tierSelect.value = '';
-    if (languageSelect) languageSelect.value = 'English';
-    if (screenerSelect) screenerSelect.value = '';
-    if (subtestSelect) subtestSelect.value = '';
-    if (pillarSelect) pillarSelect.value = '';
-    if (typeSelect) typeSelect.value = '';
-
-    // Update dependent dropdowns
-    updateScreenerOptions();
-    updateSubtestOptions();
-    
-    // Clear results instead of searching
-    const resultsPanel = document.querySelector('.results-panel');
-    if (resultsPanel) {
-        resultsPanel.innerHTML = `
-            <div class="results-container">
-                <div class="results-empty">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="M21 21l-4.35-4.35"/>
-                    </svg>
-                    <p>Select your filters and click Search to find interventions and assessments</p>
-                </div>
-            </div>
-        `;
-    }
-}
-
-// ============================================
-// Interventions Options Screen Functions
-// ============================================
-
-// New unified flowchart entry point
 function openInteractiveFlowchart() {
     console.log('Opening Interactive Flowchart');
     
@@ -7305,400 +6756,6 @@ function navigateToFindInterventions() {
     navigateToPage('interventions');
 }
 
-// ============================================
-// NEW STEP-BASED INTERVENTION MENU
-// ============================================
-
-// Menu state
-const menuState = {
-    currentStep: 1,
-    selectedScreener: null,
-    selectedScreenerData: null,
-    selectedSubtest: null,
-    selectedSubtestData: null,
-    selectedPillars: [],
-    selectedItemType: null
-};
-
-// Initialize the step-based menu when view opens
-function initializeStepBasedMenu() {
-    // Reset state
-    menuState.currentStep = 1;
-    menuState.selectedScreener = null;
-    menuState.selectedScreenerData = null;
-    menuState.selectedSubtest = null;
-    menuState.selectedSubtestData = null;
-    menuState.selectedPillars = [];
-    menuState.selectedItemType = null;
-    
-    // Check for new panel-based wizard
-    const stepWizard = document.querySelector('.step-wizard');
-    if (stepWizard) {
-        // Initialize panel-based wizard
-        goToStep(1);
-        updateStepPills();
-        return;
-    }
-    
-    // Check if we're in single-page mode
-    const singlePageMode = document.querySelector('.single-page-steps');
-    if (singlePageMode) {
-        // Set up single-page accordion mode
-        // Step 1 should be active and enabled
-        const step1 = document.querySelector('.menu-step-section[data-step="1"]');
-        if (step1) {
-            step1.classList.add('active');
-            step1.classList.remove('disabled', 'completed');
-        }
-        
-        // All other steps should be collapsed and disabled
-        for (let i = 2; i <= 5; i++) {
-            const step = document.querySelector(`.menu-step-section[data-step="${i}"]`);
-            if (step) {
-                step.classList.remove('active', 'completed');
-                step.classList.add('disabled');
-            }
-        }
-        
-        // Clear selections
-        document.querySelectorAll('.step-section-selection').forEach(el => {
-            el.textContent = '';
-        });
-    } else {
-        // Old multi-page mode
-        goToStep(1);
-    }
-}
-
-// Navigate to a specific step (updated for panel-based wizard)
-function goToStep(stepNumber) {
-    menuState.currentStep = stepNumber;
-    
-    // Check for new panel-based wizard
-    const stepPanels = document.querySelector('.step-panels');
-    if (stepPanels) {
-        // Hide all panels
-        document.querySelectorAll('.step-panel').forEach(panel => {
-            panel.classList.remove('active');
-        });
-        
-        // Show current panel
-        const currentPanel = document.getElementById(`panel-${stepNumber}`);
-        if (currentPanel) {
-            currentPanel.classList.add('active');
-        }
-        
-        // Update step pills
-        updateStepPills();
-        return;
-    }
-    
-    // Legacy code for old multi-step mode
-    // Hide all steps
-    document.querySelectorAll('.menu-step').forEach(step => {
-        step.classList.remove('active');
-    });
-    
-    // Show current step
-    const currentStepEl = document.getElementById(`step-${stepNumber}`);
-    if (currentStepEl) {
-        currentStepEl.classList.add('active');
-    }
-    
-    // Update progress indicator
-    updateProgressIndicator(stepNumber);
-    
-    // Scroll to top of menu
-    const menuView = document.getElementById('subtab-find') || document.getElementById('subtab-flowchart');
-    if (menuView) {
-        menuView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-}
-
-// Update step pills in horizontal bar
-function updateStepPills() {
-    const pills = document.querySelectorAll('.step-pill');
-    const connectors = document.querySelectorAll('.step-bar .step-connector');
-    
-    pills.forEach((pill, index) => {
-        const stepNum = index + 1;
-        pill.classList.remove('active', 'completed', 'disabled');
-        
-        if (stepNum === menuState.currentStep) {
-            pill.classList.add('active');
-        } else if (stepNum < menuState.currentStep) {
-            pill.classList.add('completed');
-        } else {
-            // Determine if step should be enabled based on previous steps
-            let enabled = false;
-            if (stepNum === 2 && menuState.selectedScreener) enabled = true;
-            else if (stepNum === 3 && menuState.selectedSubtest) enabled = true;
-            else if (stepNum === 4 && menuState.selectedPillars && menuState.selectedPillars.length > 0) enabled = true;
-            else if (stepNum === 5 && menuState.selectedItemType) enabled = true;
-            
-            if (!enabled) {
-                pill.classList.add('disabled');
-            }
-        }
-    });
-    
-    // Update connectors
-    connectors.forEach((connector, index) => {
-        connector.classList.remove('active');
-        if (index < menuState.currentStep - 1) {
-            connector.classList.add('active');
-        }
-    });
-}
-
-// Update progress indicator
-function updateProgressIndicator(currentStep) {
-    document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
-        const stepNum = index + 1;
-        indicator.classList.remove('active', 'completed');
-        
-        if (stepNum === currentStep) {
-            indicator.classList.add('active');
-        } else if (stepNum < currentStep) {
-            indicator.classList.add('completed');
-        }
-    });
-    
-    document.querySelectorAll('.step-connector').forEach((connector, index) => {
-        connector.classList.remove('completed');
-        if (index < currentStep - 1) {
-            connector.classList.add('completed');
-        }
-    });
-}
-
-// Step 1: Select Screener
-function selectScreener(screenerId) {
-    console.log('Selected screener:', screenerId);
-    
-    if (!appState.interventionMenuData || !appState.interventionMenuData.screeners) {
-        console.error('Intervention menu data not loaded');
-        return;
-    }
-    
-    // Find screener data
-    const screenerData = appState.interventionMenuData.screeners.find(s => s.screener_id === screenerId);
-    if (!screenerData) {
-        console.error('Screener not found:', screenerId);
-        return;
-    }
-    
-    menuState.selectedScreener = screenerId;
-    menuState.selectedScreenerData = screenerData;
-    setRememberedScreener(screenerId);
-    
-    // Load subtests for step 2
-    loadSubtests();
-    
-    // Update step sections and navigate
-    updateStepSections();
-    
-    // Check for new panel-based wizard
-    const stepWizard = document.querySelector('.step-wizard');
-    if (stepWizard) {
-        goToStep(2);
-        return;
-    }
-    
-    // Check if we're in single-page mode
-    const singlePageMode = document.querySelector('.single-page-steps');
-    if (singlePageMode) {
-        // Collapse step 1 and expand step 2
-        toggleStepSection(1);
-        toggleStepSection(2);
-    } else {
-        // Old multi-page mode
-        goToStep(2);
-    }
-}
-
-// Load subtests for selected screener
-function loadSubtests() {
-    const container = document.getElementById('subtest-options');
-    const screenerNameEl = document.getElementById('selected-screener-name');
-    
-    if (!container || !menuState.selectedScreenerData) return;
-    
-    // Update screener name
-    if (screenerNameEl) {
-        screenerNameEl.textContent = menuState.selectedScreenerData.screener_name;
-    }
-    
-    // Check if we're using the new panel-based wizard
-    const isNewWizard = document.querySelector('.step-wizard');
-    
-    // Generate subtest options
-    const subtests = menuState.selectedScreenerData.subtests || [];
-    
-    if (isNewWizard) {
-        // New compact button style
-        container.innerHTML = subtests.map(subtest => {
-            const escapedCode = escapeHtml(subtest.subtest_code);
-            const escapedName = escapeHtml(subtest.subtest_name);
-            return `
-                <button class="subtest-btn" data-subtest-code="${escapedCode}">
-                    <strong>${escapedCode}</strong>
-                    <span>${escapedName}</span>
-                </button>
-            `;
-        }).join('');
-    } else {
-        // Legacy card style
-        container.innerHTML = subtests.map(subtest => {
-            const escapedCode = escapeHtml(subtest.subtest_code);
-            const escapedName = escapeHtml(subtest.subtest_name);
-            const escapedDesc = escapeHtml(subtest.description);
-            return `
-                <button class="option-item" data-subtest-code="${escapedCode}">
-                    <div class="option-item-content">
-                        <div class="option-item-title">${escapedCode} - ${escapedName}</div>
-                        <div class="option-item-subtitle">
-                            Grades ${subtest.grade_range.start}-${subtest.grade_range.end} • 
-                            ${escapedDesc}
-                        </div>
-                    </div>
-                    <svg class="option-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"/>
-                    </svg>
-                </button>
-            `;
-        }).join('');
-    }
-    
-    // Add event listeners (for both old and new styles)
-    container.querySelectorAll('.option-item, .subtest-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            selectSubtest(button.dataset.subtestCode);
-        });
-    });
-}
-
-// Step 2: Select Subtest
-function selectSubtest(subtestCode) {
-    console.log('Selected subtest:', subtestCode);
-    
-    if (!menuState.selectedScreenerData) return;
-    
-    // Find subtest data
-    const subtestData = menuState.selectedScreenerData.subtests.find(s => s.subtest_code === subtestCode);
-    if (!subtestData) {
-        console.error('Subtest not found:', subtestCode);
-        return;
-    }
-    
-    menuState.selectedSubtest = subtestCode;
-    menuState.selectedSubtestData = subtestData;
-    
-    // Load pillars for step 3
-    loadPillars();
-    
-    // Update step sections and navigate
-    updateStepSections();
-    
-    // Check for new panel-based wizard
-    const stepWizard = document.querySelector('.step-wizard');
-    if (stepWizard) {
-        goToStep(3);
-        return;
-    }
-    
-    // Check if we're in single-page mode
-    const singlePageMode = document.querySelector('.single-page-steps');
-    if (singlePageMode) {
-        // Collapse step 2 and expand step 3
-        toggleStepSection(2);
-        toggleStepSection(3);
-    } else {
-        // Old multi-page mode
-        goToStep(3);
-    }
-}
-
-// Load pillars for selected subtest
-function loadPillars() {
-    const infoContainer = document.getElementById('pillar-info');
-    const optionsContainer = document.getElementById('pillar-options');
-    
-    if (!infoContainer || !optionsContainer || !menuState.selectedSubtestData) return;
-    
-    const pillars = menuState.selectedSubtestData.literacy_pillars || [];
-    const isNewWizard = document.querySelector('.step-wizard');
-    
-    // Show info as chips for new wizard, or as text for legacy
-    if (isNewWizard) {
-        infoContainer.innerHTML = pillars.map(pillar => {
-            const escapedPillar = escapeHtml(pillar);
-            return `<span class="pillar-chip">${escapedPillar}</span>`;
-        }).join('');
-    } else {
-        infoContainer.innerHTML = `
-            <p><strong>${menuState.selectedSubtestData.subtest_name}</strong> measures: ${pillars.join(', ')}</p>
-        `;
-    }
-    
-    // If single pillar, auto-select it
-    if (pillars.length === 1) {
-        menuState.selectedPillars = [pillars[0]];
-        if (isNewWizard) {
-            optionsContainer.innerHTML = `
-                <div class="pillar-checkbox-item">
-                    <input type="checkbox" id="pillar-0" checked disabled>
-                    <label for="pillar-0">${escapeHtml(pillars[0])}</label>
-                </div>
-            `;
-        } else {
-            optionsContainer.innerHTML = `
-                <div class="checkbox-option checked">
-                    <input type="checkbox" id="pillar-0" checked disabled>
-                    <label for="pillar-0">${escapeHtml(pillars[0])}</label>
-                </div>
-            `;
-        }
-    } else {
-        // Multiple pillars - show checkboxes
-        menuState.selectedPillars = [...pillars]; // Select all by default
-        
-        if (isNewWizard) {
-            optionsContainer.innerHTML = pillars.map((pillar, index) => {
-                const escapedPillar = escapeHtml(pillar);
-                return `
-                    <div class="pillar-checkbox-item" data-pillar="${escapedPillar}" data-index="${index}">
-                        <input type="checkbox" id="pillar-${index}" checked>
-                        <label for="pillar-${index}">${escapedPillar}</label>
-                    </div>
-                `;
-            }).join('');
-        } else {
-            optionsContainer.innerHTML = pillars.map((pillar, index) => {
-                const escapedPillar = escapeHtml(pillar);
-                return `
-                    <div class="checkbox-option checked" data-pillar="${escapedPillar}" data-index="${index}">
-                        <input type="checkbox" id="pillar-${index}" checked>
-                        <label for="pillar-${index}">${escapedPillar}</label>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // Add event listeners to checkboxes
-        optionsContainer.querySelectorAll('.checkbox-option, .pillar-checkbox-item').forEach(option => {
-            const checkbox = option.querySelector('input[type="checkbox"]');
-            const pillarIndex = parseInt(option.dataset.index);
-            const pillarName = pillars[pillarIndex];
-            
-            checkbox.addEventListener('change', (e) => {
-                togglePillarCheckbox(pillarName, option, e.target.checked);
-            });
-        });
-    }
-}
-
-// Helper function to escape HTML
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
@@ -7835,416 +6892,231 @@ document.addEventListener('keydown', (event) => {
 
 document.addEventListener('scroll', () => hideEvidenceLegendTooltip(), true);
 
+// ============================================
+// Interventions Menu — Progressive Filter System
+// ============================================
+// Both the standalone Interventions Menu and the embedded flowchart wizard
+// read from appState.interventionMenuData.resources — one entry per unique
+// resource (same name/URL/grade range/program), each carrying a `tags[]`
+// array of every (tier, pillar, resourceType, screeners, subtests, notes)
+// combination it applies to. This avoids duplicating a resource that shows
+// up under several tiers/pillars while still letting every filter narrow
+// correctly. Each filter narrows the resource pool; the remaining filter
+// controls only ever offer choices that still match at least one resource.
 
-// Toggle pillar checkbox selection
-function togglePillarCheckbox(pillar, element, isChecked) {
-    if (isChecked) {
-        // Add to selection
-        if (!menuState.selectedPillars.includes(pillar)) {
-            menuState.selectedPillars.push(pillar);
+const menuState = {
+    program: '',
+    tier: '',
+    pillar: '',
+    resourceType: '',
+    screener: '',
+    search: ''
+};
+
+function getAllResources() {
+    return appState.interventionMenuData?.resources || [];
+}
+
+// Remember whatever filters were last touched — here or in a flowchart
+// drilldown — so the other one can pre-fill from the same context.
+function setRememberedMenuFilters(partial) {
+    appState.rememberedMenuFilters = { ...(appState.rememberedMenuFilters || {}), ...partial };
+}
+
+// A single tag matches `state` when every tier/pillar/resourceType/screener
+// filter it defines (other than `excludeField`) is satisfied by that tag.
+function tagMatches(tag, state, excludeField) {
+    if (excludeField !== 'tier' && state.tier && String(tag.tier) !== String(state.tier)) return false;
+    if (excludeField !== 'pillar' && state.pillar && tag.pillar !== state.pillar) return false;
+    if (excludeField !== 'resourceType' && state.resourceType && tag.resourceType !== state.resourceType) return false;
+    if (excludeField !== 'screener' && state.screener && !(tag.screeners || []).includes(state.screener)) return false;
+    return true;
+}
+
+// The subset of a resource's tags that satisfy the current filters.
+function getMatchingTags(item, state, excludeField) {
+    return (item.tags || []).filter(tag => tagMatches(tag, state, excludeField));
+}
+
+// Filter the full resource list by every field in `state` except the one
+// named `excludeField` (used to compute what choices remain for that
+// field's own dropdown). A resource matches if at least one of its tags
+// satisfies the tier/pillar/resourceType/screener filters together.
+function getFilteredResources(state, excludeField) {
+    return getAllResources().filter(item => {
+        if (excludeField !== 'program' && state.program && item.program !== state.program) return false;
+        if (state.search) {
+            const needle = state.search.trim().toLowerCase();
+            if (needle && !item.name.toLowerCase().includes(needle)) return false;
         }
-        element.classList.add('checked');
-    } else {
-        // Remove from selection
-        menuState.selectedPillars = menuState.selectedPillars.filter(p => p !== pillar);
-        element.classList.remove('checked');
-    }
-    
-    console.log('Selected pillars:', menuState.selectedPillars);
-}
-
-// Validate and proceed from step 3
-function proceedFromStep3() {
-    if (menuState.selectedPillars.length === 0) {
-        alert('Please select at least one literacy pillar to continue.');
-        return;
-    }
-    
-    // Update step sections
-    updateStepSections();
-    
-    // Check for new panel-based wizard
-    const stepWizard = document.querySelector('.step-wizard');
-    if (stepWizard) {
-        goToStep(4);
-        return;
-    }
-    
-    // Check if we're in single-page mode
-    const singlePageMode = document.querySelector('.single-page-steps');
-    if (singlePageMode) {
-        // Collapse step 3 and expand step 4
-        toggleStepSection(3);
-        toggleStepSection(4);
-    } else {
-        // Old multi-page mode
-        goToStep(4);
-    }
-}
-
-// Step 4: Select Item Type
-function selectItemType(type) {
-    console.log('Selected item type:', type);
-    
-    menuState.selectedItemType = type;
-    
-    // Load and display results
-    loadResults();
-    
-    // Update step sections
-    updateStepSections();
-    
-    // Check for new panel-based wizard
-    const stepWizard = document.querySelector('.step-wizard');
-    if (stepWizard) {
-        goToStep(5);
-        return;
-    }
-    
-    // Check if we're in single-page mode
-    const singlePageMode = document.querySelector('.single-page-steps');
-    if (singlePageMode) {
-        // Collapse step 4 and expand step 5
-        toggleStepSection(4);
-        toggleStepSection(5);
-    } else {
-        // Old multi-page mode
-        goToStep(5);
-    }
-}
-
-// Helper function to check grade range overlap
-function gradeRangeOverlaps(subtestStart, subtestEnd, itemStart, itemEnd) {
-    // Convert grades to numbers for comparison (K=0, 1=1, etc.)
-    const gradeToNum = (grade) => {
-        if (grade === 'K' || grade === 'M') return 0;
-        return parseInt(grade);
-    };
-    
-    const subStart = gradeToNum(subtestStart);
-    const subEnd = gradeToNum(subtestEnd);
-    const itStart = gradeToNum(itemStart);
-    const itEnd = gradeToNum(itemEnd);
-    
-    // Check if ranges overlap
-    return itStart <= subEnd && itEnd >= subStart;
-}
-
-// Load and display results
-function loadResults() {
-    const breadcrumb = document.getElementById('results-breadcrumb');
-    const summary = document.getElementById('step5-results-summary');
-    const container = document.getElementById('step5-results-container');
-    
-    if (!container || !menuState.selectedScreenerData || !menuState.selectedSubtestData) return;
-    
-    // Update breadcrumb
-    if (breadcrumb) {
-        breadcrumb.innerHTML = `
-            <strong>${menuState.selectedScreenerData.screener_name}</strong> > 
-            <strong>${menuState.selectedSubtestData.subtest_code}</strong> > 
-            <strong>${menuState.selectedPillars.join(', ')}</strong> > 
-            <strong>${menuState.selectedItemType}</strong>
-        `;
-    }
-    
-    // Get program based on screener language
-    const program = menuState.selectedScreenerData.language === 'English' ? 'English' : 'French Immersion';
-    
-    // Get subtest grade range
-    const subtestGradeStart = menuState.selectedSubtestData.grade_range.start;
-    const subtestGradeEnd = menuState.selectedSubtestData.grade_range.end;
-    
-    // Filter results
-    let results = [];
-    if (menuState.selectedItemType === 'Assessment') {
-        results = (appState.interventionMenuData.assessments || []).filter(item => {
-            // Check program match
-            if (item.program !== program) return false;
-            
-            // Check grade range overlap
-            if (!gradeRangeOverlaps(subtestGradeStart, subtestGradeEnd, 
-                                   item.grade_range.start, item.grade_range.end)) {
-                return false;
-            }
-            
-            // Check pillar match
-            const itemPillars = item.literacy_pillars || [item.literacy_pillar];
-            return menuState.selectedPillars.some(pillar => itemPillars.includes(pillar));
-        });
-    } else {
-        // Intervention
-        results = (appState.interventionMenuData.interventions || []).filter(item => {
-            // Check program match
-            if (item.program !== program) return false;
-            
-            // Check grade range overlap
-            if (!gradeRangeOverlaps(subtestGradeStart, subtestGradeEnd,
-                                   item.grade_range.start, item.grade_range.end)) {
-                return false;
-            }
-            
-            // Check pillar match (interventions can have multiple pillars)
-            const itemPillars = item.literacy_pillars || [];
-            return menuState.selectedPillars.some(pillar => itemPillars.includes(pillar));
-        });
-    }
-    
-    // Sort by evidence level, then name
-    results.sort((a, b) => {
-        // Evidence level priority: ** > * > none
-        const evidenceOrder = { '**': 3, '*': 2, 'none': 1 };
-        const aEvidence = evidenceOrder[a.evidence_level] || 1;
-        const bEvidence = evidenceOrder[b.evidence_level] || 1;
-        
-        if (aEvidence !== bEvidence) {
-            return bEvidence - aEvidence; // Higher first
-        }
-        
-        return a.name.localeCompare(b.name);
+        return getMatchingTags(item, state, excludeField).length > 0;
     });
-    
-    // Update summary
-    if (summary) {
-        summary.innerHTML = `
-            <p><strong>${results.length}</strong> result${results.length !== 1 ? 's' : ''} found</p>
-        `;
-    }
-    
-    // Display results
-    if (results.length === 0) {
-        container.innerHTML = `
-            <div class="results-empty-state">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="M21 21l-4.35-4.35"/>
-                </svg>
-                <p>No results found for this combination. Try selecting different pillars or starting a new search.</p>
+}
+
+// Collect every distinct value for one tag-level field (`pillar`,
+// `resourceType`, or `screener`) that still has at least one matching
+// resource once every *other* current filter has been applied.
+function distinctTagValues(state, field) {
+    const values = new Set();
+    getAllResources().forEach(item => {
+        if (state.program && item.program !== state.program) return;
+        if (state.search) {
+            const needle = state.search.trim().toLowerCase();
+            if (needle && !item.name.toLowerCase().includes(needle)) return;
+        }
+        getMatchingTags(item, state, field).forEach(tag => {
+            if (field === 'screener') {
+                (tag.screeners || []).forEach(s => values.add(s));
+            } else if (tag[field]) {
+                values.add(tag[field]);
+            }
+        });
+    });
+    return Array.from(values).sort();
+}
+
+function uniqueSorted(values) {
+    return Array.from(new Set(values.filter(Boolean))).sort();
+}
+
+function translatePillar(pillarName) {
+    if (!pillarName) return '';
+    if (appState.language !== 'fr') return pillarName;
+    const match = (appState.interventionMenuData?.pillars || []).find(p => p.name === pillarName);
+    return match?.name_fr || pillarName;
+}
+
+function translateResourceType(typeName) {
+    if (!typeName) return '';
+    if (appState.language !== 'fr') return typeName;
+    const match = (appState.interventionMenuData?.resourceTypes || []).find(rt => rt.name === typeName);
+    return match?.name_fr || typeName;
+}
+
+// Build the <option> list for one filter select from the values that remain
+// once every *other* selected filter has been applied.
+function buildFacetOptionsHtml(values, selected, translate) {
+    let html = `<option value="">${escapeHtml(t('wizard_select_placeholder'))}</option>`;
+    html += values.map(v => `<option value="${escapeAttr(v)}"${v === selected ? ' selected' : ''}>${escapeHtml(translate ? translate(v) : v)}</option>`).join('');
+    return html;
+}
+
+// Repopulate the Pillar / Resource Type / Screener selects in the standalone
+// Interventions Menu so their options always reflect the other filters
+// currently applied, then re-render the results.
+function renderMenuFilterOptions() {
+    const pillarSel = document.getElementById('filter-pillar');
+    const typeSel = document.getElementById('filter-type');
+    const screenerSel = document.getElementById('filter-screener');
+    if (!pillarSel || !typeSel || !screenerSel) return;
+
+    pillarSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(menuState, 'pillar'), menuState.pillar, translatePillar);
+    typeSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(menuState, 'resourceType'), menuState.resourceType, translateResourceType);
+    screenerSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(menuState, 'screener'), menuState.screener);
+}
+
+function buildResourceCardHtml(item) {
+    const tags = getMatchingTags(item, menuState, null);
+    const gradeText = item.gradeRangeText || (item.gradeFilter || []).join(', ');
+    const tiers = uniqueSorted(tags.map(tg => tg.tier)).sort((a, b) => a - b);
+    const pillars = uniqueSorted(tags.map(tg => tg.pillar));
+    const types = uniqueSorted(tags.map(tg => tg.resourceType));
+    const screeners = uniqueSorted(tags.flatMap(tg => tg.screeners || []));
+    const notes = uniqueSorted(tags.map(tg => tg.notes));
+    const linkHtml = item.url
+        ? `<a class="resource-link-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('filter_view_resource'))}<span class="material-symbols-rounded" aria-hidden="true" translate="no">open_in_new</span></a>`
+        : `<span class="resource-link-btn resource-link-btn-disabled">${escapeHtml(t('filter_no_link'))}</span>`;
+
+    return `
+        <div class="resource-card">
+            <div class="resource-card-main">
+                <div class="resource-card-name">${escapeHtml(item.name)}</div>
+                <div class="result-badges">
+                    ${tiers.map(tier => `<span class="result-badge">${escapeHtml(t('filter_tier_option')(tier))}</span>`).join('')}
+                    ${pillars.map(p => `<span class="result-badge">${escapeHtml(translatePillar(p))}</span>`).join('')}
+                    ${types.map(rt => `<span class="result-badge">${escapeHtml(translateResourceType(rt))}</span>`).join('')}
+                    ${gradeText ? `<span class="result-badge">${escapeHtml(gradeText)}</span>` : ''}
+                </div>
+                ${screeners.length ? `<div class="resource-card-meta">${escapeHtml(t('filter_screeners_label'))}: ${escapeHtml(screeners.join(', '))}</div>` : ''}
+                ${notes.length ? `<div class="resource-card-meta resource-card-notes">${escapeHtml(notes.join('; '))}</div>` : ''}
             </div>
-        `;
-        return;
-    }
-    
-    // Render as compact expandable list
-    container.innerHTML = `
-        <div class="results-grid-compact">
-            ${results.map((item, index) => {
-                const pillars = item.literacy_pillars || [item.literacy_pillar];
-                const evidenceBadge = getEvidenceBadgeHtml(item.evidence_level);
-                
-                // Escape and validate data
-                const itemName = escapeHtml(item.name);
-                const itemProgram = escapeHtml(item.program);
-                const escapedPillars = pillars.map(p => escapeHtml(p)).join(', ');
-                
-                // Validate URL (only allow http/https)
-                let safeUrl = '';
-                let isLocalResource = false;
-                if (item.url) {
-                    if (item.url === '(SharePoint)' || item.url === '(local resource)' || item.url === '(Nelson)') {
-                        isLocalResource = true;
-                    } else {
-                        try {
-                            const url = new URL(item.url);
-                            if (url.protocol === 'http:' || url.protocol === 'https:') {
-                                safeUrl = item.url;
-                            }
-                        } catch (e) {
-                            // Invalid URL, leave empty
-                        }
-                    }
-                }
-                
-                return `
-                    <div class="result-card-compact" data-index="${index}">
-                        <div class="result-header-compact" onclick="toggleResultExpand(${index})">
-                            <div>
-                                <h4 class="result-name-compact">${itemName}</h4>
-                                <div class="result-meta-compact">
-                                    <span class="badge-grade">${item.grade_range.start}-${item.grade_range.end}</span>
-                                    <span class="badge-program">${itemProgram === 'English' ? 'EN' : 'FR'}</span>
-                                    ${evidenceBadge}
-                                </div>
-                            </div>
-                            <svg class="result-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                        <div class="result-details-compact">
-                            <div class="result-info"><strong>Addresses:</strong> ${escapedPillars}</div>
-                            ${safeUrl ? `
-                                <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="result-link-compact" onclick="event.stopPropagation()">
-                                    View Resource
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
-                                        <path d="M15 3h6v6"/>
-                                        <path d="M10 14L21 3"/>
-                                    </svg>
-                                </a>
-                            ` : isLocalResource ? `
-                                <div class="result-local-compact">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    Available on ${item.url}
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('')}
+            ${linkHtml}
         </div>
     `;
 }
 
-// Restart menu
+function renderMenuResults() {
+    const countEl = document.getElementById('results-count-compact');
+    const listEl = document.getElementById('results-list-compact');
+    if (!countEl || !listEl) return;
+
+    const filtered = getFilteredResources(menuState, null);
+    countEl.textContent = t('filter_results_label')(filtered.length);
+    listEl.innerHTML = filtered.length
+        ? filtered.map(buildResourceCardHtml).join('')
+        : `<p class="results-empty">${escapeHtml(t('filter_results_none'))}</p>`;
+}
+
+// Called whenever the user changes one of the standalone menu's filters.
+function onMenuFilterChange(field, value) {
+    menuState[field] = value;
+    setRememberedMenuFilters({ [field]: value || null });
+    renderMenuFilterOptions();
+    renderMenuResults();
+}
+
+function resetMenuFilters() {
+    menuState.program = '';
+    menuState.tier = '';
+    menuState.pillar = '';
+    menuState.resourceType = '';
+    menuState.screener = '';
+    menuState.search = '';
+    appState.rememberedMenuFilters = {};
+
+    const programSel = document.getElementById('filter-program');
+    const tierSel = document.getElementById('filter-tier');
+    const searchInput = document.getElementById('filter-search');
+    if (programSel) programSel.value = '';
+    if (tierSel) tierSel.value = '';
+    if (searchInput) searchInput.value = '';
+
+    renderMenuFilterOptions();
+    renderMenuResults();
+}
+
+// "Clear Filters" button in the standalone Interventions Menu.
 function restartMenu() {
-    initializeStepBasedMenu();
+    resetMenuFilters();
 }
 
-// ===== NEW SINGLE-PAGE ACCORDION FUNCTIONS =====
+// Pre-fill the standalone menu's filters from whatever the user last chose
+// — either here or during a flowchart drilldown — so context carries over
+// the moment they land on this page.
+function applyRememberedFiltersToMenu() {
+    const remembered = appState.rememberedMenuFilters || {};
+    menuState.program = remembered.program || appState.selectedProgram || '';
+    menuState.tier = remembered.tier ? String(remembered.tier) : '';
+    menuState.pillar = remembered.pillar || '';
+    menuState.resourceType = remembered.resourceType || '';
+    menuState.screener = remembered.screener || '';
+    menuState.search = '';
 
-function toggleStepSection(stepNumber) {
-    const section = document.querySelector(`.menu-step-section[data-step="${stepNumber}"]`);
-    if (!section) return;
-    
-    // Don't allow toggling if section is disabled
-    if (section.classList.contains('disabled')) return;
-    
-    // Toggle active class
-    const wasActive = section.classList.contains('active');
-    
-    // Close all other sections
-    document.querySelectorAll('.menu-step-section').forEach(s => {
-        if (s !== section) {
-            s.classList.remove('active');
-        }
-    });
-    
-    // Toggle this section
-    if (wasActive) {
-        section.classList.remove('active');
-    } else {
-        section.classList.add('active');
-        // Scroll section into view
-        setTimeout(() => {
-            section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
-    }
+    const programSel = document.getElementById('filter-program');
+    const tierSel = document.getElementById('filter-tier');
+    const searchInput = document.getElementById('filter-search');
+    if (programSel) programSel.value = menuState.program;
+    if (tierSel) tierSel.value = menuState.tier;
+    if (searchInput) searchInput.value = '';
+
+    renderMenuFilterOptions();
+    renderMenuResults();
 }
 
-function updateStepSections() {
-    // Update step 1
-    const step1 = document.querySelector('.menu-step-section[data-step="1"]');
-    if (step1) {
-        const selection1 = document.getElementById('step-1-selection');
-        if (menuState.selectedScreenerData) {
-            if (selection1) selection1.textContent = menuState.selectedScreenerData.name;
-            step1.classList.add('completed');
-            step1.classList.remove('disabled');
-        } else {
-            if (selection1) selection1.textContent = '';
-            step1.classList.remove('completed');
-        }
-    }
-    
-    // Update step 2
-    const step2 = document.querySelector('.menu-step-section[data-step="2"]');
-    if (step2) {
-        const selection2 = document.getElementById('step-2-selection');
-        if (menuState.selectedSubtestData) {
-            if (selection2) selection2.textContent = menuState.selectedSubtestData.name;
-            step2.classList.add('completed');
-            step2.classList.remove('disabled');
-        } else {
-            if (selection2) selection2.textContent = '';
-            step2.classList.remove('completed');
-        }
-        
-        // Enable/disable step 2 based on step 1
-        if (menuState.selectedScreener) {
-            step2.classList.remove('disabled');
-        } else {
-            step2.classList.add('disabled');
-        }
-    }
-    
-    // Update step 3
-    const step3 = document.querySelector('.menu-step-section[data-step="3"]');
-    if (step3) {
-        const selection3 = document.getElementById('step-3-selection');
-        if (menuState.selectedPillars && menuState.selectedPillars.length > 0) {
-            if (selection3) selection3.textContent = menuState.selectedPillars.join(', ');
-            step3.classList.add('completed');
-            step3.classList.remove('disabled');
-        } else {
-            if (selection3) selection3.textContent = '';
-            step3.classList.remove('completed');
-        }
-        
-        // Enable/disable step 3 based on step 2
-        if (menuState.selectedSubtest) {
-            step3.classList.remove('disabled');
-        } else {
-            step3.classList.add('disabled');
-        }
-    }
-    
-    // Update step 4
-    const step4 = document.querySelector('.menu-step-section[data-step="4"]');
-    if (step4) {
-        const selection4 = document.getElementById('step-4-selection');
-        if (menuState.selectedItemType) {
-            if (selection4) selection4.textContent = menuState.selectedItemType;
-            step4.classList.add('completed');
-            step4.classList.remove('disabled');
-        } else {
-            if (selection4) selection4.textContent = '';
-            step4.classList.remove('completed');
-        }
-        
-        // Enable/disable step 4 based on step 3
-        if (menuState.selectedPillars && menuState.selectedPillars.length > 0) {
-            step4.classList.remove('disabled');
-        } else {
-            step4.classList.add('disabled');
-        }
-    }
-    
-    // Update step 5
-    const step5 = document.querySelector('.menu-step-section[data-step="5"]');
-    if (step5) {
-        const selection5 = document.getElementById('step-5-selection');
-        
-        // Enable/disable step 5 based on step 4
-        if (menuState.selectedItemType) {
-            step5.classList.remove('disabled');
-            if (selection5) {
-                const breadcrumb = `${menuState.selectedScreenerData?.name} > ${menuState.selectedSubtestData?.name} > ${menuState.selectedPillars?.join(', ')} > ${menuState.selectedItemType}`;
-                selection5.textContent = '';
-            }
-        } else {
-            step5.classList.add('disabled');
-            if (selection5) selection5.textContent = '';
-        }
-    }
+function initializeInterventionsFilterMenu() {
+    if (!document.querySelector('.filter-menu')) return;
+    applyRememberedFiltersToMenu();
 }
-
-function toggleResultExpand(index) {
-    const card = document.querySelectorAll('.result-card-compact')[index];
-    if (card) {
-        card.classList.toggle('expanded');
-    }
-}
-
-function restartMenu() {
-    initializeStepBasedMenu();
-}
-
-// Update openInterventionsMenuView to initialize the new menu
-window.openInterventionsMenuView = function() {
-    // No-op for navigation in new design
-};
 
 // ============================================
 // Export for global use
@@ -8305,7 +7177,6 @@ window.startTier2Visual = startTier2Visual;
 window.startTier3Visual = startTier3Visual;
 window.restartTier1Visual = restartTier1Visual;
 window.restartTier2Visual = restartTier2Visual;
-window.showInterventionView = showInterventionView;
 window.openTierFlowchart = openTierFlowchart;
 window.returnToInterventionsOptions = returnToInterventionsOptions;
 window.activateSubTab = activateSubTab;
@@ -8325,7 +7196,6 @@ window.proceedFromIntegratedInfo = proceedFromIntegratedInfo;
 window.selectIntegratedOption = selectIntegratedOption;
 window.makeIntegratedDecision = makeIntegratedDecision;
 window.fwOnScreenerChange = fwOnScreenerChange;
-window.fwOnSubtestChange = fwOnSubtestChange;
 window.fwOnPillarChange = fwOnPillarChange;
 window.fwSelectItem = fwSelectItem;
 window.showFinalSummary = showFinalSummary;
@@ -8345,354 +7215,11 @@ window.restartTier2VisualIntegrated = restartTier2VisualIntegrated;
 window.confirmVisualFlowchartTierTransition = confirmVisualFlowchartTierTransition;
 window.switchVisualFlowchartToLayout = switchVisualFlowchartToLayout;
 
-// New step-based intervention menu exports
-window.initializeStepBasedMenu = initializeStepBasedMenu;
-window.selectScreener = selectScreener;
-window.selectSubtest = selectSubtest;
-window.selectItemType = selectItemType;
-window.goToStep = goToStep;
-window.proceedFromStep3 = proceedFromStep3;
+// Interventions Menu filter system
+window.onMenuFilterChange = onMenuFilterChange;
 window.restartMenu = restartMenu;
-window.toggleStepSection = toggleStepSection;
-window.toggleResultExpand = toggleResultExpand;
-
-// ============================================
-// DROPDOWN WIZARD FUNCTIONS
-// ============================================
-
-function onScreenerDropdownChange(screenerId) {
-    if (!screenerId) {
-        resetDropdownsFrom('subtest');
-        return;
-    }
-    
-    console.log('Dropdown: Selected screener:', screenerId);
-    
-    if (!appState.interventionMenuData || !appState.interventionMenuData.screeners) {
-        console.error('Intervention menu data not loaded');
-        return;
-    }
-    
-    const screenerData = appState.interventionMenuData.screeners.find(s => s.screener_id === screenerId);
-    if (!screenerData) {
-        console.error('Screener not found:', screenerId);
-        return;
-    }
-    
-    menuState.selectedScreener = screenerId;
-    menuState.selectedScreenerData = screenerData;
-
-    // Keep the remembered screener in sync across the app.
-    setRememberedScreener(screenerId);
-    
-    // Populate subtest dropdown
-    const subtestSelect = document.getElementById('subtest-select');
-    if (subtestSelect) {
-        subtestSelect.innerHTML = '<option value="">Select...</option>';
-        const subtests = screenerData.subtests || [];
-        subtests.forEach(subtest => {
-            const option = document.createElement('option');
-            option.value = subtest.subtest_code;
-            option.textContent = `${subtest.subtest_code} - ${subtest.subtest_name}`;
-            subtestSelect.appendChild(option);
-        });
-        subtestSelect.disabled = false;
-    }
-    
-    // Reset downstream dropdowns
-    resetDropdownsFrom('pillar');
-}
-
-function onSubtestDropdownChange(subtestCode) {
-    if (!subtestCode) {
-        resetDropdownsFrom('pillar');
-        return;
-    }
-    
-    console.log('Dropdown: Selected subtest:', subtestCode);
-    
-    if (!menuState.selectedScreenerData) return;
-    
-    const subtestData = menuState.selectedScreenerData.subtests.find(s => s.subtest_code === subtestCode);
-    if (!subtestData) {
-        console.error('Subtest not found:', subtestCode);
-        return;
-    }
-    
-    menuState.selectedSubtest = subtestCode;
-    menuState.selectedSubtestData = subtestData;
-    
-    // Populate pillar dropdown
-    const pillarSelect = document.getElementById('pillar-select');
-    if (pillarSelect) {
-        pillarSelect.innerHTML = `<option value="">${escapeHtml(t('wizard_select_placeholder'))}</option>`;
-        const pillars = subtestData.literacy_pillars || [];
-        
-        // Add "All Pillars" option if multiple
-        if (pillars.length > 1) {
-            const allOption = document.createElement('option');
-            allOption.value = 'ALL';
-            allOption.textContent = t('wizard_all_pillars');
-            pillarSelect.appendChild(allOption);
-        }
-        
-        pillars.forEach(pillar => {
-            const option = document.createElement('option');
-            option.value = pillar;
-            option.textContent = pillar;
-            pillarSelect.appendChild(option);
-        });
-        
-        pillarSelect.disabled = false;
-        
-        // Auto-select if only one pillar
-        if (pillars.length === 1) {
-            pillarSelect.value = pillars[0];
-            onPillarDropdownChange(pillars[0]);
-            return; // Don't reset type dropdown when auto-selecting
-        }
-    }
-    
-    // Reset downstream dropdowns
-    resetDropdownsFrom('type');
-}
-
-function onPillarDropdownChange(pillarValue) {
-    if (!pillarValue) {
-        resetDropdownsFrom('type');
-        return;
-    }
-    
-    console.log('Dropdown: Selected pillar:', pillarValue);
-    
-    if (pillarValue === 'ALL') {
-        menuState.selectedPillars = [...(menuState.selectedSubtestData?.literacy_pillars || [])];
-    } else {
-        menuState.selectedPillars = [pillarValue];
-    }
-    
-    // Enable type dropdown
-    const typeSelect = document.getElementById('type-select');
-    if (typeSelect) {
-        typeSelect.value = '';
-        typeSelect.disabled = false;
-    }
-    menuState.selectedItemType = null;
-    
-    // Hide results
-    const resultsSection = document.getElementById('dropdown-results');
-    if (resultsSection) {
-        resultsSection.style.display = 'none';
-    }
-}
-
-function onTypeDropdownChange(typeValue) {
-    if (!typeValue) {
-        const resultsSection = document.getElementById('dropdown-results');
-        if (resultsSection) {
-            resultsSection.style.display = 'none';
-        }
-        return;
-    }
-    
-    console.log('Dropdown: Selected type:', typeValue);
-    
-    menuState.selectedItemType = typeValue;
-    
-    // Load and display results
-    loadDropdownResults();
-}
-
-function loadDropdownResults() {
-    const resultsSection = document.getElementById('dropdown-results');
-    const countEl = document.getElementById('results-count-compact');
-    const listEl = document.getElementById('results-list-compact');
-    
-    if (!resultsSection || !listEl || !menuState.selectedSubtestData) return;
-    
-    // Get program based on screener language
-    const program = menuState.selectedScreenerData?.language === 'English' ? 'English' : 'French Immersion';
-    
-    // Get subtest grade range
-    const subtestStart = menuState.selectedSubtestData.grade_range?.start;
-    const subtestEnd = menuState.selectedSubtestData.grade_range?.end;
-    
-    // Get items from the correct data source
-    let items = [];
-    if (menuState.selectedItemType === 'Assessment') {
-        items = appState.interventionMenuData?.assessments || [];
-    } else {
-        items = appState.interventionMenuData?.interventions || [];
-    }
-    
-    // Filter by program
-    let filtered = items.filter(item => item.program === program);
-    
-    // Filter by grade range
-    filtered = filtered.filter(item => {
-        const itemStart = item.grade_range?.start;
-        const itemEnd = item.grade_range?.end;
-        return gradeRangeOverlaps(subtestStart, subtestEnd, itemStart, itemEnd);
-    });
-    
-    // Filter by selected pillars
-    if (menuState.selectedPillars && menuState.selectedPillars.length > 0) {
-        filtered = filtered.filter(item => {
-            const itemPillars = item.literacy_pillars || [item.literacy_pillar];
-            return menuState.selectedPillars.some(p => itemPillars.includes(p));
-        });
-    }
-    
-    // Update count
-    if (countEl) {
-        countEl.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`;
-    }
-    
-    // Render compact results
-    listEl.innerHTML = filtered.map(item => {
-        const gradeText = `${item.grade_range?.start || 'K'}-${item.grade_range?.end || '12'}`;
-        const langBadge = program === 'French Immersion' ? 'FR' : 'EN';
-        
-        return `
-            <div class="result-row">
-                <span class="result-name-compact">${escapeHtml(item.name)}</span>
-                <div class="result-badges">
-                    <span class="result-badge grade">${gradeText}</span>
-                    <span class="result-badge lang">${langBadge}</span>
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    // Show results
-    resultsSection.style.display = 'block';
-}
-
-function resetDropdownsFrom(startFrom) {
-    const order = ['subtest', 'pillar', 'type'];
-    const startIndex = order.indexOf(startFrom);
-    
-    if (startIndex === -1) return;
-    
-    for (let i = startIndex; i < order.length; i++) {
-        const select = document.getElementById(`${order[i]}-select`);
-        if (select) {
-            select.value = '';
-            select.disabled = true;
-            if (order[i] !== 'type') {
-                select.innerHTML = '<option value="">Select...</option>';
-            }
-        }
-    }
-    
-    // Clear state
-    if (startFrom === 'subtest' || startFrom === 'pillar' || startFrom === 'type') {
-        if (startFrom === 'subtest') {
-            menuState.selectedSubtest = null;
-            menuState.selectedSubtestData = null;
-        }
-        if (startFrom === 'subtest' || startFrom === 'pillar') {
-            menuState.selectedPillars = [];
-        }
-        if (startFrom === 'subtest' || startFrom === 'pillar' || startFrom === 'type') {
-            menuState.selectedItemType = null;
-        }
-    }
-    
-    // Hide results
-    const resultsSection = document.getElementById('dropdown-results');
-    if (resultsSection) {
-        resultsSection.style.display = 'none';
-    }
-}
-
-function initializeDropdownWizard() {
-    // Reset all state
-    menuState.currentStep = 1;
-    menuState.selectedScreener = null;
-    menuState.selectedScreenerData = null;
-    menuState.selectedSubtest = null;
-    menuState.selectedSubtestData = null;
-    menuState.selectedPillars = [];
-    menuState.selectedItemType = null;
-    
-    // Reset language filter
-    const languageFilter = document.getElementById('language-filter');
-    if (languageFilter) {
-        languageFilter.value = '';
-    }
-    
-    // Reset screener dropdown and repopulate with all screeners
-    const screenerSelect = document.getElementById('screener-select');
-    if (screenerSelect) {
-        screenerSelect.value = '';
-        // Trigger language filter to repopulate all screeners
-        onLanguageFilterChange('');
-    }
-    
-    resetDropdownsFrom('subtest');
-
-    // If the user already chose a screener (e.g. in the flowchart), pre-select it
-    // here for convenience so they don't have to choose it again.
-    applyRememberedScreenerToMenu();
-}
-
-// Pre-select the remembered screener in the interventions menu dropdown wizard
-// and populate its dependent dropdowns, mirroring a manual selection.
-function applyRememberedScreenerToMenu() {
-    const remembered = getRememberedScreenerId();
-    if (!remembered) return;
-    const screenerSelect = document.getElementById('screener-select');
-    if (!screenerSelect) return;
-    // Don't clobber a selection the user is already working with.
-    if (screenerSelect.value) return;
-    // Only apply if the screener exists as an option in the current list.
-    const hasOption = Array.from(screenerSelect.options).some(o => o.value === remembered);
-    if (!hasOption) return;
-    screenerSelect.value = remembered;
-    onScreenerDropdownChange(remembered);
-}
-
-// Override restartMenu to work with dropdown wizard
-function restartMenu() {
-    const dropdownWizard = document.querySelector('.dropdown-wizard');
-    if (dropdownWizard) {
-        initializeDropdownWizard();
-    } else {
-        initializeStepBasedMenu();
-    }
-}
-
-// Override openInterventionsMenuView to initialize dropdown wizard
-window.openInterventionsMenuView = function() {
-    // No-op for navigation (sub-tabs handle it in new design)
-    // Just initialize the dropdown wizard if present
-    const dropdownWizard = document.querySelector('.dropdown-wizard');
-    if (dropdownWizard) {
-        initializeDropdownWizard();
-    }
-};
-
-// Language filter function
-function onLanguageFilterChange(language) {
-    const screenerSelect = document.getElementById('screener-select');
-    if (!screenerSelect) return;
-    
-    // Use shared helper to build dropdown HTML
-    screenerSelect.innerHTML = buildScreenerDropdownHtml(language);
-    
-    // Reset downstream dropdowns
-    resetDropdownsFrom('subtest');
-}
-
-// Export new dropdown functions
-window.onScreenerDropdownChange = onScreenerDropdownChange;
-window.onSubtestDropdownChange = onSubtestDropdownChange;
-window.onPillarDropdownChange = onPillarDropdownChange;
-window.onTypeDropdownChange = onTypeDropdownChange;
-window.onLanguageFilterChange = onLanguageFilterChange;
-window.initializeDropdownWizard = initializeDropdownWizard;
-window.restartMenu = restartMenu;
+window.initializeInterventionsFilterMenu = initializeInterventionsFilterMenu;
+window.applyRememberedFiltersToMenu = applyRememberedFiltersToMenu;
 
 
 

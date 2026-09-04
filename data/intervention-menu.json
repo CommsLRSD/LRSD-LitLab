@@ -244,1088 +244,3336 @@
       ]
     }
   ],
-  "interventions": [
+  "pillars": [
     {
-      "item_id": "INT-001",
-      "name": "Abracadabra",
-      "grade_range": {
-        "start": "1",
-        "end": "2"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        1,
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonemic Awareness",
-        "Phonics",
-        "Reading Fluency",
-        "Reading Comprehension"
-      ],
-      "evidence_level": "*",
-      "url": "https://literacy.concordia.ca/resources/abra/teacher/fr/index.php"
-    },
-    {
-      "item_id": "INT-002",
-      "name": "Alec",
-      "grade_range": {
-        "start": "M",
-        "end": "5"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        1,
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonics"
-      ],
-      "evidence_level": "none",
-      "url": "https://alec-edu.com/"
-    },
-    {
-      "item_id": "INT-003",
-      "name": "Amira Learning",
-      "grade_range": {
-        "start": "K",
-        "end": "8"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Phonics",
-        "Reading Fluency"
-      ],
-      "evidence_level": "*",
-      "url": "https://amiralearning.com/amira-reading"
-    },
-    {
-      "item_id": "INT-004",
-      "name": "Barton Reading and Spelling",
-      "grade_range": {
-        "start": "3",
-        "end": "12"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness",
-        "Phonics",
-        "Vocabulary",
-        "Orthography"
-      ],
-      "evidence_level": "**",
-      "url": "https://bartonreading.com/"
-    },
-    {
-      "item_id": "INT-005",
-      "name": "Handwriting Without Tears",
-      "grade_range": {
-        "start": "K",
-        "end": "2"
-      },
-      "program": "English",
-      "tiers": [
-        1,
-        2
-      ],
-      "literacy_pillars": [
-        "Orthography"
-      ],
-      "evidence_level": "none",
-      "url": ""
-    },
-    {
-      "item_id": "INT-006",
-      "name": "Heggerty",
-      "grade_range": {
-        "start": "K",
-        "end": "2"
-      },
-      "program": "English",
-      "tiers": [
-        1,
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonemic Awareness"
-      ],
-      "evidence_level": "**",
-      "url": "https://heggerty.org/"
-    },
-    {
-      "item_id": "INT-007",
-      "name": "Kilpatrick -- Equipped for Reading Success",
-      "grade_range": {
-        "start": "K",
-        "end": "2"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness"
-      ],
-      "evidence_level": "**",
-      "url": ""
-    },
-    {
-      "item_id": "INT-008",
-      "name": "Lexia Core 5",
-      "grade_range": {
-        "start": "K",
-        "end": "5"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        1
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonemic Awareness",
-        "Phonics",
-        "Reading Fluency",
-        "Vocabulary",
-        "Reading Comprehension",
-        "Orthography"
-      ],
-      "evidence_level": "*",
-      "url": "https://www.lexialearning.com/core5"
-    },
-    {
-      "item_id": "INT-009",
-      "name": "Lexia Power Up",
-      "grade_range": {
-        "start": "6",
-        "end": "12"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Phonics",
-        "Reading Fluency",
-        "Vocabulary",
-        "Reading Comprehension",
-        "Orthography"
-      ],
-      "evidence_level": "*",
-      "url": "https://www.lexialearning.com/powerup"
-    },
-    {
-      "item_id": "INT-010",
-      "name": "Lindamood Bell's Seeing Stars",
-      "grade_range": {
-        "start": "2",
-        "end": "12"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Orthography"
-      ],
-      "evidence_level": "none",
-      "url": "https://lindamoodbell.com/program/seeing-stars-program"
-    },
-    {
-      "item_id": "INT-011",
-      "name": "Lindamood Phoneme Sequencing",
-      "grade_range": {
-        "start": "K",
-        "end": "3"
-      },
-      "program": "English",
-      "tiers": [
-        3
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness"
-      ],
-      "evidence_level": "**",
-      "url": "https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program"
-    },
-    {
-      "item_id": "INT-012",
-      "name": "Orton-Gillingham",
-      "grade_range": {
-        "start": "K",
-        "end": "12"
-      },
-      "program": "English",
-      "tiers": [
-        1,
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonemic Awareness",
-        "Reading Fluency",
-        "Reading Comprehension",
-        "Orthography"
-      ],
-      "evidence_level": "**",
-      "url": "https://www.ortonacademy.org/"
-    },
-    {
-      "item_id": "INT-013",
-      "name": "Page par Page",
-      "grade_range": {
-        "start": "M",
-        "end": "2"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        1,
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonics",
-        "Reading Fluency",
-        "Reading Comprehension"
-      ],
-      "evidence_level": "none",
-      "url": ""
-    },
-    {
-      "item_id": "INT-014",
-      "name": "Phonémique -- Version 1",
-      "grade_range": {
-        "start": "M",
-        "end": "3"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        1,
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness"
-      ],
-      "evidence_level": "none",
-      "url": ""
-    },
-    {
-      "item_id": "INT-015",
-      "name": "Phonémique -- Version 2",
-      "grade_range": {
-        "start": "M",
-        "end": "3"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        1,
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness"
-      ],
-      "evidence_level": "none",
-      "url": ""
-    },
-    {
-      "item_id": "INT-016",
-      "name": "Programme d'intervention en lecture et en orthographe (PILO)",
-      "grade_range": {
-        "start": "M",
-        "end": "3"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonics",
-        "Orthography"
-      ],
-      "evidence_level": "none",
-      "url": "(SharePoint)"
-    },
-    {
-      "item_id": "INT-017",
-      "name": "Remediation Plus Systems",
-      "grade_range": {
-        "start": "K",
-        "end": "3"
-      },
-      "program": "English",
-      "tiers": [
-        1,
-        2
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness",
-        "Phonics",
-        "Reading Fluency",
-        "Reading Comprehension",
-        "Orthography"
-      ],
-      "evidence_level": "*",
-      "url": "http://www.remediationplus.com/products/the-remediation-plus-system/"
-    },
-    {
-      "item_id": "INT-018",
-      "name": "Remediation Plus Systems",
-      "grade_range": {
-        "start": "4",
-        "end": "8"
-      },
-      "program": "English",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Reading Fluency",
-        "Reading Comprehension",
-        "Vocabulary"
-      ],
-      "evidence_level": "*",
-      "url": "http://www.remediationplus.com/products/the-remediation-plus-system/"
-    },
-    {
-      "item_id": "INT-019",
-      "name": "Ressource CBE",
-      "grade_range": {
-        "start": "M",
-        "end": "2"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        1,
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonics"
-      ],
-      "evidence_level": "none",
-      "url": ""
-    },
-    {
-      "item_id": "INT-020",
-      "name": "Ressource CBE",
-      "grade_range": {
-        "start": "M",
-        "end": "4"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle"
-      ],
-      "evidence_level": "none",
-      "url": ""
-    },
-    {
-      "item_id": "INT-021",
-      "name": "REWARDS",
-      "grade_range": {
-        "start": "4",
-        "end": "12"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Reading Fluency",
-        "Vocabulary",
-        "Orthography"
-      ],
-      "evidence_level": "**",
-      "url": "https://www.voyagersopris.com/products/reading/rewards/overview"
-    },
-    {
-      "item_id": "INT-022",
-      "name": "Saxon Reading Foundations",
-      "grade_range": {
-        "start": "K",
-        "end": "2"
-      },
-      "program": "English",
-      "tiers": [
-        1,
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness",
-        "Reading Fluency",
-        "Orthography"
-      ],
-      "evidence_level": "**",
-      "url": "https://www.heinemann.com/saxon-reading-foundations/"
-    },
-    {
-      "item_id": "INT-023",
-      "name": "Son au graphe",
-      "grade_range": {
-        "start": "3",
-        "end": "12"
-      },
-      "program": "French Immersion",
-      "tiers": [
-        1,
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonics"
-      ],
-      "evidence_level": "none",
-      "url": ""
-    },
-    {
-      "item_id": "INT-024",
-      "name": "SRA Corrective Reading",
-      "grade_range": {
-        "start": "K",
-        "end": "3"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Reading Comprehension",
-        "Orthography"
-      ],
-      "evidence_level": "*",
-      "url": "(Nelson)"
-    },
-    {
-      "item_id": "INT-025",
-      "name": "SRA Corrective Reading",
-      "grade_range": {
-        "start": "3",
-        "end": "12"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonemic Awareness",
-        "Phonics",
-        "Reading Fluency",
-        "Reading Comprehension"
-      ],
-      "evidence_level": "*",
-      "url": "(Nelson)"
-    },
-    {
-      "item_id": "INT-026",
-      "name": "SRA Early Interventions in Reading Skills",
-      "grade_range": {
-        "start": "K",
-        "end": "3"
-      },
-      "program": "English",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness",
-        "Reading Fluency"
-      ],
-      "evidence_level": "*",
-      "url": "(Nelson)"
-    },
-    {
-      "item_id": "INT-027",
-      "name": "SRA Open Court",
-      "grade_range": {
-        "start": "K",
-        "end": "3"
-      },
-      "program": "English",
-      "tiers": [
-        1,
-        2
-      ],
-      "literacy_pillars": [
-        "Phonics",
-        "Reading Fluency",
-        "Vocabulary",
-        "Reading Comprehension"
-      ],
-      "evidence_level": "*",
-      "url": "https://pages.nelson.com/assets/pdf/open_court.pdf"
-    },
-    {
-      "item_id": "INT-028",
-      "name": "SRA Open Court",
-      "grade_range": {
-        "start": "4",
-        "end": "6"
-      },
-      "program": "English",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Reading Fluency",
-        "Vocabulary",
-        "Reading Comprehension"
-      ],
-      "evidence_level": "*",
-      "url": "https://pages.nelson.com/assets/pdf/open_court.pdf"
-    },
-    {
-      "item_id": "INT-029",
-      "name": "SRA Reading Mastery",
-      "grade_range": {
-        "start": "K",
-        "end": "6"
-      },
-      "program": "English",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonemic Awareness",
-        "Phonics",
-        "Reading Fluency",
-        "Vocabulary",
-        "Reading Comprehension",
-        "Orthography"
-      ],
-      "evidence_level": "*",
-      "url": "(Nelson)"
-    },
-    {
-      "item_id": "INT-030",
-      "name": "STARI",
-      "grade_range": {
-        "start": "6",
-        "end": "9"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Reading Fluency",
-        "Reading Comprehension"
-      ],
-      "evidence_level": "**",
-      "url": "https://www.serpinstitute.org/stari"
-    },
-    {
-      "item_id": "INT-031",
-      "name": "UFLI Manual",
-      "grade_range": {
-        "start": "K",
-        "end": "2"
-      },
-      "program": "English",
-      "tiers": [
-        1,
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonemic Awareness",
-        "Phonics",
-        "Reading Fluency",
-        "Vocabulary",
-        "Reading Comprehension",
-        "Orthography"
-      ],
-      "evidence_level": "**",
-      "url": "https://ufli.education.ufl.edu/foundations-materials/"
-    },
-    {
-      "item_id": "INT-032",
-      "name": "UFLI Manual",
-      "grade_range": {
-        "start": "K",
-        "end": "8"
-      },
-      "program": "English",
-      "tiers": [
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonemic Awareness",
-        "Phonics",
-        "Reading Fluency",
-        "Vocabulary",
-        "Reading Comprehension",
-        "Orthography"
-      ],
-      "evidence_level": "**",
-      "url": "https://ufli.education.ufl.edu/foundations-materials/"
-    },
-    {
-      "item_id": "INT-033",
-      "name": "Wilson Fundations",
-      "grade_range": {
-        "start": "K",
-        "end": "3"
-      },
-      "program": "English",
-      "tiers": [
-        1,
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Phonemic Awareness",
-        "Phonics",
-        "Reading Fluency",
-        "Vocabulary",
-        "Reading Comprehension",
-        "Orthography"
-      ],
-      "evidence_level": "*",
-      "url": "https://www.wilsonlanguage.com/programs/fundations/"
-    },
-    {
-      "item_id": "INT-034",
-      "name": "Wilson Reading System",
-      "grade_range": {
-        "start": "2",
-        "end": "12"
-      },
-      "program": "English",
-      "tiers": [
-        3
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle",
-        "Orthography"
-      ],
-      "evidence_level": "**",
-      "url": "https://www.wilsonlanguage.com/programs/wilson-reading-system/"
-    },
-    {
-      "item_id": "INT-035",
-      "name": "Words Their Way",
-      "grade_range": {
-        "start": "K",
-        "end": "12"
-      },
-      "program": "English",
-      "tiers": [
-        1,
-        2,
-        3
-      ],
-      "literacy_pillars": [
-        "Orthography"
-      ],
-      "evidence_level": "none",
-      "url": ""
-    },
-    {
-      "item_id": "INT-036",
-      "name": "WordGen Elementary",
-      "grade_range": {
-        "start": "4",
-        "end": "5"
-      },
-      "program": "English",
-      "tiers": [
-        1
-      ],
-      "literacy_pillars": [
-        "Vocabulary"
-      ],
-      "evidence_level": "**",
-      "url": "https://www.serpinstitute.org/wordgen-elementary"
-    },
-    {
-      "item_id": "INT-037",
-      "name": "WordGen Weekly",
-      "grade_range": {
-        "start": "6",
-        "end": "8"
-      },
-      "program": "English",
-      "tiers": [
-        1
-      ],
-      "literacy_pillars": [
-        "Vocabulary"
-      ],
-      "evidence_level": "**",
-      "url": "https://www.serpinstitute.org/wordgen-weekly"
-    }
-  ],
-  "assessments": [
-    {
-      "item_id": "ASSESS-001",
-      "item_type": "Assessment",
-      "name": "CC3 & LeNS",
-      "grade_range": {
-        "start": "K",
-        "end": "3"
-      },
-      "program": "English",
-      "literacy_pillar": "Alphabetic Principle",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "(SharePoint)",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle"
-      ]
-    },
-    {
-      "item_id": "ASSESS-002",
-      "item_type": "Assessment",
-      "name": "CORE Phonics Survey",
-      "grade_range": {
-        "start": "K",
-        "end": "12"
-      },
-      "program": "English",
-      "literacy_pillar": "Phonics",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "(SharePoint)",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Phonics"
-      ]
-    },
-    {
-      "item_id": "ASSESS-003",
-      "item_type": "Assessment",
-      "name": "French CORE Phonics Assessment",
-      "grade_range": {
-        "start": "K",
-        "end": "12"
-      },
-      "program": "French Immersion",
-      "literacy_pillar": "Phonics",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "(SharePoint)",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Phonics"
-      ]
-    },
-    {
-      "item_id": "ASSESS-004",
-      "item_type": "Assessment",
-      "name": "Gallistel-Ellis (Reading)",
-      "grade_range": {
-        "start": "K",
-        "end": "2"
-      },
-      "program": "English",
-      "literacy_pillar": "Alphabetic Principle",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "(SharePoint)",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle"
-      ]
-    },
-    {
-      "item_id": "ASSESS-005",
-      "item_type": "Assessment",
-      "name": "Heggerty -- Letter Name Sounds",
-      "grade_range": {
-        "start": "3",
-        "end": "8"
-      },
-      "program": "English",
-      "literacy_pillar": "Alphabetic Principle",
-      "evidence_level": "**",
-      "assessment_type": "Diagnostic",
-      "url": "(SharePoint)",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle"
-      ]
-    },
-    {
-      "item_id": "ASSESS-006",
-      "item_type": "Assessment",
-      "name": "Identification du nom et du son des lettres de l'alphabet",
-      "grade_range": {
-        "start": "M",
-        "end": "2"
-      },
-      "program": "French Immersion",
-      "literacy_pillar": "Alphabetic Principle",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "(SharePoint)",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle"
-      ]
-    },
-    {
-      "item_id": "ASSESS-007",
-      "item_type": "Assessment",
-      "name": "Letter Identification Assessment",
-      "grade_range": {
-        "start": "K",
-        "end": "2"
-      },
-      "program": "English",
-      "literacy_pillar": "Alphabetic Principle",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "(SharePoint)",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle"
-      ]
-    },
-    {
-      "item_id": "ASSESS-008",
-      "item_type": "Assessment",
-      "name": "Quick Phonics Screener",
-      "grade_range": {
-        "start": "K",
-        "end": "12"
-      },
-      "program": "English",
-      "literacy_pillar": "Phonics",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "(SharePoint)",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Phonics"
-      ]
-    },
-    {
-      "item_id": "ASSESS-009",
-      "item_type": "Assessment",
-      "name": "Really Great Reading -- DAER",
-      "grade_range": {
-        "start": "K",
-        "end": "K"
-      },
-      "program": "English",
-      "literacy_pillar": "Alphabetic Principle",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle"
-      ]
-    },
-    {
-      "item_id": "ASSESS-010",
-      "item_type": "Assessment",
-      "name": "Really Great Reading -- DAEES",
-      "grade_range": {
-        "start": "1",
-        "end": "1"
-      },
-      "program": "English",
-      "literacy_pillar": "Alphabetic Principle",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Alphabetic Principle"
-      ]
-    },
-    {
-      "item_id": "ASSESS-011",
-      "item_type": "Assessment",
-      "name": "Lindamood Phoneme Sequencing (Assessment)",
-      "grade_range": {
-        "start": "K",
-        "end": "3"
-      },
-      "program": "English",
-      "literacy_pillar": "Phonemic Awareness",
-      "evidence_level": "**",
-      "assessment_type": "Diagnostic",
-      "url": "https://lindamoodbell.com/program/lindamood-phoneme-sequencing-program",
-      "tiers": [
-        3
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness"
-      ]
-    },
-    {
-      "item_id": "ASSESS-012",
-      "item_type": "Assessment",
-      "name": "Lindamood Bell's Seeing Stars (Assessment)",
-      "grade_range": {
-        "start": "2",
-        "end": "12"
-      },
-      "program": "English",
-      "literacy_pillar": "Orthography",
-      "evidence_level": "none",
-      "assessment_type": "Diagnostic",
-      "url": "https://lindamoodbell.com/program/seeing-stars-program",
-      "tiers": [
-        3
-      ],
-      "literacy_pillars": [
-        "Orthography"
-      ]
-    },
-    {
-      "item_id": "ASSESS-013",
-      "item_type": "Assessment",
-      "name": "Barton Reading and Spelling (Assessment)",
-      "grade_range": {
-        "start": "3",
-        "end": "12"
-      },
-      "program": "English",
-      "literacy_pillar": "Orthography",
-      "evidence_level": "**",
-      "assessment_type": "Diagnostic",
-      "url": "https://bartonreading.com/",
-      "tiers": [
-        3
-      ],
-      "literacy_pillars": [
-        "Orthography"
-      ]
-    },
-    {
-      "item_id": "ASSESS-014",
-      "item_type": "Assessment",
-      "name": "Kilpatrick -- Phonemic Awareness Battery",
-      "grade_range": {
-        "start": "K",
-        "end": "2"
-      },
-      "program": "English",
-      "literacy_pillar": "Phonemic Awareness",
-      "evidence_level": "**",
-      "assessment_type": "Diagnostic",
-      "url": "",
-      "tiers": [
-        3
-      ],
-      "literacy_pillars": [
-        "Phonemic Awareness"
-      ]
-    },
-    {
-      "item_id": "ASSESS-015",
-      "item_type": "Assessment",
-      "name": "SRA Reading Inventory",
-      "grade_range": {
-        "start": "K",
-        "end": "6"
-      },
-      "program": "English",
-      "literacy_pillar": "Reading Fluency",
-      "evidence_level": "*",
-      "assessment_type": "Diagnostic",
-      "url": "(Nelson)",
-      "tiers": [
-        2
-      ],
-      "literacy_pillars": [
-        "Reading Fluency"
-      ]
-    }
-  ],
-  "literacy_pillars": [
-    {
-      "id": 1,
       "name": "Alphabetic Principle",
+      "name_fr": "Le principe alphabétique",
       "definition": "Understanding that letters represent sounds and that letter combinations follow patterns and rules."
     },
     {
-      "id": 2,
       "name": "Phonemic Awareness",
+      "name_fr": "La conscience phonémique",
       "definition": "The ability to hear, identify, and manipulate individual phonemes (sounds) in spoken words, without visual support."
     },
     {
-      "id": 3,
       "name": "Phonics",
+      "name_fr": "La phonétique",
       "definition": "The relationship between letters and sounds; the ability to use letter-sound correspondences to decode written words (decoding) and to spell words (encoding)."
     },
     {
-      "id": 4,
       "name": "Reading Fluency",
+      "name_fr": "La fluidité de lecture",
       "definition": "Speed, accuracy, and prosody (expression) in oral and silent reading of connected text, reflecting automaticity in word recognition."
     },
     {
-      "id": 5,
       "name": "Vocabulary",
+      "name_fr": "Le vocabulaire",
       "definition": "Understanding and using word meanings, both receptive (understanding words heard or read) and expressive (using words in speaking and writing)."
     },
     {
-      "id": 6,
       "name": "Reading Comprehension",
+      "name_fr": "La compréhension de lecture",
       "definition": "Understanding and deriving meaning from written text, integrating visual symbols, phonological codes, orthographic patterns, word meanings, grammar, and discourse structure."
     },
     {
-      "id": 7,
       "name": "Orthography",
+      "name_fr": "L’orthographe",
       "definition": "Spelling and the structure/patterns of written words, including conventions of written language and the ability to recognize and produce correctly spelled words."
+    }
+  ],
+  "resourceTypes": [
+    {
+      "name": "Instructional Resource",
+      "name_fr": "Ressource pour l’enseignement"
+    },
+    {
+      "name": "Drill Down Assessment",
+      "name_fr": "Évaluation approfondie"
+    },
+    {
+      "name": "Intervention",
+      "name_fr": "Ressource pour les interventions"
+    }
+  ],
+  "resources": [
+    {
+      "id": "RES-0001",
+      "name": "Abracadabra",
+      "program": "English",
+      "gradeRangeText": "(1-2)",
+      "gradeFilter": [
+        "1",
+        "2"
+      ],
+      "url": "https://literacy.concordia.ca/resources/abra/teacher/en/",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Letter Naming Fluency"
+          ],
+          "notes": "MLL"
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Phonemic Segmentation Fluency",
+            "Blending",
+            "Elision"
+          ],
+          "notes": "MLL"
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonics",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency"
+          ],
+          "notes": "MLL"
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Fluency",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct"
+          ],
+          "notes": "MLL"
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Maze"
+          ],
+          "notes": "MLL"
+        },
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": "MLL"
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": "MLL"
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": "MLL"
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": "MLL"
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": "MLL"
+        }
+      ]
+    },
+    {
+      "id": "RES-0002",
+      "name": "UFLI Manual",
+      "program": "English",
+      "gradeRangeText": "(K-2); (FI 2-3)",
+      "gradeFilter": [
+        "K",
+        "1",
+        "2",
+        "FI 2",
+        "FI 3"
+      ],
+      "url": "https://ufli.education.ufl.edu/foundations-materials/",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Letter Naming Fluency"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonics",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Fluency",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Maze"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0003",
+      "name": "Orton-Gilingham",
+      "program": "English",
+      "gradeRangeText": "(K-2)",
+      "gradeFilter": [
+        "K",
+        "1",
+        "2"
+      ],
+      "url": "https://www.ortonacademy.org/",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Letter Naming Fluency"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonics",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Fluency",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Maze"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Orthography",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Orthography",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Orthography",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0004",
+      "name": "Heggerty",
+      "program": "English",
+      "gradeRangeText": "(K-2)",
+      "gradeFilter": [
+        "K",
+        "1",
+        "2"
+      ],
+      "url": "https://heggerty.org/",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Phonemic Segmentation Fluency",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0005",
+      "name": "Kilpatrick – Equipped for Reading Success",
+      "program": "English",
+      "gradeRangeText": "(K-2)",
+      "gradeFilter": [
+        "K",
+        "1",
+        "2"
+      ],
+      "url": "https://equippedforreadingsuccess.com/",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Phonemic Segmentation Fluency",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0006",
+      "name": "Word Origins",
+      "program": "English",
+      "gradeRangeText": "(3-5)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Vocabulary",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "DIBELS"
+          ],
+          "subtests": [
+            "Maze"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Orthography",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0007",
+      "name": "Handwriting without Tears",
+      "program": "English",
+      "gradeRangeText": "(K-1)",
+      "gradeFilter": [
+        "K",
+        "1"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Orthography",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Orthography",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0008",
+      "name": "UFLI Manual",
+      "program": "English",
+      "gradeRangeText": "(K-2)",
+      "gradeFilter": [
+        "K",
+        "1",
+        "2"
+      ],
+      "url": "https://ufli.education.ufl.edu/foundations-materials/",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Orthography",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Orthography",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0009",
+      "name": "Heggerty – Letter Name Sounds",
+      "program": "English",
+      "gradeRangeText": "(3-8)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FStructured%20Literacy%2FAssessments%20%26%20Interventions%2FPhonological%20Awareness%2FHeggerty%20Assessments%2FLetter%2DNames%2DSounds%2DAssessment%2E2020%2D1%2Epdf&parent=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FStructured%20Literacy%2FAssessments%20%26%20Interventions%2FPhonological%20Awareness%2FHeggerty%20Assessments",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0010",
+      "name": "CORE Phonics Survey",
+      "program": "English",
+      "gradeRangeText": "(K-12)",
+      "gradeFilter": [
+        "K",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FStructured%20Literacy%2FAssessments%20%26%20Interventions%2FPhonics%2FOther%20Phonics%20Assessments%2FCORE%20Phonics%20Survey%2Epdf&parent=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FStructured%20Literacy%2FAssessments%20%26%20Interventions%2FPhonics%2FOther%20Phonics%20Assessments",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0011",
+      "name": "Quick Phonics Screener",
+      "program": "English",
+      "gradeRangeText": "(K-12)",
+      "gradeFilter": [
+        "K",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?csf=1&web=1&e=zM0Vr5&CID=09cccb99%2D754e%2D4539%2Dbacd%2D63499595c8ed&FolderCTID=0x012000F20499129962D74E9046ECDF35332B03&id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FStructured%20Literacy%2FAssessments%20%26%20Interventions%2FPhonics%2FOther%20Phonics%20Assessments%2FQuick%20Phonics%20Screener%2Epdf&viewid=46f2e15a%2D621a%2D4c2d%2Da473%2D2d8c27980932&parent=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FStructured%20Literacy%2FAssessments%20%26%20Interventions%2FPhonics%2FOther%20Phonics%20Assessments",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0012",
+      "name": "SRA Early Interventions in Reading",
+      "program": "English",
+      "gradeRangeText": "(K-3)",
+      "gradeFilter": [
+        "K",
+        "1",
+        "2",
+        "3"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0013",
+      "name": "Kilpatrick PAST Assessment",
+      "program": "English",
+      "gradeRangeText": "(3-12)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?newTargetListUrl=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy&viewpath=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FForms%2FAllItems%2Easpx&id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FStructured%20Literacy%2FAssessments%20%26%20Interventions%2FPhonological%20Awareness%2FKilpatrick%20Assessment&viewid=46f2e15a%2D621a%2D4c2d%2Da473%2D2d8c27980932",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0014",
+      "name": "Heggerty – Phonemic Awareness Screener",
+      "program": "English",
+      "gradeRangeText": "(3-12)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FStructured%20Literacy%2FAssessments%20%26%20Interventions%2FPhonological%20Awareness%2FHeggerty%20Assessments%2FPA%2DScreener%2E2020%2Epdf&parent=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FStructured%20Literacy%2FAssessments%20%26%20Interventions%2FPhonological%20Awareness%2FHeggerty%20Assessments",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0015",
+      "name": "Lexia Core 5",
+      "program": "English",
+      "gradeRangeText": "(2-5)",
+      "gradeFilter": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Vocabulary",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0016",
+      "name": "Kilpatrick – Equipped for Reading Success",
+      "program": "English",
+      "gradeRangeText": "(3-12)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "https://equippedforreadingsuccess.com/",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0017",
+      "name": "Heggerty – Bridge The Gap",
+      "program": "English",
+      "gradeRangeText": "(2-12)",
+      "gradeFilter": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "https://shop.heggerty.org/shop-products/?_topic_category_facet=phonemic-awareness-intervention",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0018",
+      "name": "Words Their Way Inventory",
+      "program": "English",
+      "gradeRangeText": "",
+      "gradeFilter": [],
+      "url": "https://lrsdcdn.sharepoint.com/:f:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Structured%20Literacy/Assessments%20%26%20Interventions/Phonics/Words%20Their%20Way%20Inventories?csf=1&web=1&e=bKahaI",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0019",
+      "name": "UFLI Placement Assessment",
+      "program": "English",
+      "gradeRangeText": "",
+      "gradeFilter": [],
+      "url": "https://lrsdcdn.sharepoint.com/:b:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Structured%20Literacy/Assessments%20%26%20Interventions/Phonics/UFLI%20Placement%20Assessment.pdf?csf=1&web=1&e=x8NIof",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0020",
+      "name": "Lexia PowerUp",
+      "program": "English",
+      "gradeRangeText": "(6-12)",
+      "gradeFilter": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Vocabulary",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0021",
+      "name": "SRA Corrective Reading",
+      "program": "English",
+      "gradeRangeText": "(3-12)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Vocabulary",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Vocabulary",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0022",
+      "name": "Word Connections",
+      "program": "English",
+      "gradeRangeText": "(3-8)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/:f:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Structured%20Literacy/Phonics/Middle%20Years%20Phonics%20Resources/Word%20Connections?csf=1&web=1&e=qZBz6e",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Vocabulary",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0023",
+      "name": "Rewards",
+      "program": "English",
+      "gradeRangeText": "(4-12)",
+      "gradeFilter": [
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Vocabulary",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0024",
+      "name": "DIBELS Oral Reading Fluency Progress Monitoring",
+      "program": "English",
+      "gradeRangeText": "(2-8)",
+      "gradeFilter": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/:f:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/LRSD%20Literacy%20Assessments/DIBELS%20-%20English/Progress%20Monitoring?csf=1&web=1&e=RMQG7y",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Reading Fluency",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0025",
+      "name": "DIBELS Maze Progress Monitoring",
+      "program": "English",
+      "gradeRangeText": "(2-8)",
+      "gradeFilter": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?csf=1&web=1&e=RMQG7y&CID=2b4cc833%2D6eee%2D4304%2D8025%2D610cfaf221e3&FolderCTID=0x012000F20499129962D74E9046ECDF35332B03&id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FLRSD%20Literacy%20Assessments%2FDIBELS%20%2D%20English%2FProgress%20Monitoring",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 3,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0026",
+      "name": "Word Origins",
+      "program": "English",
+      "gradeRangeText": "(3-8)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Orthography",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0027",
+      "name": "Handwriting without Tears",
+      "program": "English",
+      "gradeRangeText": "(2-12)",
+      "gradeFilter": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 3,
+          "pillar": "Orthography",
+          "resourceType": "Intervention",
+          "screeners": [
+            "DIBELS",
+            "CTOPP-2"
+          ],
+          "subtests": [
+            "Letter Naming Fluency",
+            "Phonemic Segmentation Fluency",
+            "Nonsense Word Fluency: Correct Letter Sounds",
+            "Nonsense Word Fluency: Words Read Correctly",
+            "Word Reading Fluency",
+            "Oral Reading Fluency: Accuracy",
+            "Oral Reading Fluency: Words Correct",
+            "Maze",
+            "Blending",
+            "Elision"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0028",
+      "name": "Abracadabra",
+      "program": "French Immersion",
+      "gradeRangeText": "(1-2)",
+      "gradeFilter": [
+        "1",
+        "2"
+      ],
+      "url": "https://literacy.concordia.ca/resources/abra/teacher/fr/index.php",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": "MLL"
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonics",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Fluency",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": "MLL"
+        }
+      ]
+    },
+    {
+      "id": "RES-0029",
+      "name": "Page par page",
+      "program": "French Immersion",
+      "gradeRangeText": "(M-1)",
+      "gradeFilter": [
+        "M",
+        "1"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/:f:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Litt%C3%A9ratie%20structur%C3%A9e/La%20phon%C3%A9tique/Page%20par%20page?csf=1&web=1&e=6IK20Z",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonics",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Fluency",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Vocabulary",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Orthography",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0030",
+      "name": "Les leçons du CBE",
+      "program": "French Immersion",
+      "gradeRangeText": "(M-6)",
+      "gradeFilter": [
+        "M",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/:f:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Litt%C3%A9ratie%20structur%C3%A9e/La%20phon%C3%A9tique/Le%C3%A7ons%20du%20CBE%20M-7e%20ann%C3%A9e?csf=1&web=1&e=jb0IaL",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonics",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Fluency",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Vocabulary",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Orthography",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0031",
+      "name": "Son au graphe",
+      "program": "French Immersion",
+      "gradeRangeText": "(M-2)",
+      "gradeFilter": [
+        "M",
+        "1",
+        "2"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/:f:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Litt%C3%A9ratie%20structur%C3%A9e/La%20phon%C3%A9tique/Son%20au%20Graphe%20(UFLI%20fran%C3%A7ais)?csf=1&web=1&e=xGgV6H",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonics",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Fluency",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Vocabulary",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Orthography",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0032",
+      "name": "Alec",
+      "program": "French Immersion",
+      "gradeRangeText": "(M-5)",
+      "gradeFilter": [
+        "M",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "url": "https://fr.alec-edu.com/",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 1,
+          "pillar": "Phonics",
+          "resourceType": "Instructional Resource",
+          "screeners": [
+            "THaFoL"
+          ],
+          "subtests": [
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0033",
+      "name": "Phonémique version 1",
+      "program": "French Immersion",
+      "gradeRangeText": "",
+      "gradeFilter": [],
+      "url": "https://lrsdcdn.sharepoint.com/:b:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Litt%C3%A9ratie%20structur%C3%A9e/La%20conscience%20phonologique/Pratique%20Phon%C3%A9mique%20-%20version%201.pdf?csf=1&web=1&e=GVZhpR",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0034",
+      "name": "Phonémique version 2",
+      "program": "French Immersion",
+      "gradeRangeText": "",
+      "gradeFilter": [],
+      "url": "https://lrsdcdn.sharepoint.com/:b:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Litt%C3%A9ratie%20structur%C3%A9e/La%20conscience%20phonologique/Pratique%20Phon%C3%A9mique%20-%20r%C3%A9vis%C3%A9.pdf?csf=1&web=1&e=uYTyKd",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0035",
+      "name": "Kilpatrick – activités 1 minute",
+      "program": "French Immersion",
+      "gradeRangeText": "",
+      "gradeFilter": [],
+      "url": "https://lrsdcdn.sharepoint.com/:b:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Litt%C3%A9ratie%20structur%C3%A9e/La%20conscience%20phonologique/Kilpatrick%20-%20Activit%C3%A9s%20d%27une%20minute%20en%20fran%C3%A7ais.pdf?csf=1&web=1&e=qEKdG8",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0036",
+      "name": "Handwriting Without Tears - français",
+      "program": "French Immersion",
+      "gradeRangeText": "(M-1)",
+      "gradeFilter": [
+        "M",
+        "1"
+      ],
+      "url": "",
+      "tags": [
+        {
+          "tier": 1,
+          "pillar": "Orthography",
+          "resourceType": "Instructional Resource",
+          "screeners": [],
+          "subtests": [],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0037",
+      "name": "Éclair",
+      "program": "French Immersion",
+      "gradeRangeText": "",
+      "gradeFilter": [],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?csf=1&web=1&e=AKITHH&CID=a28657b0%2D63a1%2D482e%2Db4ba%2Dbbf7e907d7d7&FolderCTID=0x012000F20499129962D74E9046ECDF35332B03&id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FLitt%C3%A9ratie%20structur%C3%A9e%2FLes%20%C3%A9valuations%20et%20les%20interventions%2F%C3%89clair",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonemic Awareness",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0038",
+      "name": "Core Phonics Assessment - version française",
+      "program": "French Immersion",
+      "gradeRangeText": "",
+      "gradeFilter": [],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FLitt%C3%A9ratie%20structur%C3%A9e%2FLes%20%C3%A9valuations%20et%20les%20interventions%2FPhon%C3%A9tique%2FFrench%20CORE%20phonics%20Assessment%2Epdf&parent=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FLitt%C3%A9ratie%20structur%C3%A9e%2FLes%20%C3%A9valuations%20et%20les%20interventions%2FPhon%C3%A9tique",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0039",
+      "name": "Programme d’intervention en lecture et en orthographe",
+      "program": "French Immersion",
+      "gradeRangeText": "(M-3)",
+      "gradeFilter": [
+        "M",
+        "1",
+        "2",
+        "3"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FLitt%C3%A9ratie%20structur%C3%A9e%2FLes%20%C3%A9valuations%20et%20les%20interventions%2FLes%20interventions&viewid=46f2e15a%2D621a%2D4c2d%2Da473%2D2d8c27980932",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Vocabulary",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Orthography",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0040",
+      "name": "Les leçons du CBE",
+      "program": "French Immersion",
+      "gradeRangeText": "(3-12)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/:f:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Litt%C3%A9ratie%20structur%C3%A9e/La%20phon%C3%A9tique/Le%C3%A7ons%20du%20CBE%20M-7e%20ann%C3%A9e?csf=1&web=1&e=jb0IaL",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Vocabulary",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Orthography",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0041",
+      "name": "Son au graphe",
+      "program": "French Immersion",
+      "gradeRangeText": "(3-12)",
+      "gradeFilter": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "url": "https://lrsdcdn.sharepoint.com/:f:/r/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Litt%C3%A9ratie%20structur%C3%A9e/La%20phon%C3%A9tique/Son%20au%20Graphe%20(UFLI%20fran%C3%A7ais)?csf=1&web=1&e=xGgV6H",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Alphabetic Principle",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Fluency",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Vocabulary",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        },
+        {
+          "tier": 2,
+          "pillar": "Orthography",
+          "resourceType": "Intervention",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0042",
+      "name": "Inventaires d’orthographe",
+      "program": "French Immersion",
+      "gradeRangeText": "",
+      "gradeFilter": [],
+      "url": "https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early%20Literacy/Forms/AllItems.aspx?csf=1&web=1&e=kLXR42&CID=c3191924%2D1b8e%2D4da4%2D8ad5%2De76af0854b8b&FolderCTID=0x012000F20499129962D74E9046ECDF35332B03&id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FLitt%C3%A9ratie%20structur%C3%A9e%2FLes%20%C3%A9valuations%20et%20les%20interventions%2FPhon%C3%A9tique%2FInventaire%20d%27orthographe%20M%2D12",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Phonics",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "RES-0043",
+      "name": "Diffit – Produire ses propres textes et questions de compréhension",
+      "program": "French Immersion",
+      "gradeRangeText": "",
+      "gradeFilter": [],
+      "url": "https://web.diffit.me/",
+      "tags": [
+        {
+          "tier": 2,
+          "pillar": "Reading Comprehension",
+          "resourceType": "Drill Down Assessment",
+          "screeners": [
+            "THaFoL",
+            "IDAPEL"
+          ],
+          "subtests": [
+            "Facilité à nommer des lettres",
+            "Facilité à lire des non-mots",
+            "Facilité à lire des mots",
+            "Facilité en lecture orale"
+          ],
+          "notes": "Outil IA"
+        }
+      ]
     }
   ]
 }
