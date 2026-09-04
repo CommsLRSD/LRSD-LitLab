@@ -7183,6 +7183,13 @@ body.step-review-modal-open { overflow: hidden; }
     font-weight: 800;
   }
 
+  /* The tier toggle re-uses the same .tier-tab styling as the standard view,
+     pushed to the right of the tier name/chip so both stay visible together. */
+  .visual-flowchart-tier-tabs {
+    margin-left: auto;
+    margin-bottom: 0;
+  }
+
   .visual-flowchart-toolbar {
     display: flex;
     align-items: center;

@@ -1979,14 +1979,17 @@ function getVisualFlowchartEntries() {
 // and language mini selector, since the underlying panel is made inert while
 // the modal is open and would otherwise be unreachable.
 function renderVisualFlowchartHeaderControlsHtml() {
-    const isHoriz = appState.visualFlowchart?.layoutMode === 'horizontal';
+    // The visual pathway is itself the currently active view whenever this
+    // header renders, so only its button is pressed — layoutMode here just
+    // remembers which view to return to when the user switches away, and
+    // must not be used to mark standard/summary as also selected.
     return `
         <div class="visual-flowchart-header-controls">
             <div class="layout-toggle-group" role="group" aria-label="${escapeHtml(t('fc_view_switcher'))}">
-                <button class="layout-toggle-btn layout-toggle-btn-standard" type="button" onclick="switchVisualFlowchartToLayout('standard')" aria-pressed="${isHoriz ? 'false' : 'true'}" aria-label="${escapeHtml(t('fc_standard_view'))}" title="${escapeHtml(t('fc_standard_view'))}">
+                <button class="layout-toggle-btn layout-toggle-btn-standard" type="button" onclick="switchVisualFlowchartToLayout('standard')" aria-pressed="false" aria-label="${escapeHtml(t('fc_standard_view'))}" title="${escapeHtml(t('fc_standard_view'))}">
                     <svg class="layout-toggle-icon layout-toggle-icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
                 </button>
-                <button class="layout-toggle-btn layout-toggle-btn-summary" type="button" onclick="switchVisualFlowchartToLayout('horizontal')" aria-pressed="${isHoriz ? 'true' : 'false'}" aria-label="${escapeHtml(t('fc_summary_view'))}" title="${escapeHtml(t('fc_summary_view'))}">
+                <button class="layout-toggle-btn layout-toggle-btn-summary" type="button" onclick="switchVisualFlowchartToLayout('horizontal')" aria-pressed="false" aria-label="${escapeHtml(t('fc_summary_view'))}" title="${escapeHtml(t('fc_summary_view'))}">
                     <svg class="layout-toggle-icon layout-toggle-icon-summary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><rect x="2" y="7" width="5" height="10" rx="1"/><rect x="9.5" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="5" height="10" rx="1"/></svg>
                 </button>
                 <button class="layout-toggle-btn layout-toggle-btn-visual" type="button" aria-pressed="true" aria-label="${escapeHtml(t('fc_visual_view'))}" title="${escapeHtml(t('fc_visual_view'))}">
@@ -2185,11 +2188,14 @@ function updateVisualFlowchartFullscreenBtn() {
 }
 
 // Show the current tier ("Tier ONE: Universal Classroom") in a bar at the top of
-// the visual pathway so the tier context is always visible.
+// the visual pathway so the tier context is always visible, along with the
+// same Tier Toggle available on the standard/summary "Your Decisions" views
+// so the tier can be switched without leaving the visual pathway.
 function updateVisualFlowchartTierBar() {
     const bar = document.getElementById('visual-flowchart-tier-bar');
     if (!bar) return;
-    const tierDef = getFlowchartDefs()[appState.visualFlowchart?.tierId];
+    const tierId = appState.visualFlowchart?.tierId;
+    const tierDef = getFlowchartDefs()[tierId];
     if (!tierDef || !tierDef.title) {
         bar.hidden = true;
         bar.innerHTML = '';
@@ -2200,7 +2206,18 @@ function updateVisualFlowchartTierBar() {
     const tierName = getTierName(tierDef.title);
     bar.innerHTML = `
         <span class="visual-flowchart-tier-bar-chip">${escapeHtml(tierLabel)}</span>
-        <span class="visual-flowchart-tier-bar-name">${escapeHtml(tierName)}</span>`;
+        <span class="visual-flowchart-tier-bar-name">${escapeHtml(tierName)}</span>
+        <div class="tier-tabs visual-flowchart-tier-tabs">
+            <button class="tier-tab ${tierId === 'tier1' ? 'active' : ''}" onclick="switchToTier('tier1')" data-tier="tier1">
+                <span class="tier-label">${escapeHtml(t('tier1_label'))}</span>
+            </button>
+            <button class="tier-tab ${tierId === 'tier2' ? 'active' : ''}" onclick="switchToTier('tier2')" data-tier="tier2">
+                <span class="tier-label">${escapeHtml(t('tier2_label'))}</span>
+            </button>
+            <button class="tier-tab ${tierId === 'tier3' ? 'active' : ''}" onclick="switchToTier('tier3')" data-tier="tier3">
+                <span class="tier-label">${escapeHtml(t('tier3_label'))}</span>
+            </button>
+        </div>`;
 }
 
 // Collapse every finished tier's steps into a single expandable summary card

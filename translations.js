@@ -114,7 +114,7 @@ const TRANSLATIONS = {
         filter_notes_label: 'Notes',
         filter_screeners_label: 'Screeners',
         fw_choose_pillar_label: 'Literacy Pillar',
-        fw_choose_screener_label: 'Screener (optional)',
+        fw_choose_screener_label: 'Screener',
         fw_context_tier: (n) => `Tier ${n}`,
 
         // ── Assessment schedule section ──
@@ -444,7 +444,7 @@ const TRANSLATIONS = {
         filter_notes_label: 'Remarques',
         filter_screeners_label: 'Outils de dépistage',
         fw_choose_pillar_label: 'Pilier de littératie',
-        fw_choose_screener_label: 'Outil de dépistage (facultatif)',
+        fw_choose_screener_label: 'Outil de dépistage',
         fw_context_tier: (n) => `Niveau ${n}`,
 
         // ── Assessment schedule section ──
