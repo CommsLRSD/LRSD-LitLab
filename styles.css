@@ -6726,13 +6726,22 @@ body.step-review-modal-open { overflow: hidden; }
 .filter-sidebar {
   flex: 0 0 280px;
   width: 280px;
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: var(--space-lg);
   position: sticky;
   top: var(--space-lg);
+  color: var(--text-on-primary);
+}
+
+.filter-sidebar .wizard-title {
+  color: var(--text-on-primary);
+}
+
+.filter-sidebar .filter-group-label {
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .filter-sidebar-header {
@@ -6741,6 +6750,59 @@ body.step-review-modal-open { overflow: hidden; }
   align-items: flex-start;
   gap: var(--space-sm);
   margin-bottom: var(--space-md);
+}
+
+/* Language toggle (English / French) pinned to the top of the sidebar */
+.filter-lang-toggle {
+  display: flex;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.filter-lang-btn {
+  flex: 1;
+  padding: 0.5rem 0.6rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+
+.filter-lang-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-on-primary);
+}
+
+.filter-lang-btn.is-active {
+  background: var(--text-on-primary);
+  color: var(--primary);
+}
+
+/* "Clear Filters" sits at the very bottom of the sidebar, text only */
+.filter-sidebar-footer {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.filter-clear-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.filter-clear-btn:hover {
+  color: var(--text-on-primary);
 }
 
 /* Simple labelled filter fields (pillar / type / language and the optional
@@ -6761,36 +6823,6 @@ body.step-review-modal-open { overflow: hidden; }
 
 .filter-group .styled-select {
   width: 100%;
-}
-
-/* "More filters" disclosure — stays hidden until the three required filters
-   are chosen (JS removes the hidden attribute). */
-.filter-more {
-  border-top: 1px solid var(--border);
-  padding-top: var(--space-sm);
-}
-
-.filter-more > summary {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: var(--space-sm) 0;
-  cursor: pointer;
-  list-style: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--primary);
-}
-
-.filter-more > summary::-webkit-details-marker { display: none; }
-
-.filter-more > summary .material-symbols-rounded {
-  font-size: 18px;
-  transition: transform var(--duration) var(--ease);
-}
-
-.filter-more[open] > summary .material-symbols-rounded {
-  transform: rotate(180deg);
 }
 
 .filter-accordion-item {
@@ -6847,43 +6879,36 @@ body.step-review-modal-open { overflow: hidden; }
   margin-bottom: var(--space-md);
 }
 
-.active-filters-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
 .active-filters-empty {
   font-size: 0.8rem;
   color: var(--text-light);
 }
 
-.active-filter-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0.2rem 0.5rem;
-  border: 1px solid var(--primary-lighter);
-  border-radius: var(--radius-pill);
-  background: var(--primary-faint);
-  color: var(--primary);
+/* Filter tracker: plain text values separated by a vertical bar */
+.active-filter-item {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--text-secondary);
   font-family: inherit;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.active-filter-chip .material-symbols-rounded { font-size: 14px; }
+.active-filter-item-static {
+  cursor: default;
+  color: var(--text-light);
+}
 
-.active-filter-chip-label { font-weight: 600; }
+.active-filter-item:not(.active-filter-item-static):hover {
+  color: var(--primary);
+  text-decoration: line-through;
+}
 
-.active-filter-clear {
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-family: inherit;
-  font-size: 0.75rem;
-  text-decoration: underline;
-  cursor: pointer;
+.active-filter-sep {
+  color: var(--text-light);
+  font-size: 0.85rem;
 }
 
 .sr-only {
@@ -6898,40 +6923,12 @@ body.step-review-modal-open { overflow: hidden; }
   border: 0;
 }
 
-.evidence-sidebar {
-  flex: 0 0 280px;
-  width: 280px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: var(--space-lg);
-  position: sticky;
-  top: var(--space-lg);
-}
-
-/* Evidence definitions now sit under the results instead of beside them */
-.evidence-sidebar.evidence-footnotes {
-  flex: 1 1 auto;
-  width: auto;
-  position: static;
-  margin-top: var(--space-lg);
-}
-
-.evidence-sidebar-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0 0 var(--space-md);
-}
-
 @media (max-width: 900px) {
   .interventions-page-layout {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .evidence-sidebar,
   .filter-sidebar {
     width: 100%;
     flex: 1 1 auto;
