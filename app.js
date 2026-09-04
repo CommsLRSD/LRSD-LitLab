@@ -3135,9 +3135,9 @@ function createIntegratedSelectionNode(nodeData) {
         // opens scoped to this same drilldown if visited right afterwards.
         setRememberedMenuFilters({ tier: tierNum, program: program });
 
-        const context = getFilteredResources({ tier: tierNum, program: program, resourceType: itemType }, null);
-        const pillarOptionsHtml = buildFacetOptionsHtml(distinctSorted(context, 'pillar'), appState.fwState.pillar, translatePillar);
-        const screenerOptionsHtml = buildFacetOptionsHtml(distinctScreeners(context), appState.fwState.screener);
+        const baseState = { tier: tierNum, program: program, resourceType: itemType };
+        const pillarOptionsHtml = buildFacetOptionsHtml(distinctTagValues(baseState, 'pillar'), appState.fwState.pillar, translatePillar);
+        const screenerOptionsHtml = buildFacetOptionsHtml(distinctTagValues({ ...baseState, pillar: appState.fwState.pillar }, 'screener'), appState.fwState.screener);
 
         return `
             <div class="step-header">
@@ -3253,15 +3253,15 @@ function fwOnPillarChange(value) {
     setRememberedMenuFilters({ pillar: value || null });
 
     // Re-narrow the screener options to whatever still matches this pillar.
-    const context = getFilteredResources({
-        tier: appState.fwState.tier,
-        program: appState.fwState.program,
-        resourceType: appState.fwState.resourceType,
-        pillar: appState.fwState.pillar
-    }, 'screener');
     const screenerSel = document.getElementById('fw-screener-select');
     if (screenerSel) {
-        screenerSel.innerHTML = buildFacetOptionsHtml(distinctScreeners(context), appState.fwState.screener);
+        const context = {
+            tier: appState.fwState.tier,
+            program: appState.fwState.program,
+            resourceType: appState.fwState.resourceType,
+            pillar: appState.fwState.pillar
+        };
+        screenerSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(context, 'screener'), appState.fwState.screener);
     }
 
     fwLoadResults();
@@ -3274,7 +3274,8 @@ function fwLoadResults() {
     if (!resultsEl) return;
 
     const { tier, program, resourceType, pillar, screener } = appState.fwState;
-    const filtered = getFilteredResources({ tier, program, resourceType, pillar, screener }, null);
+    const wizardState = { tier, program, resourceType, pillar, screener };
+    const filtered = getFilteredResources(wizardState, null);
 
     if (filtered.length === 0) {
         resultsEl.innerHTML = `<p class="fw-no-results">${escapeHtml(t('fw_no_results'))}</p>`;
@@ -3287,13 +3288,15 @@ function fwLoadResults() {
         <div class="fw-results-list">
             ${filtered.map(item => {
                 const gradeText = item.gradeRangeText || (item.gradeFilter || []).join(', ');
+                const matchingPillars = uniqueSorted(getMatchingTags(item, wizardState, null).map(tg => tg.pillar));
+                const pillarText = matchingPillars.map(translatePillar).join(', ');
                 const linkHtml = item.url
                     ? `<a class="fw-result-link" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" title="${escapeHtml(t('filter_view_resource'))}"><span class="material-symbols-rounded" aria-hidden="true" translate="no">open_in_new</span></a>`
                     : '';
                 return `<div class="fw-result-item" role="button" tabindex="0" onclick="fwSelectItem('${escapeJs(item.id)}', '${escapeJs(item.name)}')" onkeydown="if(event.key==='Enter'||event.key===' '){fwSelectItem('${escapeJs(item.id)}', '${escapeJs(item.name)}')}">
                     <div class="fw-result-info">
                         <div class="fw-result-name">${escapeHtml(item.name)}</div>
-                        <div class="fw-result-meta">${escapeHtml(translatePillar(item.pillar))}${gradeText ? ` • ${escapeHtml(t('fw_grade_prefix'))} ${escapeHtml(gradeText)}` : ''}</div>
+                        <div class="fw-result-meta">${escapeHtml(pillarText)}${gradeText ? ` • ${escapeHtml(t('fw_grade_prefix'))} ${escapeHtml(gradeText)}` : ''}</div>
                     </div>
                     ${linkHtml}
                     <svg class="fw-result-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M9 18l6-6-6-6"/></svg>
@@ -6893,11 +6896,13 @@ document.addEventListener('scroll', () => hideEvidenceLegendTooltip(), true);
 // Interventions Menu — Progressive Filter System
 // ============================================
 // Both the standalone Interventions Menu and the embedded flowchart wizard
-// read from appState.interventionMenuData.resources — one row per resource,
-// tagged with its own tier and program (built from the
-// literacy_resources_*.csv files). Each filter narrows the resource pool;
-// the remaining filter controls only ever offer choices that still match at
-// least one resource.
+// read from appState.interventionMenuData.resources — one entry per unique
+// resource (same name/URL/grade range/program), each carrying a `tags[]`
+// array of every (tier, pillar, resourceType, screeners, subtests, notes)
+// combination it applies to. This avoids duplicating a resource that shows
+// up under several tiers/pillars while still letting every filter narrow
+// correctly. Each filter narrows the resource pool; the remaining filter
+// controls only ever offer choices that still match at least one resource.
 
 const menuState = {
     program: '',
@@ -6918,22 +6923,60 @@ function setRememberedMenuFilters(partial) {
     appState.rememberedMenuFilters = { ...(appState.rememberedMenuFilters || {}), ...partial };
 }
 
+// A single tag matches `state` when every tier/pillar/resourceType/screener
+// filter it defines (other than `excludeField`) is satisfied by that tag.
+function tagMatches(tag, state, excludeField) {
+    if (excludeField !== 'tier' && state.tier && String(tag.tier) !== String(state.tier)) return false;
+    if (excludeField !== 'pillar' && state.pillar && tag.pillar !== state.pillar) return false;
+    if (excludeField !== 'resourceType' && state.resourceType && tag.resourceType !== state.resourceType) return false;
+    if (excludeField !== 'screener' && state.screener && !(tag.screeners || []).includes(state.screener)) return false;
+    return true;
+}
+
+// The subset of a resource's tags that satisfy the current filters.
+function getMatchingTags(item, state, excludeField) {
+    return (item.tags || []).filter(tag => tagMatches(tag, state, excludeField));
+}
+
 // Filter the full resource list by every field in `state` except the one
 // named `excludeField` (used to compute what choices remain for that
-// field's own dropdown).
+// field's own dropdown). A resource matches if at least one of its tags
+// satisfies the tier/pillar/resourceType/screener filters together.
 function getFilteredResources(state, excludeField) {
     return getAllResources().filter(item => {
         if (excludeField !== 'program' && state.program && item.program !== state.program) return false;
-        if (excludeField !== 'tier' && state.tier && String(item.tier) !== String(state.tier)) return false;
-        if (excludeField !== 'pillar' && state.pillar && item.pillar !== state.pillar) return false;
-        if (excludeField !== 'resourceType' && state.resourceType && item.resourceType !== state.resourceType) return false;
-        if (excludeField !== 'screener' && state.screener && !(item.screeners || []).includes(state.screener)) return false;
         if (state.search) {
             const needle = state.search.trim().toLowerCase();
             if (needle && !item.name.toLowerCase().includes(needle)) return false;
         }
-        return true;
+        return getMatchingTags(item, state, excludeField).length > 0;
     });
+}
+
+// Collect every distinct value for one tag-level field (`pillar`,
+// `resourceType`, or `screener`) that still has at least one matching
+// resource once every *other* current filter has been applied.
+function distinctTagValues(state, field) {
+    const values = new Set();
+    getAllResources().forEach(item => {
+        if (state.program && item.program !== state.program) return;
+        if (state.search) {
+            const needle = state.search.trim().toLowerCase();
+            if (needle && !item.name.toLowerCase().includes(needle)) return;
+        }
+        getMatchingTags(item, state, field).forEach(tag => {
+            if (field === 'screener') {
+                (tag.screeners || []).forEach(s => values.add(s));
+            } else if (tag[field]) {
+                values.add(tag[field]);
+            }
+        });
+    });
+    return Array.from(values).sort();
+}
+
+function uniqueSorted(values) {
+    return Array.from(new Set(values.filter(Boolean))).sort();
 }
 
 function translatePillar(pillarName) {
@@ -6948,16 +6991,6 @@ function translateResourceType(typeName) {
     if (appState.language !== 'fr') return typeName;
     const match = (appState.interventionMenuData?.resourceTypes || []).find(rt => rt.name === typeName);
     return match?.name_fr || typeName;
-}
-
-function distinctSorted(items, field) {
-    return Array.from(new Set(items.map(i => i[field]).filter(Boolean))).sort();
-}
-
-function distinctScreeners(items) {
-    const set = new Set();
-    items.forEach(i => (i.screeners || []).forEach(s => set.add(s)));
-    return Array.from(set).sort();
 }
 
 // Build the <option> list for one filter select from the values that remain
@@ -6977,17 +7010,19 @@ function renderMenuFilterOptions() {
     const screenerSel = document.getElementById('filter-screener');
     if (!pillarSel || !typeSel || !screenerSel) return;
 
-    pillarSel.innerHTML = buildFacetOptionsHtml(
-        distinctSorted(getFilteredResources(menuState, 'pillar'), 'pillar'), menuState.pillar, translatePillar);
-    typeSel.innerHTML = buildFacetOptionsHtml(
-        distinctSorted(getFilteredResources(menuState, 'resourceType'), 'resourceType'), menuState.resourceType, translateResourceType);
-    screenerSel.innerHTML = buildFacetOptionsHtml(
-        distinctScreeners(getFilteredResources(menuState, 'screener')), menuState.screener);
+    pillarSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(menuState, 'pillar'), menuState.pillar, translatePillar);
+    typeSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(menuState, 'resourceType'), menuState.resourceType, translateResourceType);
+    screenerSel.innerHTML = buildFacetOptionsHtml(distinctTagValues(menuState, 'screener'), menuState.screener);
 }
 
 function buildResourceCardHtml(item) {
+    const tags = getMatchingTags(item, menuState, null);
     const gradeText = item.gradeRangeText || (item.gradeFilter || []).join(', ');
-    const screenersText = (item.screeners || []).join(', ');
+    const tiers = uniqueSorted(tags.map(tg => tg.tier)).sort((a, b) => a - b);
+    const pillars = uniqueSorted(tags.map(tg => tg.pillar));
+    const types = uniqueSorted(tags.map(tg => tg.resourceType));
+    const screeners = uniqueSorted(tags.flatMap(tg => tg.screeners || []));
+    const notes = uniqueSorted(tags.map(tg => tg.notes));
     const linkHtml = item.url
         ? `<a class="resource-link-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('filter_view_resource'))}<span class="material-symbols-rounded" aria-hidden="true" translate="no">open_in_new</span></a>`
         : `<span class="resource-link-btn resource-link-btn-disabled">${escapeHtml(t('filter_no_link'))}</span>`;
@@ -6997,13 +7032,13 @@ function buildResourceCardHtml(item) {
             <div class="resource-card-main">
                 <div class="resource-card-name">${escapeHtml(item.name)}</div>
                 <div class="result-badges">
-                    <span class="result-badge">${escapeHtml(t('filter_tier_option')(item.tier))}</span>
-                    <span class="result-badge">${escapeHtml(translatePillar(item.pillar))}</span>
-                    <span class="result-badge">${escapeHtml(translateResourceType(item.resourceType))}</span>
+                    ${tiers.map(tier => `<span class="result-badge">${escapeHtml(t('filter_tier_option')(tier))}</span>`).join('')}
+                    ${pillars.map(p => `<span class="result-badge">${escapeHtml(translatePillar(p))}</span>`).join('')}
+                    ${types.map(rt => `<span class="result-badge">${escapeHtml(translateResourceType(rt))}</span>`).join('')}
                     ${gradeText ? `<span class="result-badge">${escapeHtml(gradeText)}</span>` : ''}
                 </div>
-                ${screenersText ? `<div class="resource-card-meta">${escapeHtml(t('filter_screeners_label'))}: ${escapeHtml(screenersText)}</div>` : ''}
-                ${item.notes ? `<div class="resource-card-meta resource-card-notes">${escapeHtml(item.notes)}</div>` : ''}
+                ${screeners.length ? `<div class="resource-card-meta">${escapeHtml(t('filter_screeners_label'))}: ${escapeHtml(screeners.join(', '))}</div>` : ''}
+                ${notes.length ? `<div class="resource-card-meta resource-card-notes">${escapeHtml(notes.join('; '))}</div>` : ''}
             </div>
             ${linkHtml}
         </div>
