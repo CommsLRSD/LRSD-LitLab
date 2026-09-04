@@ -280,83 +280,77 @@
                     <aside class="filter-sidebar" aria-label="Intervention resource filters">
                         <div class="filter-sidebar-header">
                             <h3 class="wizard-title"><span class="material-symbols-rounded" aria-hidden="true" translate="no">tune</span><span data-i18n="wizard_choose_steps">Filter to find resources</span></h3>
-                            <button class="reset-btn-minimal" onclick="restartMenu()"><span class="material-symbols-rounded" aria-hidden="true" translate="no">restart_alt</span><span data-i18n="wizard_start_over">Clear Filters</span></button>
                         </div>
 
-                        <!-- Required first: pillar, resource type, language -->
+                        <!-- Language toggle: English by default, remembered in localStorage -->
+                        <div class="filter-group">
+                            <span class="filter-group-label" id="filter-language-label" data-i18n="filter_language_label">Language</span>
+                            <div class="filter-lang-toggle" role="group" aria-labelledby="filter-language-label">
+                                <button type="button" id="filter-lang-en" class="filter-lang-btn" aria-pressed="true" onclick="setMenuLanguage('English')">English</button>
+                                <button type="button" id="filter-lang-fr" class="filter-lang-btn" aria-pressed="false" onclick="setMenuLanguage('French Immersion')" data-i18n="filter_language_french">French</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-group-label" for="filter-search" data-i18n="filter_search_label">Search</label>
+                            <input type="search" id="filter-search" class="styled-select filter-search-input" data-i18n-placeholder="filter_search_placeholder" placeholder="Search by resource name…" oninput="onMenuFilterChange('search', this.value)">
+                        </div>
+
                         <div class="filter-group">
                             <label class="filter-group-label" for="filter-pillar" data-i18n="filter_pillar_label">Literacy Pillar</label>
                             <select id="filter-pillar" class="styled-select" onchange="onMenuFilterChange('pillar', this.value)">
-                                <option value="" data-i18n="filter_choose_placeholder">Choose…</option>
+                                <option value="" data-i18n="wizard_select_placeholder">All</option>
                             </select>
                         </div>
 
                         <div class="filter-group">
                             <label class="filter-group-label" for="filter-type" data-i18n="filter_type_label">Resource Type</label>
                             <select id="filter-type" class="styled-select" onchange="onMenuFilterChange('resourceType', this.value)">
-                                <option value="" data-i18n="filter_choose_placeholder">Choose…</option>
+                                <option value="" data-i18n="wizard_select_placeholder">All</option>
                             </select>
                         </div>
 
                         <div class="filter-group">
-                            <label class="filter-group-label" for="filter-program" data-i18n="filter_language_label">Language</label>
-                            <select id="filter-program" class="styled-select" onchange="onMenuFilterChange('program', this.value)">
-                                <option value="" data-i18n="filter_choose_placeholder">Choose…</option>
-                                <option value="English">English</option>
-                                <option value="French Immersion" data-i18n="filter_language_french">French</option>
+                            <label class="filter-group-label" for="filter-screener" data-i18n="filter_screener_label">Screener</label>
+                            <select id="filter-screener" class="styled-select" onchange="onMenuFilterChange('screener', this.value)">
+                                <option value="" data-i18n="wizard_select_placeholder">All</option>
                             </select>
                         </div>
 
-                        <!-- Optional refinements, hidden until the required three are set -->
-                        <details id="filter-more" class="filter-more" hidden>
-                            <summary>
-                                <span class="material-symbols-rounded" aria-hidden="true" translate="no">expand_more</span>
-                                <span data-i18n="filter_more_label">More filters</span>
-                            </summary>
+                        <div class="filter-group">
+                            <label class="filter-group-label" for="filter-subtest" data-i18n="filter_subtest_label">Subtest</label>
+                            <select id="filter-subtest" class="styled-select" onchange="onMenuFilterChange('subtest', this.value)">
+                                <option value="" data-i18n="wizard_select_placeholder">All</option>
+                            </select>
+                        </div>
 
-                            <div class="filter-group">
-                                <label class="filter-group-label" for="filter-screener" data-i18n="filter_screener_label">Screener</label>
-                                <select id="filter-screener" class="styled-select" onchange="onMenuFilterChange('screener', this.value)">
-                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
-                                </select>
-                            </div>
+                        <div class="filter-group">
+                            <label class="filter-group-label" for="filter-tier" data-i18n="filter_tier_label">Tier</label>
+                            <select id="filter-tier" class="styled-select" onchange="onMenuFilterChange('tier', this.value)">
+                                <option value="" data-i18n="wizard_select_placeholder">All</option>
+                                <option value="1">Tier 1</option>
+                                <option value="2">Tier 2</option>
+                                <option value="3">Tier 3</option>
+                            </select>
+                        </div>
 
-                            <div class="filter-group">
-                                <label class="filter-group-label" for="filter-subtest" data-i18n="filter_subtest_label">Subtest</label>
-                                <select id="filter-subtest" class="styled-select" onchange="onMenuFilterChange('subtest', this.value)">
-                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
-                                </select>
-                            </div>
+                        <div class="filter-group">
+                            <label class="filter-group-label" for="filter-grade" data-i18n="filter_grade_label">Grade Level</label>
+                            <select id="filter-grade" class="styled-select" onchange="onMenuFilterChange('grade', this.value)">
+                                <option value="" data-i18n="wizard_select_placeholder">All</option>
+                            </select>
+                        </div>
 
-                            <div class="filter-group">
-                                <label class="filter-group-label" for="filter-tier" data-i18n="filter_tier_label">Tier</label>
-                                <select id="filter-tier" class="styled-select" onchange="onMenuFilterChange('tier', this.value)">
-                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
-                                    <option value="1">Tier 1</option>
-                                    <option value="2">Tier 2</option>
-                                    <option value="3">Tier 3</option>
-                                </select>
-                            </div>
+                        <div class="filter-group">
+                            <label class="filter-group-label" for="filter-evidence" data-i18n="filter_evidence_label">Evidence Classification</label>
+                            <select id="filter-evidence" class="styled-select" onchange="onMenuFilterChange('evidence', this.value)">
+                                <option value="" data-i18n="wizard_select_placeholder">All</option>
+                            </select>
+                        </div>
 
-                            <div class="filter-group">
-                                <label class="filter-group-label" for="filter-grade" data-i18n="filter_grade_label">Grade Level</label>
-                                <select id="filter-grade" class="styled-select" onchange="onMenuFilterChange('grade', this.value)">
-                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
-                                </select>
-                            </div>
-
-                            <div class="filter-group">
-                                <label class="filter-group-label" for="filter-evidence" data-i18n="filter_evidence_label">Evidence Classification</label>
-                                <select id="filter-evidence" class="styled-select" onchange="onMenuFilterChange('evidence', this.value)">
-                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
-                                </select>
-                            </div>
-
-                            <div class="filter-group">
-                                <label class="filter-group-label" for="filter-search" data-i18n="filter_search_label">Search</label>
-                                <input type="search" id="filter-search" class="styled-select filter-search-input" data-i18n-placeholder="filter_search_placeholder" placeholder="Search by resource name…" oninput="onMenuFilterChange('search', this.value)">
-                            </div>
-                        </details>
+                        <div class="filter-sidebar-footer">
+                            <button type="button" class="filter-clear-btn" onclick="restartMenu()" data-i18n="wizard_start_over">Clear Filters</button>
+                        </div>
                     </aside><!-- /.filter-sidebar -->
 
                     <div id="dropdown-results" class="dropdown-results interventions-results-panel">
@@ -369,17 +363,6 @@
 
                     </div><!-- /.interventions-page-layout -->
 
-                    <aside class="evidence-sidebar evidence-footnotes" aria-label="Evidence and research based definitions">
-                        <h3 class="evidence-sidebar-title" data-i18n="evidence_sidebar_title">Evidence &amp; Research Definitions</h3>
-                        <div class="evidence-definition-block">
-                            <strong data-i18n="evidence_eb_title">* Evidence Based: Most rigorous and trusted</strong>
-                            <p data-i18n="evidence_eb_desc">Definition: The program or practice has been tested through high-quality peer reviewed research (often randomized controlled trials or quasi-experimental studies) and has demonstrated statistically significant positive outcomes.</p>
-                        </div>
-                        <div class="evidence-definition-block">
-                            <strong data-i18n="evidence_rb_title">** Research Based: Less rigorous than evidence-based</strong>
-                            <p data-i18n="evidence_rb_desc">Definition: The program is based on sound theories or methods that have been validated by some research, but the program itself may not have been directly studied for evidence of its effectiveness.</p>
-                        </div>
-                    </aside>
                 </div><!-- /.interventions-page-body -->
             </div><!-- /.interventions-page-wrapper -->
         </section>

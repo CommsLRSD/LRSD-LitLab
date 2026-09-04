@@ -91,7 +91,6 @@ const TRANSLATIONS = {
         filter_language_french: 'French',
         filter_tier_label: 'Tier',
         filter_grade_label: 'Grade Level',
-        filter_active_label: 'Filters:',
         filter_active_none: 'No filters applied — showing all resources.',
         filter_remove_filter: 'Remove this filter',
         filter_pillar_label: 'Literacy Pillar',
@@ -103,9 +102,6 @@ const TRANSLATIONS = {
         filter_evidence_rb: '** Research Based',
         filter_search_label: 'Search',
         filter_search_placeholder: 'Search by resource name…',
-        filter_choose_placeholder: 'Choose…',
-        filter_more_label: 'More filters',
-        filter_required_prompt: 'Choose a literacy pillar, resource type, and language above to see matching resources.',
         filter_tier_option: (n) => `Tier ${n}`,
         filter_results_label: (n) => `${n} resource${n !== 1 ? 's' : ''}`,
         filter_results_none: 'No resources match the selected filters. Try clearing a filter.',
@@ -333,7 +329,6 @@ const TRANSLATIONS = {
         evidence_rb_desc: 'Definition: The program is based on sound theories or methods that have been validated by some research, but the program itself may not have been directly studied for evidence of its effectiveness.',
         evidence_legend_label: '* Evidence Based / ** Research Based',
         evidence_legend_aria: 'Evidence and research based definitions',
-        evidence_sidebar_title: 'Evidence & Research Definitions',
 
         // ── FW results ──
         fw_no_results: 'No matching items found for the selected criteria.',
@@ -428,7 +423,6 @@ const TRANSLATIONS = {
         filter_language_french: 'Français',
         filter_tier_label: 'Niveau (Tier)',
         filter_grade_label: 'Année scolaire',
-        filter_active_label: 'Filtres :',
         filter_active_none: 'Aucun filtre appliqué — toutes les ressources sont affichées.',
         filter_remove_filter: 'Retirer ce filtre',
         filter_pillar_label: 'Pilier de littératie',
@@ -440,9 +434,6 @@ const TRANSLATIONS = {
         filter_evidence_rb: '** Fondé sur la recherche',
         filter_search_label: 'Rechercher',
         filter_search_placeholder: 'Rechercher par nom de ressource…',
-        filter_choose_placeholder: 'Choisir…',
-        filter_more_label: 'Plus de filtres',
-        filter_required_prompt: 'Choisissez un pilier de littératie, un type de ressource et une langue ci-dessus pour voir les ressources correspondantes.',
         filter_tier_option: (n) => `Niveau ${n}`,
         filter_results_label: (n) => `${n} ressource${n !== 1 ? 's' : ''}`,
         filter_results_none: 'Aucune ressource ne correspond aux filtres sélectionnés. Essayez d\'en retirer un.',
@@ -670,7 +661,6 @@ const TRANSLATIONS = {
         evidence_rb_desc: 'Définition : Le programme est fondé sur des théories ou méthodes solides validées par certaines recherches, mais le programme lui-même n\'a peut-être pas été directement étudié pour des preuves de son efficacité.',
         evidence_legend_label: '* Fondé sur des données probantes / ** Fondé sur la recherche',
         evidence_legend_aria: 'Définitions fondées sur des données probantes et la recherche',
-        evidence_sidebar_title: 'Définitions : données probantes et recherche',
 
         // ── FW results ──
         fw_no_results: 'Aucun élément correspondant aux critères sélectionnés.',

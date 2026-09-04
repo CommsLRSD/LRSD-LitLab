@@ -6976,13 +6976,46 @@ const menuState = {
     search: ''
 };
 
-// The standalone menu stays empty until these three are chosen; everything
-// else (screener, subtest, tier, grade, evidence, search) is optional
-// refinement revealed via "More filters".
-const MENU_REQUIRED_FIELDS = ['pillar', 'resourceType', 'program'];
+// Language (program) is a toggle that always has a value; the last choice is
+// remembered in localStorage so it carries over between visits.
+const MENU_LANGUAGE_KEY = 'litlab-menu-language';
+const MENU_LANGUAGE_DEFAULT = 'English';
+const MENU_LANGUAGE_VALUES = ['English', 'French Immersion'];
 
-function menuHasRequiredFilters() {
-    return MENU_REQUIRED_FIELDS.every(f => String(menuState[f] || '').trim() !== '');
+function getStoredMenuLanguage() {
+    try {
+        const stored = localStorage.getItem(MENU_LANGUAGE_KEY);
+        return MENU_LANGUAGE_VALUES.includes(stored) ? stored : MENU_LANGUAGE_DEFAULT;
+    } catch (e) {
+        // Private browsing modes can throw on localStorage access.
+        return MENU_LANGUAGE_DEFAULT;
+    }
+}
+
+function storeMenuLanguage(value) {
+    try {
+        localStorage.setItem(MENU_LANGUAGE_KEY, value);
+    } catch (e) {
+        // Ignore storage failures — the toggle still works for this session.
+    }
+}
+
+// Language toggle in the filter sidebar.
+function setMenuLanguage(value) {
+    const language = MENU_LANGUAGE_VALUES.includes(value) ? value : MENU_LANGUAGE_DEFAULT;
+    storeMenuLanguage(language);
+    onMenuFilterChange('program', language);
+}
+
+function syncMenuLanguageToggle() {
+    const current = menuState.program || MENU_LANGUAGE_DEFAULT;
+    [['filter-lang-en', 'English'], ['filter-lang-fr', 'French Immersion']].forEach(([id, value]) => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        const active = current === value;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', String(active));
+    });
 }
 
 function getAllResources() {
@@ -7194,7 +7227,7 @@ function buildResourceCardHtml(item) {
 const MENU_FILTER_CHIP_FIELDS = [
     { field: 'pillar', labelKey: 'filter_pillar_label', format: (v) => translatePillar(v) },
     { field: 'resourceType', labelKey: 'filter_type_label', format: (v) => translateResourceType(v) },
-    { field: 'program', labelKey: 'filter_program_label' },
+    { field: 'program', labelKey: 'filter_language_label', format: (v) => (v === 'French Immersion' ? t('filter_language_french') : v) },
     { field: 'screener', labelKey: 'filter_screener_label' },
     { field: 'subtest', labelKey: 'filter_subtest_label' },
     { field: 'tier', labelKey: 'filter_tier_label', format: (v) => t('filter_tier_option')(v) },
@@ -7207,23 +7240,23 @@ function renderActiveFilterChips() {
     const el = document.getElementById('active-filters');
     if (!el) return;
 
-    const chips = MENU_FILTER_CHIP_FIELDS
+    // Plain text of each chosen value (no category labels, no pills),
+    // separated by a vertical bar; clicking one removes that filter.
+    const items = MENU_FILTER_CHIP_FIELDS
         .filter(def => String(menuState[def.field] || '').trim() !== '')
         .map(def => {
             const raw = menuState[def.field];
             const value = def.format ? def.format(raw) : raw;
-            return `
-                <button type="button" class="active-filter-chip" onclick="clearMenuFilter('${escapeAttr(def.field)}')" title="${escapeHtml(t('filter_remove_filter'))}">
-                    <span class="active-filter-chip-label">${escapeHtml(t(def.labelKey))}:</span>
-                    <span class="active-filter-chip-value">${escapeHtml(value)}</span>
-                    <span class="material-symbols-rounded" aria-hidden="true" translate="no">close</span>
-                </button>
-            `;
+            // Language always has a value (it's a toggle), so it is shown but
+            // cannot be removed from here.
+            if (def.field === 'program') {
+                return `<span class="active-filter-item active-filter-item-static">${escapeHtml(value)}</span>`;
+            }
+            return `<button type="button" class="active-filter-item" onclick="clearMenuFilter('${escapeAttr(def.field)}')" title="${escapeHtml(t('filter_remove_filter'))}">${escapeHtml(value)}</button>`;
         });
 
-    el.innerHTML = chips.length
-        ? `<span class="active-filters-label">${escapeHtml(t('filter_active_label'))}</span>${chips.join('')}
-           <button type="button" class="active-filter-clear" onclick="restartMenu()">${escapeHtml(t('wizard_start_over'))}</button>`
+    el.innerHTML = items.length
+        ? items.join('<span class="active-filter-sep" aria-hidden="true">|</span>')
         : `<span class="active-filters-empty">${escapeHtml(t('filter_active_none'))}</span>`;
 }
 
@@ -7254,6 +7287,8 @@ function syncMenuFilterControls() {
         const el = document.getElementById(id);
         if (el) el.value = menuState[field] || '';
     });
+
+    syncMenuLanguageToggle();
 }
 
 function renderMenuResults() {
@@ -7263,14 +7298,6 @@ function renderMenuResults() {
 
     renderActiveFilterChips();
 
-    // Nothing is shown until the three required filters (pillar, resource
-    // type, language) have all been chosen.
-    if (!menuHasRequiredFilters()) {
-        countEl.textContent = '';
-        listEl.innerHTML = `<p class="results-empty results-prompt">${escapeHtml(t('filter_required_prompt'))}</p>`;
-        return;
-    }
-
     const filtered = getFilteredResources(menuState, null);
     countEl.textContent = t('filter_results_label')(filtered.length);
     listEl.innerHTML = filtered.length
@@ -7278,35 +7305,26 @@ function renderMenuResults() {
         : `<p class="results-empty">${escapeHtml(t('filter_results_none'))}</p>`;
 }
 
-// Reveal/hide the "More filters" toggle based on whether the required three
-// have been chosen.
-function syncMoreFiltersVisibility() {
-    const more = document.getElementById('filter-more');
-    if (!more) return;
-    more.hidden = !menuHasRequiredFilters();
-}
-
 // Called whenever the user changes one of the standalone menu's filters.
 function onMenuFilterChange(field, value) {
     menuState[field] = value;
     setRememberedMenuFilters({ [field]: value || null });
+    if (field === 'program') syncMenuLanguageToggle();
     renderMenuFilterOptions();
     renderMenuResults();
-    syncMoreFiltersVisibility();
 }
 
 function resetMenuFilters() {
     Object.keys(menuState).forEach(k => { menuState[k] = ''; });
     appState.rememberedMenuFilters = {};
 
-    const more = document.getElementById('filter-more');
-    if (more) more.removeAttribute('open');
+    // The language toggle always has a value; fall back to the remembered one.
+    menuState.program = getStoredMenuLanguage();
 
     syncMenuFilterControls();
 
     renderMenuFilterOptions();
     renderMenuResults();
-    syncMoreFiltersVisibility();
 }
 
 // "Clear Filters" button in the standalone Interventions Menu.
@@ -7321,7 +7339,7 @@ function applyRememberedFiltersToMenu() {
     const remembered = appState.rememberedMenuFilters || {};
     menuState.pillar = remembered.pillar || '';
     menuState.resourceType = remembered.resourceType || '';
-    menuState.program = remembered.program || appState.selectedProgram || '';
+    menuState.program = remembered.program || appState.selectedProgram || getStoredMenuLanguage();
     menuState.screener = remembered.screener || '';
     menuState.subtest = remembered.subtest || '';
     menuState.tier = remembered.tier ? String(remembered.tier) : '';
@@ -7329,18 +7347,10 @@ function applyRememberedFiltersToMenu() {
     menuState.evidence = remembered.evidence || '';
     menuState.search = '';
 
-    // If any refinement filter carried over, open the "More filters" panel
-    // so the user can see where it came from.
-    const more = document.getElementById('filter-more');
-    if (more && (menuState.screener || menuState.subtest || menuState.tier || menuState.grade || menuState.evidence)) {
-        more.setAttribute('open', '');
-    }
-
     syncMenuFilterControls();
 
     renderMenuFilterOptions();
     renderMenuResults();
-    syncMoreFiltersVisibility();
 }
 
 function initializeInterventionsFilterMenu() {
@@ -7448,6 +7458,7 @@ window.switchVisualFlowchartToLayout = switchVisualFlowchartToLayout;
 // Interventions Menu filter system
 window.onMenuFilterChange = onMenuFilterChange;
 window.clearMenuFilter = clearMenuFilter;
+window.setMenuLanguage = setMenuLanguage;
 window.restartMenu = restartMenu;
 window.initializeInterventionsFilterMenu = initializeInterventionsFilterMenu;
 window.applyRememberedFiltersToMenu = applyRememberedFiltersToMenu;
