@@ -304,6 +304,7 @@ const TRANSLATIONS = {
         tier1_label: 'Tier 1',
         tier2_label: 'Tier 2',
         tier3_label: 'Tier 3',
+        tier_toggle_group_label: 'Tier',
 
         // ── Check all ──
         check_all: 'Check All',
@@ -634,6 +635,7 @@ const TRANSLATIONS = {
         tier1_label: 'Palier 1',
         tier2_label: 'Palier 2',
         tier3_label: 'Palier 3',
+        tier_toggle_group_label: 'Palier',
 
         // ── Check all ──
         check_all: 'Tout cocher',
