@@ -269,54 +269,67 @@
 
                 <div class="interventions-page-body">
                     <div class="interventions-page-layout">
-                    <div class="dropdown-wizard" aria-label="Intervention menu dropdown workflow">
+                    <div class="dropdown-wizard filter-menu" aria-label="Intervention resource filters">
                         <div class="dropdown-wizard-header">
                             <div class="wizard-title-row">
-                                <h3 class="wizard-title"><span class="material-symbols-rounded" aria-hidden="true" translate="no">tune</span><span data-i18n="wizard_choose_steps">Choose each step in order</span></h3>
+                                <h3 class="wizard-title"><span class="material-symbols-rounded" aria-hidden="true" translate="no">tune</span><span data-i18n="wizard_choose_steps">Filter to find resources</span></h3>
+                                <button class="reset-btn-minimal" onclick="restartMenu()"><span class="material-symbols-rounded" aria-hidden="true" translate="no">restart_alt</span><span data-i18n="wizard_start_over">Clear Filters</span></button>
                             </div>
                         </div>
 
                         <div class="dropdown-row">
                             <div class="dropdown-group">
-                                <label for="screener-select" data-i18n="wizard_step1_label">Step 1 · Screener</label>
-                                <select id="screener-select" class="styled-select" onchange="onScreenerDropdownChange(this.value)">
-                                    <option value="">Select...</option>
+                                <label for="filter-program" data-i18n="filter_program_label">Program</label>
+                                <select id="filter-program" class="styled-select" onchange="onMenuFilterChange('program', this.value)">
+                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
+                                    <option value="English">English</option>
+                                    <option value="French Immersion">French Immersion</option>
                                 </select>
                             </div>
                             <div class="dropdown-group">
-                                <label for="subtest-select" data-i18n="wizard_step2_label">Step 2 · Subtest</label>
-                                <select id="subtest-select" class="styled-select" onchange="onSubtestDropdownChange(this.value)" disabled>
-                                    <option value="">Select...</option>
+                                <label for="filter-tier" data-i18n="filter_tier_label">Tier</label>
+                                <select id="filter-tier" class="styled-select" onchange="onMenuFilterChange('tier', this.value)">
+                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
+                                    <option value="1">Tier 1</option>
+                                    <option value="2">Tier 2</option>
+                                    <option value="3">Tier 3</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="dropdown-row">
                             <div class="dropdown-group">
-                                <label for="pillar-select" data-i18n="wizard_step3_label">Step 3 · Pillar</label>
-                                <select id="pillar-select" class="styled-select" onchange="onPillarDropdownChange(this.value)" disabled>
-                                    <option value="">Select...</option>
+                                <label for="filter-pillar" data-i18n="filter_pillar_label">Literacy Pillar</label>
+                                <select id="filter-pillar" class="styled-select" onchange="onMenuFilterChange('pillar', this.value)">
+                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
                                 </select>
                             </div>
                             <div class="dropdown-group">
-                                <label for="type-select" data-i18n="wizard_step4_label">Step 4 · Resource Type</label>
-                                <select id="type-select" class="styled-select" onchange="onTypeDropdownChange(this.value)" disabled>
-                                    <option value="">Select...</option>
-                                    <option value="Intervention">Intervention</option>
-                                    <option value="Assessment">Assessment</option>
+                                <label for="filter-type" data-i18n="filter_type_label">Resource Type</label>
+                                <select id="filter-type" class="styled-select" onchange="onMenuFilterChange('resourceType', this.value)">
+                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div id="dropdown-results" class="dropdown-results" style="display:none;">
+                        <div class="dropdown-row">
+                            <div class="dropdown-group">
+                                <label for="filter-screener" data-i18n="filter_screener_label">Screener</label>
+                                <select id="filter-screener" class="styled-select" onchange="onMenuFilterChange('screener', this.value)">
+                                    <option value="" data-i18n="wizard_select_placeholder">All</option>
+                                </select>
+                            </div>
+                            <div class="dropdown-group">
+                                <label for="filter-search" data-i18n="filter_search_label">Search</label>
+                                <input type="search" id="filter-search" class="styled-select filter-search-input" data-i18n-placeholder="filter_search_placeholder" placeholder="Search by resource name…" oninput="onMenuFilterChange('search', this.value)">
+                            </div>
+                        </div>
+
+                        <div id="dropdown-results" class="dropdown-results">
                             <div class="results-header-compact">
                                 <div id="results-count-compact" class="results-count-compact">0 results</div>
                             </div>
                             <div id="results-list-compact" class="results-list-compact"></div>
-                        </div>
-
-                        <div class="step-panel-actions">
-                            <button class="reset-btn-minimal" onclick="restartMenu()"><span class="material-symbols-rounded" aria-hidden="true" translate="no">restart_alt</span><span data-i18n="wizard_start_over">Start Over</span></button>
                         </div>
                     </div><!-- /.dropdown-wizard -->
 
