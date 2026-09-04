@@ -7074,6 +7074,11 @@ body.step-review-modal-open { overflow: hidden; }
 
   .visual-flowchart-card-interactive {
     width: 360px;
+    /* The live/interactive step (checklists, drill-down assessment and
+       intervention wizards) is exempt from the shared reference-card height
+       cap: its content is shown in full and the canvas zooms out to fit it
+       instead, rather than shrinking the card and forcing it to scroll. */
+    max-height: none;
   }
 
   /* Step 1 of each tier is usually the most text-heavy card (principles,

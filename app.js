@@ -1699,6 +1699,30 @@ function getActiveStepTarget() {
     return document.getElementById('journey-step-slot') || document.getElementById('flowchart-steps');
 }
 
+// Look up the currently-live DOM element for a flowchart node, if any.
+function findLiveStepElement(activeNode) {
+    if (!activeNode) return null;
+    return document.querySelector(`.flowchart-step[data-node-id="${CSS.escape(activeNode.id)}"]`);
+}
+
+// Move an already-existing live step element into the given slot instead of
+// building a brand-new one, so any in-progress wizard selections (screener /
+// subtest / pillar dropdowns already enabled) survive a re-render that only
+// rebuilds the markup *around* the active step — e.g. toggling between the
+// standard/summary layouts while staying on the same step. Callers must only
+// pass an existingElement when the active node genuinely has not changed
+// since the previous render (see lastRenderedActiveNodeId below); reusing a
+// left-behind element from a *different*, already-answered step would show
+// that old, disabled step instead of a fresh editable one.
+function placeActiveStepInSlot(activeNode, slot, direction = 'forward', existingElement = null) {
+    if (!activeNode || !slot) return;
+    if (existingElement) {
+        if (existingElement.parentElement !== slot) slot.appendChild(existingElement);
+        return;
+    }
+    createIntegratedNodeElement(activeNode, slot, direction);
+}
+
 // Render the whole process inside the Your Decisions panel: answered steps
 // stay open and the current step opens in its own row below.
 // Dispatches to the correct layout mode (standard list or horizontal bubbles).
@@ -1721,6 +1745,17 @@ function renderJourneyStandard(direction = 'forward') {
     const activeStep = path[path.length - 1];
     const activeNode = activeStep ? tierDef.nodes[activeStep.nodeId] : null;
 
+    // Only reuse the already-live element when this render is for the exact
+    // same active step as the previous render (e.g. re-rendering the same
+    // step after toggling the standard/summary layout) — never when the
+    // active step has actually changed (moving forward, or going back to a
+    // previously-answered step), since a stale left-behind copy of a
+    // different step would show that old, disabled step instead of a fresh
+    // editable one.
+    const liveActiveStep = (vf.lastRenderedActiveNodeId && activeNode && vf.lastRenderedActiveNodeId === activeNode.id)
+        ? findLiveStepElement(activeNode)
+        : null;
+
     // The panel owns the whole process, so the old track stays empty.
     if (track) track.innerHTML = '';
 
@@ -1740,8 +1775,10 @@ function renderJourneyStandard(direction = 'forward') {
     // the steps already answered — never in a separate area below the list.
     const slot = document.getElementById('journey-step-slot');
     if (activeNode && slot) {
-        createIntegratedNodeElement(activeNode, slot, direction);
+        placeActiveStepInSlot(activeNode, slot, direction, liveActiveStep);
     }
+
+    vf.lastRenderedActiveNodeId = activeNode ? activeNode.id : null;
 
     refreshVisualFlowchartModal();
     ensureActiveStepPresent(activeNode, direction);
@@ -1763,6 +1800,13 @@ function renderJourneyHorizontal(direction = 'forward') {
     const activeStep = path[path.length - 1];
     const activeNode = activeStep ? tierDef.nodes[activeStep.nodeId] : null;
     const activeNumber = getActiveStepNumber();
+
+    // Only reuse the already-live element when this render is for the exact
+    // same active step as the previous render — see renderJourneyStandard for
+    // the full rationale.
+    const liveActiveStep = (vf.lastRenderedActiveNodeId && activeNode && vf.lastRenderedActiveNodeId === activeNode.id)
+        ? findLiveStepElement(activeNode)
+        : null;
 
     // Update progress count and bar
     const list = document.getElementById('journey-map-list');
@@ -1839,8 +1883,10 @@ function renderJourneyHorizontal(direction = 'forward') {
     // Render the active step question into the slot
     const slot = document.getElementById('journey-step-slot');
     if (activeNode && slot) {
-        createIntegratedNodeElement(activeNode, slot, direction);
+        placeActiveStepInSlot(activeNode, slot, direction, liveActiveStep);
     }
+
+    vf.lastRenderedActiveNodeId = activeNode ? activeNode.id : null;
 
     refreshVisualFlowchartModal();
     ensureActiveStepPresent(activeNode, direction);
@@ -2263,11 +2309,25 @@ function refreshVisualFlowchartModal() {
     const viewport = document.getElementById('visual-flowchart-viewport');
     if (!stage || !viewport || !appState.visualFlowchartModal) return;
 
-    // The live step element is moved into the stage, so park it back in its slot
-    // before the stage is re-rendered; otherwise re-rendering destroys it.
+    // The live step element is moved into the stage, so park it back in its
+    // slot before the stage is re-rendered; otherwise re-rendering destroys
+    // it. Only park it if it still matches the current active node — if the
+    // user has since moved to a different step (or gone back to answer an
+    // earlier one again), this is a stale leftover already represented
+    // elsewhere by a read-only "completed-step-view" summary, so it is
+    // discarded instead. Leaving it in the slot used to stack it underneath
+    // (or in front of) the real active step once the pathway view closed,
+    // which showed up as a step that looked permanently disabled/greyed out.
     const hostedStep = stage.querySelector('.visual-flowchart-active-host .flowchart-step');
-    const parkingSlot = document.getElementById('journey-step-slot');
-    if (hostedStep && parkingSlot) parkingSlot.appendChild(hostedStep);
+    if (hostedStep) {
+        const currentActiveNodeId = appState.visualFlowchart?.currentNodeId;
+        if (currentActiveNodeId && hostedStep.dataset.nodeId === currentActiveNodeId) {
+            const parkingSlot = document.getElementById('journey-step-slot');
+            if (parkingSlot) parkingSlot.appendChild(hostedStep);
+        } else {
+            hostedStep.remove();
+        }
+    }
 
     const entries = getVisualFlowchartEntries();
     const items = buildVisualFlowchartDisplayItems(entries);
