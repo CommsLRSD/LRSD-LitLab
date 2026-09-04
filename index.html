@@ -96,6 +96,10 @@
                 <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">folder_open</span>
                 <span class="nav-link-label" data-i18n="nav_resources">Resources</span>
             </button>
+            <button class="nav-link" data-page="faq" role="menuitem" aria-selected="false">
+                <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">quiz</span>
+                <span class="nav-link-label" data-i18n="nav_faq">FAQs</span>
+            </button>
             <button class="nav-link" data-page="history" role="menuitem" aria-selected="false">
                 <span class="material-symbols-rounded nav-icon" aria-hidden="true" translate="no">history</span>
                 <span class="nav-link-label" data-i18n="nav_history">History</span>
@@ -134,6 +138,10 @@
             <button class="mobile-nav-item" data-page="resources">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">folder_open</span>
                 <span data-i18n="nav_resources">Resources</span>
+            </button>
+            <button class="mobile-nav-item" data-page="faq">
+                <span class="material-symbols-rounded" aria-hidden="true" translate="no">quiz</span>
+                <span data-i18n="nav_faq">FAQs</span>
             </button>
             <button class="mobile-nav-item" data-page="history">
                 <span class="material-symbols-rounded" aria-hidden="true" translate="no">history</span>
@@ -547,6 +555,647 @@
                     </div>
                 </div><!-- /.resources-page-body -->
             </div><!-- /.resources-page-wrapper -->
+        </section>
+
+        <!-- ── FAQs ───────────────────────────────────────────── -->
+        <section id="faq-section" class="content-section" data-page="faq">
+            <div class="faq-page-wrapper">
+                <div class="hero-area">
+                    <h2 class="section-title" data-i18n="faq_section_title">FAQs</h2>
+                    <p class="section-subtitle" data-i18n="faq_section_subtitle">Answers to common questions about CTOPP-2, DIBELS, THaFol, and the LRSD literacy data portal</p>
+                </div>
+
+                <div class="faq-page-body">
+                    <div class="faq-container">
+                    <div class="faq-category">
+                      <h3 class="faq-category-title">CTOPP-2 FAQs</h3>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What is the CTOPP-2?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The Comprehensive Test of Phonological Processing - Second Edition (CTOPP-2) is a measure of phonological awareness, phonological memory, and naming. It is a standardized, norm-referenced assessment that should only be administered and interpreted with the support of an appropriately trained professional(s) (i.e., Clinical Services Staff). The purpose of the CTOPP-2’s use in LRSD, is to systematically support and inform appropriate screening, instruction, and intervention practices using a research-based assessment tool. It should not be used to diagnose a student as a standalone measure. Rather, it shoiuld be used to inform and direct more comprehensive in-depth conversation(s) about a student(s) with the broader student support team. Therefore, CTOPP-2 data, along with other collateral information (e.g., EYE, Reports Cards, K Questionnaire, School based testing, Observations, etc.), will be required to help guide the most appropriate programming and service needs using a Response to Intervention/Instruction Model (RTI).</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Where do I start the administration?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Begin with the first item of every subtest regardless of age.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What skills are measured by DIBELS and why are they important?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Yes, it is advised to administer them is the listed order and to not deviate from this sequence.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>When do I stop (discontinue)?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The administration of any subtest is discontinued if the student is unable to successfully complete the first three (Elision &amp; Blending) to four items (Memory for Digits – no score is recorded but administration continues) or properly identify the colors or numbers during the practice items.</p>
+                          <p>For the remainder of subtests, testing is stopped when the discontinue criterion is reached, or the final item is administered.</p>
+                          <p>For the RAN subtests the score is determined by the amount of time required to complete the task. On these subtests, testing is discontinued, and no score is recorded if the student cannot name all of the items correctly after error correction during the practice session. Additionally, if the examinee makes more than four naming errors, do not score this subtest.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>How long will this take?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Although testing times may vary from student-to-student testing time will take, on average, between 15-20 minutes per student.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What if the student is nonverbal, EAL, or has needs that may impair his/her ability to complete these subtests?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Although it is encouraged that the screening be completed with all students to support the development of their literacy profile, there will exist certain conditions where it may not be appropriate to do so. It is important that the student understands the instructions. This understanding is typically demonstrated by passing the initial items. You are encouraged to discuss these students with the larger school team (i.e., Teacher, Student Services, Clinicians, Learning Team, IPL/ERI, etc.) to discuss the feasibility, timing and utility of completing the CTOPP-2 screening tool.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What if the student wants to quit halfway through or doesn’t want to start?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>If a student wants to terminate testing half-way through or refuse to begin, you are encouraged to comfort and encourage the student to persist, if possible. However, it is also important to remember that this should be a positive experience for the student and this is of utmost importance. In this circumstance you may choose to take a break, start again on another day, or consult with your team members to determine if it is in the student’s best interest to continue. It is advised to resume testing with the student as soon as is possible.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Why are we using pre-recorded audio files?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Pre-recorded audio files are being utilized to ensure consistency of administration (standardization) and to reduce any administration errors.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Where can I find the audio files?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Audio files can be found here.</p>
+                          <p>Subtests that require the use of the audio recording are: Elision, Blending Words, Memory for Digits. It will be important to pause the recording after each item.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Can I repeat the recorded items on the Blending task?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Yes, items can be repeated only one additional time. If students fails to respond correctly, it is scored “0”.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Where can I find the training video?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The training video prepared by The University of Toronto – OISE can be found at this link.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What if the student answers with “I don’t know”?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Provide one prompt to respond and if they are still unable to provide an answer, score the item as incorrect.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What if they get 2 wrong and then continue to get one right then another wrong?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Continue until you have reached the indicated “Discontinue” rule (I.e., 3 incorrect OR “Don’t know” items in a row) indicated directly on the protocol.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What if the student doesn’t respond quickly?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The test authors indicate that the examiner should encourage the student to progress fairly rapidly through the tests and not spend too much time on specific items.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What if they are slow in responding on the Rapid Naming tests?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The authors suggest that if the student has not responded within 2 seconds of encountering an item the examiner should encourage a response; if none is forthcoming, the examiner should score the item as incorrect “0”. And prompt the student to proceed to the next item.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What if the student skips a line on the Rapid Naming tests?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>If the student skips a line, score the first number on the skipped line as incorrect and try to immediately redirect the student to the correct line.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What if the student names the wrong color/number or skips an item on the Rapid Naming subtest?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>It is marked as incorrect. Additionally, if the examinee makes more than four naming errors, do not score this subtest.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Do I point to the items on the Rapid Naming Tests?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Pointing is only suggested during the practice items (if necessary), to begin the test and to re-direct the student if they missed an item(s). Otherwise, the student should be able to track on their own. If they chose to track with their fingers, it should be noted on the protocol.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Does the time recorded for the RAN subtests begin with the practice items?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>No, it does not. Timing begins following the administration of the practice items when they name the first item.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>How do I score the RAN subtests?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The score is the total elapsed time required to administer ALL of the items (not including practice) and the number of errors. If the student has made more than 4 errors, do not score this subtest.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Should the tests be completed in one session?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>You should be able to complete all subtests in one session. If this is not possible, it is advised to complete them in as close succession as possible.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What about testing conditions and locations?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>It is advised to evaluate students under the most “optimal” conditions possible, which involves reducing all distractions (visual &amp; auditory), arranging for comfortable and appropriate seating, and ensuring the child is comfortable and at ease. It is also recommended that the student sit directly beside the examiner in order to observe and record accurately.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What if the student has prescription eyeglasses? Do they have to wear them?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Yes. If this is not possible, please note on the protocol that testing was completed without their prescription eyeglasses.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Where do I note my observations?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Observations can be noted in the margins of the subtest directly onto the test protocols. It should be further noted that from time to time, the examiner will have reason to believe that the results of a particular subtest are invalid (e.g., sick, confused, distracted, visibly, anxious). This should be noted and discussions with the larger team should occur to determine if a retest should occur.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Should I praise and or correct the student during the administration?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>It is recommended that you consistently praise and encourage the student, but that you avoid prompting, correcting (unless indicate to do so) and deviating from the testing procedures. Do not, through speech or gesture, comment on the accuracy of any item except those that serve as examples. The purpose of the screening is to evaluate what the student can do independently without support. Therefore, do not deviate from the printed instructions in an attempt to help the examinee understand the directions.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Why are there 2 protocols (Red and Blue)?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The CTOPP-2 has been normed for individuals aged 4 – 24years of age. The Red protocol is for children aged from 4 –6 while the Blue protocol is for individuals aged 7-24 years of age. For the purpose of our screening, we will primarily use the Red protocol.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Should I practice before doing my first administration?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>It is recommended by the authors that you practice giving the test on at least three times before using it in a “real situation”. Consult with someone who is experienced with test administration during the process.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="faq-category">
+                      <h3 class="faq-category-title">LRSD Portal FAQs</h3>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Where do I find information and materials about literacy in the LRSD?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Click here. <a href="https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy" target="_blank" rel="noopener noreferrer">https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy</a></p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="faq-category">
+                      <h3 class="faq-category-title">Literacy Data FAQs</h3>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Where can I find THaFOL training and materials?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Click here. hyperlink: https://lrsdcdn.sharepoint.com/sites/TeachingLearning/aer/Shared Documents/Forms/AllItems.aspx?id=%2Fsites%2FTeachingLearning%2Faer%2FShared%20Documents%2FEntering%20EY%20Screeners%20Data%2Epdf&amp;parent=%2Fsites%2FTeachingLearning%2Faer%2FShared%20Documents</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Where can I find information on using/accessing Power BI Reports?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Click here. <a href="https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/_layouts/15/stream.aspx?id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FOverview%20of%20Power%20BI%20Reports%20for%20Literacy%20and%20Numeracy%2Emp4&amp;referrer=StreamWebApp%2EWeb&amp;referrerScenario=AddressBarCopied%2Eview%2Ed7a6ec49%2D38c6%2D4055%2D9a4b%2D0518d0445374" target="_blank" rel="noopener noreferrer">https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/_layouts/15/stream.aspx?id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FOverview%20of%20Power%20BI%20Reports%20for%20Literacy%20and%20Numeracy%2Emp4&amp;referrer=StreamWebApp%2EWeb&amp;referrerScenario=AddressBarCopied%2Eview%2Ed7a6ec49%2D38c6%2D4055%2D9a4b%2D0518d0445374</a></p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="faq-category">
+                      <h3 class="faq-category-title">THaFol FAQs</h3>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Where can I find THaFOL training and materials?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Click here. HYPERLINK: https://lrsdcdn.sharepoint.com/sites/TeachingLearning/curriculum/Literacy/Early Literacy/Forms/AllItems.aspx?id=%2Fsites%2FTeachingLearning%2Fcurriculum%2FLiteracy%2FEarly%20Literacy%2FLRSD%20Literacy%20Assessments%2FTHaFol%20%2D%20French&amp;viewid=46f2e15a%2D621a%2D4c2d%2Da473%2D2d8c27980932&amp;csf=1&amp;web=1&amp;e=O9GLx1&amp;sw=auth&amp;CID=5640d494%2Db994%2D4950%2D90e4%2D05a886f2f2d2&amp;FolderCTID=0x012000F20499129962D74E9046ECDF35332B03</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="faq-category">
+                      <h3 class="faq-category-title">DIBELS FAQs</h3>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What is the DIBELS?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>DIBELS ® (Dynamic Indicators of Basic Early Literacy Skills) is a set of procedures and measures for assessing the acquisition of literacy skills. They are designed to be short (one minute) fluency measures that can be used to regularly detect risk and monitor the development of early literacy and early reading skills in kindergarten through eighth grade.</p>
+                          <p>When implemented as recommended, DIBELS results can be used to evaluate individual student development as well as provide grade-level feedback toward validated instructional objectives.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What should I know about proper use of the DIBELS?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>DIBELS assessment materials should not be used for student practice or coaching. Practice and coaching on the materials will invalidate the results. DIBELS should never be used to grade students. They are intended to be used to identify students who need additional instructional support.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What skills are measured by DIBELS and why are they important?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The critical skills necessary for successful beginning reading include: phonemic awareness, phonics, fluency, vocabulary, and comprehension. The DIBELS measures assess students on four of these five critical skills, which are often referred to as the “Big Ideas” of reading.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Can a student use a ruler or other tracking device to mark their spot on a probe?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Using a ruler or straightedge for tracking is an approved accommodation for those children who need it. The Administration and Scoring Guide includes a list of all approved accommodations. Accommodations should only be used with children who require them.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Can DIBELS be used with non-native English speakers?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Yes, DIBELS is designed to be administered to all students who are learning to read English. We don’t have any specific guidelines for administering DIBELS to students learning to speak and read English. While the measures are standardized and should be given to all students in the same manner, there are a few accommodations that can be made when necessary and are specified in the chapter on Approved Accommodations in the Administration and Scoring Guide available from our Download Materials page.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Can DIBELS be used with students in special education?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Yes, DIBELS can be used with special education students. DIBELS is designed to be administered to all students who are learning to read in English and who are physically capable of taking the tests. You would generally only exclude students who are deaf, who stutter, who are completely nonverbal, or who have severe phonological difficulties.</p>
+                          <p>During the benchmark screening of all students, students receiving special education should be administered grade-level materials. When progress monitoring you can use materials at the students’ instructional-level if the grade-level materials are too difficult to show response to instruction.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Can DIBELS scores be used on report cards?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>No. DIBELS scores should never be used to grade a student. The measures should only be used for instructional decision-making (i.e., to identify students who need additional instructional support and monitoring response to intervention). DIBELS scores should only be given to parents in conjunction with an appropriate explanation. Use our Parent Tip Sheet and our Parent Guide</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Can you repeat a word on Phoneme Segmentation Fluency (PSF) if a student asks you to?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>All efforts should be made to minimize the possibility of a child asking for a word to be repeated (e.g., relatively quiet assessment space, sit close to the child, speak clearly); however, there are times when it does occur and, if so, repeat the word. If it happens occasionally, it is “small stuff.” If it happens frequently for a particular child, you might want to check into hearing issues. If it happens frequently for many children, look at the assessment conditions and make necessary adjustments.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Do I need to give all three Oral Reading Fluency (ORF) passages?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>DIBELS 8th Edition only uses one ORF passage per benchmark period.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What scores can be generated from the DIBELS?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The DIBELS generates the following scores In Power BI:</p>
+                          <p>Subtest: The subtest risk statuses can be helpful in determining instructional groupings or understanding the underlying reasons for aggregate risk. They do not overrule the composite status.</p>
+                          <p>Composite: This score combines multiple DIBELS measures to provide an overall view of a student’s reading proficiency and is the best predictor of end-of year performance. The composite score iis therefore the most robust predictor of risk. It is superior to any one subtest in its reliability and in the accuracy of its predictors. As a result, we advise that schools use the composite score in determining overall risk in reading. In most cases, a student scoring in a single risk category on all the individual subtests will score in the same category for the composite score; however, specific cases exist where the subtest measures and composite colors may not align.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Are there situations where the subtest scores and composite scores will not align?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Yes, see examples below:</p>
+                          <p>Yellow subtests with red composite: Students who score at the lower end of the yellow (below benchmark) range on subtests may end up with a composite score in the red (well below benchmark) range.</p>
+                          <p>Varying subtest scores: In cases where students score at differing levels on subtests, the composite will not necessarily reflect an average of the subtest levels because the composite is not based on risk status. Instead, the more informative subtests will be given more weight. For example, if a student scores green on three subtests, yellow on one, and red on another, it matters which subtests are at which levels. If the student is in second or third grade and receives the red status on ORF-WRC, it is much more likely that student will obtain a yellow or even red composite score. In contrast, if that same student received the green status on NWF-CLS, WRF, and ORF-WRC, it is much more likely the student will obtain a green composite score, Importantly, even though the latter instance indicates a student is at benchmark, a red status on either NWF-WRC or ORF-ACC may be cause for concern and monitoring  depending on how deep in the red the student’s score is.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Do I need to keep testing students who score at Benchmark?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Yes. The benchmark goals increase over time, so a student who meets the beginning-of-year goal is not guaranteed to meet the middle- or end-of-year goal. Screening all students at each time period will enable timely identification of students who are not continuing to progress in their literacy development. Additionally, screening the entire school enables the school or district a complete data set to evaluate how all students are responding to instruction.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>How much time do DIBELS tests take?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Each of the DIBELS tests only takes about one minute to complete. DIBELS tests are “indicators” of the student’s overall reading status and are not intended to be in-depth or comprehensive measures of reading. Just like using a thermometer to take a child’s temperature, which provides a quick indicator of a child’s general health, these quick DIBELS tests provide teachers with information about a child’s reading health and how well he or she is progressing on a particular early reading skill. Benchmark assessments generally take 2 to 6 minutes to give, depending on the grade of the student and time of year. Teachers only need about 1 to 2 minutes to progress monitor students at each testing time. DIBELS measures allow teachers to get valuable information about students’ reading skills without using large amounts of instructional time.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>When do I use DIBELS Progress Monitoring Probes?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The key to effective progress monitoring of student interventions is selecting the appropriate subtest based on Benchmark risk and placement assessment indicators. The chosen subtest should align with the primary skill targeted by the intervention and should not be one where the student showed no risk.</p>
+                          <p>Letter Naming Fluency (LNF) should not be used for progress monitoring, as it’s more suited for identifying risk than measuring growth.</p>
+                          <p>Students with multiple areas of need and multi-component interventions may require monitoring across more than one subtest. However, when selecting a single subtest, preference should be given to Nonsense Word Fluency (NWF) and Oral Reading Fluency (ORF), as these are most effective at detecting growth over time.</p>
+                          <p>The chosen subtest should reflect the specific focus of intervention:</p>
+                          <p>Use Phoneme Segmentation Fluency (PSF) for phonological awareness-focused interventions.</p>
+                          <p>Use Word Reading Fluency (WRF) for sight word recognition interventions, especially if decoding is already strong.</p>
+                          <p>Maze can be used for progress monitoring reading comprehension, but only infrequently (e.g., twice between benchmark periods) due to the slow pace of growth in comprehension skills.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>How often do I use Progress Monitoring Probes?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Determining how often to monitor progress is crucial for students receiving intervention. In general, more frequent monitoring is recommended for foundational skills and more intensive interventions—but usually no more than once per week.</p>
+                          <p>For most students in kindergarten through third grade, monitoring every two weeks is recommended. In grades 4 and up, every 2–3 weeks may be sufficient due to typically slower growth in Oral Reading Fluency (ORF).</p>
+                          <p>For students at some risk receiving strategic support, monitoring every four weeks (or every 4–5 weeks in upper grades) is usually appropriate.</p>
+                          <p>An exception is the Maze subtest, which measures reading comprehension. Because comprehension improves more slowly, it should only be used for progress monitoring once or twice between benchmark periods (about once per month).</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Do the Progress Monitoring (PM) Probes get more difficult within a grade level? Which PM probe should I use?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The passages are intended to be equivalent in grade level. They do not progress in difficulty in any systematic manner. Each passage balances decodability, Lexile level, and various measures of comprehensibility. You can find out more about this in the Appendix A of the Administration and Scoring Guide.</p>
+                          <p>The guide can be accessed from the Testing Materials Page. Just click on the “DOWNLOAD DIBELS MATERIALS” button and the Guide is the first link on the page after the click-through use agreement.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>How do I know if a student is responding to interventions?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Judging whether a student is responding to intervention can be challenging. While past research suggested waiting for eight or more assessments, DIBELS 8 recommends a more timely approach based on student growth goals.</p>
+                          <p>An end-of-year benchmark goal should be set, and student progress should be tracked using an aimline—a straight line from the starting benchmark score to the end-of-year goal. If a student’s scores stay on or above the aimline, they are likely responding well to intervention. However:</p>
+                          <p>If a student has four consecutive scores below the aimline, this signals the need to adjust the intervention or, for Grades 1 and up, consider off-grade-level monitoring.</p>
+                          <p>For Oral Reading Fluency (ORF), due to its reliability, only three scores below the aimline indicate a need for change.</p>
+                          <p>While the guide does not give strict rules for when to discontinue intervention, reaching the end-of-year benchmark is typically a good reason to do so, depending on the student’s progress and available resources.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Does the DIBELS identify Dyslexia?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>No. Risk on LNF and PSF subtests in kindergarten and first grade and NWF in first through third grade could be used to understand potential risk for dyslexia. It is important to recognize that these tools are intended to screen for risk and do not render diagnosis regarding dyslexia. While DIBELS measures effectively capture most students with true reading difficulty, many students who are flagged may not prove to meet criteria for dyslexia diagnosis on a more comprehensive evaluation protocol.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What is OFF-grade Progress Monitoring?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Another challenge in progress monitoring is knowing when to use off-grade-level forms for students significantly behind. For students in Grades 1–8 who begin the year at or below the 10th percentile on national DIBELS 8 norms—especially older students with a history of risk—off-grade-level progress monitoring may be appropriate.</p>
+                          <p>Start by trying one grade level below, and go further down only if the student also scores at or below the 10th percentile for that grade. Alternatively, off-grade-level monitoring may be needed when:</p>
+                          <p>3+ ORF scores or 4+ scores on other subtests fall below the aimline, indicating the intervention is not working.</p>
+                          <p>Benchmarking must always be done using on-grade-level forms, even if progress monitoring uses lower-level materials. When using off-grade-level monitoring, it’s recommended to:</p>
+                          <p>Occasionally test with on-grade-level forms every 4–6 weeks.</p>
+                          <p>Move the student back to on-grade-level monitoring once they meet the end-of-year benchmark goal on the off-grade-level subtest.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>How do I explain DIBELS scores to parents and families?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Checkout DIBELS Tips for Families and our Parent Guide to DIBELS Assessment which can be found on this resources page.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>How do I score a student who finishes before the full minute is up?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>If a student completes the assessment in less than one minute, you end the assessment and record the score.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>How do I score a student who responds with individual sounds and a blend during Nonsense Word Fluency (NWF)?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>You score the last thing that the student responded with based on the directions in the Administration and Scoring Guide, available from our Download Materials page. Credit can be given for WRC when the blend is correct and it occurs after the student says the individual letter sounds.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>How do I score proper nouns in Oral Reading Fluency (ORF)?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>You can accept an answer as correct if the student provides (a) a reasonable phonetic pronunciation of the name, or (b) the correct pronunciation of the name if the correct pronunciation of the name is non-regular and the tester knows the correct pronunciation. The developers worked hard to ensure that included names are reasonably accessible. During standardized administration the tester provides the correct pronunciation if the student struggles for 3 seconds.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>I can’t find the student materials for Phoneme Segmentation Fluency (PSF)?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>The Kindergarten and 1st grade benchmark booklets include PSF scoring sheets. There are no student materials for PSF since it’s an auditory measure.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>If a student repeatedly reads a word incorrectly during Oral Reading Fluency (ORF), is it marked wrong every time?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Yes, when scoring ORF you are counting the words read correctly. If a student does not read a word correctly, they do not get credit for it.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Is there a window for when to Benchmark students?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Roughly, the windows for benchmark are as follows:</p>
+                          <p>Beginning of year – Month 1-3 of the school year</p>
+                          <p>Middle of year – month 4-6 of the school year</p>
+                          <p>End of year – month 7-9 of the school year</p>
+                          <p>Generally you would want to administer earlier in the window for BOY, middle for MOY, and end for EOY to get the best assessment of growth and alignment to how benchmarks were set.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Should I teach nonsense words to students?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>No, you should teach your students letter-sound correspondences and blending. Once students begin developing these skills, their performance will generalize to the NWF score.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Should the tester or student read the title of the Oral Reading Fluency (ORF) passage?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>No. The directions indicate that you direct the students to the first word of the passage. If they do accidentally read the title and hesitate for 3 seconds on a word, then you should supply the correct word. Do not start the timer until they read the first word of the passage.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What do I do if a student skips an entire line when reading an Oral Reading Fluency (ORF) passage?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>If a student skips an entire line during ORF, draw a line through the row and count the words as incorrect when scoring.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>What do I do if I run out of progress monitoring probes?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>If you run out of probes (i.e., finish all 20 probes), you can start over at the beginning of the booklet. Note that you should only repeat a passage when progress monitoring, and only in this specific instance.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Why are there no Letter Naming Fluency (LNF) progress monitoring materials?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Letter Naming Fluency should not be progress monitored. It is different from the other measures in that it is not aligned with one of the five major skill areas in beginning reading. It’s used for benchmark screening because it is a good indicator of risk, but shouldn’t be monitored beyond that.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Why do the 3rd grade and 4th grade benchmarks go up in the Middle of Year and down again at the End of Year?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Cut-scores are determined using Receiver Operating Curve analyses and choosing a score that optimally predicts to end of year reading performance. In this case, the passage for the middle of the year simply results in faster reading rates for high-achieving students. It most likely has to do with the content of the passages.</p>
+                        </div>
+                      </div>
+                      <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                          <span>Why does DIBELS 8th Edition have only 1 Oral Reading Fluency (ORF) passage for benchmark screening?</span>
+                          <span class="faq-icon"><span class="plus"></span></span>
+                        </button>
+                        <div class="faq-answer">
+                          <p>Administering one ORF passage saves considerable testing time, and research shows it provides nearly the same screening accuracy as administering three passages.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <p class="faq-footnote">Adapted from: DIBELS – Frequently Asked Questions &amp; Chapter 4: Progress Monitoring with DIBELS 8th Edition</p>
+                    </div>
+
+                    <!-- total items: 64 -->
+                </div><!-- /.faq-page-body -->
+            </div><!-- /.faq-page-wrapper -->
         </section>
 
         <!-- ── ABOUT ──────────────────────────────────────────── -->

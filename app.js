@@ -768,11 +768,14 @@ function toggleFAQ(element) {
     // Close all FAQs
     document.querySelectorAll('.faq-item').forEach(item => {
         item.classList.remove('active');
+        const question = item.querySelector('.faq-question');
+        if (question) question.setAttribute('aria-expanded', 'false');
     });
     
     // Open clicked FAQ if it wasn't active
     if (!wasActive) {
         faqItem.classList.add('active');
+        element.setAttribute('aria-expanded', 'true');
     }
 }
 
